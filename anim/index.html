@@ -1,1 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>planeclick6.html</title>
+<meta charset="utf-8">
+<link rel="icon" type="image/png" href="img/grad.png">
+<meta name="description" content="Click on plane">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+
+<style>
+body{margin:0px;border:0px;background-color:#024;font-family:Monospace;overflow:hidden;}
+span{position:absolute;color:#ff0;font-size:14pt;}
+</style>
+
+<script type="importmap">
+	{
+		"imports": {
+			"three": "https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.module.min.js",
+			"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.174.0/examples/jsm/"
+		}
+	}
+</script>
+
+</head>
+
+<body>
+
+<span id="sp" style="left:10px;top:5px;"></span>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+var camera, scene, renderer, controls,sphere;
+var iw=window.innerWidth,ih=window.innerHeight;
+var raycaster=new THREE.Raycaster(),selected,intersects=[],alvos=[];
+var mouse=new THREE.Vector2();
+var plane,line,sphere,geometry,material;
+var points=[];
+var sim=0;
+
+
+	camera = new THREE.PerspectiveCamera(50,window.innerWidth/window.innerHeight,0.1,1000);
+	camera.position.set(0,25,100);
+	scene=new THREE.Scene();
+
+	renderer= new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setPixelRatio( window.devicePixelRatio );
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	renderer.setClearColor('#024',1);
+	document.body.appendChild(renderer.domElement);
+
+	window.addEventListener("mousedown",onClick);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+
+	const mat=new THREE.MeshNormalMaterial({side:THREE.DoubleSide});
+	plane=new THREE.Mesh(new THREE.PlaneGeometry(50,50),mat);
+	alvos.push(plane);
+	scene.add(plane);
+
+	//points.push(new THREE.Vector3(0,2,0)) ;
+	///geometry=new THREE.BufferGeometry().setFromPoints(points);
+	material=new THREE.LineBasicMaterial({color:'#fff'});
+	//line=new THREE.Line(geometry,material);
+	//scene.add(line);
+
+	const luz=new THREE.AmbientLight("#fff",1);scene.add(luz);
+  
+function onClick(event){
+	mouse.x=( event.clientX/window.innerWidth)*2-1;
+	mouse.y=-( event.clientY/window.innerHeight)*2+1;
+	raycaster.setFromCamera(mouse,camera);
+	intersects=raycaster.intersectObjects(alvos);
+	if(intersects.length>0){
+		const position=intersects[0].point;
+		console.log("Clicked on plane at:",intersects[0].point);
+		points.push(new THREE.Vector3(intersects[0].point.x,intersects[0].point.y,0.1)) ;
+		if(sim==0){
+			geometry=new THREE.SphereGeometry(0.2,16,16);
+			sphere=new THREE.Mesh(geometry,material);
+			sphere.position.copy(position);
+			sphere.position.z=0.1;;
+			scene.add(sphere);
+			geometry=new THREE.BufferGeometry().setFromPoints(points);
+			line=new THREE.Line(geometry,material);
+			scene.add(line);
+			sim=1;
+		}else{
+			scene.remove(line);
+			geometry=new THREE.BufferGeometry().setFromPoints(points);
+			line=new THREE.Line(geometry,material);
+			scene.add(line);
+		}
+	}
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	controls.update();
+	renderer.render(scene,camera);
+}
+
+animate();
+
+</script>
+</body>
+</html>
 
