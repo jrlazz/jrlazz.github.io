@@ -1,3 +1,3 @@
 # jrlazz.github.io
-My GitHub Site<br>
+<h1 style="color:#090;">My GitHub Site<br>
 <img src="ag_baboy.gif">
