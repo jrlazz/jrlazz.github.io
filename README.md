@@ -1,5 +1,5 @@
 # jrlazz.github.io
 <h2 style="color:#06c;">My GitHub Site<br>
 <img src="ag_baboy.gif"><br>
-<a href="./vivian/jtm.html" target="_blank" style="font-size:12pt;">Jardim de Todo Mundo</a><br>
+<a href="jrlazz.github.io/vivian/jtm.html" target="_blank" style="font-size:12pt;">Jardim de Todo Mundo</a><br>
 <a href="https://jrlazz.eu5.org/" target="_blank">Freewha</a>
