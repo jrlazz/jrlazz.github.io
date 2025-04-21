@@ -1,1 +1,249 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
 
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+<meta charset="UTF-8">
+
+<title>index.html</title>
+
+<!-- fundovalendomesmoweb.jpg (jtm) -->
+
+<style>
+
+body { overflow: hidden; margin: 0; background: #f4f9d0;}
+div { position:absolute; left:-5000px; top:-5000px; width:0px; height:0px; font-size:14pt;}
+.spana { position:absolute; left:10px; top:10px;}
+.spanb { position:absolute; left:10px; top:40px;}
+.freewha { position:absolute; left:0px; top:0px;}
+
+#main-img {
+  display: block; margin: 0px auto;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  -webkit-filter: grayscale(0); filter: grayscale(0);}
+
+#zoom-img {
+  pointer-events: none;
+  position: relative;
+  top: 50%;
+  left: 50%;
+}
+
+#zoom {
+  position: absolute;
+  width: 400px;
+  height: 200px;
+  border-radius: 1%;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+/*  border: 2px solid #c00;*/
+}
+
+</style>
+
+</head>
+
+<!--
+ onmousemove="showCoords(event);"
+-->
+
+<body>
+
+<!-- 
+<img style="position:absolute;left:100px;top:100px;" id="main-img" src="../img/jtm02.jpg" width="100%" />
+-->
+
+
+<img id="main-img" src="../img/jtm02.jpg" width="100%" />
+<div id="zoom">
+<img id="zoom-img" />
+</div>
+
+<div id="divb" style="display:none;">
+<img id="ima" src="../img/sinal.png" />
+</div>
+
+
+<!-- <img id="free" class="freewha" src="../img/free_r2.png" /> -->
+
+<span class="spana" id="alerta1"></span><br>
+<span class="spanb"  id="alerta2"></span><br>
+
+
+<script src='../js/mag01.js'></script>
+
+<script id="rendered-js">
+
+var w=0;
+var wa=0;
+var h=0;
+
+var locx=0;
+var locy=0;
+var tamx=0;
+var tamy=0;
+
+var zoom = document.querySelector("#zoom");
+var zoomImg = document.querySelector("#zoom-img");
+var mainImg = document.querySelector("#main-img");
+var enterTL = new TimelineMax({ paused: true });
+var timer = TweenLite.delayedCall(3, () => enterTL.reverse()).pause();
+
+var cx, cy, ratio;
+
+window.addEventListener("load", init);
+
+function init() {
+	zoomImg.src = mainImg.src;
+	ratio = mainImg.naturalWidth / mainImg.width;
+	resize();
+
+	TweenLite.set([zoom, zoomImg], { xPercent: -50, yPercent: -50 });
+	TweenLite.set(zoom, { autoAlpha: 0, scale: 0 });
+
+	enterTL.
+	to(mainImg, 0.5, { filter: "grayscale(0)", "-webkit-filter": "grayscale(0)" }, 0).
+	to(zoom, 0.5, { autoAlpha: 1, scale: 1.0 }, 0);
+//	to(mainImg, 0.5, { filter: "grayscale(1)", "-webkit-filter": "grayscale(1)" }, 0).
+//	to(zoom, 0.5, { autoAlpha: 1, scale: 1.5 }, 0);
+
+	window.addEventListener("resize", resize);
+	mainImg.addEventListener("mouseleave", leaveAction);
+	mainImg.addEventListener("mousemove", moveAction);
+}
+
+function leaveAction() {
+	enterTL.reverse();
+}
+
+function moveAction(e) {
+
+	w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+	if(w!=wa){location.reload();}
+
+	enterTL.play();
+	//timer.restart(true);
+//	TweenLite.set(zoom, { x: e.x, y: e.y });
+	TweenLite.set(zoom, { x: locx, y: locy });
+	TweenLite.set(zoomImg, { x: (cx - e.x) * ratio, y: (cy - e.y) * ratio });
+
+	if( e.y>(ymaiorque) && e.y<(ymenorque) && e.x>(xmaiorque) && e.x<(xmenorque)){
+		document.getElementById("zoom").style.display="none";
+		document.getElementById("divb").style.display="inline-block";
+	} else {
+		document.getElementById("zoom").style.display="inline-block";
+		document.getElementById("divb").style.display="none";
+	}
+
+
+//	document.getElementById("alerta2").innerText=e.x + " " + e.y;
+}
+
+function resize() {
+  var rect = mainImg.getBoundingClientRect();
+  cx = rect.left + rect.width / 2;
+  cy = rect.top + rect.height / 2;
+}
+
+function showCoords(event) {
+	xx = event.clientX;
+	yy = event.clientY;
+	document.getElementById("alerta1").innerText=xx + " " + yy;
+}
+
+
+w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+wa = w;
+h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
+var xmaiorque=(w/1366)*1028;
+var xmenorque=(w/1366)*1340;
+var ymaiorque=(w/1366)*125;
+var ymenorque=(w/1366)*352;
+
+//document.getElementById("free").src="../img/poweredby.png";
+//document.getElementById("free").style.left= w - 180 + "px";
+//document.getElementById("free").src="../img/freewha.png";
+//document.getElementById("free").style.left= w - 169 + "px";
+//document.getElementById("free").src="../img/free_r2.png";
+//document.getElementById("free").style.left= w - 186 + "px";
+
+locx=(w/1366)*(1077+100);
+locy=(w/1366)*(159+70);
+
+tamx=(w/1366)*300;
+tamy=(w/1366)*210;
+
+document.getElementById("zoom").style.width=tamx + "px";
+document.getElementById("zoom").style.height=tamy + "px";
+
+document.getElementById("divb").style.left= xmaiorque + "px";
+document.getElementById("divb").style.top= ymaiorque + "px";
+
+document.getElementById("ima").width= tamx;
+document.getElementById("ima").height= tamy;
+
+
+/*
+
+window.onload = userAgentDetect;
+
+function userAgentDetect() {
+  if(window.navigator.userAgent.match(/Mobile/i)
+  || window.navigator.userAgent.match(/iPhone/i)
+  || window.navigator.userAgent.match(/iPod/i)
+  || window.navigator.userAgent.match(/IEMobile/i)
+  || window.navigator.userAgent.match(/Windows Phone/i)
+  || window.navigator.userAgent.match(/Android/i)
+  || window.navigator.userAgent.match(/BlackBerry/i)
+  || window.navigator.userAgent.match(/webOS/i)) {
+    document.body.className += ' mobile';
+    alert('True - Mobile - ' + navigator.userAgent);
+  } else {
+    alert('False - Mobile - ' + navigator.userAgent);
+  }
+
+  if(window.navigator.userAgent.match(/Tablet/i)
+  || window.navigator.userAgent.match(/iPad/i)
+  || window.navigator.userAgent.match(/Nexus 7/i)
+  || window.navigator.userAgent.match(/Nexus 10/i)
+  || window.navigator.userAgent.match(/KFAPWI/i)) {
+    document.body.className -= ' mobile';
+    document.body.className += ' tablet';
+    alert('True - Tablet - ' + navigator.userAgent);
+  } else {
+    alert('False - Tablet - ' + navigator.userAgent);
+  }
+
+  if(window.navigator.userAgent.match(/firefox/i)) {
+    document.body.className -= ' mobile';
+    document.body.className += ' tablet';
+    alert('True' + navigator.userAgent);
+  } else {
+    alert('False' + navigator.userAgent);
+  }
+
+  var res = (window.navigator.userAgent).toLowerCase();
+  alert(res.search("firefox"));
+  alert(res.search("android"));
+}
+
+*/
+
+
+
+//$firemobo=stripos($useragent,"firefox")-stripos($useragent,"android");
+//if ( $device || ($firemobo==55) ){header("Location: $irpara");}
+
+
+//# sourceURL=pen.js
+</script>
+
+</body>
+</html>
