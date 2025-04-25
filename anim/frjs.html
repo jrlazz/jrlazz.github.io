@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>file_read_js.html</title>
+<meta charset="utf-8" />
+<link rel="icon" type="image/png" href="img/grad.png">
+<meta name="description" content="FontLoader text around the cylinder">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+
+<style>
+body {margin:0;background-color:#036;font-family:Lucida Console;font-size:9pt;color:#ff0;overflow:hidden;}
+a {text-decoration:none;}
+a:link {color:#ff0;}
+a:visited {color:#ff0;}
+a:hover {color:#ff0;}
+a:active {color:#ff0;}
+</style>
+
+</head>
+
+<body>
+
+<span style="position:absolute;width:99%;top:10px;font-size:16pt;color:#ff0;text-align:center;">
+
+<script>
+
+var xmlhttp = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+
+xmlhttp.onreadystatechange = function () {
+	if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+		alert(xmlhttp.responseText);
+		console.log(xmlhttp.responseText);
+        }
+}
+
+xmlhttp.open("GET", "3ds.txt", true);
+xmlhttp.send();
+
+
+</script>
+</body>
+</html>
