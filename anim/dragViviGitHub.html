@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>dragViviGitHub.html</title>
+<meta charset="utf-8">
+<link rel="icon" type="image/png" href="img/github-mark.png">
+<meta name="description" content="Construct a City">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+
+<style>
+@font-face {font-family:cas;src:url(../fonte/Cascadia.ttf);}
+body{margin:0px;overflow:hidden;background-color:#06a;}
+span{position:absolute;font-family:cas;font-size:14pt;color:#fc0;text-align:center;z-index:1;}
+label{width:100px;text-align:center;}
+.btn{position:absolute;left:5px;top:25px;color:#fff;font-family:cas;font-size:10pt;background-color:#06a;border:1px outset #fff;padding:2px;display:z-index:1;}
+.btn:hover{background-color:#f00;border:1px inset #fff;}
+</style>
+
+<!--
+<script type="importmap">
+	{
+	  "imports": {
+		"three": "https://unpkg.com/three@0.173.0/build/three.module.min.js",
+		"three/addons/": "https://unpkg.com/three@0.173.0/examples/jsm/"
+	  }
+	}
+</script>
+
+
+<script type="importmap">{"imports":{"three":"https://esm.sh/three@0.175.0/build/three.module.js","three/addons/":"https://esm.sh/three@0.175.0/examples/jsm/"}}</script>
+-->
+
+</head>
+
+<script src="../js122/FileSaver.js"></script>
+
+<body>
+
+<span style="left:5px;top:5px;font-size:7pt;font-family:cas;cursor:pointer;">right click &rarr; inspect</span>
+<span id="spanC" style="left:10%;top:5px;width:80%;color:#ff0;text-align:center;z-index:2;"></span>
+<span id="spanG" style="left:800px;top:0px;font-size:10pt;color:#fff;z-index:2;display:none;"></span>
+
+<div id="divA" style="position:absolute;left:10px;top:10px;width:180px;height:320px;font-family:cas;font-size:12pt;color:#fff;background-color:#06a;padding:8px;border:3px ridge #06a;display:none;z-index:2;">
+Once pointed and without moving the mouse, You can keypress for additional moves.
+<br><br>
+A: left<br>
+D: right<br>
+W: up<br>
+S: down<br>
+F: front<br>
+B: back<br>
+R: rotate<br><br>
+Z: brings to origin<br><span style="font-size:10pt;">(must reposition!)</span>
+</div>
+
+<label id="labA" class="btn" style="top:25px;">load a file
+<input type='file' accept='text/plain' onchange='openFile(event)' style="position:absolute;display:none;">
+</label>
+<div id='output' style="position:absolute;left:50px;top:50px;width:200px;height:200px;overflow-y:scroll;display:none;"></div>
+<label id="labB" class="btn" style="top:50px;">load example</label>
+<label id="labC" class="btn" onclick="repla();" style="top:75px;">clear screen</label>
+<label id="labD" class="btn" style="top:100px;">save a file</label>
+
+<script type="module">
+
+import * as THREE from '../js122/three.module.min.js';
+import { OrbitControls } from '../js122/OrbitControls.js';
+import { MTLLoader } from '../js122/MTLLoader.js';
+import { OBJLoader } from '../js122/OBJLoader.js';
+//import { DDSLoader } from '../js122/DDSLoader.js';
+import { FontLoader} from '../js122/FontLoader.js';
+import { TextGeometry } from '../js122/TextGeometry.js';
+
+
+/*
+
+import * as THREE from '../js/three.module_res_res.js';
+import { OrbitControls } from '../js/OrbitControls_res_res.js';
+import { MTLLoader } from '../js/MTLLoader_res_res.js';
+import { OBJLoader } from '../js/OBJLoader_res_res.js';
+import { DDSLoader } from '../js/DDSLoader_res_res.js';
+import { FontLoader} from '../js/FontLoader_res_res.js';
+import { TextGeometry } from '../js/TextGeometry_res_res.js';
+
+
+import * as THREE from "three";
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+import { DDSLoader } from 'three/addons/loaders/DDSLoader.js';
+import { FontLoader } from "three/addons/loaders/FontLoader.js";
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+import { BufferGeometryUtils } from 'three/addons/geometries/BufferGeometryUtils.js';
+*/
+	var container,stats;
+	var camera, controls, scene, renderer;
+	var objects=[];
+	var plane=new THREE.Plane();
+	var raycaster=new THREE.Raycaster();
+	var mouse=new THREE.Vector2();
+	var offset=new THREE.Vector3();
+	var intersection=new THREE.Vector3();
+	var Selected, Dragged;
+	var intersects=[];
+	var kd;
+	var arr=new THREE.Group();
+
+var cube;
+var geo=[];
+var sgeo=[];
+var tex=[];
+var mat=[];
+var mesh=[];
+var lig=[];
+
+var extrudeSettings;
+
+var jeto=[];
+var veto=[];
+var qual=0;
+
+var kjeto=0;
+
+var str="";
+var salvo=0;
+var blob;
+
+var mAr=[];
+var yAr=[];
+
+var jafui=0;
+
+var w1=0;
+var w2=0;
+var w3=0;
+
+var loader;
+var text;
+var font=undefined;
+
+var vem;
+
+function init() {
+
+
+
+
+	async function loadText(url) {
+		text = await fetch(url);
+		//awaits for text.text() prop 
+		//and then sends it to readText()
+		readText(await text.text());
+	}
+
+	function readText(text){
+		vem=text.replace(/(\r\n|\n|\r)/gm, '');
+		//console.log(text.replace(/(\r\n|\n|\r)/gm, ''));
+	}
+
+	loadText('block.txt');
+
+	var exam=document.getElementById('labB');
+	exam.onclick=function examme(){rst();}
+	var save=document.getElementById('labD');
+	save.onclick=function saveme(){salvo=1;xyz();}
+
+	camera=new THREE.PerspectiveCamera(50,window.innerWidth/window.innerHeight,1,1000);
+	camera.position.set(0,3,20);
+
+	scene=new THREE.Scene();
+	scene.position.set(-0.5,0,0);
+
+	lig[1]=new THREE.AmbientLight(0xffcc99,0.01);
+	scene.add(lig[1]);
+		lig[2]=new THREE.PointLight(0xffcc99,1);
+		lig[2].position.set(20,4,50);
+		scene.add(lig[2]);
+	lig[3]=new THREE.PointLight(0xffcc99,1);
+	lig[3].position.set(50,25,0);
+	scene.add(lig[3]);
+		lig[4]=new THREE.PointLight(0xffcc99,1);
+		lig[4].position.set(-50,4,-50);
+		scene.add(lig[4]);
+	lig[5]=new THREE.PointLight(0xffcc99,0.5);
+	lig[5].position.set(-20,5,0);
+	scene.add(lig[5]);
+
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.sortObjects=false;
+	renderer.setClearColor('#06a',1.0);
+
+
+	document.body.appendChild(renderer.domElement);
+
+	renderer.domElement.addEventListener('pointermove',onDocumentMouseMove,false);
+	renderer.domElement.addEventListener('pointerdown',onDocumentMouseDown,false);
+	renderer.domElement.addEventListener('pointerup',onDocumentMouseUp,false);
+	document.addEventListener('keydown',onDocumentKeyDown,false);
+	window.addEventListener('resize',onWindowResize,false);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	controls.minDistance=1;
+	controls.maxDistance=50;
+	controls.enablePan=true;
+	controls.enableDamping=true;
+
+	const manager=new THREE.LoadingManager();
+	manager.onStart=function(url,itemsLoaded,itemsTotal){console.log('Started loading file:'+url+'.\nLoaded '+itemsLoaded+' of '+itemsTotal + ' files.' );};
+	manager.onLoad=function(){console.log('Loading complete!');};
+	manager.onProgress=function(url,itemsLoaded,itemsTotal){console.log('loading texture'+url+' '+(itemsLoaded/itemsTotal*100)+'%');};
+	manager.onError=function(url){console.log('Error loading texture:'+url);};
+	//manager.addHandler(/\.dds$/i,new DDSLoader());
+
+	loadOBJ ("models/extras/","tun.mtl","tun.obj",scene,function(tuna){
+		var object=tuna.clone();
+		object.position.x=0;
+		object.scale.set(1,1,1);
+		object.position.set(0.5,8,-20);
+		cube=object;
+		scene.add(object);
+	});
+
+	var grid=new THREE.GridHelper(128,128);//size,divisions
+	grid.material.color.setHex(0x9999cc);
+	grid.position.set(0.5,-0.5,0.5);
+	scene.add(grid);
+
+// Blocks ******** ******** ********
+
+	// House
+	geo[1]=new THREE.BoxGeometry(1,1,1);
+	loader=new THREE.TextureLoader(manager);
+	mat[1]=[
+		new THREE.MeshBasicMaterial({map:loader.load("img/blocos/256jantra.png"),transparent:true,side:THREE.DoubleSide}),
+		new THREE.MeshBasicMaterial({map:loader.load("img/blocos/256jan.png"),side:THREE.DoubleSide}),
+		new THREE.MeshBasicMaterial({map:loader.load("img/blocos/cinblk.png"),side:THREE.DoubleSide}),
+		new THREE.MeshBasicMaterial({map:loader.load("img/blocos/cinblk.png"),side:THREE.DoubleSide}),
+		new THREE.MeshBasicMaterial({map:loader.load("img/blocos/256jan.png"),side:THREE.DoubleSide}),
+		new THREE.MeshBasicMaterial({map:loader.load("img/blocos/256jan.png"),side:THREE.DoubleSide}),
+	];
+	mesh[1]=new THREE.Mesh(geo[1],mat[1]);
+	for(let k=1;k<21;k++){
+		kjeto++;
+		jeto[kjeto]=mesh[1].clone();
+		jeto[kjeto].name="obj"+kjeto;
+		jeto[kjeto].position.set(-12,5,-20);
+		scene.add(jeto[kjeto]);
+		objects.push(jeto[kjeto]);
+		veto[kjeto]="House";
+	}
+
+	// Roof
+	var length=0.5;var width=1;
+	var shape=new THREE.Shape();
+	shape.moveTo(0,0);
+	shape.lineTo(0,width);
+	shape.lineTo(length,0);
+	shape.lineTo(0,0);
+		extrudeSettings={steps:1,depth:1,bevelEnabled:false,bevelThickness:0,bevelSize:0,bevelOffset:0,bevelSegments:0};
+	geo[2]=new THREE.ExtrudeGeometry(shape,extrudeSettings);
+	mat[2]=new THREE.MeshBasicMaterial({color:0xff0000});
+	mesh[2]=new THREE.Mesh(geo[2],mat[2]);
+	mesh[2].rotation.set(Math.PI,0,Math.PI);
+	mesh[2].position.set(0,-0.5,0.5);
+		geo[3]=new THREE.ExtrudeGeometry(shape,extrudeSettings);
+		mat[3]=new THREE.MeshBasicMaterial({color:0xff0000});
+		mesh[3]=new THREE.Mesh(geo[3],mat[3]);
+		mesh[3].position.set(0,-0.5,-0.5);
+	geo[4]=new THREE.BoxGeometry(1,1,1);
+	mat[4]=new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:0.0});
+	mesh[4]=new THREE.Mesh(geo[4],mat[4]);
+		mesh[4].add(mesh[2]);
+		mesh[4].add(mesh[3]);
+	for(let k=1;k<21;k++){
+		kjeto++;
+		jeto[kjeto]=mesh[4].clone();
+		jeto[kjeto].name="obj"+kjeto;
+		jeto[kjeto].position.set(-9.5,5,-20);
+		scene.add(jeto[kjeto]);
+		objects.push(jeto[kjeto]);
+		veto[kjeto]="Roof";
+	}
+
+	// Roof big
+	length=1;width=2;
+	shape=new THREE.Shape();
+	shape.moveTo(0,0);
+	shape.lineTo(0,width);
+	shape.lineTo(length,0);
+	shape.lineTo(0,0);
+		extrudeSettings={steps:1,depth:1,bevelEnabled:false,bevelThickness:0,bevelSize:0,bevelOffset:0,bevelSegments:0};
+	sgeo[5]=new THREE.Geometry();
+	geo[5]=new THREE.ExtrudeGeometry(shape,extrudeSettings);
+	geo[6]=new THREE.ExtrudeGeometry(shape,extrudeSettings);
+	geo[7]=new THREE.PlaneGeometry(1,0.01);
+		mesh[5]=new THREE.Mesh(geo[5]);
+		mesh[5].rotation.set(Math.PI,0,Math.PI);
+		mesh[5].position.set(0.5,-0.5,0.5);
+		mesh[5].updateMatrix();
+//THREE.GeometryUtils.merge(totalGeom, cubeMesh);
+		sgeo[5].merge(mesh[5].geometry,mesh[5].matrix);
+	mesh[6]=new THREE.Mesh(geo[6]);
+	mesh[6].position.set(0.5,-0.5,-0.5);
+	mesh[6].updateMatrix();
+	sgeo[5].merge(mesh[6].geometry,mesh[6].matrix);
+		mesh[7]=new THREE.Mesh(geo[7]);
+		mesh[7].position.set(0,0,0);
+		mesh[7].updateMatrix();
+		sgeo[5].merge(mesh[7].geometry,mesh[7].matrix);
+	mat[5]=new THREE.MeshBasicMaterial({color:0xff0000});
+	mesh[8]=new THREE.Mesh(sgeo[5],mat[5]);
+	for(let k=1;k<21;k++){
+		kjeto++;
+		jeto[kjeto]=mesh[8].clone();
+		jeto[kjeto].name="obj"+kjeto;
+		jeto[kjeto].position.set(-7.5,5,-20);
+		scene.add(jeto[kjeto]);
+		objects.push(jeto[kjeto]);
+		veto[kjeto]="Roof big";
+	}
+
+	// Floor2
+	sgeo[9]=new THREE.Geometry();
+	geo[9]=new THREE.BoxGeometry(1,1,1);
+		mesh[9]=new THREE.Mesh(geo[9]);
+		mesh[9].position.set(-1,-1,0);
+		mesh[9].updateMatrix();
+		sgeo[9].merge(mesh[9].geometry,mesh[9].matrix);
+	mesh[12]=new THREE.Mesh(geo[9]);
+	mesh[12].position.set(0,-1,0);
+	mesh[12].updateMatrix();
+	sgeo[9].merge(mesh[12].geometry,mesh[12].matrix);
+		mesh[13]=new THREE.Mesh(geo[9]);
+		mesh[13].position.set(-1,-2,0);
+		mesh[13].updateMatrix();
+		sgeo[9].merge(mesh[13].geometry,mesh[13].matrix);
+	mesh[14]=new THREE.Mesh(geo[9]);
+	mesh[14].position.set(0,-2,0);
+	mesh[14].updateMatrix();
+	sgeo[9].merge(mesh[14].geometry,mesh[14].matrix);
+		tex[9]=new THREE.TextureLoader(manager).load('img/blocos/ground.png');
+		tex[9].wrapS=THREE.RepeatWrapping;tex[9].wrapT=THREE.RepeatWrapping;
+		tex[9].repeat.set(2,2);
+		mat[9]=new THREE.MeshBasicMaterial({map:tex[9],color:0xaaaaaa});
+		mesh[15]=new THREE.Mesh(sgeo[9],mat[9]);
+	for(let k=1;k<21;k++){
+		kjeto++;
+		jeto[kjeto]=mesh[15].clone();
+		jeto[kjeto].name="obj"+kjeto;
+		jeto[kjeto].position.set(11.8,7,-20);
+		scene.add(jeto[kjeto]);
+		objects.push(jeto[kjeto]);
+		veto[kjeto]="Floor2";
+	}
+
+	// Floor1
+	sgeo[16]=new THREE.Geometry();
+		mesh[16]=new THREE.Mesh(geo[9]);
+		mesh[16].position.set(0,-1,0);
+		mesh[16].updateMatrix();
+		sgeo[16].merge(mesh[16].geometry,mesh[16].matrix);
+	mesh[17]=new THREE.Mesh(geo[9]);
+	mesh[17].position.set(0,-2,0);
+	mesh[17].updateMatrix();
+	sgeo[16].merge(mesh[17].geometry,mesh[17].matrix);
+		mesh[18]=new THREE.Mesh(sgeo[16],mat[9]);
+	for(let k=1;k<21;k++){
+		kjeto++;
+		jeto[kjeto]=mesh[18].clone();
+		jeto[kjeto].name="obj"+kjeto;
+		jeto[kjeto].position.set(14.5,7,-20);
+		scene.add(jeto[kjeto]);
+		objects.push(jeto[kjeto]);
+		veto[kjeto]="Floor1";
+	}
+
+	// Clock
+	loader=new THREE.TextureLoader(manager);
+	mat[20]=[
+		new THREE.MeshBasicMaterial({map:loader.load("img/blocos/256clock.png"),side:THREE.DoubleSide}),
+		new THREE.MeshBasicMaterial({map:loader.load("img/blocos/256clock.png"),side:THREE.DoubleSide}),
+		new THREE.MeshBasicMaterial({map:loader.load("img/blocos/cinblk.png"),side:THREE.DoubleSide}),
+		new THREE.MeshBasicMaterial({map:loader.load("img/blocos/cinblk.png"),side:THREE.DoubleSide}),
+		new THREE.MeshBasicMaterial({map:loader.load("img/blocos/256clock.png"),side:THREE.DoubleSide}),
+		new THREE.MeshBasicMaterial({map:loader.load("img/blocos/256clock.png"),side:THREE.DoubleSide}),
+	];
+	geo[20]=new THREE.BoxGeometry(1,1,1);
+	mesh[20]=new THREE.Mesh(geo[20],mat[20]);
+	for(let k=1;k<6;k++){
+		kjeto++;
+		jeto[kjeto]=mesh[20].clone();
+		jeto[kjeto].name="obj"+kjeto;
+		jeto[kjeto].position.set(0.3,5,-20);
+		scene.add(jeto[kjeto]);
+		objects.push(jeto[kjeto]);
+		veto[kjeto]="Clock";
+	}
+
+	// Clock Base
+	loader=new THREE.TextureLoader(manager);
+	mat[21]=[
+		new THREE.MeshBasicMaterial({map:loader.load("img/blocos/256azul.png"),side:THREE.DoubleSide}),
+		new THREE.MeshBasicMaterial({map:loader.load("img/blocos/256azul.png"),side:THREE.DoubleSide}),
+		new THREE.MeshBasicMaterial({map:loader.load("img/blocos/cinblk.png"),side:THREE.DoubleSide}),
+		new THREE.MeshBasicMaterial({map:loader.load("img/blocos/cinblk.png"),side:THREE.DoubleSide}),
+		new THREE.MeshBasicMaterial({map:loader.load("img/blocos/256azultra.png"),transparent:true,side:THREE.DoubleSide}),
+		new THREE.MeshBasicMaterial({map:loader.load("img/blocos/256azul.png"),side:THREE.DoubleSide}),
+	];
+	geo[21]=new THREE.BoxGeometry(1,1,1);
+	mesh[21]=new THREE.Mesh(geo[21],mat[21]);
+	for(let k=1;k<6;k++){
+		kjeto++;
+		jeto[kjeto]=mesh[21].clone();
+		jeto[kjeto].name="obj"+kjeto;
+		jeto[kjeto].position.set(2.3,5,-20);
+		scene.add(jeto[kjeto]);
+		objects.push(jeto[kjeto]);
+		veto[kjeto]="Clock Base";
+	}
+
+	// Tower Block
+	tex[22]=new THREE.TextureLoader(manager).load('img/blocos/256tijazul.png');
+	geo[22]=new THREE.BoxGeometry(1,1,1);
+	mat[22]=new THREE.MeshBasicMaterial({map:tex[22],color:0xffffff});
+	mesh[22]=new THREE.Mesh(geo[22],mat[22]);
+	for(let k=1;k<21;k++){
+		kjeto++;
+		jeto[kjeto]=mesh[22].clone();
+		jeto[kjeto].name="obj"+kjeto;
+		jeto[kjeto].position.set(4.5,5,-20);
+		scene.add(jeto[kjeto]);
+		objects.push(jeto[kjeto]);
+		veto[kjeto]="Tower Block";
+	}
+
+	// Red Ball
+	geo[23]=new THREE.SphereGeometry(0.5,16,16);
+	mat[23]=new THREE.MeshStandardMaterial({color:0xff0000,metalness:0.2,roughness:0.2});
+	mesh[23]=new THREE.Mesh(geo[23],mat[23]);
+	for(let k=1;k<11;k++){
+		kjeto++;
+		jeto[kjeto]=mesh[23].clone();
+		jeto[kjeto].name="obj"+kjeto;
+		jeto[kjeto].position.set(-1.8,5,-20);
+		scene.add(jeto[kjeto]);
+		objects.push(jeto[kjeto]);
+		veto[kjeto]="Red Ball";
+	}
+
+	// Text
+	loader=new FontLoader(manager);
+	text="20  20  20  10  10  5  5  20   10    20   20\n               blocks shelf";
+//	loader.load('../fonte/Cascadia_Regular.json',function(response){font=response;createText();});
+
+
+
+	loader.load('../js122/Cascadia_Regular.json',function(response){font=response;createText();});
+
+	
+
+	mat[25]=[new THREE.MeshPhongMaterial({color:'#555',flatShading:true}),new THREE.MeshPhongMaterial({color:'#006'})];
+	function createText(){
+		geo[25]=new TextGeometry(text,{
+		font:font,size:40,height:10,curveSegments:8,bevelThickness:1,bevelSize:1,bevelEnabled:false});
+		geo[25].computeBoundingBox();
+		mesh[25]=new THREE.Mesh(geo[25],mat[25]);
+		mesh[25].position.set(-13,3,-21);
+		mesh[25].scale.set(0.02,0.02,0.02);
+		scene.add(mesh[25]);
+	}
+
+	// Octahedron INI
+	sgeo[126]=new THREE.Geometry();
+	geo[126]=new THREE.OctahedronGeometry(0.75,0);
+	geo[127]=new THREE.PlaneGeometry(1,0.01);
+		mesh[126]=new THREE.Mesh(geo[126]);
+		mesh[126].position.set(0,-0.5,0);
+		mesh[126].updateMatrix();
+		sgeo[126].merge(mesh[126].geometry,mesh[126].matrix);
+	mesh[127]=new THREE.Mesh(geo[127]);
+	mesh[127].position.set(0,-0.5,0);
+	mesh[127].rotation.set(0,0,Math.PI);
+	mesh[127].updateMatrix();
+	sgeo[126].merge(mesh[127].geometry,mesh[127].matrix);
+		mat[127]=new THREE.MeshStandardMaterial({color:0xff0000,metalness:0.2,roughness:0.2});
+		mesh[128]=new THREE.Mesh(sgeo[126],mat[127]);
+	for(let k=1;k<11;k++){
+		kjeto++;
+		jeto[kjeto]=mesh[128].clone();
+		jeto[kjeto].name="obj"+kjeto;
+		jeto[kjeto].position.set(-4.5,5.75,-20);
+		jeto[kjeto].rotation.set(0,Math.PI/4,0);
+		scene.add(jeto[kjeto]);
+		objects.push(jeto[kjeto]);
+		veto[kjeto]="Octahedron";
+	}
+
+	// Bridge
+	sgeo[108]=new THREE.Geometry();
+	geo[109]=new THREE.BoxGeometry(1,1,1);
+	mesh[109]=new THREE.Mesh(geo[109]);
+	mesh[109].position.set(-1,-2,0);
+	mesh[109].updateMatrix();
+	sgeo[108].merge(mesh[109].geometry,mesh[109].matrix);
+		mesh[110]=new THREE.Mesh(geo[109]);
+		mesh[110].position.set(1,-2,0);
+		mesh[110].updateMatrix();
+		sgeo[108].merge(mesh[110].geometry,mesh[110].matrix);
+	mesh[111]=new THREE.Mesh(geo[109]);
+	mesh[111].position.set(0,-1,0);
+	mesh[111].updateMatrix();
+	sgeo[108].merge(mesh[111].geometry,mesh[111].matrix);
+		mesh[112]=new THREE.Mesh(geo[109]);
+		mesh[112].position.set(-1,-1,0);
+		mesh[112].updateMatrix();
+		sgeo[108].merge(mesh[111].geometry,mesh[112].matrix);
+	mesh[113]=new THREE.Mesh(geo[109]);
+	mesh[113].position.set(1,-1,0);
+	mesh[113].updateMatrix();
+	sgeo[108].merge(mesh[111].geometry,mesh[113].matrix);
+		tex[108]=new THREE.TextureLoader(manager).load('img/blocos/ground.png');
+		tex[108].wrapS=THREE.RepeatWrapping;tex[108].wrapT=THREE.RepeatWrapping;
+		tex[108].repeat.set(2,2);
+		mat[108]=new THREE.MeshBasicMaterial({map:tex[108],color:0xaaaaaa});
+		mesh[112]=new THREE.Mesh(sgeo[108],mat[108]);
+
+	geo[158]= new THREE.TorusGeometry(1,0.5,10,10,3.14 );
+		tex[158]=new THREE.TextureLoader(manager).load('img/blocos/ground.png');
+		tex[158].wrapS=THREE.RepeatWrapping;tex[158].wrapT=THREE.RepeatWrapping;
+		tex[158].repeat.set(6,6);
+		mat[158]=new THREE.MeshBasicMaterial({map:tex[158],color:0xaaaaaa});
+
+	mesh[158]=new THREE.Mesh(geo[158],mat[158]);
+	mesh[158].position.y=-2.5;
+	mesh[112].add(mesh[158]);
+
+	for(let k=1;k<11;k++){
+		kjeto++;
+		jeto[kjeto]=mesh[112].clone();
+		jeto[kjeto].name="obj"+kjeto;
+		jeto[kjeto].position.set(7.5,7,-20);
+		scene.add(jeto[kjeto]);
+		objects.push(jeto[kjeto]);
+		veto[kjeto]="Bridge";
+	}
+
+	// Watchtower
+	geo[70]=new THREE.CylinderGeometry(.5,.5,7,32,16,0);
+	tex[70]=new THREE.TextureLoader().load('img/blocos/watchtower7.png');
+	mat[70]=new THREE.MeshStandardMaterial({map:tex[70],color:0xffffff,transparent:true});
+	mesh[70]=new THREE.Mesh(geo[70],mat[70]);
+
+	geo[71]=new THREE.CylinderGeometry(.02,.02,0,5,8,8,0);
+	mat[71]=new THREE.MeshStandardMaterial({color:0x000000});
+	mesh[71]=new THREE.Mesh(geo[71],mat[71]);
+
+	geo[72]=new THREE.SphereGeometry(0.05,8,8);
+	mat[72]=new THREE.MeshStandardMaterial({color:0xff0000,emissive:0xffff00,emissiveIntensity:1});
+	mesh[72]=new THREE.Mesh(geo[72],mat[72]);
+
+	geo[73]=new THREE.CircleGeometry(0.5,16);
+	mat[73]=new THREE.MeshStandardMaterial({color:0x333333});
+	mesh[73]=new THREE.Mesh(geo[73],mat[73]);
+	mesh[73].rotation.x=-Math.PI/2;
+
+	mesh[74]=mesh[73].clone();
+	mesh[74].rotation.x=Math.PI/2;
+
+	mesh[70].position.y=3;
+	mesh[71].position.y=1.75;
+	mesh[70].add(mesh[71]);
+	mesh[72].position.y=2.25;
+	mesh[70].add(mesh[72]);
+	mesh[73].position.y=1.5;
+	mesh[70].add(mesh[73]);
+	mesh[74].position.y=-3.5;
+	mesh[70].add(mesh[74]);
+
+	geo[75]=new THREE.CylinderGeometry(.4,.4,9,4,4,0);
+	mat[75]=new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:0.0});
+	mesh[75]=new THREE.Mesh(geo[75],mat[75]);
+	mesh[75].add(mesh[70]);
+	for(let k=1;k<3;k++){
+		kjeto++;
+		jeto[kjeto]=mesh[75].clone();
+		jeto[kjeto].name="obj"+kjeto;
+		jeto[kjeto].position.set(-15,5,-20);
+		if(k==2){jeto[kjeto].position.set(17.5,5,-20);}
+		scene.add(jeto[kjeto]);
+		objects.push(jeto[kjeto]);
+		veto[kjeto]="Watchtower";
+	}
+
+function rst(){
+str="";
+str=str+'2,-7,0,2,0;3,-8,1,2,0;4,-7,1,2,-1.5707963267948966;5,-8,2,2,-1.5707963267948966;';
+str=str+'6,-8,3,2,0;7,2,1,0,-1.5707963267948966;8,1,0,0,0;9,5,0,0,-1.5707963267948966;';
+str=str+'10,6,0,0,0;11,6,1,0,-1.5707963267948966;12,5,1,0,0;';
+str=str+'13,5,2,0,-1.5707963267948966;14,6,2,0,0;21,-7,3,2,0;';
+str=str+'22,-8,4,2,0;23,2,2,0,-1.5707963267948966;24,1,1,0,0;';
+str=str+'41,5,3,0,0;61,-5,0,0,0;62,-7,0,1,-1.5707963267948966;';
+str=str+'63,-7,0,2,0;64,-8,0,1,-1.5707963267948966;65,-9,0,3,-1.5707963267948966;';
+str=str+'66,2,0,0,0;68,3,0,0,-3.141592653589793;70,8,0,0,0;';
+str=str+'71,6,0,0,0;74,0,0,0,0;101,-4,2,0,0;102,-2,2,0,0;106,-4,1,0,0;107,-2,1,0,0;';
+str=str+'111,-4,0,0,0;112,-4,3,0,0;113,-7,2,2,0;114,-8,0,2,0;115,-2,0,0,0;116,-2,3,0,0;';
+str=str+'117,3,0,0,0;118,3,1,0,0;119,3,2,0,0;120,3,3,0,0;121,2,0,0,0;131,-4,4,0,0;132,-2,4,0,0;';
+str=str+'133,3,4,0,0;141,-2,5,0,0.7853981633974483;142,-4,5,0,0.7853981633974483;';
+str=str+'143,-2,4,0,0.7853981633974483;144,-4,4,0,0.7853981633974483;';
+str=str+'145,3,4,0,0.7853981633974483;146,3,5,0,0.7853981633974483;151,-3,0,0,0;';
+
+str=vem;
+
+str=str+'152,-9,0,5,-1.5707963267948966;161,-9,0,6,0;';
+mAr=str.split(";");
+	for(let b=0;b<200;b++){
+		if(mAr[b]){
+			jafui=1;
+			yAr=mAr[b].split(",");
+			jeto[yAr[0]].position.x=yAr[1];
+			jeto[yAr[0]].position.y=yAr[2];
+			jeto[yAr[0]].position.z=yAr[3];
+			jeto[yAr[0]].rotation.y=yAr[4];
+		}
+	}
+}
+
+// fim da init ******** ********
+}
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	document.getElementById("divA").style.left=window.innerWidth-208+"px";
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	render();
+}
+
+function render(){
+	controls.update();
+	w1++;
+	if(w1>100 && jafui==0 && document.getElementById("output").innerText!=""){salvo=2;abc();}
+	w2++;
+	w3=w3-0.01;
+	if(cube){
+		if(w2<50){cube.rotation.x +=0.01;}
+		mesh[72].material.emissiveIntensity=w3;
+		if(w2>=50){cube.rotation.x -=0.01;}
+		if(w2==100){w2=0;w3=1.01;cube.rotation.x=0;}
+	}
+	renderer.render(scene,camera);
+}
+            
+function loadOBJ(path,fileMaterial,fileOBJ,scene,fMesh){
+	new MTLLoader().load(path+fileMaterial,function(materials){
+		materials.preload();new OBJLoader().setMaterials(materials).load(path+fileOBJ,function(object){
+			var mesh=object;
+			object.traverse(function(child){
+				if(child instanceof THREE.Mesh){mesh=child;}
+			});
+			fMesh(mesh);
+		});
+	});
+};
+	
+function onDocumentMouseMove(event){
+	qual="-1";
+	event.preventDefault();
+	mouse.x=(event.clientX/window.innerWidth)*2 -1;
+	mouse.y=-(event.clientY/window.innerHeight)*2 +1;
+        raycaster.setFromCamera(mouse,camera);
+	if(Dragged){
+		if(raycaster.ray.intersectPlane(plane,intersection)){Dragged.position.copy(intersection.sub(offset));}
+		return;
+	}
+	intersects=raycaster.intersectObjects(objects);
+	if(intersects.length>0){
+		if(Selected!=intersects[0].object){
+			Selected=intersects[0].object;
+			plane.setFromNormalAndCoplanarPoint(
+			camera.getWorldDirection(plane.normal),
+			Selected.position);
+		}
+		qual=intersects[0].object.name.substring(3);
+		document.getElementById("spanC").innerText=veto[qual] + " " + intersects[0].object.name + " ... x=" + intersects[0].object.position.x+ " y=" + intersects[0].object.position.y+ " z=" + intersects[0].object.position.z;
+		document.body.style.cursor='pointer';
+		document.getElementById("divA").style.display="";
+	}else{
+		Selected=null;
+		document.body.style.cursor='auto';
+		document.getElementById("spanC").innerText="";
+		document.getElementById("divA").style.display="none";
+	}
+}
+
+function onDocumentMouseDown(event){
+	event.preventDefault();
+	if(Selected){
+		controls.enabled=false;
+		Dragged=Selected;
+		if(raycaster.ray.intersectPlane(plane,intersection)){offset.copy(intersection).sub(Dragged.position);}
+		document.body.style.cursor='move';
+	}
+}
+
+function onDocumentMouseUp(event){
+	event.preventDefault();
+	controls.enabled=true;
+	if(Selected){
+		Selected.position.x=Math.round(Selected.position.x);
+		Selected.position.y=Math.round(Selected.position.y);
+		Selected.position.z=Math.round(Selected.position.z);
+		qual=intersects[0].object.name.substring(3);
+		document.getElementById("spanC").innerText=veto[qual] + " " + intersects[0].object.name + " ... x=" + intersects[0].object.position.x+ " y=" + intersects[0].object.position.y+ " z=" + intersects[0].object.position.z;
+	}
+	if(Dragged){Dragged=null;}
+	document.body.style.cursor='auto';
+	xyz();
+}
+
+function xyz(){
+	str="";
+	for(let k=1;k<=kjeto;k++){
+		scene.add(jeto[k]);
+		str=str+k+","+jeto[k].position.x+","+jeto[k].position.y+","+jeto[k].position.z+","+jeto[k].rotation.y+";\r\n";
+	}
+	if(salvo==1){blob=new Blob([str],{type:"text/plain;charset=utf-8"});saveAs(blob,"block.txt");}
+	salvo=0;
+}
+
+function abc(){
+	if(salvo==2){
+		//alert(salvo);
+		salvo=0;
+		mAr=document.getElementById('output').textContent.split(";");
+		for(let b=1;b<200;b++){
+			if(mAr[b]){
+				jafui=1;
+				yAr=mAr[b].split(",");
+				jeto[yAr[0]].position.x=yAr[1];
+				jeto[yAr[0]].position.y=yAr[2];
+				jeto[yAr[0]].position.z=yAr[3];
+				jeto[yAr[0]].rotation.y=yAr[4];
+			}
+		}
+	}
+}
+
+function onDocumentKeyDown(event){
+	kd=event.keyCode;
+	//alert(kd);
+	if(jeto[qual]){
+		if(kd==65){jeto[qual].position.x = Number(jeto[qual].position.x)-1;}//A
+		if(kd==68){jeto[qual].position.x = Number(jeto[qual].position.x)+1;}//D
+			if(kd==83){jeto[qual].position.y = Number(jeto[qual].position.y)-1;}//S
+			if(kd==87){jeto[qual].position.y = Number(jeto[qual].position.y)+1;;}//W
+		if(kd==80 || kd==70){jeto[qual].position.z=Number(jeto[qual].position.z)+1;}//P F
+		if(kd==76 || kd==66){jeto[qual].position.z=Number(jeto[qual].position.z)-1;}//L B
+			if(kd==90){jeto[qual].position.set(0,0,0);}//Z
+		if(kd==82){jeto[qual].rotation.y=Number(jeto[qual].rotation.y)-Math.PI/2;}//R
+		document.getElementById("spanC").innerText=intersects[0].object.name + "\r\n x=" + intersects[0].object.position.x+ " y=" + intersects[0].object.position.y+ " z=" + intersects[0].object.position.z;
+		xyz();
+	}
+}
+
+init();
+
+animate();
+
+document.getElementById("divA").style.left=window.innerWidth-208+"px";
+
+</script>
+
+<script>
+
+var openFile=function(event){
+	var input=event.target;
+	var reader=new FileReader();
+	reader.onload=function(){
+		//var text=reader.result;
+		var text=reader.result.replace(/(\r\n|\n|\r)/gm, '')
+		var node=document.getElementById('output');
+		node.innerText=text;
+		//console.log(reader.result.substring(0,10000));
+		//document.getElementById('labA').style.display="none";
+	};
+	reader.readAsText(input.files[0]);
+}
+
+function repla(){window.location.replace(window.location.href);}
+
+
+//https://www.google.com/search?client=firefox-b-d&q=ho+to+read+line+by+line+a+file+loaded+with+fetch+js
+//https://www.google.com/search?q=replace+line+break+in+a+txt+file+in+javascript&client=firefox-b-d&sca_esv=2c7588cce8c665d3&ei=oPgMaNKQJpim5OUP7LbEgQM&oq=replace+linebreak+in+a+txt+file+in+javas&gs_lp=Egxnd3Mtd2l6LXNlcnAiKHJlcGxhY2UgbGluZWJyZWFrIGluIGEgdHh0IGZpbGUgaW4gamF2YXMqAggAMgcQIRigARgKMgcQIRigARgKSNonUIgJWNUYcAF4AJABAJgB-gGgAb4OqgEFMC42LjS4AQHIAQD4AQGYAgqgApoOwgIKEAAYsAMY1gQYR8ICBRAhGJ8FmAMAiAYBkAYIkgcFMS41LjSgB9o8sgcFMC41LjS4B-0N&sclient=gws-wiz-serp
+//https://stackoverflow.com/questions/14446447/how-to-read-a-local-text-file-in-the-browser
+
+
+/*
+
+Dragging building blocks on screen. 
+
+Hello discourse.threejs.org Friends,
+
+It was a pleasure to learn merging and dragging meshes.
+Three.js is an unlimited tool for creation 3D scenerys.
+(It seems like a virtual Swiss army knife coding instrument)
+
+Hope You like... here:
+
+http://jrlazz.eu5.org/anim/dragVivi.html
+
+Thanks for the great Three.js Team!
+
+Jose Roberto Lazzareschi
+
+*/
+</script>
+
+</body>
+</html>
