@@ -11,7 +11,7 @@
 <meta name="twitter:image:height" content="47" />
 
 <style>
-@font-face {font-family:cas;src:url(../fonte/Cascadia.ttf);}
+@font-face {font-family:cas;src:url(res_res.js/Cascadia.ttf);}
 body{margin:0px;overflow:hidden;background-color:#06a;}
 span{position:absolute;font-family:cas;font-size:14pt;color:#fc0;text-align:center;z-index:1;}
 label{width:100px;text-align:center;}
@@ -35,7 +35,7 @@ label{width:100px;text-align:center;}
 
 </head>
 
-<script src="../js122/FileSaver.js"></script>
+<script src="../res_res.js/FileSaver.js"></script>
 
 <body>
 
@@ -66,26 +66,28 @@ Z: brings to origin<br><span style="font-size:10pt;">(must reposition!)</span>
 
 <script type="module">
 
-import * as THREE from '../js122/three.module.js';
-import { OrbitControls } from '../js122/OrbitControls.js';
-import { MTLLoader } from '../js122/MTLLoader.js';
-import { OBJLoader } from '../js122/OBJLoader.js';
-//import { DDSLoader } from '../js122/DDSLoader.js';
-import { FontLoader} from '../js122/FontLoader.js';
-import { TextGeometry } from '../js122/TextGeometry.js';
-
-
 /*
 
-import * as THREE from '../js/three.module_res_res.js';
-import { OrbitControls } from '../js/OrbitControls_res_res.js';
-import { MTLLoader } from '../js/MTLLoader_res_res.js';
-import { OBJLoader } from '../js/OBJLoader_res_res.js';
-import { DDSLoader } from '../js/DDSLoader_res_res.js';
-import { FontLoader} from '../js/FontLoader_res_res.js';
-import { TextGeometry } from '../js/TextGeometry_res_res.js';
+import * as THREE from '../js140/three.module.min.js';
+import { OrbitControls } from '../js140/OrbitControls.js';
+import { MTLLoader } from '../js140/MTLLoader.js';
+import { OBJLoader } from '../js140/OBJLoader.js';
+//import { DDSLoader } from '../js140/DDSLoader.js';
+import { FontLoader} from '../js140/FontLoader.js';
+import { TextGeometry } from '../js140/TextGeometry.js';
+*/
 
 
+
+import * as THREE from '../res_res.js/three.module_res_res.min.js';
+import { OrbitControls } from '../res_res.js/OrbitControls_res_res.js';
+import { MTLLoader } from '../res_res.js/MTLLoader_res_res.js';
+import { OBJLoader } from '../res_res.js/OBJLoader_res_res.js';
+import { DDSLoader } from '../res_res.js/DDSLoader_res_res.js';
+import { FontLoader} from '../res_res.js/FontLoader_res_res.js';
+import { TextGeometry } from '../res_res.js/TextGeometry_res_res.js';
+
+/*
 import * as THREE from "three";
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
@@ -455,11 +457,11 @@ function init() {
 	// Text
 	loader=new FontLoader(manager);
 	text="20  20  20  10  10  5  5  20   10    20   20\n               blocks shelf";
-//	loader.load('../fonte/Cascadia_Regular.json',function(response){font=response;createText();});
+	//loader.load('../fonte/Cascadia_Regular.json',function(response){font=response;createText();});
 
 
 
-	loader.load('../js122/Cascadia_Regular.json',function(response){font=response;createText();});
+	loader.load('../res_res.js/Cascadia_Regular.json',function(response){font=response;createText();});
 
 	
 
