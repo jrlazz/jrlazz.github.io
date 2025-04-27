@@ -11,7 +11,7 @@
 <meta name="twitter:image:height" content="47" />
 
 <style>
-@font-face {font-family:cas;src:url(../res_res.js/Cascadia.ttf);}
+@font-face {font-family:cas;src:url(../git.js/Cascadia.ttf);}
 body{margin:0px;overflow:hidden;background-color:#06a;}
 span{position:absolute;font-family:cas;font-size:14pt;color:#fc0;text-align:center;z-index:1;}
 label{width:100px;text-align:center;}
@@ -35,7 +35,7 @@ label{width:100px;text-align:center;}
 
 </head>
 
-<script src="../res_res.js/FileSaver.js"></script>
+<script src="../git.js/FileSaver.js"></script>
 
 <body>
 
@@ -66,37 +66,14 @@ Z: brings to origin<br><span style="font-size:10pt;">(must reposition!)</span>
 
 <script type="module">
 
-/*
+import * as THREE from '../git.js/three.module.git.min.js';
+import { OrbitControls } from '../git.js/OrbitControls.git.js';
+import { MTLLoader } from '../git.js/MTLLoader.git.js';
+import { OBJLoader } from '../git.js/OBJLoader.git.js';
+//import { DDSLoader } from '../git.js/DDSLoader.git.js';
+import { FontLoader} from '../git.js/FontLoader.git.js';
+import { TextGeometry } from '../git.js/TextGeometry.git.js';
 
-import * as THREE from '../js140/three.module.min.js';
-import { OrbitControls } from '../js140/OrbitControls.js';
-import { MTLLoader } from '../js140/MTLLoader.js';
-import { OBJLoader } from '../js140/OBJLoader.js';
-//import { DDSLoader } from '../js140/DDSLoader.js';
-import { FontLoader} from '../js140/FontLoader.js';
-import { TextGeometry } from '../js140/TextGeometry.js';
-*/
-
-
-
-import * as THREE from '../res_res.js/three.module_res_res.min.js';
-import { OrbitControls } from '../res_res.js/OrbitControls_res_res.js';
-import { MTLLoader } from '../res_res.js/MTLLoader_res_res.js';
-import { OBJLoader } from '../res_res.js/OBJLoader_res_res.js';
-//import { DDSLoader } from '../res_res.js/DDSLoader_res_res.js';
-import { FontLoader} from '../res_res.js/FontLoader_res_res.js';
-import { TextGeometry } from '../res_res.js/TextGeometry_res_res.js';
-
-/*
-import * as THREE from "three";
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
-import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
-import { DDSLoader } from 'three/addons/loaders/DDSLoader.js';
-import { FontLoader } from "three/addons/loaders/FontLoader.js";
-import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
-import { BufferGeometryUtils } from 'three/addons/geometries/BufferGeometryUtils.js';
-*/
 	var container,stats;
 	var camera, controls, scene, renderer;
 	var objects=[];
@@ -216,7 +193,6 @@ function init() {
 	manager.onLoad=function(){console.log('Loading complete!');};
 	manager.onProgress=function(url,itemsLoaded,itemsTotal){console.log('loading texture'+url+' '+(itemsLoaded/itemsTotal*100)+'%');};
 	manager.onError=function(url){console.log('Error loading texture:'+url);};
-	//manager.addHandler(/\.dds$/i,new DDSLoader());
 
 	loadOBJ ("models/extras/","tun.mtl","tun.obj",scene,function(tuna){
 		var object=tuna.clone();
@@ -304,7 +280,6 @@ function init() {
 		mesh[5].rotation.set(Math.PI,0,Math.PI);
 		mesh[5].position.set(0.5,-0.5,0.5);
 		mesh[5].updateMatrix();
-//THREE.GeometryUtils.merge(totalGeom, cubeMesh);
 		sgeo[5].merge(mesh[5].geometry,mesh[5].matrix);
 	mesh[6]=new THREE.Mesh(geo[6]);
 	mesh[6].position.set(0.5,-0.5,-0.5);
@@ -457,14 +432,7 @@ function init() {
 	// Text
 	loader=new FontLoader(manager);
 	text="20  20  20  10  10  5  5  20   10    20   20\n               blocks shelf";
-	//loader.load('../fonte/Cascadia_Regular.json',function(response){font=response;createText();});
-
-
-
-	loader.load('../res_res.js/Cascadia_Regular.json',function(response){font=response;createText();});
-
-	
-
+	loader.load('../git.js/Cascadia_Regular.json',function(response){font=response;createText();});
 	mat[25]=[new THREE.MeshPhongMaterial({color:'#555',flatShading:true}),new THREE.MeshPhongMaterial({color:'#006'})];
 	function createText(){
 		geo[25]=new TextGeometry(text,{
