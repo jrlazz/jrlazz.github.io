@@ -5,7 +5,7 @@ import {
 	RGBA_S3TC_DXT5_Format,
 	RGB_ETC1_Format,
 	RGB_S3TC_DXT1_Format
-} from "../js/three.module_res_res.js";
+} from './three.module_res_res.min.js';
 
 var DDSLoader = function ( manager ) {
 
