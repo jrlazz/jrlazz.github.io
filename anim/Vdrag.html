@@ -56,11 +56,11 @@ R: rotate<br><br>
 Z: brings to origin<br><span style="font-size:10pt;">(must reposition!)</span>
 </div>
 
-<label id="labA" class="btn" style="top:25px;">load a file
+<label id="labA" class="btn" style="top:25px;display:none;">load a file
 <input type='file' accept='text/plain' onchange='openFile(event)' style="position:absolute;display:none;">
 </label>
 <div id='output' style="position:absolute;left:50px;top:50px;width:200px;height:200px;overflow-y:scroll;display:none;"></div>
-<label id="labB" class="btn" style="top:50px;">load example</label>
+<label id="labB" class="btn" style="top:50px;display:none;">load example</label>
 <label id="labC" class="btn" onclick="repla();" style="top:75px;">clear screen</label>
 <label id="labD" class="btn" style="top:100px;">save a file</label>
 
@@ -124,19 +124,13 @@ var vem;
 
 function init() {
 
-
-
-
 	async function loadText(url) {
 		text = await fetch(url);
-		//awaits for text.text() prop 
-		//and then sends it to readText()
 		readText(await text.text());
 	}
 
 	function readText(text){
 		vem=text.replace(/(\r\n|\n|\r)/gm, '');
-		//console.log(text.replace(/(\r\n|\n|\r)/gm, ''));
 	}
 
 	loadText('block.txt');
@@ -173,7 +167,6 @@ function init() {
 	renderer.sortObjects=false;
 	renderer.setClearColor('#06a',1.0);
 
-
 	document.body.appendChild(renderer.domElement);
 
 	renderer.domElement.addEventListener('pointermove',onDocumentMouseMove,false);
@@ -190,7 +183,7 @@ function init() {
 
 	const manager=new THREE.LoadingManager();
 	manager.onStart=function(url,itemsLoaded,itemsTotal){console.log('Started loading file:'+url+'.\nLoaded '+itemsLoaded+' of '+itemsTotal + ' files.' );};
-	manager.onLoad=function(){console.log('Loading complete!');};
+	manager.onLoad=function(){console.log('Loading complete!');mostra();};
 	manager.onProgress=function(url,itemsLoaded,itemsTotal){console.log('loading texture'+url+' '+(itemsLoaded/itemsTotal*100)+'%');};
 	manager.onError=function(url){console.log('Error loading texture:'+url);};
 
@@ -740,6 +733,12 @@ function onDocumentKeyDown(event){
 		xyz();
 	}
 }
+
+function mostra(){
+	document.getElementById('labA').style.display="";
+	document.getElementById('labB').style.display="";
+}
+
 
 init();
 
