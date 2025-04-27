@@ -18,7 +18,7 @@
 import {
 	BufferGeometry,
 	ExtrudeGeometry
-} from '../js/three.module_res_res.js';
+} from './three.module_res_res.min.js';
 
 class TextGeometry extends ExtrudeGeometry {
 
