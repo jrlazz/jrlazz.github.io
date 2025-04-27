@@ -369,11 +369,11 @@ function init() {
 
 	// Text
 	loader=new FontLoader(manager);
-	text="20  20  20  10  10  5  5  20   10    20   20\n               blocks shelf";
+	let texto="20  20  20  10  10  5  5  20   10    20   20\n               blocks shelf";
 	loader.load('../font/Cascadia_Regular.json',function(response){font=response;createText();});
-	mat[25]=[new THREE.MeshPhongMaterial({color:'#555',flatShading:true}),new THREE.MeshPhongMaterial({color:'#006'})];
+	mat[25]=[new THREE.MeshPhongMaterial({color:'#960'}),new THREE.MeshPhongMaterial({color:'#006'})];
 	function createText(){
-		geo[25]=new TextGeometry(text,{
+		geo[25]=new TextGeometry(texto,{
 		font:font,size:40,height:10,curveSegments:8,bevelThickness:1,bevelSize:1,bevelEnabled:false});
 		geo[25].computeBoundingBox();
 		mesh[25]=new THREE.Mesh(geo[25],mat[25]);
