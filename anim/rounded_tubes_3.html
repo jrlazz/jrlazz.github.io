@@ -20,7 +20,7 @@ button {position:absolute;left:20px;top:40px;width:30px;font-family:Arial;font-s
 
 <body>
 
-<span id="spb" style="position:absolute;top:3%;width:99%;font-size:20.5pt;color:#c90;text-align:center;display:''">... Rounded Tube with SVG and ExtrudeGeometry ...</span>
+<span id="spb" style="position:absolute;top:3%;width:99%;font-size:20.5pt;color:#c90;text-align:center;display:''">... Rounded Tube with SVG and ExtrudeGeometry ... 90&#186; and 150&#186; </span>
 
 <script type="module">
 
@@ -98,7 +98,7 @@ function animate() {
 	if(mesh[30] && mesh[31] && sim==0){
 		for(let z=40;z<300;z++){
 			mesh[z]=mesh[30].clone();mesh[z].rotation.y=(z-40)/30;// cuidado aqui vale y
-			if(mesh[z].rotation.y<=p/1.3){grc.add(mesh[z]);scene.add(grc);}// lembre aqui vale y
+			if(mesh[z].rotation.y<=p/1.2){grc.add(mesh[z]);scene.add(grc);}// lembre aqui vale y
 
 			mesh[100+z]=mesh[31].clone();mesh[100+z].rotation.y=(z-40)/30;// cuidado aqui vale y
 			if(mesh[100+z].rotation.y<=p/2){grd.add(mesh[100+z]);scene.add(grd);}// lembre aqui vale y
