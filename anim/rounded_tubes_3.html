@@ -32,11 +32,11 @@ import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
 
 var camera, scene, renderer, loader, controls, text, font;
 var luz;
-var mesh=[];
+var mat=[], mesh=[];
 var grc=new THREE.Group(), grd=new THREE.Group();
 var sim=0;
 var p=Math.PI;
-var paths=[], shapes=[], depth, bevelEnabled,material,geometry, mat, extrusion=5;
+var paths=[], shapes=[], depth, bevelEnabled, geometry, mat, extrusion=5;
 
 	camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,1,1000);
 	camera.position.set(0,0,100);
@@ -64,20 +64,21 @@ function loadSVG(url,q){
 		paths=data.paths;
 		let i=0;
 		//for(let i=0;i<paths.length;i++){
-			mat=[new THREE.MeshStandardMaterial({color:'#c0c',transparent:true,opacity:1,metalness:0.5,roughness:0.2}),new THREE.MeshStandardMaterial({color:'#cc0',transparent:true,opacity:1,metalness:0.5,roughness:0.2})];
+			mat[31]=[new THREE.MeshStandardMaterial({color:'#c0c'}),new THREE.MeshStandardMaterial({color:'#c90'})];
+			mat[30]=[new THREE.MeshStandardMaterial({color:'#0c0'}),new THREE.MeshStandardMaterial({color:'#09c'})];
 			shapes=SVGLoader.createShapes(paths[i]);
 			//for(let j=0;j<shapes.length;j++){
 				let j=0;
 				geometry=new THREE.ExtrudeGeometry(shapes[j],{depth:extrusion,bevelEnabled:true,curveSegments:1});
 				if(q==2){
 					//geometry.translate(-50,-50,0);
-					mesh[30]=new THREE.Mesh(geometry,mat);
+					mesh[30]=new THREE.Mesh(geometry,mat[30]);
 					mesh[30].scale.setScalar(0.2);
 					mesh[30].geometry.translate(40,40,0);
 					mesh[30].position.set(0,0,20);
 				}
 				if(q==1){
-					mesh[31]=new THREE.Mesh(geometry,mat);
+					mesh[31]=new THREE.Mesh(geometry,mat[31]);
 					mesh[31].scale.setScalar(0.2);
 					mesh[31].geometry.translate(50,50,0);
 					mesh[31].position.set(0,0,-20);
