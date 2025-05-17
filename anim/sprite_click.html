@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>sprite_click.html</title>
+<link rel="icon" type="image/png" href="img/github-mark.png">
+<meta name="description" content="Click on balls to bring sprites">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+
+<style>
+@font-face {font-family:cas;src:url(../font/Cascadia.ttf);}
+body{margin:0;background-color:#036;overflow:hidden;}
+span{position:absolute;width:100%;text-align:center;top:0px;font-family:Lucida Console;font-size:12pt;font-weight:bold;color:#ff0;}
+</style>
+
+<script type="importmap">
+	{
+	"imports": {
+		"three": "https://cdn.jsdelivr.net/npm/three@0.175/build/three.module.js",
+		"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.175/examples/jsm/"
+	}}
+</script>
+
+</head>
+
+<body>
+
+<span id="panb">... and click on balls ...</span>
+
+<script type='module'>
+
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+var scene,camera,renderer,controls,lig,canvas,ctx,sprite,texture,mat,loader,color;
+var cola,colb;
+var mouse=new THREE.Vector2();
+var raycaster=new THREE.Raycaster(),selected,intersects=[],alvos=[];
+var plane,line,sphere,geometry,material;
+var points=[];
+var mark=[];
+var inva=1;
+
+function init(){
+	scene=new THREE.Scene();
+
+	camera=new THREE.PerspectiveCamera(30,innerWidth/innerHeight,0.1,1000);
+	camera.position.set(0,0,10);
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setClearColor("#036",0);
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.outputEncoding=THREE.sRGBEncoding;
+	renderer.outputColorSpace =THREE.LinearSRGBColorSpace;
+
+	document.body.appendChild(renderer.domElement);
+
+	window.addEventListener("mousedown",onClick);
+
+	window.addEventListener("resize",(event) => {
+		camera.aspect=innerWidth/innerHeight;
+		camera.updateProjectionMatrix();
+		renderer.setSize(innerWidth,innerHeight);
+	});
+
+	controls=new OrbitControls(camera, renderer.domElement);
+	controls.enableDamping=true;
+	controls.enableRotate=false;
+ 
+	lig=new THREE.AmbientLight('#fff',4);scene.add(lig);
+
+	texture=new THREE.TextureLoader().load("img/Equirectangular_projection_SW_3.jpg");
+	texture.encoding= THREE.sRGBEncoding;
+	texture.mapping=THREE.EquirectangularReflectionMapping;
+
+	mat=new THREE.MeshStandardMaterial({side:THREE.DoubleSide,map:texture});
+	plane=new THREE.Mesh(new THREE.PlaneGeometry(10,4.9),mat);
+	alvos.push(plane);
+	scene.add(plane);
+
+	for(let z=1;z<19;z++){
+		getRGBColor();
+		mark[z]=new THREE.Mesh(new THREE.SphereGeometry(0.1),new THREE.MeshStandardMaterial({color:cola}));
+		inva=inva*(-1);
+		mark[z].position.set(inva*Math.random()*3,inva*Math.random()*2,0);
+		mark[z].name="mark 19"+(50+z);
+		alvos.push(mark[z]);
+		scene.add(mark[z]);
+	}
+
+	canvas=document.createElement('canvas');
+	canvas.width=500;
+	canvas.height=500;
+	ctx=canvas.getContext('2d');
+}
+
+function onClick(event){
+	mouse.x=( event.clientX/window.innerWidth)*2-1;
+	mouse.y=-( event.clientY/window.innerHeight)*2+1;
+	scene.remove(sprite);
+	getRGBColor();
+	raycaster.setFromCamera(mouse,camera);
+	intersects=raycaster.intersectObjects(alvos);
+	if(intersects.length>0){
+		const position=intersects[0].point;
+		ctx.clearRect(0,0,canvas.width,canvas.height);
+		ctx.beginPath();
+		ctx.fillStyle='#ddd';
+		ctx.strokeStyle=cola;
+		ctx.lineWidth=18;
+		ctx.roundRect(50,10,400,200,10);
+		ctx.fill();
+		ctx.stroke();
+		ctx.closePath();
+		ctx.fillStyle='#090';
+		ctx.font='150px cas';
+		ctx.textAlign='center';
+		ctx.textBaseline='middle';
+		ctx.fillText(intersects[0].object.name,30,115);
+		texture=new THREE.CanvasTexture(canvas);
+		texture.colorSpace=THREE.SRGBColorSpace;
+		material=new THREE.SpriteMaterial({map:texture});
+		sprite=new THREE.Sprite(material);
+		sprite.position.set(intersects[0].point.x,intersects[0].point.y,0.5);
+		if(intersects[0].object.name!=""){scene.add(sprite);}
+	}
+}
+
+function getRGBColor(){
+	const R=Math.floor(Math.random()*256);
+	const G=Math.floor(Math.random()*256);
+	const B=Math.floor(Math.random()*256);
+	cola="rgb("+R+","+G+","+B+")";
+	colb="rgb("+(255-R)+","+(255-G)+","+(255-B)+")";//alert(cola+" ... " +colb);
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	controls.update();
+	renderer.render(scene, camera);
+}
+
+init();
+animate();
+
+</script>
+</body>
+</html>
