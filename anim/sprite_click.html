@@ -13,7 +13,7 @@
 <style>
 @font-face {font-family:cas;src:url(../font/Cascadia.ttf);}
 body{margin:0;background-color:#036;overflow:hidden;}
-span{position:absolute;width:100%;text-align:center;top:0px;font-family:Lucida Console;font-size:12pt;font-weight:bold;color:#ff0;}
+span{position:absolute;width:100%;text-align:center;top:0px;font-family:cas;font-size:12pt;font-weight:bold;color:#ff0;}
 </style>
 
 <script type="importmap">
@@ -96,6 +96,20 @@ function init(){
 	canvas.width=500;
 	canvas.height=500;
 	ctx=canvas.getContext('2d');
+
+		ctx.fillStyle='#ff0';
+		ctx.font='150px cas';
+		ctx.textAlign='center';
+		ctx.textBaseline='middle';
+		ctx.fillText("1950",150,100);
+		ctx.stroke();
+		texture=new THREE.CanvasTexture(canvas);
+		texture.colorSpace=THREE.SRGBColorSpace;
+		material=new THREE.SpriteMaterial({map:texture});
+		sprite=new THREE.Sprite(material);
+		scene.add(sprite);
+		scene.remove(sprite);
+
 }
 
 function onClick(event){
