@@ -1,0 +1,100 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>play_mp3.html</title>
+<link rel="icon" type="image/png" href="img/github-mark.png">
+<meta name="description" content="http://127.0.0.1/play_mp3.html">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+
+<style>
+body{margin:16px;font-family:monospace;font-size:12pt;background-color:#016;color:#ff0;overflow:hidden;}
+input{position:relative;top:10px;}
+</style>
+
+</head>
+
+<body>
+
+<audio id="audio" loop><source id="sour" src="mp3/supergrass.mp3" type="audio/mpeg"></audio>
+
+<table id="TA" style="position:absolute;left:10px;top:15px;display:none;">
+<tr><td>mp3 vol.: <input id="mp3" type="range" value="0.5" min="0.0" max="1" step="0.1" onchange="mp3vol();" autocomplete="off"></input>&nbsp;<span id="spanA"></span>&nbsp;&nbsp;gain: <input id="gai" type="range" value="1" min="0" max="20" step="1" onchange="mp3gain();" autocomplete="off"></input>&nbsp;<span id="spanB">&nbsp;&nbsp;</span></td></tr><tr>
+</table>
+
+<button id="BA" onclick="restart();" style="position:absolute;left:80%;top:28px;width:200px;background-color:#900;color:#fff;display:none;">Restart</button>
+<a id="BV" href="play_mp3.txt" target="_blank" style="position:absolute;left:80%;top:68px;width:200px;background-color:#060;color:#fff;text-align:center;text-decoration:none;border:2px outset #ff0;display:none;">View code</a>
+<button id="BB" onclick="init();" style="position:absolute;left:40%;top:100px;width:200px;height:90px;background-color:#900;color:#fff;font-size:41px;display:;z-index:2;">Start</button>
+
+<input id="vemmp3file" style="position:absolute;top:28px;left:600px;display:none;" type="file" accept=".mp3" autocomplete="off"></input>
+<div id="mp3file" style="position:absolute;left:672px;top:31px;width:300px;font-size:11pt;background-color:#016;display:none"></div>
+
+<script>
+
+var sim=0;
+
+var bId=function(id){return document.getElementById(id);}
+var audio=bId("audio");
+var mp3val=bId("mp3");
+var mgain=bId("gai");
+
+var dspanA=bId("spanA");
+var dspanB=bId("spanB");
+
+var dBA=bId("BA");
+var dBB=bId("BB");
+
+var dTA=bId("TA");
+var dBV=bId("BV");
+
+var dvemmp3file=bId("vemmp3file");
+
+var dmp3file=bId("mp3file");
+var dsour=bId("sour");
+
+audio.load();
+
+	// to choose music
+	var fileInput=document.getElementById("vemmp3file");
+	fileInput.addEventListener("change",event => {
+		const objUrl=URL.createObjectURL(event.target.files[0]);//alert(objUrl);
+		dsour.src=objUrl;;
+		audio.load();
+		audio.play();
+		dmp3file.innerText="";dsour.src.substring(dsour.src.lastIndexOf('/')+1);
+	});
+
+var aCtx=null,scopeCanvas=null,gainMP3,source;
+
+function restart(){location.href="play_mp3.html";}
+
+function init(){setupAudio(scopeCanvas);sim=1;console.clear();dBB.style.display="none";dTA.style.display="";dBA.style.display="";dBV.style.display="";dvemmp3file.style.display="";dmp3file.style.display="";}
+
+function setupAudio(obj){
+	window.AudioContext=window.AudioContext || window.webkitAudioContext;
+	aCtx=new AudioContext();
+	gainMP3=aCtx.createGain();
+	gainMP3.connect(aCtx.destination);
+	source=aCtx.createMediaElementSource(audio);
+	source.connect(gainMP3);
+	gainMP3.gain.value=1.0;
+	source.connect(aCtx.destination);
+	audio.play();
+	gainMP3.gain.value=gainMP3.gain.value-1;
+}
+
+function mp3vol(){dspanA.innerText=mp3val.value;audio.volume=mp3val.value;}
+function mp3gain(){dspanB.innerText=mgain.value;if(gainMP3){gainMP3.gain.value=mgain.value;}}
+
+audio.volume=mp3val.value;
+dspanA.innerText=mp3val.value;
+
+dspanB.innerText=mgain.value;
+dmp3file.innerText=dsour.src.substring(dsour.src.lastIndexOf('/')+1);
+
+</script>
+</body>
+</html>
