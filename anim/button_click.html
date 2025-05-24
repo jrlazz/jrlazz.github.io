@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>button_click.html</title>
+<link rel="icon" type="image/png" href="img/github-mark.png">
+<meta name="description" content="Click on box to bring it's name">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+
+<style>
+@font-face {font-family:cas;src:url(../font/Cascadia.ttf);}
+body{margin:0;background-color:#036;overflow:hidden;}
+span{position:absolute;width:100%;text-align:center;top:10px;font-family:cas;font-size:14pt;color:#ff0;}
+</style>
+
+<script type="importmap">
+	{
+	"imports": {
+		"three": "https://cdn.jsdelivr.net/npm/three@0.175/build/three.module.js",
+		"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.175/examples/jsm/"
+	}}
+</script>
+
+</head>
+
+<body>
+
+<span id="pana">... Click on box to bring it's name ...</span>
+<span id="panb" style="top:40px;font-size:24pt;">?</span>
+
+<script type='module'>
+
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+var scene,camera,renderer,controls,lig;
+var mouse=new THREE.Vector2();
+var raycaster=new THREE.Raycaster(),selected,intersects=[];
+var but1,but2;
+var targets=[];
+
+function init(){
+	scene=new THREE.Scene();
+
+	camera=new THREE.PerspectiveCamera(30,innerWidth/innerHeight,0.1,1000);
+	camera.position.set(-10,10,10);
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setClearColor("#036",0);
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.outputEncoding=THREE.sRGBEncoding;
+	renderer.outputColorSpace =THREE.LinearSRGBColorSpace;
+
+	document.body.appendChild(renderer.domElement);
+
+	window.addEventListener("mousedown",onClick);
+
+	window.addEventListener("resize",(event) => {
+		camera.aspect=innerWidth/innerHeight;
+		camera.updateProjectionMatrix();
+		renderer.setSize(innerWidth,innerHeight);
+	});
+
+	controls=new OrbitControls(camera,renderer.domElement);
+ 
+	lig=new THREE.AmbientLight('#fff',4);scene.add(lig);
+
+	but1=new THREE.Mesh(new THREE.BoxGeometry(2,2,2),new THREE.MeshNormalMaterial());
+	but1.position.x=-3;
+	but1.name="but1";
+	targets.push(but1);
+	scene.add(but1);
+	
+	but2=new THREE.Mesh(new THREE.BoxGeometry(2,2,2),new THREE.MeshNormalMaterial());
+	but2.position.x=3;
+	but2.name="but2";
+	targets.push(but2);
+	scene.add(but2);
+}
+
+function onClick(event){
+	mouse.x=( event.clientX/window.innerWidth)*2-1;
+	mouse.y=-( event.clientY/window.innerHeight)*2+1;
+	raycaster.setFromCamera(mouse,camera);
+	intersects=raycaster.intersectObjects(targets);
+	if(intersects.length>0){
+		document.getElementById("panb").innerText=intersects[0].object.name;
+	}else{
+		document.getElementById("panb").innerText="?";
+	}
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	controls.update();
+	renderer.render(scene, camera);
+}
+
+init();
+animate();
+
+</script>
+</body>
+</html>
