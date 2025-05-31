@@ -49,7 +49,7 @@ THREE.Cache.enabled=true;
 
 	scene=new THREE.Scene();
 	camera=new THREE.PerspectiveCamera(65,window.innerWidth/window.innerHeight,0.1,1000);
-	camera.position.set(0, 25, 25);
+	camera.position.set(10, 25, 25);
 
 	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
 	renderer.setSize(window.innerWidth,window.innerHeight);
@@ -154,35 +154,6 @@ function animate(){
 		scene.add(unionMesh);
 
 		sim=1;
-
-/*
-	const meshA=new THREE.Mesh(new THREE.BoxGeometry(3,3,3));
-	const meshB=new THREE.Mesh(new THREE.SphereGeometry(2,16,16));
-
-	const csgA=CSG.fromMesh(meshA);
-	const csgB=CSG.fromMesh(meshB);
-
-	const unionCSG=csgA.union(csgB);
-	const subtractCSG=csgA.subtract(csgB);
-	const intersectCSG=csgA.intersect(csgB);
-
-	const unionMesh=CSG.toMesh(unionCSG, new THREE.Matrix4());
-	const subtractMesh=CSG.toMesh(subtractCSG, new THREE.Matrix4());
-	const intersectMesh=CSG.toMesh(intersectCSG, new THREE.Matrix4());
-
-	unionMesh.material=new THREE.MeshNormalMaterial();
-	subtractMesh.material=new THREE.MeshNormalMaterial();
-	intersectMesh.material=new THREE.MeshNormalMaterial();
-
-	unionMesh.position.set(-5,20,20);
-	subtractMesh.position.set(0,20,20);
-	intersectMesh.position.set(5,20,20);
-
-	scene.add(unionMesh);
-	scene.add(subtractMesh);
-	scene.add(intersectMesh);
-*/	    
-
 	}
 	renderer.render(scene, camera);
 }
