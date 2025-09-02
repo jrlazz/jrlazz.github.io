@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>cir_axi.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="ok.ico"/>
+<style>
+body {font-family:Arial;font-size:14pt;background-color:#024;color:#fff;margin:0px;overflow:hidden;}
+button {position:absolute;left:20px;top:40px;width:30px;font-family:Arial;font-size:18pt;font-weight:bold;color:red;border-radius:2%;cursor:pointer}
+</style>
+
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+<script type="importmap">
+	{
+		"imports":{
+			"three":"https://unpkg.com/three@0.163.0/build/three.module.js",
+			"three/addons/":"https://unpkg.com/three@0.163.0/examples/jsm/"
+		}
+	}
+</script>
+
+</head>
+
+<body>
+
+<span id="spa" style="position:absolute;left:45%;top:45%;width:300px;font-family:Arial;font-size:41pt;color:#048;display:''"></span>
+
+<button style="left:20px;" id="menos">-</button>
+<button style="left:80px;" id="mais">+</button>
+
+<button style="left:84%;width:120px;background-color:#ccc;text-align:center;"><a id="code" href="cir_axi.txt" target="_blank" style="color:#f00;text-decoration:none;font-size:16pt;">The Code</a></button>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
+
+var camera,scene,renderer,controls,loader,mat,geo,mesh,mesh2,textureLoader,ggk,bat,ar;
+
+var w=0;
+var ww=0;
+var conta=1;
+
+var ax;
+var b=[];
+var c=[];
+var e=[];
+var g=[];
+var m=[];
+var s=[];
+var t=[];
+
+var gr1=new THREE.Group();
+
+var p=Math.PI;
+
+var degrad=0.0174532925;
+var wwdegrad;
+
+var paths=[];
+var shapes=[];
+var depth,bevelEnabled,amb,starA,starB,starC;
+var extrusion=8;
+
+var va,vb,lookAt,dist,gg,o;
+var va2,vb2,lookAt2,dist2,gg2,o2;
+var va3,vb3,lookAt3,dist3,gg3,o3;
+
+var points=[];
+var point1=new THREE.Vector3(0,0,0);
+var point2=new THREE.Vector3(0,0,0);
+var direction;
+var line;
+
+var go=1;
+var pulo=8;
+
+var bId=function(id){return document.getElementById(id);}
+var dmais=bId("mais");
+var dmenos=bId("menos");
+var dspa=bId("spa");
+
+function init() {
+
+	dmais.onclick=function XMAIS(){if(pulo<14){pulo=pulo+2;}}
+	dmenos.onclick=function XMENOS(){if(pulo>0){pulo=pulo-2;}}
+
+	camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,1,1000,1);
+	camera.position.set(0,5,15);
+
+	scene = new THREE.Scene();
+	scene.position.set(-10,0,0);
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.setClearColor('#024',0);
+	//renderer.outputColorSpace=THREE.LinearSRGBColorSpace;
+
+	document.body.appendChild(renderer.domElement);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+
+	window.addEventListener('resize',onWindowResize,false);
+
+	loader=new SVGLoader();
+	loader.load("img/100x96.svg",function(data){
+		paths=data.paths;
+		for(let i=0;i<paths.length;i++){
+			mat=new THREE.MeshStandardMaterial({color:('#666'),metalness:0.5,roughness:0.4});
+			shapes=SVGLoader.createShapes(paths[i]);
+			for(let j=0;j<shapes.length;j++){
+				geo=new THREE.ExtrudeGeometry(shapes[j],{depth:extrusion,bevelEnabled:false,curveSegments:6});
+				mesh=new THREE.Mesh(geo,mat);
+				mesh.scale.set(0.09,0.09,0.09);
+			}
+		}
+		mesh.position.set(-4.5,-4.5,-2.2);
+		mesh2=mesh.clone();
+		mesh2.position.set(-4.5,-4.5,-6.1);
+	});
+
+	amb=new THREE.AmbientLight('#fc9',6);
+	scene.add(amb);
+	starA=new THREE.SpotLight('#fff',4000);
+	starA.position.set(0,30,40);
+	scene.add(starA);
+	starB=new THREE.SpotLight('#fff',4000);
+	starB.position.set(0,-50,-20);
+	scene.add(starB);
+	starC=new THREE.SpotLight('#ff0',2000);
+	starC.position.set(-10,5,0);
+	scene.add(starC);
+
+g[10]=new THREE.SphereGeometry(0.5,32,32,0,6.28,0,1.57); 
+m[10]=new THREE.MeshStandardMaterial({color:'#f00'}); 
+s[1]=new THREE.Mesh(g[10],m[10]);
+m[11]=new THREE.MeshBasicMaterial({color:'#090'}); 
+s[2]=new THREE.Mesh(g[10],m[11]);
+s[2].rotation.z=p;
+
+g[30]=new THREE.CylinderGeometry(0.05,0.05,4,32); 
+m[30]=new THREE.MeshStandardMaterial({color:'#cf0'}); 
+s[31]=new THREE.Mesh(g[30],m[30]);
+s[31].position.set(8.3,-5,-0.5);
+s[31].rotation.set(0,0,p/2);
+s[32]=s[31].clone();
+s[32].position.set(8.3,-5,0.5);
+
+m[31]=new THREE.MeshStandardMaterial({color:'#f0f'}); 
+s[33]=new THREE.Mesh(g[30],m[31]);
+s[33].rotation.set(0,0,p/2);
+s[33].position.set(12.5,-5,-0.5);
+
+s[34]=s[33].clone();
+s[34].rotation.set(0,0,p/2);
+s[34].position.set(12.5,-5,0.5);
+
+s[35]=s[31].clone();
+s[35].scale.y=0.3;
+s[35].rotation.set(0,p/2,p/2);
+s[35].position.set(22.25,4,-0.5);
+
+s[36]=s[32].clone();
+s[36].scale.y=0.3;
+s[36].rotation.set(0,p/2,p/2);
+s[36].position.set(22.25,3.6,-0.5);
+
+s[37]=s[33].clone();
+s[37].scale.y=0.3;
+s[37].rotation.set(0,p/2,p/2);
+s[37].position.set(22.25,3.2,-0.5);
+
+s[38]=s[34].clone();
+s[38].scale.y=0.3;
+s[38].rotation.set(0,p/2,p/2);
+s[38].position.set(22.25,2.8,-0.5);
+
+m[41]=new THREE.MeshStandardMaterial({color:'#f00'}); 
+s[39]=new THREE.Mesh(g[30],m[41]);
+s[39].scale.y=0.3;
+s[39].rotation.set(p/2,0,0);
+s[39].position.set(22.25,2.4,-0.5);
+
+m[42]=new THREE.MeshStandardMaterial({color:'#fff'}); 
+s[40]=new THREE.Mesh(g[30],m[42]);
+s[40].scale.y=0.3;
+s[40].rotation.set(p/2,0,0);
+s[40].position.set(22.25,2,-0.5);
+
+s[41]=s[39].clone();
+s[41].scale.y=0.6;
+s[41].position.set(12,-4.9,-3);
+
+s[42]=s[40].clone();
+s[42].scale.y=0.6;
+s[42].position.set(11,-4.9,-3);
+
+for(let z=31;z<43;z++){gr1.add(s[z]);}
+
+	g[12]=new THREE.CylinderGeometry(0.2,0.2,9); 
+	m[12]=new THREE.MeshStandardMaterial( { color:'#666',metalness:0.5,roughness:0.2} ); 
+	c[10]=new THREE.Mesh(g[12],m[12]);
+
+	c[14]=c[10].clone();
+	c[14].rotation.set(p/2,0,0);
+	c[14].scale.set(2,0.6,2);
+	c[14].position.z=-3.6;
+
+	c[15]=c[10].clone();
+	c[15].rotation.set(0,p/2,0);
+	c[15].scale.set(1,0.15,1);
+
+	c[17]=c[10].clone();
+	c[17].rotation.set(p/2,p/2,0);
+	c[17].scale.set(1,0.25,1);
+
+	c[16]=c[10].clone();
+	c[16].rotation.set(0,0,p/2);
+	c[16].scale.set(4,0.025,4);
+
+	c[18]=c[17].clone();
+
+g[18]=new THREE.SphereGeometry(0.5,32,32); 
+m[18]=new THREE.MeshStandardMaterial({color:'#099'}); 
+s[18]=new THREE.Mesh(g[18],m[18]);
+
+c[12]=c[10].clone();
+c[12].rotation.set(p/2,p/6,p/2);
+scene.add(c[12]);
+c[13]=c[10].clone();
+c[13].rotation.set(p/2,-p/6,p/2);
+
+c[10].add(c[12]);
+c[10].add(c[13]);
+c[10].position.z=-1.8;
+
+c[11]=c[10].clone();
+c[11].position.z=-5.7;
+
+s[1].add(s[2]);
+s[1].add(c[15]);
+s[1].rotation.x=p/2;
+
+	textureLoader=new THREE.TextureLoader();
+	t[1]=new THREE.TextureLoader().load("img/wood_grain.jpg");
+
+	g[13]=new THREE.BoxGeometry(1,6,2); 
+	m[13]=new THREE.MeshStandardMaterial({map:t[1],color:'#960',metalness:0.5,roughness:0.2}); 
+	b[1]=new THREE.Mesh(g[13],m[13]);
+	b[1].scale.set(1.5,1,1);
+	b[1].position.set(0,-2.2,-3.8);
+	b[1].rotation.y=p/2;
+
+	b[2]=b[1].clone();
+	b[2].scale.set(0.75,2,15);
+	b[2].position.set(10,-5.5,-3);
+	b[2].rotation.x=p/2;
+
+	b[3]=b[1].clone();
+	b[3].scale.set(2,0.715,4.5);
+	b[3].position.set(19,-3.15,0);
+
+	b[4]=b[1].clone();
+	b[4].scale.set(0.5,0.2,0.2);
+	b[4].position.set(14.3,-1.2,0);
+
+	b[5]=b[4].clone();
+	b[5].position.set(23.7,-1.2,0);
+
+	b[6]=b[1].clone();
+	b[6].scale.set(1.25,1.62,0.5);
+	b[6].position.set(23,-0.36,-1.62);
+
+	g[17]=new THREE.BoxGeometry(2,3,1); 
+	m[17]=new THREE.MeshStandardMaterial({color:'#224'}); 
+	b[7]=new THREE.Mesh(g[17],m[17]);
+	b[7].rotation.y=p/2;
+	b[7].position.set(23,3,0);
+
+	b[8]=b[7].clone();
+	b[8].scale.set(0.5,3.25,0.5);
+	b[8].position.set(22.25,-0.36,-1.62);
+
+	b[9]=b[7].clone();
+	b[9].rotation.set(p/2,0,p/2);
+	b[9].scale.set(0.5,4,0.5);
+	b[9].position.set(16,-5,-1.62);
+
+	b[10]=b[9].clone();
+	b[10].rotation.set(p/2,0,0);
+	b[10].scale.set(0.5,1,0.5);
+	b[10].position.set(10.5,-5,-0.5);
+
+	b[11]=b[9].clone();
+	b[11].scale.set(1.5,3,0.5);
+	b[11].position.set(10.5,-5,-5.5);
+
+	for(let z=1;z<12;z++){gr1.add(b[z]);}
+
+	g[14]=new THREE.CylinderGeometry(0.1,0.1,4.5); 
+	m[14]=new THREE.MeshStandardMaterial({color:'#999',metalness:0.5,roughness:0.2}); 
+
+	c[2]=new THREE.Mesh(g[14],m[14]);
+	c[3]=c[2].clone();
+	c[4]=c[2].clone();c[4].rotation.x=p/2;c[4].scale.y=0.27;
+
+	for(let z=21;z<34;z++){c[z]=c[2].clone();c[z].scale.y=0.3}
+	c[21].position.set(14.4,-5,0.5);
+	c[22].position.set(14.4,-5,-0.5);
+	c[23].position.set(6.2,-5,0.5);
+	c[24].position.set(6.2,-5,-0.5);
+	c[25]=c[2].clone();c[25].scale.y=0.5;c[25].position.set(23,2,0);// solenoid cylinder
+	c[26]=c[2].clone();c[26].scale.y=0.055;c[26].position.set(23,0.87,0);// solenoid cylinder
+
+	c[27].position.set(22.25,4.0,0);
+	c[28].position.set(22.25,3.6,0);
+	c[29].position.set(22.25,3.2,0);
+	c[30].position.set(22.25,2.8,0);
+	c[31].position.set(22.25,2.4,0);
+	c[32].position.set(22.25,2.0,0);
+	c[33].position.set(23.5,0,0);c[33].scale.y=0.1;c[33].rotation.z=p/2;
+
+	for(let z=27;z<33;z++){c[z].scale.y=0.1;c[z].rotation.set(p/2,0,p/2);}
+
+	for(let z=21;z<34;z++){gr1.add(c[z]);}
+
+t[2]=new THREE.TextureLoader().load("img/ggk3404p2.png");
+g[40]=new THREE.PlaneGeometry(2,0.5);
+m[40]=new THREE.MeshStandardMaterial({map:t[2],color:'#999',transparent:true}); 
+ggk=new THREE.Mesh(g[40],m[40]);
+ggk.position.set(23,-5.5,3.05);
+
+	t[3]=new THREE.TextureLoader().load("img/bat3404p2.png");
+	g[41]=new THREE.PlaneGeometry(9,2);
+	m[41]=new THREE.MeshStandardMaterial({map:t[3],color:'#fff',transparent:true}); 
+	bat=new THREE.Mesh(g[41],m[41]);
+	bat.rotation.x=-p/2;
+	bat.position.set(11,-4.5,-5.5);
+
+	gr1.add(ggk);gr1.add(bat);
+
+	for(let z=1;z<3;z++){e[z]=s[1].clone();}
+
+g[1]=new THREE.CylinderGeometry(0.2,0.2,4.5);
+m[1]=new THREE.MeshStandardMaterial({color:'#c60',metalness:0.5,roughness:0.2});
+c[1]=new THREE.Mesh(g[1],m[1]);
+c[1].geometry.translate(0,2,0);
+c[1].add(e[1]);
+c[1].rotation.set(0,0,-p/2);
+c[1].scale.set(2,2,2);
+
+	va3=new THREE.Vector3(0,0,0);
+	vb3=new THREE.Vector3(8.6,0,0,0);
+	lookAt3=new THREE.Vector3();
+	dist3=va3.distanceTo(vb3);
+	gg3=new THREE.CylinderGeometry(0.75,0.75,dist3).rotateX(p/2);
+	m[40]=new THREE.MeshStandardMaterial({color:'#0ff',wireframe:false,transparent:true,opacity:0.5});
+	o3=new THREE.Mesh(gg3,m[40]);
+	o3.position.copy(va3);
+	o3.lookAt(vb3);
+	o3.position.x=o3.position.x+19;
+
+	va=new THREE.Vector3(0,0,0);
+	vb=new THREE.Vector3(9,0,0);
+	lookAt=new THREE.Vector3();
+	dist=va.distanceTo(vb);
+	gg=new THREE.CylinderGeometry(1,1,dist).rotateX(p/2);
+	m[30]=new THREE.MeshStandardMaterial({color:'#090',transparent:true,opacity:0.5});
+	o=new THREE.Mesh(gg,m[30]);
+	o.position.copy(va);
+	o.lookAt(vb);
+	o.position.x=o.position.x+19;
+
+	gr1.add(o);gr1.add(o3);
+
+g[50]=new THREE.ConeGeometry(0.1,0.3,16); 
+m[50]=new THREE.MeshBasicMaterial({color:'#0ff'} );
+ar=new THREE.Mesh(g[50],m[50]);
+ar.position.set(24,0,0);
+ar.rotation.set(p/2,0,-p/2);
+
+gr1.add(ar);
+
+	/* Orig
+	let a = _some_v3_;
+	let b = _some_v3_;
+	let lookAt = new THREE.Vector3();
+	let dist = a.distanceTo(b);
+	let g = new THREE.CylinderGeometry(r, r, dist) //create geometry
+		.translate(0, dist * 0.5, 0) // rise at a half of height, setting bottm to 0, 0, 0
+		.rotateX(Math.PI * 0.5); // align with Z-axis
+	let m = _some_material_;
+	let o = new THREE.Mesh(g, m);
+	o.position.copy(a); // set position
+	o.lookAt(b); // orient
+	*/
+
+	/*
+	m[20]=new THREE.LineBasicMaterial({color:0x00ffff});
+	points=[];
+	points.push(new THREE.Vector3(-1,0,0));
+	points.push( new THREE.Vector3(1,0,0));
+	g[20]=new THREE.BufferGeometry().setFromPoints(points);
+	line=new THREE.Line(g[20],m[20]);
+	scene.add(line);
+	*/
+
+}
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	conta=1-conta;
+	w++;
+	if(w<=100){dspa.innerText=w+" %";}
+	if(mesh && go==1){
+
+		gr1.position.x=0.2;scene.add(gr1);
+
+		scene.add(e[1]);scene.add(e[2]);
+		scene.add(c[1]);scene.add(c[2]);scene.add(c[3]);scene.add(c[4]);
+		scene.add(c[10]);scene.add(c[11]);
+		scene.add(c[14]);
+		scene.add(c[16]);
+		scene.add(c[17]);scene.add(c[18]);
+		scene.add(s[18]);
+		scene.add(mesh);scene.add(mesh2);
+		go=0;
+	}
+	if(go==0 && conta==1){
+		dspa.style.display="none";
+		ww=ww+pulo;
+		if(ww==360){ww=0;}
+		wwdegrad=ww*degrad;
+		e[1].position.x=4*Math.sin(1*(wwdegrad));
+		e[1].position.y=4*Math.cos(1*(wwdegrad));
+		e[2].position.x=10+4*Math.sin(1*(wwdegrad));
+		c[1].position.x=e[2].position.x+0.5;
+
+		c[2].position.copy(e[2].position);c[2].position.y=-2.24;
+		c[2].position.x +=0.5;c[2].position.z +=0.5;
+
+		c[3].position.copy(e[2].position);c[3].position.y=-2.24;
+		c[3].position.x +=0.5;c[3].position.z -=0.5;
+
+		c[4].position.copy(e[2].position);c[4].position.y=0;
+		c[4].position.x +=0.5;//c[4].position.z -=0.5;
+		
+		c[16].position.x=e[2].position.x+9.2
+		c[17].position.copy(e[1].position);c[17].position.z=-1;
+		c[18].position.copy(e[1].position);c[18].position.z=-6.5;
+		s[18].position.copy(e[1].position);s[18].position.z=-7.0;
+
+		//dspa.innerText=e[2].position.x;
+		if(e[2].position.x<6.5){c[25].position.y=2;ar.position.set(24,0,0);ar.rotation.set(p/2,0,-p/2);}
+		if(e[2].position.x>13){c[25].position.y=2.5;ar.position.set(23,1.13,0);ar.rotation.set(p/2,p/2,p/2);}
+
+		scene.remove(o2);
+		va2=new THREE.Vector3(e[2].position.x,0,0);
+		vb2=new THREE.Vector3(e[1].position.x,e[1].position.y,0);
+		lookAt=new THREE.Vector3();
+		dist2=va2.distanceTo(vb2);
+		gg2=new THREE.CylinderGeometry(0.4,0.4,dist2).translate(0,dist2*0.5,0).rotateX(p/2);
+		m[31]=new THREE.MeshStandardMaterial({color:'#c60',metalness:0.5,roughness:0.2});
+		o2=new THREE.Mesh(gg2,m[31]);
+		o2.position.copy(va2);
+		o2.lookAt(vb2)
+		scene.add(o2);
+
+		/*
+		points=[];
+		points.push( new THREE.Vector3(e[2].position.x,0,0));
+		points.push( new THREE.Vector3(e[1].position.x, e[1].position.y,0));
+		g[20]=new THREE.BufferGeometry().setFromPoints( points );
+		scene.remove(line);
+		line=new THREE.Line(g[20],m[20]);
+		scene.add(line);
+		*/
+
+		c[10].rotation.z -=(pulo*0.0174532925);
+		c[11].rotation.z -=(pulo*0.0174532925);
+	}
+	renderer.render(scene,camera);
+}
+
+init();
+animate();
+
+/*
+
+Circular to Axial movement with Three.js
+
+The link
+
+https://jrlazz.eu5.org/anim/cir_axi.html
+
+Obs: Cylinder from 2 points code based on:
+     https://discourse.threejs.org/t/straight-tube-geometry/45946/3
+     prisoner849 ... Dec 2022
+     ... Looks like you're trying to put a tube from one point to another.
+
+
+*/
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>audio3d_chrome_r1.html</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<link type="text/css" rel="stylesheet" href="main.css">
+<style>
+body{margin:0px;border:0px;background-color:#024;font-family:Monospace;overflow:hidden;}
+</style>
+</head>
+
+<body>
+
+<table style="position:absolute;left:0px;top:8px;width:99%;color:#fc0;z-index:2;">
+<tr>
+<td style="width:20%;height:32px;">
+<span style="color:#fc0;font-size:8pt;cursor:pointer;">click right to inspect / see code</span>
+</td><td style="width:20%;">
+<button id="bostart" style="display:;font-size:10pt;height:24px;background-color:#f00;color:#fff;font-weight:bold;cursor:pointer;"> start </button>
+<button id="bo" style="display:none;font-size:10pt;height:24px;background-color:#fc0;color:#00c;font-weight:bold;cursor:pointer;"> Play/Pause </button>
+</td><td style="width:30%;">
+<span id="spansel" style="display:none;color:#cc0;font-size:12pt;">audio&nbsp;<select id="sel" autocomplete="off" style="background-color:#630;color:#ff0;font-size:12pt;border:1px inset #999;cursor:pointer;" onchange="troca();">
+<option value="1248.mp3">1 2 4 8 kHz</option>
+<option value="unstress_you_red.mp3">Unstress You</option>
+<option value="TwoofUs.mp3">Two of Us</option>
+<option value="satisfaction.mp3">Satisfaction</option>
+<option value="ICallYourName.mp3">I Call Your Name</option>
+<option value="WeCanWorkItOut.mp3">We Can Work It Out</option>
+</select>
+</span>
+</td><td style="width:10%;">
+<input id="volin" type="range" style="display:none;width:100px;cursor:pointer;" value="0.2" min="0" max="1" step="0.02" onchange="mudavol();" autocomplete="off"></input>
+</td><td style="width:10%;">
+<span id="spanB" style="display:none;position:relative;top:-7px;color:#fc0;font-size:9pt;"></span>
+</td></tr></table>
+
+<script type="module">
+
+import * as THREE from '../js/three.module_res_res.js';
+import { OrbitControls } from '../js/OrbitControls_res_res.js';
+
+var scene, camera, renderer, analyser, uniforms, controls;
+var box=[];
+var geo=[];
+var mat=[];
+var w=0;
+var currentTime;
+var volval=document.getElementById("volin");
+var file;
+var mediaElement, fftSize, listener, audio, format;
+
+	var start=document.getElementById('bostart');start.onclick=function StartAnimation(){init();}
+	var inpA=document.getElementById('volin');inpA.onchange=function StartAnimation(){mudavol();}
+	var sela=document.getElementById('sel');sela.onchange=function StartAnimation(){troca();}
+
+function init() {
+
+	document.getElementById("bostart").style.display="none";
+	document.getElementById("bo").style.display="";
+	document.getElementById("spansel").style.display="";
+	document.getElementById("volin").style.display="";
+	document.getElementById("spanB").style.display="";
+
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setSize( window.innerWidth,window.innerHeight);
+	renderer.setClearColor(0x002244);
+	renderer.setPixelRatio(window.devicePixelRatio);
+	document.body.appendChild(renderer.domElement);
+	scene=new THREE.Scene();
+	camera=new THREE.PerspectiveCamera(90,window.innerWidth/window.innerHeight,1,1000);
+	camera.position.set(0,0,400);
+
+	fftSize=512;
+	listener=new THREE.AudioListener();
+	audio=new THREE.Audio(listener);
+	file='1248.mp3';
+	mediaElement=new Audio(file);
+	mediaElement.play();
+	mediaElement.volume=0.2;
+	audio.setMediaElementSource(mediaElement);
+	analyser=new THREE.AudioAnalyser(audio,fftSize);
+	format=(renderer.capabilities.isWebGL2 ) ? THREE.RedFormat : THREE.LuminanceFormat;
+	uniforms={tAudioData: { value: new THREE.DataTexture( analyser.data, fftSize / 2, 1, format ) }	};
+
+	var esq=new THREE.DirectionalLight('#ccc',1);
+	esq.position.set(-30,30,60).normalize();
+	scene.add(esq);
+	var dir=new THREE.DirectionalLight('#ccc',1);
+	dir.position.set(30,-30,-60).normalize();
+	scene.add(dir);
+
+	var tex1=new THREE.TextureLoader().load('img/1kHz.png');
+	var tex2=new THREE.TextureLoader().load('img/2kHz.png');
+	var tex4=new THREE.TextureLoader().load('img/4kHz.png');
+	var tex8=new THREE.TextureLoader().load('img/8kHz.png');
+
+	var marca1=new THREE.MeshStandardMaterial({map:tex1,transparent:true});
+	var marca2=new THREE.MeshStandardMaterial({map:tex2,transparent:true});
+	var marca4=new THREE.MeshStandardMaterial({map:tex4,transparent:true});
+	var marca8=new THREE.MeshStandardMaterial({map:tex8,transparent:true});
+
+	geo[0]=new THREE.BoxGeometry(2,0.5,5);
+	mat[0]=new THREE.MeshStandardMaterial({color:0xffffff});
+	box[0]=new THREE.Mesh(geo[0],mat[0]);
+	
+	box[601]=new THREE.Mesh(geo[0],marca1);
+	box[602]=new THREE.Mesh(geo[0],marca2);
+	box[604]=new THREE.Mesh(geo[0],marca4);
+	box[608]=new THREE.Mesh(geo[0],marca8);
+
+	box[601].position.set(-415,25,0);box[601].scale.set(1,900,10);
+	box[602].position.set(-328,25,0);box[602].scale.set(1,900,10);
+	box[604].position.set(-158,25,0);box[604].scale.set(1,900,10);
+	box[608].position.set( 185,25,0);box[608].scale.set(1,900,10);
+
+	scene.add(box[601]);scene.add(box[602]);scene.add(box[604]);scene.add(box[608]);
+
+	for(let z=1;z<129;z++){
+		geo[z]=geo[0].clone();
+		mat[z]=new THREE.MeshStandardMaterial({color:'hsl('+z*2+',50%,50%)',metalness:0.5,roughness:0.5});
+		box[z]=new THREE.Mesh(geo[z],mat[z]);
+		box[z].scale.set(2,1,10);
+		box[z].position.x=-400+z*6;
+		scene.add(box[z]);
+	}
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	controls.minDistance=50;
+	controls.maxDistance=800;
+	controls.enablePan=true;
+	controls.enableDamping=true;
+
+	document.getElementById("bo").addEventListener("click",function(){
+		mediaElement.volume=volval.value;
+		if(mediaElement.paused){
+			mediaElement.play();
+		}else{
+			mediaElement.pause();
+		}
+	})
+
+	window.addEventListener('resize',onWindowResize);
+
+	animate();
+}
+
+function onWindowResize(){
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function mudavol(){
+	mediaElement.volume=volval.value;
+	document.getElementById("spanB").innerText="vol= "+volval.value;
+}
+
+function troca(){
+	var select=document.getElementById('sel');
+	var value=select.options[select.selectedIndex].value;
+	mediaElement.src=value;
+	mediaElement.play();
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	controls.update();
+	render();
+ 	for (let j=1;j<129;j++){
+		box[j].scale.y=3*parseInt(analyser.data[j]);
+		box[j].position.x=-500+j*8;
+		box[j].position.y=-200+(3*parseInt(analyser.data[j])/4);
+	}
+}
+
+function render(){
+	analyser.getFrequencyData();
+	uniforms.tAudioData.value.needsUpdate=true;
+	renderer.render(scene,camera);
+}
+
+document.getElementById("spanB").innerText="vol= "+volval.value;
+
+/*
+
+Hi Three.js followers,
+
+3D audio spectrum without canvas code
+
+This page was made to work on Chrome.
+
+the link:
+
+http://jrlazz.eu5.org/anim/audio3d_chrome_r1.html
+
+Again, Thanks for the great Three.js Team!
+
+Jose Roberto Lazzareschi
+
+*/
+
+
+</script>
+</body>
+</html>

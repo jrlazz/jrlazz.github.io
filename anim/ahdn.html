@@ -1,0 +1,148 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>ahdn.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="ok.ico"/>		
+
+<style>
+@font-face {font-family:myq;src:url('../fonte/MysteryQuest-Regular.ttf');}
+body{font-family:myq;background-color:#256;margin:0px;overflow:hidden;}
+button{font-family:myq;font-size:12pt;background-color:#256;color:#ff0;border:2px outset #ff0;}
+</style>
+</head>
+<body>
+<button id="toc" style="position:absolute;left:0px;top:0px;width:70px;height:20px;cursor:pointer;font-size:10.25pt;display:;">A H D N</button>
+<canvas id="can" style="position:absolute;left:10px;top:40px;width:200px;height:100px;background-color:#256;display:;"></canvas>
+<script>
+var foi=0;
+var myTimeout;
+var sim=0;
+var bId=function(id){return document.getElementById(id);}
+var dtoc=bId("toc");
+var dhard=bId("hard");
+var can=bId("can");
+var audioContext=null;
+var ana;
+var bufferLength;
+var dataArray;
+var ctx;
+var width;
+var height;
+var sliceWidth;
+var MasterGain;
+var gNode;
+var now;
+var aC;
+var attack;
+var decay;
+var sustain;
+var release;
+var adsrCanvas;
+var lator=[];
+var lope;
+var drawscope;
+var isPlaying;
+var freq=30;
+var oct=12;
+// fres e notas
+var fre=[];
+var nota=[];
+for(let z=0;z<109;z++){fre[z+1]=(27.5*Math.pow(2, z*1/12)).toFixed(3);}
+for(let z=1;z<107;z++){fre[z]=fre[z+3];}
+var xa=[];
+var ya=[];
+var k=0;
+xa=[" ","A","A#","B","C","C#","D","D#","E","F","F#","G","G#"];
+for(let u=1;u<13;u++){for(let z=(u*12-11);z<((u*12-11)+12);z++){k++;nota[z]=xa[k]+u;}k=0;}
+for(let z=1;z<107;z++){nota[z]=nota[z+3];}
+
+var vals=[];
+var acor="";var JIBrown=["A2","D3","F3","G3","A3","C4","D4","G4","A4","C5","D5","G5","B5","C6","D6","E6","F#6","G#6","A6","D7","E7","F7","G7"];
+for(let z=0;z<JIBrown.length;z++){acor=acor+" "+JIBrown[z];};
+for(let z=0;z<JIBrown.length;z++){for(let y=0;y<107;y++){if(JIBrown[z]==nota[y]){vals[z]=y;y=107;}}}
+
+dtoc.onclick=function TO(){init();}
+window.addEventListener("click",onClick);
+
+function onClick(event){fhard();}
+function fhard(){
+	for(let z=0;z<(vals.length);z++){lator[z].frequency.setValueAtTime(fre[vals[z]+oct],aC.currentTime);}
+	for(let z=0;z<24;z++){lator[z].type="sawtooth";}
+	lope.startEnvelope();drawscope();isPlaying=true;
+	myTimeout=setTimeout(function(){if(isPlaying){lope.stopEnvelope();isPlaying=false;mika();}},3000);
+}
+function mika(){
+parent.document.getElementById("hard").style.width="1px";
+parent.document.getElementById("hard").style.height="1px";
+parent.document.getElementById("hard").src="ahdn_no.html";
+}
+
+function init(){
+	if(foi==0){foi=1;}
+	dtoc.style.display="none";
+	function setupscope(audioContext,gNode,canvas){
+		ana=aC.createAnalyser();
+		gNode.connect(ana);
+		ana.fftSize=2048;//2048 16384
+		bufferLength=ana.fftSize;
+		dataArray=new Uint8Array(bufferLength);
+		ctx=canvas.getContext('2d');
+		width=canvas.width;
+		height=canvas.height;
+		function drawscope(){
+			ana.getByteTimeDomainData(dataArray);
+			ctx.fillStyle='#256';
+			ctx.fillRect(0,0,width,height);
+			ctx.lineWidth=1;
+			ctx.strokeStyle='#fc0';
+			ctx.beginPath();
+			sliceWidth=width*1.0/bufferLength;
+			let x=0;let y=0;
+			for(let i=0;i<bufferLength;i++){
+				y=dataArray[i]/128*height/2
+				if(i==0){ctx.moveTo(x,y);}else{ctx.lineTo(x,y);}
+					x += sliceWidth;
+				}
+			ctx.lineTo(width, height/2);
+			ctx.stroke();
+			requestAnimationFrame(drawscope);
+		}
+		return drawscope;
+	}
+	function createADSR(aC,attack,decay,sustain,release){
+		MasterGain=aC.createGain();
+		gNode=aC.createGain();
+		gNode.gain.setValueAtTime(0,aC.currentTime); // Initial gain value
+		function startEnvelope(){
+			now=aC.currentTime;
+			gNode.gain.cancelScheduledValues(now);
+			gNode.gain.setValueAtTime(0,now);
+			gNode.gain.exponentialRampToValueAtTime(1,now+attack);// Exponential attack
+			gNode.gain.exponentialRampToValueAtTime(sustain,now+attack+decay);// Exponential decay
+		}
+		function stopEnvelope(){
+			now=aC.currentTime;
+			gNode.gain.cancelScheduledValues(now);
+			gNode.gain.setValueAtTime(gNode.gain.value,now);
+			gNode.gain.exponentialRampToValueAtTime(0.01,now+release); // Exponential release
+		}
+		return {gNode,startEnvelope,stopEnvelope};
+	}
+	aC=new (window.AudioContext || window.webkitAudioContext)();
+	attack=0.05;	decay=0.07;	sustain=0.9;	release=3.7;
+	adsrCanvas=document.getElementById('adsrCanvas');
+	for(let z=0;z<24;z++){lator[z]=aC.createOscillator();}
+	lope=createADSR(aC,attack,decay,sustain,release);
+	drawscope=setupscope(aC,lope.gNode,can);
+	for(let z=0;z<24;z++){lator[z].connect(lope.gNode);}
+	MasterGain.gain.setValueAtTime(0.7,aC.currentTime);
+	lope.gNode.connect(MasterGain);
+	MasterGain.connect(aC.destination);
+	for(let z=0;z<24;z++){lator[z].start();}
+	isPlaying=false;
+}
+</script>
+</body>
+</html>

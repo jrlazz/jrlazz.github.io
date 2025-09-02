@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>backmove.html</title>
+<link rel="shortcut icon" href="../ok.ico">
+ <style>
+@font-face{font-family:myq;src:url('../fonte/MysteryQuest-Regular.ttf');}
+body{overflow: hidden;margin:0px;background-color:#000;}
+</style>
+
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.171.0/build/three.module.min.js",
+      "three/addons/": "https://unpkg.com/three@0.171.0/examples/jsm/"
+    }
+  }
+</script>
+
+</head>
+
+<body>
+
+<img id="ima"  src="img/w01500h00994.jpg" style="position:absolute;left:1px;top:1px;filter:invert(0%) blur(0px;) brightness(20%) hue-rotate(140deg);opacity:0.0;z-index:-1;"></img>
+<span id="sp" style="position:absolute;width:1px;height:1px;top:10%;font-family:myq;font-size:41px;color:#ff0;text-align:center;opacity:0.0;z-index:-1;">Hello... only Image...</span>
+<a id="but" href="backmove.txt" target="_blank" style="position:absolute;width:76px;left:4px;top:55px;background-color:#000;color:#0ff;font-family:Arial;font-size:10pt;text-decoration:none;text-align:center;opacity:0.0;">The Code</a>
+
+<script type="module">
+
+import * as THREE from 'three';
+import {OrbitControls} from "three/addons/controls/OrbitControls.js";
+import Stats from "three/addons/libs/stats.module.js";
+
+var camera, scene, renderer, controls, stats, mesh0, mesh, dirLight;
+var t1=0;var t2=0;var t3=0;var t4=0;var t5=0;
+var p1=1;
+var p2=0.25;
+var pX=0;var pY=0;
+var sim=0;
+var xL=0;var xR=0;var yT=0;var yD=0;
+var w0,w1,w2,w3,w4,h0,h1,h2,h3,h4;
+var bId=function(id){return document.getElementById(id);}
+var dbo=bId("bo");
+var dima=bId("ima");
+var dsp=bId("sp");
+var dbut=bId("but");
+
+	scene=new THREE.Scene();
+
+	camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000,0.1);
+	camera.position.set(0,0,120);
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+
+	document.body.appendChild(renderer.domElement);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	stats=new Stats();
+	document.body.appendChild(stats.dom);
+
+	function onWindowResize() {
+		camera.aspect=window.innerWidth/window.innerHeight;
+
+		w1=w0;
+		h1=h0;
+		w2=window.innerWidth;
+		h2=h1*window.innerWidth/w1;
+		w3=w2*2;
+		h3=parseInt(h2*2);
+		w4=w3;
+		h4=h3;
+		if((window.innerHeight*2)>(h3*2)){
+			h4=(window.innerHeight*2);
+			w4=w3*(window.innerHeight*2)/(h3*2);
+		}
+
+		dima.style.width=w3+"px";dima.style.height=h3+"px";
+		dima.style.left=-w3/4+"px";dima.style.top=-h3/4+"px";
+
+		dsp.style.width=w4/2+"px";
+		dsp.style.height=h4/2+"px";
+
+		camera.updateProjectionMatrix();
+		renderer.setSize(window.innerWidth, window.innerHeight);
+	}
+
+	window.addEventListener('resize', onWindowResize, false);
+
+	mesh0=new THREE.Mesh(new THREE.SphereGeometry(2,16,16), new THREE.MeshBasicMaterial({color:'#000',transparent:true,opacity:0.0}));
+	mesh0.position.set(15,0,0);
+	mesh=new THREE.Mesh(new THREE.BoxGeometry(30,30,30), new THREE.MeshStandardMaterial({color:'#f00',metalness:0.7,roughness:0.2,transparent:true,opacity:0.0}));
+	mesh.position.set(0,0,0);
+	mesh.add(mesh0);
+	scene.add(mesh);
+
+	dirLight=new THREE.DirectionalLight('#fff',50);
+	dirLight.position.set(0,0,90);
+	dirLight.target=mesh;
+	scene.add(dirLight);
+
+	window.addEventListener('mousemove', (event) => {
+		if(event.clientX<window.innerWidth/2){
+			if(pX<xL){dima.style.left=pX+p1+"px";}
+		}else{
+			if(pX>xR){dima.style.left=pX-p1+"px";}
+		}
+
+		if(event.clientY>window.innerHeight/2){
+			if(pY<yT){dima.style.top=pY+p1+"px";}
+		}else{
+			if(pY>yD){dima.style.top=pY-p1+"px";}
+		}
+		//dsp.innerText=pX + " "+ pY+" " +event.clientX+" "+ event.clientY;
+	});
+
+function animate(){
+	requestAnimationFrame(animate);
+
+	pX=parseFloat(dima.style.left);
+	pY=parseFloat(dima.style.top);
+
+	t1++;
+
+	if(t1<500){
+		if(pX<xL){dima.style.left=parseFloat(dima.style.left)+p2+"px";}
+		if(pY>yD){dima.style.top= parseFloat(dima.style.top) -p2+"px";}
+		t2++;
+		//mesh.position.x +=0.05;
+		dima.style.filter="invert("+t2/25+"%) blur("+t2/50+"px)";
+	}
+
+	if(t1>500 && t1<1001){
+		if(pX>xR){dima.style.left=parseFloat(dima.style.left)-p2+"px";}
+		t2--;
+		dima.style.filter="invert("+t2/25+"%) blur("+t2/50+"px)";
+	}
+
+	if(t1>1000 && t1<1501){
+		if(pX<xL){dima.style.left=parseFloat(dima.style.left)+p2+"px";}
+		if(pY<yT){dima.style.top= parseFloat(dima.style.top) +p2+"px";}
+		t2++;
+		dima.style.filter="invert("+t2/25+"%) blur("+t2/50+"px)";
+	}
+
+	if(t1>1500){
+		if(pX>xR){dima.style.left=parseFloat(dima.style.left)-p2+"px";}
+		t2--;
+		dima.style.filter="invert("+t2/25+"%) blur("+t2/50+"px)";
+	}
+
+	if(t1>2000){t1=0;}
+
+
+	if(mesh){
+		mesh.rotation.x +=.03;
+		mesh.rotation.y +=.03;
+		mesh.rotation.z +=.03;
+	}
+
+	t5=t5+0.5;mesh.material.color=new THREE.Color("hsl("+t5+", 100%, 50%)");if(t5>359){t5=0;}
+
+	if(sim==0 && t3<1 && mesh){
+		t3=t3+0.0025;
+		dima.style.opacity=t3;
+		dsp.style.opacity=t3;
+		dbut.style.opacity=t3;
+		mesh0.material.opacity=t3;
+		mesh.material.opacity=t3;
+		if(t3>0.99){sim=1;}
+	}
+
+	t4=t4+0.001;
+	if(dima){dima.style.filter="hue-rotate("+Math.sin(t4)*360+"deg)";}
+	if(t4>1.57){t4=0;}
+
+	stats.update();
+	controls.update();
+	
+	renderer.render(scene, camera);
+}
+
+animate();
+
+document.addEventListener('DOMContentLoaded', function () {
+	var el = document.getElementById("ima");
+	w0=el.naturalWidth;
+	h0=el.naturalHeight;
+
+	//w0=parseInt(("w00647h00625.jpg").substring(1,6));
+	//h0=parseInt(("w00647h00625.jpg").substring(8,12));
+
+	//w0=parseInt(("w01500h00994.jpg").substring(1,6));
+	//h0=parseInt(("w01500h00994.jpg").substring(8,12));
+
+	w1=w0;
+	h1=h0;
+
+	w2=window.innerWidth;
+	h2=h1*window.innerWidth/w1;
+	w3=w2*2;
+	h3=parseInt(h2*2);
+
+	w4=w3;
+	h4=h3;
+
+	if((window.innerHeight*2)>(h3*2)){
+		h4=(window.innerHeight*2);
+		w4=w3*(window.innerHeight*2)/(h3*2);
+	}
+
+	xL=-window.innerWidth/4;//-w4/4;
+	xR=-window.innerWidth+window.innerWidth/4;//w4+w4/4;
+	yT=-window.innerHeight/2;//h4/4;
+	yD=-window.innerHeight-window.innerHeight/2;//h4+h4/4;
+	
+	dima.style.width=w4+"px";dima.style.height=h4+"px";
+	dima.style.left=-w4/4+"px";dima.style.top=-h4/4+"px";
+
+	dsp.style.width=w4/2+"px";
+	dsp.style.height=h4/2+"px";
+
+})
+
+</script>
+</body>
+</html>

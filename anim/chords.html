@@ -1,0 +1,388 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>chords.html</title>
+<link rel="shortcut icon" href="ok.ico">
+
+<style>
+body{margin:0px;font-family:Lucida Console;font-size:11pt;background-color:#033;color:#ff0;overflow:hidden;}
+button{border:2px outset #f00;font-size:12pt;font-weight:bold;font-family:Comic Sans MS;}
+button:active{border-style:inset;}
+.bu{border:2px outset #f00;font-size:12pt;font-weight:bold;font-family:Comic Sans MS;}
+span{color:#ff0;font-size:11pt;}
+input{position:absolute;left:0px;cursor:pointer;text-align:center;}
+.sp{position:relative;top:-8px;}
+
+.in{background-color:#066;width:36px;border-style:outset;height:18px;font-size:6pt;color:#fff;}
+.in2{background-color:#fc0;width:36px;border-style:outset;font-size:12pt;font-weight:bold;}
+</style>
+
+</head>
+
+<body>
+
+<table style="position:absolute;left:700px;top:5px;">
+<tr><td colspan="3" style="height:30px;"><button class="bu" id="octme" onclick="foct(1);">oct1</button> <button class="bu" onclick="foct(2);">oct2</button> <button class="bu" onclick="foct(3);">oct3</button> <button class="buc" onclick="fmute();">mute</button>
+ <select id="selchordma" autocomplete="off" class="bu" onchange="trocama();">
+<option value="0,0">Major</option>
+<option value="restart">Restart</option>
+<option value="";>none</option>
+<option value="E4,C#4,A3,E3,A2,E2">A+</option>
+<option value="F4,D4,A#3,F3,A#2,F2">A#+</option>
+<option value="F#4,D#4,B3,F#3,B,F#2">B+</option>
+<option value="E4,C4,G3,E3,C3,E2">C+</option>
+<option value="F4,C#4,G#3,F3,C#3,F2">C#+</option>
+<option value="A4,F#4,D4,A3,D3,A2">D+</option>
+<option value="A#4,G4,D#4,A#3,D#3,A#2">D#+</option>
+<option value="E4,B3,G#3,E3,B2,E2">E+</option>
+<option value="F4,C4,A3,F3,C3,F2">F+</option>
+<option value="F#4,C#4,A#3,F#3,C#3,F#2">F#+</option>
+<option value="G4,B3,G3,D3,B2,G2">G+</option>
+<option value="G#4,D#4,C4,G#3,D#3,G#2">G#+</option>
+</select>
+
+ <select id="selchordme" autocomplete="off" class="bu" onchange="trocame();">
+<option value="0,0">Minor</option>
+<option value="restart">Restart</option>
+<option value="";>none</option>
+<option value="E4,C4,A3,E3,A2,E2">A-</option>
+<option value="F4,C#4,A#3,F3,A#,2F2">A#-</option>
+<option value="F#4,D4,B3,F#3,B2,F#2">B-</option>
+<option value="G4,D#4,C4,G3,C3,G2">C-</option>
+<option value="G#4,E4,C#4,G#3,C#3,G#2">C#-</option>
+<option value="A4,F4,D4,A3,D3,A2">D-</option>
+<option value="A#4,F#4,D#4,A#3,D#3,A#2">D#-</option>
+<option value="E4,B3,G3,E3,B2,E2">E-</option>
+<option value="F4,C4,G#3,F3,C3,F2">F-</option>
+<option value="F#4,C#4,A3,F#3,C#3,F#2">F#-</option>
+<option value="G4,D4,A#3,G3,D3,G2">G-</option>
+<option value="G#4,D#4,B3,G#3,D#3,G#2">G#-</option>
+</select>
+
+ <select id="selchordse" autocomplete="off" class="bu" onchange="trocase();">
+<option value="0,0">Seventh</option>
+<option value="restart">Restart</option>
+<option value="";>none</option>
+<option value="E4,C#4,G3,E3,A2,E2">A7</option>
+<option value="F4,D4,G#3,F3,A#2,F2">A#7</option>
+<option value="B4,F#4,D#4,A3,F#3,B2">B7</option>
+<option value="G4,E4,A#3,G3,C3,E2">C7</option>
+<option value="G#4,F4,B3,G#3,C#3,G#2">C#7</option>
+<option value="A4,F#4,C4,A3,D3,A2">D7</option>
+<option value="A#4,G4,C#4,A#3,D#3,A#2">D#7</option>
+<option value="E4,D4,G#3,D3,B2,E2">E7</option>
+<option value="F4,C4,A3,D#3,C3,F2">F7</option>
+<option value="F#4,E4,A#3,E3,C#3,F#2">F#7</option>
+<option value="F4,B3,G3,D3,B2,G2">G7</option>
+<option value="G#4,F#4,C4,F#3,D#3,G#2">G#7</option>
+</select>
+
+ <select id="selchordxt" autocomplete="off" class="bu" onchange="trocaxt();">
+<option value="0,0">Extra</option>
+<option value="restart">Restart</option>
+<option value="";>none</option>
+<option value="E4,B5,E5,F#5,G#5,B6,E6,F#6,B7,F#7">Bagpipe</option>
+<option value="C4,G4,E5,C5,G5,C6">Satisf. 1</option>
+<option value="B4,F#4,D#5,F#5,B6,C#6,F#6,C#7">Satisf. 2</option>
+<option value="B5,C5,D5,F5">Train</option>
+</select>
+</td>
+</tr>
+<tr>
+<td colspan="3" style="height:30px;">
+<button class="bu" onclick="iniseq();">inisec</button>
+<button class="bu" onclick="javascript:clearInterval(myinter);fmute();">parasec</button>
+</td>
+</tr>
+
+<tr>
+<td colspan="3" style="height:30px;">
+<span class="sp">interval: </span><input id="ininterval" type="range" onchange="mudainterval();" value=1200 min=200 max=2400 autocomplete="off" style="position:relative;"></input> <span class="sp" id="spaninterval"></span>
+</td>
+</tr>
+
+
+<tr>
+<td colspan="3" style="height:30px;">
+<span class="sp">volfreq: </span><input id="volfreq" type="range" onchange="mudavolfreq();" value=1.6 min=1 max=3 step=0.1 autocomplete="off" style="position:relative;"></input> <span class="sp" id="spanvolfreq"></span>
+</td>
+</tr>
+
+<tr>
+<td colspan="3" style="height:30px;">
+<span class="sp">volume: </span><input id="volume" type="range" onchange="mudavolume();" value=2 min=0 max=5 step=0.2 autocomplete="off" style="position:relative;"></input> <span class="sp" id="spanvolume"></span>
+</td>
+</tr>
+
+</table>
+
+
+
+<script>
+
+var box=24;
+
+document.write("<div style='position:absolute;width:1193px;height:24px;left:180px;top:200px;border:1px solid #0ff;padding:4px;display:none;'>");
+for(let z=1;z<(box+1);z++){document.write("<input type='text' id='"+z+"' onclick='ch(id)' value='"+z+"' class='in' autocomplete='off'>");}
+document.write("</div>");
+
+document.write("<div style='position:absolute;width:1193px;height:24px;left:180px;top:240px;border:1px solid #0ff;padding:4px;'>");
+for(let z=(box+1);z<(1+box*2);z++){document.write("<input type='text' id='"+z+"' onclick='ch(id-box)' value='"+(z-box)+"' class='in2' autocomplete='off'>");}
+document.write("</div>");
+
+var bId=function(id){return document.getElementById(id);}
+
+var chor=[];for(let z=1;z<(1+box*2);z++){chor[z]=bId(z);}
+var did=[];for(let z=1;z<(1+box*2);z++){did[z]=bId(z.toString())}
+
+var dma=bId("selchordma");
+var dme=bId("selchordme");
+var dse=bId("selchordse");
+var dxt=bId("selchordxt");
+
+var pos;
+posx=0;for(let z=1;z<(box+1);z++){chor[z].style.left=4+posx*50+"px";posx++;}
+posx=0;for(let z=(box+1);z<(1+box*2);z++){chor[z].style.left=4+posx*50+"px";posx++;}
+
+var fre=[];for(let z=0;z<109;z++){fre[z+1]=(27.5*Math.pow(2, z*1/12)).toFixed(3);}
+var ya=[];var nota=[];var k=0;
+var xa=[];xa=[" ","A","A#","B","C","C#","D","D#","E","F","F#","G","G#"];
+for(let u=1;u<13;u++){for(let z=(u*12-11);z<((u*12-11)+12);z++){k++;nota[z]=xa[k]+u;};k=0;}
+
+var valor;
+var octa=110;
+var myinter;
+var conta=0;
+var xx,yy;
+var interval=1200;
+var volfreq=1.6;
+var volume=1;
+
+var lfo,lfoGain,vollfo,vollfoGain;
+var det=0;
+var envo=1;
+var numosc=97;
+
+
+
+
+
+var timeout;
+var gNode,MNode;
+
+osctype="sine";
+
+var envelope,envelo,now;
+var attack=0.05;
+var decay=0.01;
+var sustain=0.7
+var release=3.0;
+
+var attack2=0.1;
+var decay2=0.5;
+var sustain2=0.7
+var release2=3.0;
+
+var isPlaying=false;
+
+var aCtx=null;
+var osc=[];var oscGain=[];
+var oscb=[];var oscGainb=[];
+
+
+
+// ******** ********
+
+
+
+function setupAudio(obj){
+
+	window.AudioContext=window.AudioContext || window.webkitAudioContext;
+	aCtx=new AudioContext();
+
+	lfo=aCtx.createOscillator();
+	lfo.frequency.value=4.5;
+	lfo.start(0);
+	lfoGain=aCtx.createGain();
+	lfoGain.gain.value=0;
+	lfo.connect(lfoGain);
+
+	vollfo=aCtx.createOscillator();
+	vollfo.frequency.value=volfreq;
+	vollfo.start(0);
+	vollfoGain=aCtx.createGain();
+	vollfoGain.gain.value=0.3;
+	vollfo.connect(vollfoGain);
+
+	gNode=aCtx.createGain();
+	MNode=aCtx.createGain();
+	MNode.gain.value=volume;
+
+	for(let z=1;z<(box+1);z++){
+		oscGainb[z]=aCtx.createGain();
+		oscb[z]=aCtx.createOscillator();
+		oscb[z].type="sawtooth";//sine square triangle sawtooth
+		oscb[z].start(aCtx.currentTime);
+		oscb[z].connect(oscGainb[z]);
+		oscGainb[z].gain.value=0;
+		oscGainb[z].connect(gNode);
+	}
+
+	for(let z=1;z<numosc;z++){
+		oscGain[z]=aCtx.createGain();
+		osc[z]=aCtx.createOscillator();
+		osc[z].type="sine";//sine square triangle sawtooth
+		osc[z].start(aCtx.currentTime);
+		osc[z].connect(oscGain[z]);
+	}
+
+	for(let z=1;z<numosc;z++){
+		osc[z].frequency.value=fre[z];
+						//lfoGain.connect(osc[z].frequency);
+		oscGain[z].gain.value=0;
+		oscGain[z].connect(gNode);
+	}
+
+	gNode.connect(MNode);
+	MNode.connect(aCtx.destination);
+	foct(2);
+	envelo=createADSR2(aCtx,attack2,decay2,sustain2,release2);
+	envelo.startenvelo();isPlaying=true;
+}
+
+function createADSR2(aCtx,attack2,decay2,sustain2,release2){
+	gNode.gain.setValueAtTime(0.001,aCtx.currentTime);
+	function startenvelo() {
+		now=aCtx.currentTime;
+		gNode.gain.cancelScheduledValues(now);
+		gNode.gain.setValueAtTime(0.001,now);
+		gNode.gain.exponentialRampToValueAtTime(1,now+attack2);
+		gNode.gain.exponentialRampToValueAtTime(sustain2,now+attack2+decay2);
+	}
+	function stopenvelo() {
+		now=aCtx.currentTime;
+		gNode.gain.cancelScheduledValues(now);
+		gNode.gain.setValueAtTime(gNode.gain.value, now);
+		gNode.gain.exponentialRampToValueAtTime(0.001,now+release2);
+	}
+	return{gNode,startenvelo,stopenvelo}
+}
+
+function playcho(valor){
+	envelo.startenvelo();isPlaying=true;
+	fmute();
+	a=valor.split(",");;
+	for(let z=1;z<numosc;z++){oscGain[z].gain.value=0;}
+	for(let z=0;z<(box+1);z++){
+		if(a[z]){
+			for(let r=1;r<numosc;r++){
+				if(nota[r]==a[z]){
+					oscb[z+1].frequency.value=fre[r];
+					lfoGain.connect(oscb[z+1].frequency);
+					oscGainb[z+1].gain.value=10/1000;
+					vollfoGain.connect(oscGainb[z+1].gain);
+				}
+			}	
+		}
+	}
+	setTimeout(()=>{envelo.stopenvelo();isPlaying=false;},1000)
+}
+
+function fmute(){vollfoGain.disconnect();for(let z=1;z<numosc;z++){osc[z].frequency.value=fre[z];oscGain[z].gain.value=0;}}
+
+function foct(u){
+	if(u==1){octa=27.5;foctchange();}
+	if(u==2){octa=55;foctchange();}
+	if(u==3){octa=110;foctchange();}
+}
+
+function foctchange(){
+	for(let z=0;z<109;z++){fre[z+1]=(octa*Math.pow(2,z*1/12)).toFixed(3);}
+	for(let z=1;z<numosc;z++){osc[z].frequency.value=fre[z];}
+}
+
+function iniseq(){conta=0;myinter=setInterval(seq,interval);}
+
+function seq(){
+	conta++;
+	if(conta==1){playcho(document.getElementById(1).value);}
+	if(conta==3){playcho("E4,C4,A3,E3,A2,E2");}
+	if(conta==5){playcho(document.getElementById(3).value);}
+	if(conta==7){playcho("E4,C4,A3,E3,A2,E2");}
+
+	if(conta==8){conta=0;}//clearInterval(myinter);}
+}
+
+function trocama(){
+	scma=dma;valor=scma.options[scma.selectedIndex].value;
+	xx=dma.selectedIndex;yy=dma.options;//alert("Index: " + yy[xx].index + " is " + yy[xx].text);
+	if(valor=="restart"){location.href="chords.html";}
+	scma.selectedIndex="Major";
+}
+
+function trocame(){
+	scme=dme;valor=scme.options[scme.selectedIndex].value;
+	xx=dme.selectedIndex;yy=dme.options;
+	if(valor=="restart"){location.href="chords.html";}
+	scme.selectedIndex="Minor";
+}
+
+function trocase(){
+	scse=dse;valor=scse.options[scse.selectedIndex].value;
+	xx=dse.selectedIndex;yy=dse.options;
+	if(valor=="restart"){location.href="chords.html";}
+	scse.selectedIndex="Seventh";
+}
+
+function trocaxt(){
+	scxt=dxt;valor=scxt.options[scxt.selectedIndex].value;
+	xx=dxt.selectedIndex;yy=dxt.options;
+	if(valor=="restart"){location.href="chords.html";}
+	scxt.selectedIndex="Extra";
+}
+
+function ch(i){
+	let k=Number(i)+box;
+	if(valor){
+		did[i].value=valor;playcho(valor);
+		did[i].style.backgroundColor="#c00";
+		did[k].value=yy[xx].text;
+	}
+	if(valor==""){did[i].value="";did[k].value="";}
+}
+
+function mudainterval(){
+	clearInterval(myinter);fmute();
+	interval=document.getElementById("ininterval").value;
+	iniseq();
+	document.getElementById("spaninterval").innerText=interval;
+}
+
+function mudavolfreq(){
+	volfreq=document.getElementById("volfreq").value;
+	vollfo.frequency.value=volfreq;
+	document.getElementById("spanvolfreq").innerText=volfreq;
+}
+
+function mudavolume(){
+	MNode.gain.value=document.getElementById("volume").value;
+	document.getElementById("spanvolume").innerText=MNode.gain.value.toFixed(1);
+}
+
+let firstClick=()=>{
+	setupAudio();
+	document.removeEventListener('pointerdown',firstClick)
+}
+
+document.addEventListener('pointerdown',firstClick)
+
+document.getElementById("spaninterval").innerText=interval;
+document.getElementById("spanvolfreq").innerText=volfreq;
+document.getElementById("spanvolume").innerText=volume;
+
+</script>
+
+
+</body>
+</html>

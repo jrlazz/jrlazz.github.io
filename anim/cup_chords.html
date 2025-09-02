@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>cup_chords.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="https://threejs.org/files/favicon.ico"/>
+
+<style>
+body{font-family:Monospace;font-size:14pt;overflow:hidden;margin:0px;background-color:#156;}
+button{position:absolute;left:10px;width:50px;height:50px;border:2px solid #ff0;border-radius:50%;font-size:16pt;font-weight:bold;color:#ff0;background-color:#027;cursor:pointer;}
+button:active{border:4px solid #ff0;}
+audio{position:absolute;width:80px;height:23px;display:none;}
+</style>
+
+</head>
+
+<body>
+
+<span id="spanA" style="position:absolute;left:10px;top:5px;color:#cc0;font-size:9pt;">right click &rarr; inspect &rarr; source code</span>
+
+<audio id="aue1" controls style="left:100px;top:50px;"><source src="mp3/notas_guitarra/e1.mp3" type="audio/mpeg"></audio>
+<audio id="aua1" controls style="left:180px;top:50px;"><source src="mp3/notas_guitarra/a1.mp3" type="audio/mpeg"></audio>
+<audio id="aud2" controls style="left:260px;top:50px;"><source src="mp3/notas_guitarra/d2.mp3" type="audio/mpeg"></audio>
+<audio id="aug2" controls style="left:340px;top:50px;"><source src="mp3/notas_guitarra/g2.mp3" type="audio/mpeg"></audio>
+<audio id="aub2" controls style="left:420px;top:50px;"><source src="mp3/notas_guitarra/b2.mp3" type="audio/mpeg"></audio>
+<audio id="aue3" controls style="left:500px;top:50px;"><source src="mp3/notas_guitarra/e3.mp3" type="audio/mpeg"></audio>
+
+<button id="e1" onclick="bote1();" style="top: 60px;display:none;">e1</button>
+<button id="a1" onclick="bota1();" style="top:120px;display:none;">a1</button>
+<button id="d2" onclick="botd2();" style="top:180px;display:none;">d2</button>
+<button id="g2" onclick="botg2();" style="top:240px;display:none;">g2</button>
+<button id="b2" onclick="botb2();" style="top:300px;display:none;">b2</button>
+<button id="e3" onclick="bote3();" style="top:360px;display:none;">e3</button>
+
+<img id="hand" src="img/click_002070.png" style="position:absolute;left:10px;top:420px;width:50px;display:none;"></img>
+
+<div id="divhide" style="position:absolute;left:-100px;top:40px;width:80px;height:440px;background-color:#156;"></div>
+
+<svg id="clo" viewBox="0 0 50 50" style="position:absolute;left:40%;top:30%;width:50%;z-index:2;display:;">
+<circle style="stroke:#330;stroke-width:0.5px;fill:#0240" cx="10" cy="10" r="8"></circle>
+<line x1="10" y1="10" x2="10" y2="3" style="stroke-width:0.5px;stroke:#330;">
+<animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0,10,10" to="360,10,10" dur="5s" repeatCount="indefinite" />
+</line>
+</svg>
+
+<table id="tabaud" style="position:absolute;left:100px;top:50px;display:none;"><tr>
+<td colspan="3" style="width:50px;text-align:center;"><img src="img/samick_r2.png" width="40"></img></td></tr><tr>
+<td style="width:50px;text-align:left;"><button onclick="dim();" style="position:relative;font-size:11pt;width:30px;height:30px;">-</button></td>
+<td style="width:50px;height:50px;text-align:center;"><img id="alto" src="img/aud_ff0.png" width="20"></img></td>
+<td style="width:50px;text-align:left;"><button onclick="aum();" style="position:relative;font-size:11pt;width:30px;height:30px;">+</button></td>
+</tr></table>
+
+<script type="module">
+
+import * as THREE from '../js/three.module_res_res.js';
+import { FontLoader} from '../js/FontLoader_res_res.js';
+import { TextGeometry } from '../js/TextGeometry_res_res.js';
+import { OrbitControls } from '../js/OrbitControls_res_res.js';
+import { DDSLoader } from '../js/DDSLoader_res_res.js';
+import { MTLLoader } from '../js/MTLLoader_res_res.js';
+import { OBJLoader } from '../js/OBJLoader_res_res.js';
+
+var b=[];
+var bm=[];
+var woo=[];
+var w=0;
+var y=0;
+var z=0;
+
+var we1=0;
+var wa1=0;
+var wd2=0;
+var wg2=0;
+var wb2=0;
+var we3=0;
+
+var ye1=0;
+var ya1=0;
+var yd2=0;
+var yg2=0;
+var yb2=0;
+var ye3=0;
+
+var textGeo1, textGeo2, textMesh1, textMesh2, circG1, circG2, circ1, circ2, bojoG1, bojoG2, bojo1, bojo2;
+
+var element;
+
+var shape=new THREE.Shape();
+var path=new THREE.Path();
+var points, geoL, matL1, matL2, matL3, matL4, matL5, matL6, line1, line2, line3, line4, line5, line6, movetox, movetoy, linetox, linetoy;
+var j0,j1,j2,j3,j4,j5;
+var j6=1;
+var j7=3;
+
+var container,camera,scene,ambient,renderer,controls,manager,loader,Mesh,Geo,Mat;
+var wW=window.innerWidth,wH=window.innerHeight;
+var font=undefined;
+
+	container=document.createElement('div');
+	document.body.appendChild(container);
+
+	camera=new THREE.PerspectiveCamera(70,wW/wH,1,1000,1);
+	camera.position.set(0,0,70);
+
+	scene=new THREE.Scene();
+	scene.rotation.set(0,1.8,-0.5);
+	scene.position.set(0,0,0);
+	//scene.rotation.set(0,Math.PI/9,0);
+
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(wW,wH);
+	renderer.setClearColor('#156',1);
+
+
+	container.appendChild(renderer.domElement);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	controls.minDistance=30;
+	controls.maxDistance=200;
+	controls.enablePan=true;
+	controls.enableZoom=true;
+	controls.enableRotate=true;
+	controls.enableDamping=true;
+
+	window.addEventListener('resize',onResize,false);
+
+	manager=new THREE.LoadingManager();
+	manager.onStart=function(url,itemsLoaded,itemsTotal){console.log('Started loading file:'+url+'.\nLoaded '+itemsLoaded+' of '+itemsTotal + ' files.' );};
+	manager.onLoad=function(){console.log('Loading complete!');};
+	manager.onProgress=function(url,itemsLoaded,itemsTotal){console.log('loading texture'+url+' '+(itemsLoaded/itemsTotal*100)+'%');};
+	manager.onError=function(url){console.log('Error loading texture:'+url);};
+	manager.addHandler(/\.dds$/i,new DDSLoader());
+
+	ambient=new THREE.AmbientLight("#fc9",1);
+	scene.add(ambient);
+
+	var frontLight=new THREE.DirectionalLight('#fc9',0.5);
+	frontLight.position.set(0,-10,-80);
+	scene.add(frontLight);
+
+	var pointLight=new THREE.PointLight('#fc9',0.5);
+	pointLight.position.set(0,-80,240 );
+	scene.add(pointLight);
+
+	var mat=[new THREE.MeshStandardMaterial({color:'#02d',flatShading:true,metalness:0.5,roughness:0.3}),new THREE.MeshStandardMaterial({color:'#660',flatShading:true,metalness:0.5,roughness:0.3})];
+	var mat2=[new THREE.MeshStandardMaterial({color:'#660',flatShading:true,metalness:0.5,roughness:0.3}),new THREE.MeshStandardMaterial({color:'#02d',flatShading:true,metalness:0.5,roughness:0.3})];
+
+	loader=new FontLoader();
+	loader.load('../fonte/tubes.json',function(response){font=response;createText();});
+
+	function createText() {
+		textGeo1=new TextGeometry("\x53",{font:font,size:40,height:12,curveSegments:32,bevelThickness:1,bevelSize:0.5,bevelEnabled:true});
+		textGeo1.center();
+		textMesh1=new THREE.Mesh(textGeo1,mat);
+		textMesh1.position.set(-18,0,0);
+		textMesh1.scale.set(1,1,1);
+		textMesh1.rotation.set(0,1.57,0);
+
+		textGeo2=new TextGeometry("\x53",{font:font,size:17,height:4,curveSegments:32,bevelThickness:1,bevelSize:0.5,bevelEnabled:true});
+		textMesh2=new THREE.Mesh(textGeo2,mat2);
+		textMesh2.position.set(-20,0,22);
+		textMesh2.scale.set(1,1,1);
+		textMesh2.rotation.set(1.57,0,0);
+}
+
+        var materialIn=new THREE.MeshStandardMaterial({color:'#02d',metalness:0.7,roughness:0.1,side:THREE.DoubleSide});
+        var materialOut=new THREE.MeshStandardMaterial({color:'#660',metalness:0.7,roughness:0.1});
+
+	circG1=new THREE.CircleGeometry(17,32);
+	circ1=new THREE.Mesh(circG1,materialOut);
+	circ1.position.set(27,0,0);
+	circ1.rotation.set(1.57,1.57,0);
+		circG2=new THREE.CircleGeometry(15,32);
+		var circ2=new THREE.Mesh(circG2,materialIn);
+		circ2.position.set(24,0,0);
+		circ2.rotation.set(1.57,1.57,0);
+
+	bojoG1=new THREE.SphereGeometry(32,64,64,0,Math.PI*2,Math.PI/5,Math.PI/1.6);
+	bojo1=new THREE.Mesh(bojoG1,materialOut);
+	bojo1.position.set(0,0,0);
+	bojo1.rotation.set(-0.0,0.0,1.57);
+		bojoG2=new THREE.SphereGeometry(28,64,64,0,Math.PI*2,Math.PI/5,Math.PI/1.6);
+		bojo2=new THREE.Mesh(bojoG2,materialIn);
+		bojo2.position.set(0,0,0);
+		bojo2.rotation.set(-0.0,0.0,1.57);
+
+function onResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	document.getElementById("tabaud").style.left=window.innerWidth-160+"px";
+	document.getElementById("tabaud").style.top=window.innerHeight-160+"px";
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	controls.update();
+	render();
+}
+
+function render(){
+	renderer.render(scene,camera);
+	w++;
+	if(w==120){
+		scene.add(textMesh1);
+		scene.add(textMesh2);
+		scene.add(bojo1);
+		scene.add(bojo2);
+		scene.add(circ1);
+		scene.add(circ2);
+
+		path=null;path=new THREE.Path();
+		path.moveTo(0,-10);path.quadraticCurveTo(0,0,0,10);points=path.getPoints();
+		geoL=new THREE.BufferGeometry().setFromPoints(points);
+
+		matL1=new THREE.LineBasicMaterial({color:0xff00ff});
+		line1=new THREE.Line(geoL,matL1);
+		line1.position.set(-24,0,0);line1.rotation.set(0,1.57,0);line1.scale.set(j7,1.5,0);
+		scene.add(line1);
+
+		matL2=new THREE.LineBasicMaterial({color:0xffff00});
+		line2=new THREE.Line(geoL,matL2);
+		line2.position.set(-22,0,0);line2.rotation.set(0,1.57,0);line2.scale.set(j7,1.5,0);
+		scene.add(line2);
+
+		matL3=new THREE.LineBasicMaterial({color:0x00ff00});
+		line3=new THREE.Line(geoL,matL3);
+		line3.position.set(-20,0,0);line3.rotation.set(0,1.57,0);line3.scale.set(j7,1.5,0);
+		scene.add(line3);
+
+		matL4=new THREE.LineBasicMaterial({color:0x00ccff});
+		line4=new THREE.Line(geoL,matL4);
+		line4.position.set(-18,0,0);line4.rotation.set(0,1.57,0);line4.scale.set(j7,1.5,0);
+		scene.add(line4);
+
+		matL5=new THREE.LineBasicMaterial({color:0xcc9900});
+		line5=new THREE.Line(geoL,matL5);
+		line5.position.set(-16,0,0);line5.rotation.set(0,1.57,0);line5.scale.set(j7,1.5,0);
+		scene.add(line5);
+
+		matL6=new THREE.LineBasicMaterial({color:0xdddddd});
+		line6=new THREE.Line(geoL,matL6);
+		line6.position.set(-14,0,0);line6.rotation.set(0,1.57,0);line6.scale.set(j7,1.5,0);
+		scene.add(line6);
+
+		document.getElementById("e1").style.display="";
+		document.getElementById("a1").style.display="";
+		document.getElementById("d2").style.display="";
+		document.getElementById("g2").style.display="";
+		document.getElementById("b2").style.display="";
+		document.getElementById("e3").style.display="";
+
+		document.getElementById("hand").style.display="";
+		document.getElementById("tabaud").style.display="";
+
+		element=document.getElementById("clo");
+		if(element){element.remove();}
+	}
+
+	if(document.getElementById("e1").innerText=="E1"){
+	if(ye1==0){aue1.currentTime=0;aue1.play();}
+		we1++;
+		j0=0;j1=-we1;
+		j2=2-we1/2.5;
+		if(j6==0){j2=-2+we1/2.5;}
+		j3=0;j4=0;j5=we1;
+		scene.remove(line1);
+		path=null;path=new THREE.Path();
+		path.moveTo(0,-10);path.quadraticCurveTo(j2,0,0,10);points=path.getPoints();
+		geoL=new THREE.BufferGeometry().setFromPoints(points);
+		matL1=new THREE.LineBasicMaterial({color:0xff00ff});
+		line1=new THREE.Line(geoL,matL1);
+		line1.position.set(-24,0,0);line1.rotation.set(0,1.57,0);line1.scale.set(j7,1.5,0);
+		scene.add(line1);
+		if(we1==5){
+			j6=1-j6;
+			j7=j7-0.2;if(j7<0){j7=3;}
+			we1=0;
+			ye1++;
+			if(ye1==15){bote1();ye1=0;}
+		}
+	}
+
+	if(document.getElementById("a1").innerText=="A1"){
+		if(ya1==0){aua1.currentTime=0;aua1.play();}
+		wa1++;
+		j0=0;j1=-wa1;
+		j2=2-wa1/2.5;
+		if(j6==0){j2=-2+wa1/5;}
+		j3=0;j4=0;j5=wa1;
+		scene.remove(line2);
+		path=null;path=new THREE.Path();
+		path.moveTo(0,-10);path.quadraticCurveTo(j2,0,0,10);points=path.getPoints();
+		geoL=new THREE.BufferGeometry().setFromPoints(points);
+		matL2=new THREE.LineBasicMaterial({color:0xffff00});
+		line2=new THREE.Line(geoL,matL2);
+		line2.position.set(-22,0,0);line2.rotation.set(0,1.57,0);line2.scale.set(j7,1.5,0);
+		scene.add(line2);
+		if(wa1==5){
+			j6=1-j6;j7=j7-0.2;if(j7<0){j7=3;}
+			wa1=0;
+			ya1++;
+			if(ya1==15){ya1=0;bota1();}
+		}
+	}
+
+	if(document.getElementById("d2").innerText=="D2"){
+		if(yd2==0){aud2.currentTime=0;aud2.play();}
+		wd2++;
+		j0=0;j1=-wd2;
+		j2=2-wd2/2.5;
+		if(j6==0){j2=-2+wd2/2.5;}
+		j3=0;j4=0;j5=wd2;
+		scene.remove(line3);
+		path=null;path=new THREE.Path();
+		path.moveTo(0,-10);path.quadraticCurveTo(j2,0,0,10);points=path.getPoints();
+		geoL=new THREE.BufferGeometry().setFromPoints(points);
+		matL3=new THREE.LineBasicMaterial({color:0x00ff00});
+		line3=new THREE.Line(geoL,matL3);
+		line3.position.set(-20,0,0);line3.rotation.set(0,1.57,0);line3.scale.set(j7,1.5,0);
+		scene.add(line3);
+		if(wd2==5){
+			j6=1-j6;j7=j7-0.2;if(j7<0){j7=3;}
+			wd2=0;
+			yd2++;
+			if(yd2==15){yd2=0;botd2();}
+		}
+	}
+
+	if(document.getElementById("g2").innerText=="G2"){
+		if(yg2==0){aug2.currentTime=0;aug2.play();}
+		wg2++;
+		j0=0;j1=-wg2;
+		j2=2-wg2/2.5;
+		if(j6==0){j2=-2+wg2/2.5;}
+		j3=0;j4=0;j5=wg2;
+		scene.remove(line4);
+		path=null;path=new THREE.Path();
+		path.moveTo(0,-10);path.quadraticCurveTo(j2,0,0,10);points=path.getPoints();
+		geoL=new THREE.BufferGeometry().setFromPoints(points);
+		matL4=new THREE.LineBasicMaterial({color:0x00ccff});
+		line4=new THREE.Line(geoL,matL4);
+		line4.position.set(-18,0,0);line4.rotation.set(0,1.57,0);line4.scale.set(j7,1.5,0);
+		scene.add(line4);
+		if(wg2==5){
+			j6=1-j6;j7=j7-0.2;if(j7<0){j7=3;}
+			wg2=0;
+			yg2++;
+			if(yg2==15){yg2=0;botg2();}
+		}
+	}
+
+	if(document.getElementById("b2").innerText=="B2"){
+		if(yb2==0){aub2.currentTime=0;aub2.play();}
+		wb2++;
+		j0=0;j1=-wb2;
+		j2=2-wb2/2.5;
+		if(j6==0){j2=-2+wb2/2.5;}
+		j3=0;j4=0;j5=wb2;
+		scene.remove(line5);
+		path=null;path=new THREE.Path();
+		path.moveTo(0,-10);path.quadraticCurveTo(j2,0,0,10);points=path.getPoints();
+		geoL=new THREE.BufferGeometry().setFromPoints(points);
+		matL5=new THREE.LineBasicMaterial({color:0xcc9900});
+		line5=new THREE.Line(geoL,matL5);
+		line5.position.set(-16,0,0);line5.rotation.set(0,1.57,0);line5.scale.set(j7,1.5,0);
+		scene.add(line5);
+		if(wb2==5){
+			j6=1-j6;j7=j7-0.2;if(j7<0){j7=3;}
+			wb2=0;
+			yb2++;
+			if(yb2==15){yb2=0;botb2();}
+		}
+	}
+
+	if(document.getElementById("e3").innerText=="E3"){
+		if(ye3==0){aue3.currentTime=0;aue3.play();}
+		we3++;
+		j0=0;j1=-we3;
+		j2=2-we3/2.5;
+		if(j6==0){j2=-2+we3/2.5;}
+		j3=0;j4=0;j5=we3;
+		scene.remove(line6);
+		path=null;path=new THREE.Path();
+		path.moveTo(0,-10);path.quadraticCurveTo(j2,0,0,10);points=path.getPoints();
+		geoL=new THREE.BufferGeometry().setFromPoints(points);
+		matL6=new THREE.LineBasicMaterial({color:0xdddddd});
+		line6=new THREE.Line(geoL,matL6);
+		line6.position.set(-14,0,0);line6.rotation.set(0,1.57,0);line6.scale.set(j7,1.5,0);
+		scene.add(line6);
+		if(we3==5){
+			j6=1-j6;j7=j7-0.2;if(j7<0){j7=3;}
+			we3=0;
+			ye3++;
+			if(ye3==15){ye3=0;bote3();}
+		}
+	}
+
+}
+
+animate();
+
+/*
+
+
+Hi Three.js followers,
+
+Cup with guitar strings, rev.1
+
+And Samick is in the scene... Oh... the guitar SHE brought to Me!
+
+the link:
+
+http://jrlazz.eu5.org/anim/cup_chords.html
+
+Again, Thanks for the great Three.js Team!
+
+Jose Roberto Lazzareschi
+
+PS: Now e1 is correct...
+
+*/
+
+</script>
+
+<script>
+
+var volu=0.5;
+
+function valvol(volu){
+	aue1.volume=volu;aua1.volume=volu;aud2.volume=volu;aug2.volume=volu;aub2.volume=volu;aue3.volume=volu;
+}
+
+function dim(){
+	document.getElementById("alto").width=document.getElementById("alto").width-1;
+	if(document.getElementById("alto").width<15){document.getElementById("alto").width=15;}
+	volu=volu-0.1;if(volu<0){volu=0;}
+	valvol(volu);
+}
+
+function aum(){
+	document.getElementById("alto").width=document.getElementById("alto").width+1;
+	if(document.getElementById("alto").width>35){document.getElementById("alto").width=35;}
+	volu=volu+0.1;if(volu>1){volu=1;}
+	valvol(volu);
+}
+
+function bote1(){
+	if(document.getElementById("e1").innerText=="e1"){proibe();document.getElementById("e1").innerText="E1";return;};
+	if(document.getElementById("e1").innerText=="E1"){permite();document.getElementById("e1").innerText="e1";return;};
+}
+function bota1(){
+	if(document.getElementById("a1").innerText=="a1"){proibe();document.getElementById("a1").innerText="A1";return;};
+	if(document.getElementById("a1").innerText=="A1"){permite();document.getElementById("a1").innerText="a1";return;};
+}
+function botd2(){
+	if(document.getElementById("d2").innerText=="d2"){proibe();document.getElementById("d2").innerText="D2";return;};
+	if(document.getElementById("d2").innerText=="D2"){permite();document.getElementById("d2").innerText="d2";return;};
+}
+function botg2(){
+	if(document.getElementById("g2").innerText=="g2"){proibe();document.getElementById("g2").innerText="G2";return;};
+	if(document.getElementById("g2").innerText=="G2"){permite();document.getElementById("g2").innerText="g2";return;};
+}
+function botb2(){
+	if(document.getElementById("b2").innerText=="b2"){proibe();document.getElementById("b2").innerText="B2";return;};
+	if(document.getElementById("b2").innerText=="B2"){permite();document.getElementById("b2").innerText="b2";return;};
+}
+function bote3(){
+	if(document.getElementById("e3").innerText=="e3"){proibe();document.getElementById("e3").innerText="E3";return;};
+	if(document.getElementById("e3").innerText=="E3"){permite();document.getElementById("e3").innerText="e3";return;};
+}
+
+function proibe(){
+	var m=0;
+	myInterval=setInterval(function(){m=m+8;document.getElementById("divhide").style.left=-80+m+"px";if(m==80){clearInterval(myInterval);}},50);
+}
+
+function permite(){
+	var m=0;
+	myInterval=setInterval(function(){m=m-8;document.getElementById("divhide").style.left=m+"px";if(m==-80){clearInterval(myInterval);}},50);
+}
+
+document.getElementById("tabaud").style.left=window.innerWidth-160+"px";
+document.getElementById("tabaud").style.top=window.innerHeight-160+"px";
+
+valvol(volu);
+
+</script>
+</body>
+</html>

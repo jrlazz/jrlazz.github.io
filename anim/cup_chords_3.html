@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>cup_chords_3.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="https://threejs.org/files/favicon.ico"/>
+
+<style>
+body{overflow:hidden;margin:0px;background-color:#156;}
+button{position:absolute;font-family:Arial;font-size:10pt;font-weight:bold;left:10px;width:32px;height:28px;border:2px solid #ff0;border-radius:50%;color:#ff0;background-color:#027;cursor:pointer;}
+button:active{border:2px solid #1560;background-color:#0270;}
+audio{position:absolute;width:80px;height:23px;display:none;}
+span{position:absolute;left:-100pz;top:-100px;font-family:Monospace;color:#ff0;font-size:9pt;}
+circle{stroke-width:0.1px;fill:#0240;}
+label{position:absolute;left:10px;top:320px;font-family:Monospace;color:#ff0;font-size:9pt;cursor:pointer;}
+input{opacity:0;}
+.checkmark{position:absolute;top:5px;left:0px;height:12px;width:12px;background-color:#cc0;}
+input:checked ~ .checkmark {background-color:#0c0;}
+.checkmark:after{content:"";position:absolute;display:none;}
+input:checked ~ .checkmark:after{display:block;}
+.checkmark:after{left:2px;top:2px;width:5px;height:5px;border:solid white;border-width:2px 2px 2px 2px;}
+</style>
+
+</head>
+
+<body>
+
+<span id="spanA" style="left:10px;top:5px;">right click &rarr; inspect &rarr; source code</span>
+
+<img id="braco" src="img/braco.png" style="position:absolute;left:0px;top:50px;width:300px;opacity:0.4;"></img>
+
+<div id="cobre" style="position:absolute;left:0px;top:40px;width:300px;height:300px;background-color:#156;z-index:3;"></div>
+
+<audio id="aue1"><source src="mp3/notas_guitarra/e1.mp3" type="audio/mpeg"></audio>
+<audio id="auf1"><source src="mp3/notas_guitarra/f1.mp3" type="audio/mpeg"></audio>
+<audio id="aufs1"><source src="mp3/notas_guitarra/fs1.mp3" type="audio/mpeg"></audio>
+<audio id="aug1"><source src="mp3/notas_guitarra/g1.mp3" type="audio/mpeg"></audio>
+<audio id="augs1"><source src="mp3/notas_guitarra/gs1.mp3" type="audio/mpeg"></audio>
+
+<audio id="aua1"><source src="mp3/notas_guitarra/a1.mp3" type="audio/mpeg"></audio>
+<audio id="auas1"><source src="mp3/notas_guitarra/as1.mp3" type="audio/mpeg"></audio>
+<audio id="aub1"><source src="mp3/notas_guitarra/b1.mp3" type="audio/mpeg"></audio>
+<audio id="auc2"><source src="mp3/notas_guitarra/c2.mp3" type="audio/mpeg"></audio>
+<audio id="aucs2"><source src="mp3/notas_guitarra/cs2.mp3" type="audio/mpeg"></audio>
+
+<audio id="aud2"><source src="mp3/notas_guitarra/d2.mp3" type="audio/mpeg"></audio>
+<audio id="auds2"><source src="mp3/notas_guitarra/ds2.mp3" type="audio/mpeg"></audio>
+<audio id="aue2"><source src="mp3/notas_guitarra/e2.mp3" type="audio/mpeg"></audio>
+<audio id="auf2"><source src="mp3/notas_guitarra/f2.mp3" type="audio/mpeg"></audio>
+<audio id="aufs2"><source src="mp3/notas_guitarra/fs2.mp3" type="audio/mpeg"></audio>
+
+<audio id="aug2"><source src="mp3/notas_guitarra/g2.mp3" type="audio/mpeg"></audio>
+<audio id="augs2"><source src="mp3/notas_guitarra/gs2.mp3" type="audio/mpeg"></audio>
+<audio id="aua2"><source src="mp3/notas_guitarra/a2.mp3" type="audio/mpeg"></audio>
+<audio id="auas2"><source src="mp3/notas_guitarra/as2.mp3" type="audio/mpeg"></audio>
+
+<audio id="aub2"><source src="mp3/notas_guitarra/b2.mp3" type="audio/mpeg"></audio>
+<audio id="auc3"><source src="mp3/notas_guitarra/c3.mp3" type="audio/mpeg"></audio>
+<audio id="aucs3"><source src="mp3/notas_guitarra/cs3.mp3" type="audio/mpeg"></audio>
+<audio id="aud3"><source src="mp3/notas_guitarra/d3.mp3" type="audio/mpeg"></audio>
+<audio id="auds3"><source src="mp3/notas_guitarra/ds3.mp3" type="audio/mpeg"></audio>
+
+<audio id="aue3"><source src="mp3/notas_guitarra/e3.mp3" type="audio/mpeg"></audio>
+<audio id="auf3"><source src="mp3/notas_guitarra/f3.mp3" type="audio/mpeg"></audio>
+<audio id="aufs3"><source src="mp3/notas_guitarra/fs3.mp3" type="audio/mpeg"></audio>
+<audio id="aug3"><source src="mp3/notas_guitarra/g3.mp3" type="audio/mpeg"></audio>
+<audio id="augs3"><source src="mp3/notas_guitarra/gs3.mp3" type="audio/mpeg"></audio>
+
+<audio id="aubd2"><source src="mp3/notas_guitarra/bd2.mp3" type="audio/mpeg"></audio>
+<audio id="ausn1"><source src="mp3/notas_guitarra/sn1.mp3" type="audio/mpeg"></audio>
+<audio id="ausn2"><source src="mp3/notas_guitarra/sn2.mp3" type="audio/mpeg"></audio>
+<audio id="aucy2"><source src="mp3/notas_guitarra/cy2.mp3" type="audio/mpeg"></audio>
+<audio id="au3d"><source src="mp3/notas_guitarra/pos_3d.mp3" type="audio/mpeg"></audio>
+<audio id="au3am"><source src="mp3/notas_guitarra/pos_3am.mp3" type="audio/mpeg"></audio>
+
+<img id="drums" src="mp3/drums2.png" style="position:absolute;left:92px;top:300px;width:200px;display:none;filter:blur(2px);"></img>
+<img id="bate" src="img/click_bate.png" style="position:absolute;left:-100px;top:0px;width:32px;display:;filter:hue-rotate(90deg);"></img>
+
+<button id="e1"  name="e" onclick="bote1(this.id);" style="left:  2px;top:222px;">e1</button>
+<button id="f1"  name="e" onclick="bote1(this.id);" style="left: 57px;top:222px;">f1</button>
+<button id="fs1" name="e" onclick="bote1(this.id);" style="left:113px;top:222px;">fs1</button>
+<button id="g1"  name="e" onclick="bote1(this.id);" style="left:169px;top:222px;">g1</button>
+<button id="gs1" name="e" onclick="bote1(this.id);" style="left:225px;top:222px;">gs1</button>
+
+<button id="a1"  name="a" onclick="bota1(this.id);" style="left:  2px;top:190px;">a1</button>
+<button id="as1" name="a" onclick="bota1(this.id);" style="left: 57px;top:190px;">as1</button>
+<button id="b1"  name="a" onclick="bota1(this.id);" style="left:113px;top:190px;">b1</button>
+<button id="c2"  name="a" onclick="bota1(this.id);" style="left:169px;top:190px;">c2</button>
+<button id="cs2" name="a" onclick="bota1(this.id);" style="left:225px;top:190px;">cs2</button>
+
+<button id="d2"  name="d" onclick="botd2(this.id);" style="left:  2px;top:158px;">d2</button>
+<button id="ds2" name="d" onclick="botd2(this.id);" style="left: 57px;top:158px;">ds2</button>
+<button id="e2"  name="d" onclick="botd2(this.id);" style="left:113px;top:158px;">e2</button>
+<button id="f2"  name="d" onclick="botd2(this.id);" style="left:169px;top:158px;">f2</button>
+<button id="fs2" name="d" onclick="botd2(this.id);" style="left:225px;top:158px;">fs2</button>
+
+<button id="g2"  name="g" onclick="botg2(this.id);" style="left:  2px;top:126px;">g2</button>
+<button id="gs2" name="g" onclick="botg2(this.id);" style="left: 57px;top:126px;">gs2</button>
+<button id="a2"  name="g" onclick="botg2(this.id);" style="left:113px;top:126px;">a2</button>
+<button id="as2" name="g" onclick="botg2(this.id);" style="left:169px;top:126px;">as2</button>
+
+<button id="b2"  name="b" onclick="botb2(this.id);" style="left:  2px;top:94px;">b2</button>
+<button id="c3"  name="b" onclick="botb2(this.id);" style="left: 57px;top:94px;">c3</button>
+<button id="cs3" name="b" onclick="botb2(this.id);" style="left:113px;top:94px;">cs3</button>
+<button id="d3"  name="b" onclick="botb2(this.id);" style="left:169px;top:94px;">d3</button>
+<button id="ds3" name="b" onclick="botb2(this.id);" style="left:225px;top:94px;">ds3</button>
+
+<button id="e3"  name="ee" onclick="bote3(this.id);" style="left:  2px;top:62px;">e3</button>
+<button id="f3"  name="ee" onclick="bote3(this.id);" style="left: 57px;top:62px;">f3</button>
+<button id="fs3" name="ee" onclick="bote3(this.id);" style="left:113px;top:62px;">fs3</button>
+<button id="g3"  name="ee" onclick="bote3(this.id);" style="left:169px;top:62px;">g3</button>
+<button id="gs3" name="ee" onclick="bote3(this.id);" style="left:225px;top:62px;">gs3</button>
+
+<img id="hand" src="img/click_002070.png" style="position:absolute;left:32px;top:255px;width:30px;display:;filter:hue-rotate(270deg) brightness(400%);"></img>
+
+<span id="toca1"></span>
+<span id="toca2"></span>
+<span id="toca3"></span>
+<span id="toca4"></span>
+<span id="toca5"></span>
+<span id="toca6"></span>
+
+<svg id="clo" viewBox="0 0 50 50" style="position:absolute;left:40%;top:30%;width:50%;z-index:2;display:;">
+<circle style="stroke:#f00;" cx="10" cy="10" r="8"></circle>
+<circle style="stroke:#0f0;" cx="10" cy="10" r="7"></circle>
+<circle style="stroke:#00f;" cx="10" cy="10" r="6"></circle>
+<circle style="stroke:#f0f;" cx="10" cy="10" r="5"></circle>
+<circle style="stroke:#ff0;" cx="10" cy="10" r="4"></circle>
+<circle style="stroke:#09f;" cx="10" cy="10" r="3"></circle>
+<circle style="stroke:#999;" cx="10" cy="10" r="2"></circle>
+<circle style="stroke:#156;" cx="10" cy="10" r="1"></circle>
+<line x1="10" y1="10" x2="10" y2="1" style="stroke-width:0.2px;stroke:#156;">
+<animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0,10,10" to="360,10,10" dur="2s" repeatCount="indefinite" />
+</line>
+</svg>
+
+<table id="tabaud" style="position:absolute;left:100px;top:50px;display:"><tr>
+<td colspan="3" style="width:50px;text-align:center;"><img id="samick" src="img/samick_r2.png" width="80" style="filter: hue-rotate(0deg);"></img></td></tr><tr>
+<td style="width:50px;text-align:left;"><button onclick="dim();" style="position:relative;font-size:11pt;width:30px;height:30px;">-</button></td>
+<td style="width:50px;height:50px;text-align:center;"><img id="alto" src="img/aud_ff0.png" width="20"></img></td>
+<td style="width:50px;text-align:left;"><button onclick="aum();" style="position:relative;font-size:11pt;width:30px;height:30px;">+</button></td>
+</tr></table>
+
+<span style="left:10px;top:300px;">Accompaniments</span>
+
+<label>&nbsp;&nbsp;&nbsp;seq1<input type="checkbox" autocomplete="off" id="seq1" onchange="acom();"><span class="checkmark"></span></label>
+
+<script type="module">
+
+import * as THREE from '../js/three.module_res_res.js';
+import { FontLoader} from '../js/FontLoader_res_res.js';
+import { TextGeometry } from '../js/TextGeometry_res_res.js';
+import { OrbitControls } from '../js/OrbitControls_res_res.js';
+import { DDSLoader } from '../js/DDSLoader_res_res.js';
+import { MTLLoader } from '../js/MTLLoader_res_res.js';
+import { OBJLoader } from '../js/OBJLoader_res_res.js';
+
+var buts=document.getElementsByTagName("button");
+for(let i=0;i<buts.length;i++){buts[i].style.display="none";}
+var imgs=document.getElementsByTagName("img");
+for(let i=0;i<imgs.length;i++){imgs[i].style.display="none";}
+
+var container,camera,scene,ambient,frontLight,pointLight,renderer,controls,manager,loader,Mesh,Geo,Mat;
+var wW=window.innerWidth,wH=window.innerHeight;
+var mat1,mat2,materialIn,materialOut,textGeo1,textGeo2,textMesh1,textMesh2,tex,marca,circG1,circG2,circ0,circ1,circ2,bojoG1,bojoG2,bojo1,bojo2;
+var font=undefined;
+
+var w=0;var y=0;var z=0;
+
+var element;
+
+var path=new THREE.Path();
+var points,geoL,matL1,matL2,matL3,matL4,matL5,matL6,line1,line2,line3,line4,line5,line6;
+
+var we1=0;var wa1=0;var wd2=0;var wg2=0;var wb2=0;var we3=0;
+var ye1=0;var ya1=0;var yd2=0;var yg2=0;var yb2=0;var ye3=0;
+var j2e1=1;var j2a1=1;var j2d2=1;var j2g2=1;var j2b2=1;var j2e3=1;
+var j6e1=1;var j6a1=1;var j6d2=1;var j6g2=1;var j6b2=1;var j6e3=1;
+
+var marca;
+	container=document.createElement('div');
+	document.body.appendChild(container);
+
+	camera=new THREE.PerspectiveCamera(70,wW/wH,1,1000,1);
+	camera.position.set(0,0,70);
+
+	scene=new THREE.Scene();
+	scene.rotation.set(0,1.8,-0.5);
+	scene.position.set(0,0,0);
+
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(wW,wH);
+	renderer.setClearColor('#156',1);
+
+
+	container.appendChild(renderer.domElement);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	controls.minDistance=30;
+	controls.maxDistance=200;
+	controls.enablePan=true;
+	controls.enableZoom=true;
+	controls.enableRotate=true;
+	controls.enableDamping=true;
+
+	window.addEventListener('resize',onResize,false);
+
+	manager=new THREE.LoadingManager();
+	manager.onStart=function(url,itemsLoaded,itemsTotal){console.log('Started loading file:'+url+'.\nLoaded '+itemsLoaded+' of '+itemsTotal + ' files.' );};
+	manager.onLoad=function(){console.log('Loading complete!');};
+	manager.onProgress=function(url,itemsLoaded,itemsTotal){console.log('loading texture'+url+' '+(itemsLoaded/itemsTotal*100)+'%');};
+	manager.onError=function(url){console.log('Error loading texture:'+url);};
+	manager.addHandler(/\.dds$/i,new DDSLoader());
+
+	ambient=new THREE.AmbientLight("#fc9",1);
+	scene.add(ambient);
+
+	frontLight=new THREE.DirectionalLight('#fc9',0.5);
+	frontLight.position.set(0,-10,-80);
+	scene.add(frontLight);
+
+	pointLight=new THREE.PointLight('#fc9',0.5);
+	pointLight.position.set(0,-80,240 );
+	scene.add(pointLight);
+
+	mat1=[new THREE.MeshStandardMaterial({color:'#02d',flatShading:true,metalness:0.5,roughness:0.3}),new THREE.MeshStandardMaterial({color:'#660',flatShading:true,metalness:0.5,roughness:0.3})];
+	mat2=[new THREE.MeshStandardMaterial({color:'#660',flatShading:true,metalness:0.5,roughness:0.3}),new THREE.MeshStandardMaterial({color:'#02d',flatShading:true,metalness:0.5,roughness:0.3})];
+
+	loader=new FontLoader();
+	loader.load('../fonte/tubes.json',function(response){font=response;createText();});
+
+	function createText() {
+		textGeo1=new TextGeometry("\x53",{font:font,size:40,height:12,curveSegments:32,bevelThickness:1,bevelSize:0.5,bevelEnabled:true});
+		textGeo1.center();
+		textMesh1=new THREE.Mesh(textGeo1,mat1);
+		textMesh1.position.set(-18,0,0);
+		textMesh1.scale.set(1,1,1);
+		textMesh1.rotation.set(0,1.57,0);
+
+		textGeo2=new TextGeometry("\x53",{font:font,size:17,height:4,curveSegments:32,bevelThickness:1,bevelSize:0.5,bevelEnabled:true});
+		textMesh2=new THREE.Mesh(textGeo2,mat2);
+		textMesh2.position.set(-20,0,22);
+		textMesh2.scale.set(1,1,1);
+		textMesh2.rotation.set(1.57,0,0);
+}
+
+        materialIn=new THREE.MeshStandardMaterial({color:'#02d',metalness:0.7,roughness:0.1,side:THREE.DoubleSide});
+        materialOut=new THREE.MeshStandardMaterial({color:'#660',metalness:0.7,roughness:0.1});
+
+	tex=new THREE.TextureLoader().load('img/threejs3.png');
+	marca=new THREE.MeshStandardMaterial({map:tex,transparent:true});
+
+	circG1=new THREE.CircleGeometry(17,32);
+	circ1=new THREE.Mesh(circG1,materialOut);
+	circ1.position.set(27,0,0);
+	circ1.rotation.set(1.57,1.57,0);
+		circG2=new THREE.CircleGeometry(15,32);
+		circ2=new THREE.Mesh(circG2,materialIn);
+		circ2.position.set(24,0,0);
+		circ2.rotation.set(1.57,1.57,0);
+	circ0=new THREE.Mesh(circG1,marca);
+	circ0.position.set(27,0,0);
+	circ0.rotation.set(1.57,1.57,0);
+
+	bojoG1=new THREE.SphereGeometry(32,64,64,0,Math.PI*2,Math.PI/5,Math.PI/1.6);
+	bojo1=new THREE.Mesh(bojoG1,materialOut);
+	bojo1.position.set(0,0,0);
+	bojo1.rotation.set(-0.0,0.0,1.57);
+		bojoG2=new THREE.SphereGeometry(28,64,64,0,Math.PI*2,Math.PI/5,Math.PI/1.6);
+		bojo2=new THREE.Mesh(bojoG2,materialIn);
+		bojo2.position.set(0,0,0);
+		bojo2.rotation.set(-0.0,0.0,1.57);
+
+function onResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	document.getElementById("tabaud").style.left=window.innerWidth-160+"px";
+	document.getElementById("tabaud").style.top=window.innerHeight-260+"px";
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	controls.update();
+	render();
+}
+
+function render(){
+	renderer.render(scene,camera);
+	w++;
+	if(w==40){
+		scene.add(textMesh1);scene.add(textMesh2);
+		scene.add(bojo1);scene.add(bojo2);
+		scene.add(circ0);scene.add(circ1);scene.add(circ2);
+
+		path=null;path=new THREE.Path();
+		path.moveTo(0,-10);path.quadraticCurveTo(0,0,0,10);points=path.getPoints();
+		geoL=new THREE.BufferGeometry().setFromPoints(points);
+
+		matL1=new THREE.LineBasicMaterial({color:0xff00ff});
+		line1=new THREE.Line(geoL,matL1);
+		line1.position.x=-24;line1.rotation.y=1.57;line1.scale.y=1.6;
+		scene.add(line1);
+
+		matL2=new THREE.LineBasicMaterial({color:0xffff00});
+		line2=new THREE.Line(geoL,matL2);
+		line2.position.x=-22;line2.rotation.y=1.57;line2.scale.y=1.6;	
+		scene.add(line2);
+
+		matL3=new THREE.LineBasicMaterial({color:0x00ff00});
+		line3=new THREE.Line(geoL,matL3);
+		line3.position.x=-20;line3.rotation.y=1.57;line3.scale.y=1.6;
+		scene.add(line3);
+
+		matL4=new THREE.LineBasicMaterial({color:0x00ccff});
+		line4=new THREE.Line(geoL,matL4);
+		line4.position.x=-18;line4.rotation.y=1.57;line4.scale.y=1.6;
+		scene.add(line4);
+
+		matL5=new THREE.LineBasicMaterial({color:0xcc9900});
+		line5=new THREE.Line(geoL,matL5);
+		line5.position.x=-16;line5.rotation.y=1.57;line5.scale.y=1.6;
+		scene.add(line5);
+
+		matL6=new THREE.LineBasicMaterial({color:0xdddddd});
+		line6=new THREE.Line(geoL,matL6);
+		line6.position.x=-14;line6.rotation.y=1.57;line6.scale.y=1.6;
+		scene.add(line6);
+
+		document.getElementById("hand").style.display="";
+		document.getElementById("tabaud").style.display="";
+
+		element=document.getElementById("clo");
+		if(element){element.remove();}
+	}
+
+	if(w==45){
+		for(let i=0;i<imgs.length;i++){imgs[i].style.display="";}
+		document.getElementById("drums").style.display="none";
+		for(let i=0;i<buts.length;i++){buts[i].style.display="";}
+		document.getElementById("cobre").style.display="none";
+	}
+
+	if(document.getElementById("e1").innerText=="E1"){
+		if(ye1==0){eval("au"+document.getElementById("toca1").innerText).play();}
+		we1++;j2e1=2-we1/2.5;if(j6e1==0){j2e1=-2+we1/2.5;}
+		scene.remove(line1);path=null;path=new THREE.Path();
+		path.moveTo(0,-10);path.quadraticCurveTo(j2e1,0,0,10);points=path.getPoints();
+		geoL=new THREE.BufferGeometry().setFromPoints(points);
+		matL1=new THREE.LineBasicMaterial({color:0xff00ff});
+		line1=new THREE.Line(geoL,matL1);
+		line1.position.x=-24;line1.rotation.y=1.57;line1.scale.y=1.6;
+		scene.add(line1);
+		if(we1==5){j6e1=1-j6e1;we1=0;ye1++;if(ye1==15){ye1=0;bote1("x");}}
+	}
+
+	if(document.getElementById("a1").innerText=="A1"){
+		if(ya1==0){eval("au"+document.getElementById("toca2").innerText).play();}
+		wa1++;j2a1=2-wa1/2.5;if(j6a1==0){j2a1=-2+wa1/2.5;}
+		scene.remove(line2);path=null;path=new THREE.Path();
+		path.moveTo(0,-10);path.quadraticCurveTo(j2a1,0,0,10);points=path.getPoints();
+		geoL=new THREE.BufferGeometry().setFromPoints(points);
+		matL2=new THREE.LineBasicMaterial({color:0xffff00});
+		line2=new THREE.Line(geoL,matL2);
+		line2.position.x=-22;line2.rotation.y=1.57;line2.scale.y=1.6;
+		scene.add(line2);
+		if(wa1==5){j6a1=1-j6a1;wa1=0;ya1++;if(ya1==15){ya1=0;bota1("x");}}
+	}
+
+	if(document.getElementById("d2").innerText=="D2"){
+		if(yd2==0){eval("au"+document.getElementById("toca3").innerText).play();}
+		wd2++;j2d2=2-wd2/2.5;if(j6d2==0){j2d2=-2+wd2/2.5;}
+		scene.remove(line3);path=null;path=new THREE.Path();
+		path.moveTo(0,-10);path.quadraticCurveTo(j2d2,0,0,10);points=path.getPoints();
+		geoL=new THREE.BufferGeometry().setFromPoints(points);
+		matL3=new THREE.LineBasicMaterial({color:0x00ff00});
+		line3=new THREE.Line(geoL,matL3);
+		line3.position.x=-20;line3.rotation.y=1.57;line3.scale.y=1.6;
+		scene.add(line3);
+		if(wd2==5){j6d2=1-j6d2;wd2=0;yd2++;if(yd2==15){yd2=0;botd2("x");}}
+	}
+
+	if(document.getElementById("g2").innerText=="G2"){
+		if(yg2==0){eval("au"+document.getElementById("toca4").innerText).play();}
+		wg2++;j2g2=2-wg2/2.5;if(j6g2==0){j2g2=-2+wg2/2.5;}
+		scene.remove(line4);path=null;path=new THREE.Path();
+		path.moveTo(0,-10);path.quadraticCurveTo(j2g2,0,0,10);points=path.getPoints();
+		geoL=new THREE.BufferGeometry().setFromPoints(points);
+		matL4=new THREE.LineBasicMaterial({color:0x00ccff});
+		line4=new THREE.Line(geoL,matL4);
+		line4.position.x=-18;line4.rotation.y=1.57;line4.scale.y=1.6;
+		scene.add(line4);
+		if(wg2==5){j6g2=1-j6g2;wg2=0;yg2++;if(yg2==15){yg2=0;botg2("x");}}
+	}
+
+	if(document.getElementById("b2").innerText=="B2"){
+		if(yb2==0){eval("au"+document.getElementById("toca5").innerText).play();}
+		wb2++;j2b2=2-wb2/2.5;if(j6b2==0){j2b2=-2+wb2/2.5;}
+		scene.remove(line5);path=null;path=new THREE.Path();
+		path.moveTo(0,-10);path.quadraticCurveTo(j2b2,0,0,10);points=path.getPoints();
+		geoL=new THREE.BufferGeometry().setFromPoints(points);
+		matL5=new THREE.LineBasicMaterial({color:0xcc9900});
+		line5=new THREE.Line(geoL,matL5);
+		line5.position.x=-16;line5.rotation.y=1.57;line5.scale.y=1.6;
+		scene.add(line5);
+		if(wb2==5){j6b2=1-j6b2;wb2=0;yb2++;if(yb2==15){yb2=0;botb2("x");}}
+	}
+
+	if(document.getElementById("e3").innerText=="E3"){
+		if(ye3==0){eval("au"+document.getElementById("toca6").innerText).play();}
+		we3++;j2e3=2-we3/2.5;if(j6e3==0){j2e3=-2+we3/2.5;}
+		scene.remove(line6);path=null;path=new THREE.Path();
+		path.moveTo(0,-10);path.quadraticCurveTo(j2e3,0,0,10);points=path.getPoints();
+		geoL=new THREE.BufferGeometry().setFromPoints(points);
+		matL6=new THREE.LineBasicMaterial({color:0xdddddd});
+		line6=new THREE.Line(geoL,matL6);
+		line6.position.x=-14;line6.rotation.y=1.57;line6.scale.y=1.6;
+		scene.add(line6);
+		if(we3==5){j6e3=1-j6e3;we3=0;ye3++;if(ye3==15){ye3=0;bote3("x");}}
+	}
+
+}
+
+animate();
+
+</script>
+
+<script>
+
+var volu=0.5;
+var qtname=0;
+var k=0;
+var re1=document.getElementById("e1");
+var ra1=document.getElementById("a1");
+var rd2=document.getElementById("d2");
+var rg2=document.getElementById("g2");
+var rb2=document.getElementById("b2");
+var re3=document.getElementById("e3");
+var batex=document.getElementById("bate");
+var drum=document.getElementById("drums");
+var sam=document.getElementById("samick");
+var per=0;
+
+function valvol(volu){
+	aue1.volume=volu;  auf1.volume=volu;aufs1.volume=volu; aug1.volume=volu;augs1.volume=volu;
+	aua1.volume=volu; auas1.volume=volu; aub1.volume=volu; auc2.volume=volu;aucs2.volume=volu;
+	aud2.volume=volu; auds2.volume=volu; aue2.volume=volu; auf2.volume=volu;aufs2.volume=volu;
+	aug2.volume=volu; augs2.volume=volu; aua2.volume=volu;auas2.volume=volu;
+	aub2.volume=volu;  auc3.volume=volu;aucs3.volume=volu; aud3.volume=volu;auds3.volume=volu;
+	aue3.volume=volu;  auf3.volume=volu;aufs3.volume=volu; aug3.volume=volu;augs3.volume=volu;
+	aubd2.volume=volu;ausn1.volume=volu;ausn2.volume=volu;aucy2.volume=volu;au3d.volume=volu; au3am.volume=volu;
+	document.getElementById("alto").width=35*volu;
+}
+
+function dim(){
+	document.getElementById("alto").width=document.getElementById("alto").width-1;
+	if(document.getElementById("alto").width<0){document.getElementById("alto").width=0;}
+	volu=volu-0.1;if(volu<0){volu=0;}
+	valvol(volu);
+}
+
+function aum(){
+	document.getElementById("alto").width=document.getElementById("alto").width+1;
+	if(document.getElementById("alto").width>35){document.getElementById("alto").width=35;}
+	volu=volu+0.1;if(volu>1){volu=1;}
+	valvol(volu);
+}
+
+function bote1(id){
+	qtname=5;
+	if(id!="x"){for(k=0;k<qtname;k++){document.getElementsByName("e")[k].style.display="none";}}
+	if(id=="x"){for(k=0;k<qtname;k++){document.getElementsByName("e")[k].style.display="";}}
+	document.getElementById("toca1").innerText=id;
+	if(re1.innerText=="e1"||re1.innerText=="f1"||re1.innerText=="fs1"||re1.innerText=="g1"||re1.innerText=="gs1"){document.getElementById("samick").style="filter: hue-rotate(90deg)";document.getElementById("e1").innerText="E1";return;};
+	if(re1.innerText=="E1"||re1.innerText=="F1"||re1.innerText=="FS1"||re1.innerText=="G1"||re1.innerText=="GS1"){document.getElementById("samick").style="filter: hue-rotate(0deg)";document.getElementById("e1").innerText="e1";return;};
+}
+
+function bota1(id){
+	qtname=5;
+	if(id!="x"){for(k=0;k<qtname;k++){document.getElementsByName("a")[k].style.display="none";}}
+	if(id=="x"){for(k=0;k<qtname;k++){document.getElementsByName("a")[k].style.display="";}}
+	document.getElementById("toca2").innerText=id;
+	if(ra1.innerText=="a1"||ra1.innerText=="as1"||ra1.innerText=="b1"||ra1.innerText=="c1"||ra1.innerText=="cs1"){document.getElementById("samick").style="filter: hue-rotate(160deg)";document.getElementById("a1").innerText="A1";return;};
+	if(ra1.innerText=="A1"||ra1.innerText=="AS1"||ra1.innerText=="B1"||ra1.innerText=="C1"||ra1.innerText=="CS1"){document.getElementById("samick").style="filter: hue-rotate(0deg)";document.getElementById("a1").innerText="a1";return;};
+}
+
+function botd2(id){
+	qtname=5;
+	if(id!="x"){for(k=0;k<qtname;k++){document.getElementsByName("d")[k].style.display="none";}}
+	if(id=="x"){for(k=0;k<qtname;k++){document.getElementsByName("d")[k].style.display="";}}
+	document.getElementById("toca3").innerText=id;
+	if(rd2.innerText=="d2"||rd2.innerText=="ds2"||rd2.innerText=="e2"||rd2.innerText=="f2"||rd2.innerText=="fs2"){document.getElementById("samick").style="filter: hue-rotate(180deg)";document.getElementById("d2").innerText="D2";return;};
+	if(rd2.innerText=="D2"||rd2.innerText=="DS2"||rd2.innerText=="E2"||rd2.innerText=="F2"||rd2.innerText=="FS2"){document.getElementById("samick").style="filter: hue-rotate(0deg)";document.getElementById("d2").innerText="d2";return;};
+}
+
+function botg2(id){
+	qtname=4;
+	if(id!="x"){for(k=0;k<qtname;k++){document.getElementsByName("g")[k].style.display="none";}}
+	if(id=="x"){for(k=0;k<qtname;k++){document.getElementsByName("g")[k].style.display="";}}
+	document.getElementById("toca4").innerText=id;
+	if(rg2.innerText=="g2"||rg2.innerText=="gs2"||rg2.innerText=="a3"||rg2.innerText=="as3"){document.getElementById("samick").style="filter: hue-rotate(210deg)";document.getElementById("g2").innerText="G2";return;};
+	if(rg2.innerText=="G2"||rg2.innerText=="GS2"||rg2.innerText=="A3"||rg2.innerText=="AS3"){document.getElementById("samick").style="filter: hue-rotate(0deg)";document.getElementById("g2").innerText="g2";return;};
+}
+
+function botb2(id){
+	qtname=5;
+	if(id!="x"){for(k=0;k<qtname;k++){document.getElementsByName("b")[k].style.display="none";}}
+	if(id=="x"){for(k=0;k<qtname;k++){document.getElementsByName("b")[k].style.display="";}}
+	document.getElementById("toca5").innerText=id;
+	if(rb2.innerText=="b2"||rb2.innerText=="c2"||rb2.innerText=="cs2"||rb2.innerText=="d3"||rb2.innerText=="ds3"){document.getElementById("samick").style="filter: hue-rotate(240deg)";document.getElementById("b2").innerText="B2";return;};
+	if(rb2.innerText=="B2"||rb2.innerText=="C2"||rb2.innerText=="CS2"||rb2.innerText=="D3"||rb2.innerText=="DS3"){document.getElementById("samick").style="filter: hue-rotate(0deg)";document.getElementById("b2").innerText="b2";return;};
+}
+
+function bote3(id){
+	qtname=5;
+	if(id!="x"){for(k=0;k<qtname;k++){document.getElementsByName("ee")[k].style.display="none";}}
+	if(id=="x"){for(k=0;k<qtname;k++){document.getElementsByName("ee")[k].style.display="";}}
+	document.getElementById("toca6").innerText=id;
+	if(re3.innerText=="e3"||re3.innerText=="f3"||re3.innerText=="fs3"||re3.innerText=="g3"||re3.innerText=="gs3"){document.getElementById("samick").style="filter: hue-rotate(270deg)";document.getElementById("e3").innerText="E3";return;};
+	if(re3.innerText=="E3"||re3.innerText=="F3"||re3.innerText=="FS3"||re3.innerText=="G3"||re3.innerText=="GS3"){document.getElementById("samick").style="filter: hue-rotate(0deg)";document.getElementById("e3").innerText="e3";return;};
+}
+
+function acom(){
+	per=1-per;
+	if(per==1){
+		drum.style.display=""; 
+		str="bd2sn1bd2sn1bd2bd2cy2   3d*   sn1   bd2bd2cy2   3am   sn1   bd2bd2cy2   3d*   sn1   bd2bd2cy2   ";
+		comp=str.length-3;
+		cor=360/comp;
+		strplay="";m=-3;
+		myInterval=setInterval(function(){
+			m +=3;
+			strplay=str.substring(m,m+3);
+			if(str.substring(m+2,m+3)=="*"){strplay=str.substring(m,m+2)};
+			if(document.getElementById("au"+strplay)){document.getElementById("au"+strplay).play();}
+			batex.style.left="-100px";
+			drum.style.filter="blur(2px) hue-rotate(0deg)";
+			if(strplay=="bd2"){batex.style.left="168px";batex.style.top="382px";batex.style.filter="hue-rotate(0deg)";drum.style.filter="hue-rotate(120deg) blur(1px)";}
+			if(strplay=="sn1"||strplay=="sn2"||strplay=="cy2"){batex.style.left="137px";batex.style.top="362px";batex.style.filter="hue-rotate(270deg)";drum.style.filter="hue-rotate(270deg) blur(1px)";}
+			sam.style="filter: hue-rotate("+cor*m+"deg) brightness(130%)";
+			if(m==comp){m=-3;}},290);
+	} else {
+		drum.style.display="none";
+		batex.style.left="-100px";
+		sam.style="filter: hue-rotate(0deg) brightness(100%)";
+		clearInterval(myInterval);
+	}
+}
+
+document.getElementById("tabaud").style.left=window.innerWidth-160+"px";
+document.getElementById("tabaud").style.top=window.innerHeight-260+"px";
+
+valvol(volu);
+
+/*
+
+Hi Three.js followers,
+
+Cup with guitar strings, rev.3
+
+And Samick is in the scene... Oh... the guitar SHE brought to Me!
+
+the link:
+
+http://jrlazz.eu5.org/anim/cup_chords_3.html
+
+Again, Thanks for the great Three.js Team!
+
+Jose Roberto Lazzareschi
+
+r1: Now e1 is correct.
+r2: Not only one note at a time.
+r3: Many notes and one accompaniment.
+
+*/
+
+
+</script>
+
+</body>
+</html>

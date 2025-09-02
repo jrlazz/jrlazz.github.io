@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>aalong_2.html</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"/>
+<link rel="shortcut icon" href="../ok.ico">
+
+<script type="importmap">
+{
+"imports": {
+"three": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.module.min.js",
+"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.172.0/examples/jsm/"
+}
+}
+</script>
+
+<script>
+	var run = true;
+</script>
+
+<style>
+body{margin:0;background-color:#000;font-family:Monospace;font-size:9pt;color:#cff;overflow:hidden;}
+</style>
+</head>
+
+<body>
+
+<div id="bi" src="" style="position:absolute;left:50px;top:30px;width:100px;height:100px;border:2px solid #0ff;cursor:pointer;background-color:#06c;"></div>
+<span style="position:absolute;left:32px;top:145px;color:#0ff;opacity:0.8;">You may click on blue square
+<br>
+<br>
+<b>CTRL+U ... TO SEE THE CODE</b>
+</span>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { Flow } from 'three/addons/modifiers/CurveModifier.js';
+
+var scene,camera,renderer,loader,geometry,material,controls,geo,mat,flow;
+var somePoints,curve,objectToCurve;
+
+var g=[], l=[], m=[], s=[], ss=[];
+var pts, curve, points, line, light; 
+var v=1;
+var object3D;
+var dbi=document.getElementById("bi");
+var rot=-0.002;
+
+dbi.onclick=function BI(){
+	v=1-v;
+	run=!run
+	if(v==1){
+		rot=-0.002;
+	}else{
+		rot=-0.01;
+	}
+}
+
+scene=new THREE.Scene();
+
+camera=new THREE.PerspectiveCamera(40,window.innerWidth/window.innerHeight,1,1000);
+camera.position.set(0,0,3);
+camera.lookAt( scene.position );
+
+somePoints=[
+new THREE.Vector3(-1, 0.3,0),
+new THREE.Vector3(-1.2, 0,0),
+new THREE.Vector3(-1,-0.3,0),
+new THREE.Vector3(1,-0.3,0),
+new THREE.Vector3(1.2, 0,0),
+new THREE.Vector3(1, 0.3,0)
+];
+
+pts=new THREE.Points(new THREE.BufferGeometry().setFromPoints(somePoints),new THREE.PointsMaterial({color:'#f00',size:0.1}));
+scene.add(pts);
+
+curve=new THREE.CatmullRomCurve3(somePoints);
+curve.closed=true;
+
+points=curve.getPoints(60);
+line=new THREE.LineLoop(
+	new THREE.BufferGeometry().setFromPoints(points),
+	new THREE.LineBasicMaterial({color:'#fff'})
+);
+
+scene.add( line );
+
+l[1]=new THREE.AmbientLight('#fff',5);
+scene.add(l[1]);
+
+g[1]=new THREE.CylinderGeometry(0.05,0.05,0.3);
+m[1]=new THREE.MeshStandardMaterial({color:'#0ff'});
+s[1]=new THREE.Mesh(g[1],m[1]);
+
+g[2]=new THREE.BoxGeometry(0.07,0.07,0.07);
+m[2]=new THREE.MeshStandardMaterial({color:'#f0f'});
+s[2]=new THREE.Mesh(g[2],m[2]);
+scene.add(s[2]);
+
+objectToCurve=s[1];
+flow=new Flow(objectToCurve);
+flow.updateCurve(0,curve);
+scene.add(flow.object3D);
+
+renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setClearColor('#034');
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setSize( window.innerWidth,window.innerHeight);
+document.body.appendChild(renderer.domElement);
+controls=new OrbitControls(camera,renderer.domElement);
+
+let t = 0;
+
+function animate(){
+	requestAnimationFrame(animate);
+	if (flow) {
+		t -= rot;
+		if (run === true) console.log('curve.getPoint(t) ', curve.getPoint(t));
+			s[2].position.set(-curve.getPoint(t).x,curve.getPoint(t).y,0);
+			flow.moveAlongCurve(rot);
+	}
+	renderer.render(scene,camera);
+}
+
+animate();
+
+</script>
+</body>
+</html>

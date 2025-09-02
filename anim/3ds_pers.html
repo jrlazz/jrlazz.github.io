@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>3ds_pers.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="https://threejs.org/files/favicon.ico"/>
+
+<style>
+body{margin:0px;border:0px;background-color:#003344;font-family:Monospace;overflow:hidden;}
+span{position:absolute;color:#ff0;font-size:9pt;}
+</style>
+
+</head>
+
+<body>
+
+<span id="spanA" style="left:100px;top:5px;">right click &rarr; inspect &rarr; source code</span>
+
+<script type="module">
+
+import * as THREE from '../js/three.module_res_res.js';
+import { OrbitControls } from '../js/OrbitControls_res_res.js';
+import { DDSLoader } from '../js/DDSLoader_res_res.js';
+import { MTLLoader } from '../js/MTLLoader_res_res.js';
+import { OBJLoader } from '../js/OBJLoader_res_res.js';
+import { TDSLoader } from '../js/TDSLoader_res_res.js';
+import { FontLoader } from '../js/FontLoader_res_res.js';
+import { TextGeometry } from '../js/TextGeometry_res_res.js'
+
+let renderer,scene,camera,material,geometry,objLoader;
+let ambient,ppotLight,qpotLight,spotLight,sun;
+
+var altera=0;
+
+var mesh=null;
+var color=Math.random()*0xffffff;
+
+var k=0;
+var w=0;
+var bone=new Array();
+var arte=new Array();
+var oo=new Array();
+var f1=new Array();
+var pp=new Array();
+var jar=new Array();
+var geo=new Array();
+var mat=new Array();
+var mesh=new Array();
+var tex=new Array();
+var rot=new Array();rot[1]=0;
+var jrl=new Array();
+
+
+var loader=new Array();
+var loaderCount=0;
+
+var v=1;
+var j=0;
+
+var de2ra=function(degree){return degree*(Math.PI/180);};
+
+var passo=0.02;
+
+var w=0;
+var ww=0;
+var f1LP=5;
+
+var teclaA=0;var teclaD=0;
+var teclaW=0;var teclaS=0;
+var teclaG=0;var teclaH=0;
+var teclaC=0;var teclaB=0;
+var teclaV=0;
+var teclaL=0;var teclaP=0;
+var setaE=0;var setaD=0;
+var setaC=0;var setaB=0;
+var mov=0.2;
+var angfrente=0;
+var etapa=0;
+
+var Tgeometry;
+
+var target=new THREE.Vector3(); // create once an reuse it
+
+var querocontrols=0;// tirar controls de const controls e de animate
+
+
+var malucar=0;
+var mika=0;
+var duration;
+var ur=window.location.href;
+var quando=200;
+var home=0;
+if(ur.includes("127")){quando=100;home=1;}
+
+var normal;
+
+// ***************************************************************
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	document.body.appendChild( renderer.domElement );
+
+	renderer.shadowMap.enabled=true;
+	renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+
+//BasicShadowMap...gives unfiltered shadow maps - fastest, but lowest quality.
+//PCFShadowMap...(Default) filters shadow maps using the Percentage-Closer Filtering (PCF) algorithm (default).
+//PCFSoftShadowMap...filters shadow maps using the Percentage-Closer Soft Shadows (PCSS) algorithm.
+//VSMShadowMap...filters shadow maps using the Variance Shadow Map (VSM) algorithm. When using VSMShadowMap all shadow receivers will also cast shadows.
+
+	//renderer.outputEncoding=THREE.sRGBEncoding;
+	
+	renderer.setClearColor(0x003344);
+
+	scene=new THREE.Scene();
+	scene.position.set(0,0,0);
+
+	camera=new THREE.PerspectiveCamera(70,window.innerWidth/window.innerHeight,1,1000);
+	camera.position.set(0,20,30);
+
+	window.addEventListener('resize',onResize,false);
+
+	const manager=new THREE.LoadingManager();
+	manager.onStart=function(url,itemsLoaded,itemsTotal){console.log('Started loading file:'+url+'.\nLoaded '+itemsLoaded+' of '+itemsTotal + ' files.' );};
+	manager.onLoad=function(){console.log('Loading complete!');};
+	manager.onProgress=function(url,itemsLoaded,itemsTotal){console.log('loading texture'+url+' '+(itemsLoaded/itemsTotal*100)+'%');};
+	manager.onError=function(url){console.log('Error loading texture:'+url);};
+	manager.addHandler(/\.dds$/i,new DDSLoader());
+
+	const controls=new OrbitControls(camera,renderer.domElement);
+	controls.enablePan=true;
+	controls.enableDamping=true;// precisa de controls update em animate
+	controls.minDistance=1;
+	controls.maxDistance=200;
+
+	// Text
+	let textMesh1, textMesh2, textGeo, materials;
+	let text="Personagem",bevelEnabled=true,font=undefined;
+	const height=5,size=50,hover=30,curveSegments=8,bevelThickness=2,bevelSize=2;
+
+	loader=new FontLoader();
+	loader.load('../js/roboto_italic.typeface.json',function(response){
+	font=response;
+	createText();
+	});
+
+function createText() {
+	textGeo=new TextGeometry(text,{font:font,size:size,height:height,curveSegments:curveSegments,bevelThickness:bevelThickness,bevelSize:bevelSize,bevelEnabled:bevelEnabled});
+        textGeo.center();
+//	textGeo.computeBoundingBox();
+//	const centerOffset=-0.5*(textGeo.boundingBox.max.x-textGeo.boundingBox.min.x);
+	materials=[
+		new THREE.MeshPhongMaterial({color:0xffcc00,flatShading:true}),// front
+		new THREE.MeshPhongMaterial({color:0x000080})// side
+	];
+	textMesh1=new THREE.Mesh(textGeo,materials);
+//	textMesh1.rotation.set(-0.4,0,0);//Math.PI*2
+	textMesh1.position.set(0,-5,17);
+	textMesh1.scale.set(0.05,0.05,0.05);
+//	textMesh1.castShadow=true;
+	scene.add(textMesh1);
+
+}
+	var texGGK=new THREE.TextureLoader().load('models/extras/bojomad2.jpg');
+	texGGK.wrapS=THREE.RepeatWrapping;texGGK.wrapT=THREE.RepeatWrapping;
+	texGGK.repeat.set(1,2);
+	var matGGK=new THREE.MeshStandardMaterial({map:texGGK,color:('#ff0')});
+	var geoGGK=new THREE.BoxGeometry(35,35,0.5);
+	var GGK=new THREE.Mesh(geoGGK,matGGK);
+	GGK.rotation.set(1.57,0,1.57);
+	GGK.position.set(0,-8,0);
+	GGK.receiveShadow=true;
+	scene.add(GGK);
+
+//const displacementMap=new THREE.TextureLoader().load('img/papelao_acc.jpg');
+//displacementMap.wrapS=THREE.RepeatWrapping;displacementMap.wrapT=THREE.RepeatWrapping;
+//displacementMap.repeat.set(5,5);
+
+	// 3DS
+	loader=new TDSLoader();
+	loader.load('models/extras/3ds_pers4.3ds',function(object){
+		object.traverse(function(child){
+			if(child.isMesh){
+        			//child.material.isMeshStandardMaterial=true;
+				//child.material.specular.setScalar(0.9);
+				//child.material.normalMap=normal;
+				//child.material.map=displacementMap;
+				//child.material.transparent=true;
+				child.material.opacity=0.999;
+				//child.material.metalness=0.1;
+				//child.material.roughness=0.9;
+				//child.material.color.setHex(0xffff00);
+        			//child.material.wireframe=true;
+        			//child.material.wireframeLinewidth=4;
+        			//child.material.isMeshStandardMaterial=true;
+        			child.castShadow=true;
+				//child.receiveShadow=true;
+				//child.material=new THREE.MeshStandardMaterial({map:texGGK,color:'#fff',metalness:0.8,roughness:0.2,emissive:'#0ff',emissiveIntensity:0.3});
+            			//child.material.needsUpdate = true;
+            			//child.material.displacementMap=displacementMap;
+            			//child.material.displacementScale=0.5;
+			}
+		});
+		object.scale.set(10,10,10);
+		object.position.set(0,3,0);
+		object.rotation.set(-1.54,0,0);
+		jrl[1]=object;
+	scene.add(jrl[1]);
+	});
+
+	// Lights
+
+	ambient=new THREE.AmbientLight("#ccc",0.8);
+	scene.add(ambient);
+
+	sun=new THREE.PointLight("#999",0.8);
+	sun.position.set(0,15,0);
+	sun.shadow.mapSize.width=1024;
+	sun.shadow.mapSize.height=1024;
+	sun.castShadow=true;
+//	scene.add(sun);
+
+	spotLight=new THREE.SpotLight(0x996633,1);
+	spotLight.position.set(-50,15,0);
+	spotLight.angle=Math.PI/3;
+	spotLight.castShadow=true;
+	spotLight.shadow.mapSize.width=2048;
+	spotLight.shadow.mapSize.height=2048;
+	scene.add(spotLight);
+
+
+	// Edif&iacute;cio Evelyn, Rua Girassol, 594 Apto. 502, CEP: 05433-001
+
+function onResize() {
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function animate() {
+	requestAnimationFrame(animate);
+	renderer.render(scene,camera);
+	if(jrl[1]){jrl[1].rotation.z -=0.01;}
+}
+
+function alterando(){
+}
+
+animate();
+
+var keys=[];
+
+var ang=0;
+
+window.addEventListener("keydown",function(e){
+        keys[e.keyCode]=e.keyCode;
+	alert(e.keyCode);
+        var keysArray=getNumberArray(keys);
+	teclaA=0;teclaD=0;teclaW=0;teclaS=0;teclaG=0;teclaH=0;teclaC=0;teclaB=0;teclaV=0;setaE=0;setaD=0;setaC=0;setaB=0;teclaL=0;teclaP=0;
+	for(var i=0;i<keysArray.length;i++){
+	if(keysArray[i]==37 || keysArray[i]==76){teclaG=1;}//G Rot+
+	if(keysArray[i]==39 || keysArray[i]==82){teclaH=1;}//H Rot-
+	if(keysArray[i]==87){teclaW=1;}//W Front
+	if(keysArray[i]==83){teclaV=1;}//V Pilot Back
+	if(keysArray[i]==38){teclaW=1;}//W Front
+	if(keysArray[i]==40){teclaV=1;}//V Pilot Back
+	if(keysArray[i]==76){teclaL=1;}//L
+	if(keysArray[i]==80){teclaP=1;}//P
+	if(keysArray[i]==79){
+		if(querocontrols==0){
+			querocontrols=1;
+			const controls=new OrbitControls(camera,renderer.domElement);
+			controls.enablePan=true;
+			controls.enableDamping=true;// precisa de controls update em animate
+			controls.minDistance=1;
+			controls.maxDistance=200;
+		}
+	}//C
+	if(keysArray[i]==67){
+		//window.location.replace("http://jrlazz.eu5.org/anim/ggk_car.php");
+		window.location.replace(ur);
+		querocontrols=0;
+		OrbitControls.enabled=false;
+	}//B
+	}
+        //if(keysArray.toString()=="17,65"){document.getElementById("spanid").innerText +=" Select all!";}
+},false);
+
+window.addEventListener('keyup',function(e){
+        keys[e.keyCode]=false;
+	teclaA=0;teclaD=0;teclaW=0;teclaS=0;teclaG=0;teclaH=0;teclaC=0;teclaB=0;teclaV=0;setaE=0;setaD=0;setaC=0;setaB=0;teclaL=0;teclaP=0;
+	for(var i=0;i<getNumberArray(keys).length;i++){
+	if(getNumberArray(keys)[i]==37 || getNumberArray(keys)[i]==76){teclaG=1;}//G Rot+
+	if(getNumberArray(keys)[i]==39 || getNumberArray(keys)[i]==82){teclaH=1;}//H Rot-
+	if(getNumberArray(keys)[i]==87){teclaW=1;}//W Front
+	if(getNumberArray(keys)[i]==83){teclaV=1;}//V Pilot Back
+	if(getNumberArray(keys)[i]==38){teclaW=1;}//W Front
+	if(getNumberArray(keys)[i]==40){teclaV=1;}//V Pilot Back
+	if(getNumberArray(keys)[i]==76){teclaL=1;}//L
+	if(getNumberArray(keys)[i]==80){teclaP=1;}//P
+	if(getNumberArray(keys)[i]==79){
+		if(querocontrols==0){
+			querocontrols=1;
+			controls=new OrbitControls(camera,renderer.domElement);
+			controls.enablePan=true;
+			controls.enableDamping=true;// precisa de controls update em animate
+			controls.minDistance=1;
+			controls.maxDistance=200;
+		}
+	}//C
+	if(getNumberArray(keys)[i]==67){
+		window.location.replace(ur);
+		querocontrols=0;
+		OrbitControls.enabled=false;
+	}//B
+	}
+},false);
+
+
+</script>
+
+<script>
+
+function limpa(){
+	window.location.replace(window.location.href);
+}
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>amplifier.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="ok.ico" />
+<style>
+body{overflow:hidden;margin:0px;background-color:#048;font-family:Monospace;}
+span{position:absolute;font-size:16pt;}
+</style>
+
+<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+	{
+		"imports":{
+	"three":"https://unpkg.com/three@0.164.0/build/three.module.js",
+	"three/addons/":"https://unpkg.com/three@0.164.0/examples/jsm/"
+		}
+	}
+</script>
+
+</head>
+
+<body>
+<span style="left:20%;width:60%;top:20px;text-align:center;color:#ff0;">... Let's control this Led brightness</SPAN>
+<span id="spa" style="position:absolute;left:40%;top:35%;font-size:82pt;color:#069;display:''"></span>
+<button style="position:absolute;left:84%;top:3%;width:120px;background-color:#ccc;text-align:center;"><a id="code" href="amplifier.txt" target="_blank" style="color:#f00;text-decoration:none;font-size:16pt;">The Code</a></button>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+
+var renderer, scene, camera, loader, controls, text, font;
+var luz=[];
+var axe=[];
+var geo=[];
+var mat=[];
+var tex=[];
+var mesh=[];
+var cai=[];
+var bat=[];
+var ctc=[];
+var lin=[];
+var cha=[];
+var tra=[];
+var led=[];
+var caibat=new THREE.Group();
+var spr=[];for(let z=1;z<6;z++){spr[z]=new THREE.Group();}
+var ango=0;
+var sim=0;
+var p=Math.PI;
+var res=new THREE.Group();var resB=new THREE.Group();var resC=new THREE.Group();
+var onoff=new THREE.Group();
+var transistor=new THREE.Group();
+var c;
+var m;
+var v=0;
+var w=0;
+var w1=0;
+var lincor=0;
+
+var pcbgeo, pcbmat, pcb;
+
+var raycaster=new THREE.Raycaster();
+var mouse=new THREE.Vector2();
+var cylinder, selected;
+var intersects=[];
+var alvos=[];
+
+function init() {
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.setClearColor(0x006699,0);
+	renderer.toneMapping=THREE.ACESFilmicToneMapping;
+	renderer.toneMappingExposure=1;
+	renderer.colorSpace=THREE.SRGBColorSpace;
+					
+	document.body.appendChild(renderer.domElement);
+
+	scene=new THREE.Scene();
+
+	camera=new THREE.PerspectiveCamera(50,window.innerWidth/window.innerHeight,1,1000,1);
+	camera.position.set(0, 80, 80);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	
+	window.addEventListener('resize',onWindowResize);
+	window.addEventListener("click",onClick);
+	window.addEventListener("mousemove",onMove);
+
+	luz[1]=new THREE.AmbientLight("#fff",2);
+	luz[2]=new THREE.PointLight('#fff',3000);luz[2].position.set(-80,  0,   0);
+	luz[3]=new THREE.PointLight('#fff',3000);luz[3].position.set( 80,  0,   0);
+	luz[4]=new THREE.PointLight('#fff',3000);luz[4].position.set(  0, 80, 100);
+	luz[5]=new THREE.PointLight('#fff',3000);luz[5].position.set(  0,-80, 100);
+	luz[6]=new THREE.PointLight('#fff',3000);luz[6].position.set(  0,  0,  80);
+	luz[7]=new THREE.PointLight('#fff',3000);luz[7].position.set(  0,  0, -80);
+
+	pcbgeo=new THREE.BoxGeometry(160,80,1);
+	pcbmat=new THREE.MeshStandardMaterial({color:'#242',transparent:true,opacity:0.4});
+	pcb=new THREE.Mesh(pcbgeo,pcbmat);
+	pcb.rotation.set(p/2,0,0);
+	pcb.position.set(0,-3.5,0);
+
+	axe[0]=new THREE.AxesHelper(0.001);
+	axe[0].position.x=-15;
+	geo[0]=new THREE.BoxGeometry(1,0.2,0.5);
+	mat[0]=new THREE.MeshStandardMaterial({color:'#c99',metalness:0.6,roughness:0.6});
+	mesh[0]=new THREE.Mesh(geo[0],mat[0]);
+	mesh[0].position.y=3;
+	axe[0].add(mesh[0]);
+
+	axe[500]=new THREE.AxesHelper(0.001);
+	axe[500].position.x=-15;
+	geo[500]=new THREE.SphereGeometry(0.2,32);
+	mat[500]=new THREE.MeshStandardMaterial({color:'#999'});
+	mesh[500]=new THREE.Mesh(geo[500],mat[500]);
+	mesh[500].position.y=2;
+	axe[500].add(mesh[500]);
+
+	v=14.5;	Cyli(1,2.9,2.9,v,32);	Mate(1);
+	mat[1].metalness=0;mat[1].roughness=1;
+	mesh[1]=new THREE.Mesh(geo[1],mat[1]);
+	mesh[1].rotation.set(p/2,0,p/2);
+
+	v=2.0;	Cyli(2,3.15,3.15,v,32);	Mate(2);
+	mesh[2]=new THREE.Mesh(geo[2],mat[2]);
+	mesh[2].rotation.set(p/2,0,p/2);
+	mesh[2].position.set(-6.5,0,0);
+
+	mesh[3]=mesh[2].clone();
+	mesh[3].position.set(6.5,0,0);
+
+	Sphe(31,0.6,32);	Mate(31);
+	mesh[31]=new THREE.Mesh(geo[31],mat[31]);
+
+	v=10.2;	Cyli(32,0.6,0.6,v,32);	Mate(32);
+	geo[32].translate(0,-v/2,0);
+	mesh[32]=new THREE.Mesh(geo[32],mat[32]);
+
+	v=10.2;	Cyli(33,0.6,0.6,v,32);	Mate(33);
+	geo[33].translate(0,-v/2,0);
+	mesh[33]=new THREE.Mesh(geo[33],mat[33]);
+	mesh[33].rotation.set(p/2,0,p/2);
+
+	mesh[31].add(mesh[32]);mesh[31].add(mesh[33]);
+	mesh[31].position.set(-10.8,0,0);
+
+	mesh[34]=mesh[31].clone();
+	mesh[34].rotation.set(-p,0,-p);
+	mesh[34].position.set(10.8,0,0);
+
+// conductors
+
+v=110; Cyli(35,0.6,0.6,v,32);	Mate(33);// bateria a resistor
+geo[35].translate(0,-v/2,0);
+matc('#999');
+lin[1]=new THREE.Mesh(geo[35],m);
+lin[1].rotation.set(p/2,0,p/2);
+lin[1].position.set(-70,-8,-20);
+
+lin[2]=lin[1].clone();
+lin[2].scale.set(1,0.09,1);
+lin[2].rotation.set(0,p/2,0);
+lin[2].position.set(-70,0,-20);
+
+lin[3]=lin[2].clone();
+lin[3].position.set(-70,0,4);
+
+lin[4]=lin[1].clone();// neutro a emissor
+lin[4].scale.set(1,0.81,1);
+lin[4].position.set(-70,-8,18);
+
+lin[5]=lin[1].clone();// neutro bateria neutro emissor (curta)
+lin[5].scale.set(1,0.13,1);
+lin[5].position.set(-70,-8,18.5);
+lin[5].rotation.set(p/2,0,0);
+
+lin[6]=lin[1].clone();// resistor a base
+lin[6].scale.set(1,0.21,1);
+lin[6].position.set(-0.4,-8,15.5);
+
+lin[7]=lin[1].clone();// resistor a positivo
+lin[7].scale.set(1,0.085,1);
+lin[7].position.set(0,-8,-10.5);
+lin[7].rotation.set(p/2,0,0);
+
+lin[8]=lin[1].clone();// resistor a led
+lin[8].scale.set(1,0.07,1);
+lin[8].position.set(40,-8,9);
+lin[8].rotation.set(p/2,0,0);
+
+lin[9]=lin[1].clone();// coletor a led
+lin[9].scale.set(1,0.19,1);
+lin[9].position.set(19,-8,13);
+
+lin[10]=lin[1].clone();// linha de base a resistor a positivo
+lin[10].scale.set(1,0.04,1);
+lin[10].position.set(0,-8,15.5);
+lin[10].rotation.set(p/2,0,0);
+
+// text Jos\xE9
+
+	loader=new FontLoader();
+	loader.load('../fonte/Lucida Console_Regular.json',function(response){font=response;createText();});
+	function createText(){
+		geo[50]=new TextGeometry("10 KOhm",{font:font,size:3,depth:0.6,curveSegments:12,bevelThickness:0.1,bevelSize:0.1,bevelEnabled:false});
+		mat[50]=[new THREE.MeshStandardMaterial({color:'#fc0'}),new THREE.MeshStandardMaterial({color:'#c0c'})];
+		tex[11]=new THREE.Mesh(geo[50],mat[50]);
+		tex[11].position.set(-10,6,0);
+
+		geo[55]=new TextGeometry("270 Ohm",{font:font,size:3,depth:0.6,curveSegments:12,bevelThickness:0.1,bevelSize:0.1,bevelEnabled:false});
+		tex[12]=new THREE.Mesh(geo[55],mat[50]);
+		tex[12].position.set(30,5,-10);
+
+		geo[56]=new TextGeometry("BC107",{font:font,size:3,depth:0.6,curveSegments:12,bevelThickness:0.1,bevelSize:0.1,bevelEnabled:false});
+		tex[13]=new THREE.Mesh(geo[56],mat[50]);
+		tex[13].position.set(13,17,16);
+
+		geo[57]=new TextGeometry("LED",{font:font,size:3,depth:0.6,curveSegments:12,bevelThickness:0.1,bevelSize:0.1,bevelEnabled:false});
+		tex[14]=new THREE.Mesh(geo[57],mat[50]);
+		tex[14].position.set(36,16,11);
+
+		geo[51]=new TextGeometry("Transistorized circuit for LED",{font:font,size:5,depth:1,curveSegments:12,bevelThickness:0.1,bevelSize:0.1,bevelEnabled:false});
+		geo[51].center();
+		tex[15]=new THREE.Mesh(geo[51],mat[50]);
+		tex[15].rotation.set(p/2,p,p);
+		tex[15].position.set(0,-3,30);
+
+		geo[53]=new TextGeometry("OFF",{font:font,size:3.5,depth:1,curveSegments:12,bevelThickness:0.1,bevelSize:0.1,bevelEnabled:false});
+		geo[53].center();
+		mat[51]=[new THREE.MeshStandardMaterial({color:'#fff'}),new THREE.MeshStandardMaterial({color:'#fff'})];
+		tex[3]=new THREE.Mesh(geo[53],mat[51]);
+		tex[3].rotation.set(-p/2,-p/2,p/2);
+		tex[3].position.set(0,0,6);
+
+		geo[54]=new TextGeometry("ON",{font:font,size:3.5,depth:1,curveSegments:12,bevelThickness:0.1,bevelSize:0.1,bevelEnabled:false});
+		geo[54].center();
+		mat[52]=[new THREE.MeshStandardMaterial({color:'#000'}),new THREE.MeshStandardMaterial({color:'#000'})];
+		tex[4]=new THREE.Mesh(geo[54],mat[52]);
+		tex[4].rotation.set(2*p,-p/2,0);
+		tex[4].position.set(0,0,6);
+	}
+
+// Led
+
+matc('#600');
+led[1]=new THREE.Mesh(new THREE.CylinderGeometry(4,4,6,32),m);
+led[1].geometry.translate(0,-3,0);
+
+led[2]=new THREE.Mesh(new THREE.CylinderGeometry(0.6,0.6,18,32),mat[33]);
+led[2].geometry.translate(0,-14,2);
+led[2].position.y=3;
+
+led[3]=new THREE.Mesh(new THREE.CylinderGeometry(0.6,0.6,18,32),mat[33]);
+led[3].geometry.translate(0,-14,-2);
+led[3].position.y=1;
+
+matc('#600');
+led[4]=new THREE.Mesh(new THREE.CylinderGeometry(4.5,4.5,2,32),m);
+led[4].geometry.translate(0,-7,0);
+
+led[5]=new THREE.Mesh(new THREE.SphereGeometry(4,32),m);
+
+led[1].add(led[5]);
+led[1].add(led[2]);
+led[1].add(led[3]);
+led[1].add(led[4]);
+led[1].name="bol";
+alvos.push(led[1]);
+led[1].position.set(40,10,11);
+
+	// transistor
+
+	matcm('#cdc',0.5,0.2);
+	tra[1]=new THREE.Mesh(new THREE.CylinderGeometry(5,5,10,32),m);
+	tra[1].position.set(0,10,0.5);
+
+	tra[2]=new THREE.Mesh(new THREE.CylinderGeometry(6,6,0.5,32),m);
+	tra[2].position.set(0,5,0.5);
+
+	tra[3]=led[3].clone();tra[3].position.set(-1,13,0);
+	tra[4]=led[3].clone();tra[4].position.set(3,13,2.5);
+	tra[5]=led[3].clone();tra[5].position.set(-1,13,5);
+
+	tra[6]=new THREE.Mesh(new THREE.BoxGeometry(2,0.5,2),m);
+	tra[6].rotation.set(0,p/4,0);tra[6].position.set(-4.5,5,4.5);
+
+	for(let z=1;z<7;z++){transistor.add(tra[z]);}
+	transistor.position.set(20,0,15);
+
+// box, batteries e contacts
+
+matc('#740');
+cai[1]=new THREE.Mesh(new THREE.BoxGeometry(1,8,31),m);
+cai[1].geometry.translate(0,0,3);
+cai[1].position.set(-4,0,0);
+
+cai[2]=new THREE.Mesh(new THREE.BoxGeometry(2,15,48),m);
+cai[2].scale.setScalar(0.5);
+cai[2].position.set(4,0,3);
+
+cai[3]=cai[2].clone();cai[3].position.set(12,0,3);
+cai[4]=cai[2].clone();cai[4].position.set(20,0,3);
+
+cai[5]=cai[1].clone();cai[5].scale.set(33,0.2,1.05);cai[5].position.set(12,-4,0);
+cai[6]=cai[1].clone();cai[6].position.set(28,0,0);
+cai[7]=cai[1].clone();cai[7].rotation.set(0,p/2,0);cai[7].scale.set(1,1,1.06);cai[7].position.set(8.8,0,18.7);
+
+cai[8]=cai[7].clone();cai[8].position.set(8.8,0,-12.7);
+
+matc('#999');
+
+Cy(2,2,48,32);
+bat[1]=new THREE.Mesh(c,m);
+bat[1].rotation.set(p/2,p/2,0);
+bat[1].scale.setScalar(0.5);
+matc('#666');
+Cy(6.9,6.9,48,32);
+bat[2]=new THREE.Mesh(c,m);
+bat[2].geometry.translate(0,2,0);
+matc('#860');
+Cyt(7,7,20,32,32,true);
+bat[3]=new THREE.Mesh(c,m);
+bat[3].geometry.translate(0,-12,0);
+
+matc('#000');
+Cyt(7,7,28,32,32,true);
+bat[4]=new THREE.Mesh(c,m);
+bat[4].geometry.translate(0,12,0);
+
+bat[1].add(bat[2]);bat[1].add(bat[3]);bat[1].add(bat[4]);
+
+bat[5]=bat[1].clone();bat[5].position.set(8,0,6);bat[5].rotation.set(p/2,p,p);
+bat[6]=bat[1].clone();bat[6].position.set(16,0,0);
+bat[7]=bat[5].clone();bat[7].position.set(24,0,6);
+
+matc('#aaa');
+ctc[1]=new THREE.Mesh(new THREE.BoxGeometry(12,6,0.5),m);
+ctc[1].position.set(12,0,-12);
+ctc[2]=ctc[1].clone();ctc[2].position.set(20,0,18);
+ctc[3]=ctc[1].clone();ctc[3].position.set(4,0,18);
+
+ctc[4]=new THREE.Mesh(new THREE.BoxGeometry(6,6,0.5),m);
+ctc[4].position.set(0,0,-12);
+ctc[5]=ctc[4].clone();ctc[5].position.set(24,0,-12);
+
+for(let z=1;z<9;z++){caibat.add(cai[z]);}
+for(let z=1;z<6;z++){caibat.add(ctc[z]);}
+for(let z=5;z<8;z++){caibat.add(bat[z]);}
+caibat.add(bat[1]);
+
+	// switch
+
+	matc('#259');
+	cha[0]=new THREE.Mesh(new THREE.BoxGeometry(25,14,11),m);
+	cha[0].position.set(5.75,-8,0);
+
+	matc('#000');
+	cha[1]=new THREE.Mesh(new THREE.CylinderGeometry(12,12,10,16,16,false,0,p/2),m);
+	cha[1].rotation.set(-p/2,-p/2,-p);
+	cha[1].position.set(0,10,0);
+
+
+	cha[11]=new THREE.Mesh(new THREE.PlaneGeometry(10,12),m);
+	cha[11].rotation.set(-p/2,-p/2,0);
+	cha[11].position.set(0,0,6);
+	cha[11].name="cha11";
+	alvos.push(cha[11]);
+	cha[1].position.set(6,1,0);
+	cha[1].add(cha[11]);
+	cha[1].name="cha1";
+	alvos.push(cha[1]);
+
+	matc('#f00');
+	cha[2]=new THREE.Mesh(new THREE.CylinderGeometry(12,12,10,16,16,false,0,p/2),m);
+	cha[2].rotation.set(p/2,p/2,p);
+	cha[2].position.set(11.5,0,0);
+	cha[2].name="cha2";
+	alvos.push(cha[2]);
+
+	cha[22]=new THREE.Mesh(new THREE.PlaneGeometry(10,12),m);
+	cha[22].rotation.set(-p/2,-p/2,0);
+	cha[22].position.set(0,0,6);
+	cha[22].name="cha22";
+	alvos.push(cha[22]);
+
+	cha[2].position.set(6,1,0);
+	cha[2].add(cha[22]);
+	cha[2].name="cha2";
+	alvos.push(cha[2]);
+
+	cha[22]=new THREE.Mesh(new THREE.CylinderGeometry(2,2,10,32,32),m);
+	cha[22].rotation.set(p/2,0,0);
+	cha[22].position.set(15.3,-0.7,0);
+
+	cha[3]=new THREE.Mesh(new THREE.BoxGeometry(0.01,0.01,0.01),m);
+
+	cha[3].add(cha[1]);cha[3].add(cha[2]);
+
+	cha[3].position.set(-6,0,0);
+	axe[1000]=new THREE.AxesHelper(0.001);
+	axe[1000].add(cha[3]);
+	axe[1000].position.set(6,1,0);
+
+	onoff.add(axe[1000]);onoff.add(cha[0]);
+	onoff.position.set(-50,3,-20);
+
+}
+
+function Sphe(m,r,s){geo[m]=new THREE.SphereGeometry(r,s);}
+function Mate(m){mat[m]=new THREE.MeshStandardMaterial({color:'#ccc',metalness:0.9,roughness:0.6,side:THREE.DoubleSide});}
+function Cyli(m,r1,r2,v,s){geo[m]=new THREE.CylinderGeometry(r1,r2,v,s);}
+function Cy(r1,r2,v,s){c=new THREE.CylinderGeometry(r1,r2,v,s);}
+function Cyt(r1,r2,v,s1,s2,t){c=new THREE.CylinderGeometry(r1,r2,v,s1,s2,t);}
+function matc(c){m=new THREE.MeshStandardMaterial({color:c});}
+function matcm(c,met,rou){m=new THREE.MeshStandardMaterial({color:c,metalness:met,roughness:rou});}
+
+function animate() {
+	requestAnimationFrame(animate);
+
+	w++;
+
+	if(w<100){document.getElementById("spa").innerText=w+" %";}
+	
+	if(axe[0] && sim==0){
+		for(let z=1;z<250;z++){
+			ango=ango+0.08;
+			axe[z]=axe[0].clone();
+			axe[z].rotation.x=ango*2;
+			axe[z].position.x=-6+(ango/1.65);
+			res.add(axe[z]);
+		}
+
+		for(let z=1;z<125;z++){
+			ango=ango+0.18;
+			axe[z+500]=axe[500].clone();
+			axe[z+500].rotation.x=ango;
+			axe[z+500].position.x=20+(ango/5);
+			spr[1].add(axe[z+500]);
+		}
+
+		resB.add(res);
+		resB.add(mesh[1]);
+		resB.add(mesh[2]);
+		resB.add(mesh[3]);
+		resB.add(mesh[31]);
+		resB.add(mesh[34]);
+		resB.rotation.set(0,p/2,0);
+		resB.position.set(0,0,0);
+
+		desliga();
+
+		sim=1;
+	}
+
+	if(tex[15] && resB && spr[1] && sim==1){
+		cha[1].add(tex[3]);
+		cha[2].add(tex[4]);
+		for(let z=11;z<16;z++){scene.add(tex[z])}
+		resC=resB.clone();
+		spr[2]=spr[1].clone();spr[2].position.set(25,0,8);
+		spr[3]=spr[1].clone();spr[3].position.set( 0,0,16);
+		spr[4]=spr[1].clone();spr[4].position.set(25,0,24);
+		sim=2;
+	}
+
+
+	if(sim==2){
+		scene.add(resB);
+		//resC.rotation.set(0,p/2,0);
+		resC.position.set(40,0,-9.2);
+		scene.add(resC);
+		spr[5].add(spr[1]);spr[5].add(spr[2]);spr[5].add(spr[3]);spr[5].add(spr[4]);
+		spr[5].rotation.y=p/2;
+		spr[5].position.set(0,0,42);
+		caibat.add(spr[5]);
+		caibat.rotation.set(p/2,p,p/2);
+		caibat.position.set(-70,10,-20);
+		scene.add(caibat);
+		scene.add(pcb);
+		scene.add(led[1]);
+		scene.add(transistor);
+		scene.add(onoff);
+		for(let z=1;z<11;z++){scene.add(lin[z]);}
+		for(let z=1;z<8;z++){scene.add(luz[z]);}
+		document.getElementById("spa").style.display="none";
+		sim=3;
+	}
+	if(sim==3 && lincor==1){
+		w1++;
+			if(w1>15){for(let z=1;z<11;z++){lin[z].material.color.set('#333');}}
+			if(w1>30){w1=0;for(let z=1;z<11;z++){lin[z].material.color.set('#999');}}
+		//	if(w1>15){desliga();}
+		//	if(w1>30){w1=0;liga();}
+
+	}
+	controls.update();
+	renderer.render(scene, camera);
+}
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function onClick(event){
+	raycaster.setFromCamera(mouse,camera);
+	intersects=raycaster.intersectObjects(alvos,false);
+	if (intersects.length>0){
+		selected=intersects[0].object;
+		if(selected.name=="cha1" || selected.name=="cha11"){desliga();lincor=0;for(let z=1;z<11;z++){lin[z].material.color.set('#999');}}
+		if(selected.name=="cha2" || selected.name=="cha22"){liga();lincor=1;}
+	}
+}
+
+function onMove(event){
+	document.body.style.cursor='default';
+	mouse.x=event.clientX/window.innerWidth*2-1;
+	mouse.y=-(event.clientY/window.innerHeight)*2+1;
+	raycaster.setFromCamera(mouse,camera);
+	intersects=raycaster.intersectObjects(alvos,false);
+	if (intersects.length>0){document.body.style.cursor='pointer';}
+}
+
+function liga(){
+	axe[1000].rotation.z =-0.2;
+	led[1].material.color.set('#f00');
+	led[5].material.color.set('#f00');
+	led[4].material.color.set('#f00');
+}
+
+function desliga(){
+	axe[1000].rotation.z =0.2;
+	led[1].material.color.set('#600');
+	led[5].material.color.set('#600');
+	led[4].material.color.set('#600');
+}
+
+init();
+
+animate();
+
+/*
+
+Transistorized circuit for LED
+
+the link:
+
+https://jrlazz.eu5.org/anim/amplifier.html
+
+Thanks to the Three.js Team!
+
+Jose Roberto Lazzareschi
+
+*/
+
+
+</script>
+
+</body>
+</html>
