@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>umbrella.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="https://threejs.org/files/favicon.ico"/>
+
+<style>
+span{position:absolute;font-family:Monospace;font-size:9pt;color:#ff0;z-index:2;cursor:pointer;}
+body{margin:0px;overflow:hidden;background-image:url('img/field3.jpg');background-size:100% 100%;background-color:#2e70ac;}
+a{cursor:pointer;}input{width:45px;font-size:16pt;font-family:Monospace;background-color:#001144;color:#0ff;border:none;}
+</style>
+
+</head>
+
+<body>
+
+<span id="spanA" style="left:10px;top:5px;">right click &rarr; inspect &rarr; source code</span>
+
+<svg id="clo" viewBox="0 0 50 50" style="position:absolute;left:40%;top:30%;width:50%;z-index:2;display:;">
+<circle style="stroke:#f00;stroke-width:0.1px;fill:#0240" cx="10" cy="10" r="8"></circle>
+<circle style="stroke:#0f0;stroke-width:0.1px;fill:#0240" cx="10" cy="10" r="7"></circle>
+<circle style="stroke:#00f;stroke-width:0.1px;fill:#0240" cx="10" cy="10" r="6"></circle>
+<circle style="stroke:#f0f;stroke-width:0.1px;fill:#0240" cx="10" cy="10" r="5"></circle>
+<circle style="stroke:#ff0;stroke-width:0.1px;fill:#0240" cx="10" cy="10" r="4"></circle>
+<circle style="stroke:#09f;stroke-width:0.1px;fill:#0240" cx="10" cy="10" r="3"></circle>
+<circle style="stroke:#999;stroke-width:0.1px;fill:#0240" cx="10" cy="10" r="2"></circle>
+<circle style="stroke:#156;stroke-width:0.1px;fill:#0240" cx="10" cy="10" r="1"></circle>
+<line x1="10" y1="9" x2="10" y2="2" style="stroke-width:0.15px;stroke:#156;">
+<animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0,10,10" to="360,10,10" dur="1s" repeatCount="indefinite" />
+</line>
+</svg>
+
+<canvas id="canvasRain" style="position:absolute;left:0px;top:0px;background-color:transparent;width:100%;height:100%;display:none;z-index:-1;">Canvas Not Supported</canvas>
+<span style="position:absolute;left:10px;top:25px;"><a onclick="rainyes();" style="color:#fff;background-color:#060;">&nbsp;yes_rain&nbsp;</a>&nbsp;<a onclick="rainno();" style="color:#fff;background-color:#600;">&nbsp;no_rain&nbsp;</a></span>
+
+<script type="module">
+
+import * as THREE from '../js/three.module_res_res.js';
+import { OrbitControls } from '../js/OrbitControls_res_res.js';
+import { Line2 } from '../js/Line2_res_res.js';
+import { LineMaterial } from '../js/LineMaterial_res_res.js';
+import { LineGeometry } from '../js/LineGeometry_res_res.js';
+
+var renderer, scene, camera, controls, line, matLine, divs, color, spline, t, lineGeometry;
+var point=new THREE.Vector3();
+var pp=[];
+var positions=[];
+var colors=[];
+var points=[];
+var pointshand=[];
+var BI, CH;
+var curvefactor=1;
+var w=0;
+var w1=0;
+
+var geometry;
+var sphere=[];
+var material=[];
+var materialX;
+var materialV;
+var j=0;
+var phi=0;
+var cor=new THREE.Color();
+var ponta=[];
+var group=new THREE.Group();
+for(let i=0;i<15;i++){group[i]=new THREE.Group();}
+var lineA=[];
+var lineB=[];
+var lineC=[];
+
+var torusG;
+var torus;
+
+var cylG, cylM, cyl;
+var pontaG, pontaM;
+
+var capa=[];
+var capaG;
+var capaM=[];
+var tex=[];
+
+var element;
+
+
+function init(){
+
+	//BI=document.getElementById('inp');BI.onchange=function StartAnimation(){ex1();}
+
+	renderer = new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setPixelRatio( window.devicePixelRatio );
+	renderer.setClearColor(0x000000,0);
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	document.body.appendChild(renderer.domElement);
+
+	scene=new THREE.Scene();
+	scene.rotation.z=0.1;
+
+	camera = new THREE.PerspectiveCamera(40, window.innerWidth/window.innerHeight,1,1000);
+	camera.position.set(0,0,40);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	controls.minDistance=30;
+	controls.maxDistance=60;
+	controls.enablePan=true;
+	controls.enableZoom=true;
+	controls.enableRotate=true;
+	controls.enableDamping=true;
+
+	var ambient=new THREE.AmbientLight("#fff",1);
+	scene.add(ambient);
+
+	var frontLight=new THREE.DirectionalLight('#ff0',1);
+	frontLight.position.set(0,0,-80);
+	scene.add(frontLight);
+
+	var pointLight=new THREE.PointLight('#0ff',1);
+	pointLight.position.set(0,0,80 );
+	scene.add(pointLight);
+
+	geometry=new THREE.SphereGeometry(14.65,32,16, 0,Math.PI/6, 0, 0.815);
+	for(let z=1;z<13;z++){
+		j++;phi +=Math.PI/6;
+		material[j]=new THREE.MeshStandardMaterial({color:cor.setHSL(phi/3,1,phi/12),side:THREE.DoubleSide});
+		sphere[j]=new THREE.Mesh(geometry,material[j]);
+		sphere[j].position.set(0,-8.18,0);sphere[j].rotation.set(0,phi,0);
+		scene.add(sphere[j]);
+	}
+
+	capaG=new THREE.SphereGeometry(14.65,32,16, 0,6.28, 0, 0.815);
+	tex[1]=new THREE.TextureLoader().load('img/pingo1.png');
+	tex[1].wrapS=THREE.RepeatWrapping;tex[1].wrapT=THREE.RepeatWrapping;
+	tex[1].repeat.set(20,3);
+		tex[2]=new THREE.TextureLoader().load('img/pingo2.png');
+		tex[2].wrapS=THREE.RepeatWrapping;tex[2].wrapT=THREE.RepeatWrapping;
+		tex[2].repeat.set(30,3);
+	tex[3]=new THREE.TextureLoader().load('img/pingo3.png');
+	tex[3].wrapS=THREE.RepeatWrapping;tex[3].wrapT=THREE.RepeatWrapping;
+	tex[3].repeat.set(20,2);
+		capaM[1]=new THREE.MeshStandardMaterial({map:tex[1],transparent:true});
+		capaM[2]=new THREE.MeshStandardMaterial({map:tex[2],transparent:true});
+		capaM[3]=new THREE.MeshStandardMaterial({map:tex[3],transparent:true});	capa=new THREE.Mesh(capaG,capaM);
+	capa[1]=new THREE.Mesh(capaG,capaM[1]);
+	capa[1].position.set(0,-8.10,0);
+		capa[2]=new THREE.Mesh(capaG,capaM[2]);
+		capa[2].position.set(0,-8.10,0);
+	capa[3]=new THREE.Mesh(capaG,capaM[3]);
+	capa[3].position.set(0,-8.10,0);
+	scene.add(capa[3]);
+
+	cylG=new THREE.CylinderGeometry(0.15,0.15,16);
+	cylM=new THREE.MeshStandardMaterial({color:0x666666,metalness:0.7,roughness:0.2});
+	cyl=new THREE.Mesh(cylG,cylM);
+	cyl.position.set(0,-1.5,0);
+	scene.add(cyl);
+
+	pontaG=new THREE.SphereGeometry(0.15,32,32);
+	pontaM=new THREE.MeshStandardMaterial({color:0x666666,metalness:0.7,roughness:0.2});
+	ponta[1]=new THREE.Mesh(pontaG,pontaM)
+	ponta[1].position.set(-10.7,2,0);
+
+	ponta[0]=ponta[1].clone();
+	ponta[0].scale.set(3,3,3);
+	ponta[0].position.set(0,6.6,0);
+
+	ponta[40]=ponta[1].clone();
+	ponta[40].scale.set(2,2,2);
+	ponta[40].position.set(-2,-9.5,0);
+
+	ponta[41]=ponta[1].clone();
+	ponta[41].scale.set(2,2,2);
+	ponta[41].position.set(0,1.7,0);
+
+	for(let i=0;i<=45;i +=3){points.push(Math.sin(i*(Math.PI/180))*14.7,Math.cos(i*(Math.PI/180))*14.7,0);}
+	var geometryX=new LineGeometry();
+	geometryX.setPositions(points);
+	materialX=new LineMaterial({color:0x000000,linewidth:1});
+	lineA[1]=new Line2(geometryX,materialX);
+	//lineX.computeLineDistances();
+	lineA[1].position.set(0.0,-8.2,0);
+	lineA[1].rotation.set(0,0,0.8);
+	lineB[1]=lineA[1].clone();
+	lineB[1].position.set(0.0,-8.3,0);
+
+	torusG=new THREE.TorusGeometry(1,0.15,32,32,Math.PI);
+	torus=new THREE.Mesh(torusG,cylM);
+	torus.position.set(-1,-9.4,0);
+	torus.rotation.set(0,0,3.14);
+	scene.add(torus);
+
+	points=[];
+	points.push(0,0,0);
+	points.push(6,0,0);
+	var geometryV=new LineGeometry();
+	geometryV.setPositions(points);
+	materialV=new LineMaterial({color:'#000',linewidth:1});
+	lineC[1]=new Line2(geometryV,materialV);
+	lineC[1].position.set(0,1.45,0);
+	lineC[1].rotation.set(0,0,0.8);
+
+	window.addEventListener('resize',onWindowResize);
+	onWindowResize();
+
+}
+
+function ex1(){
+}
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	renderer.render(scene,camera);
+	controls.update();
+	w++;
+	scene.rotation.y -=0.01;
+
+	if(w==30){
+		group[1].add(ponta[1]);
+		scene.add(group[1]);
+		for(let z=2;z<14;z++){
+			ponta[z]=ponta[1].clone();
+			lineA[z]=lineA[1].clone();lineB[z]=lineB[1].clone();lineC[z]=lineC[1].clone();
+			group[z].add(ponta[z]);
+			group[z].add(lineA[z]);group[z].add(lineB[z]);group[z].add(lineC[z]);
+			group[z].rotation.set(0,z*(Math.PI/6),0);
+			scene.add(group[z]);
+			scene.add(ponta[0]);
+			scene.add(ponta[40]);
+			scene.add(ponta[41]);
+			element=document.getElementById("clo");
+			if(element){element.remove();}
+		}
+	}
+
+	if(w==1){
+		materialX.resolution.set(window.innerWidth,window.innerHeight);
+		materialV.resolution.set(window.innerWidth,window.innerHeight);
+	}
+
+	if(w==1){
+		document.getElementById("canvasRain").style.display="block";
+	}
+	if(document.getElementById("canvasRain").style.display=="block"){
+		w1++;
+		if(w1==7){scene.remove(capa[3]);scene.remove(capa);scene.add(capa[2]);}
+		if(w1==14){scene.remove(capa[2]);scene.add(capa[1]);}
+		if(w1==21){scene.remove(capa[1]);scene.add(capa[3]);w1=0;}
+	}
+
+	if(document.getElementById("canvasRain").style.display=="none"){
+		for(let z=1;z<4;z++){scene.remove(capa[z]);}
+	}
+
+}
+
+init();
+
+animate();
+
+/*
+
+Hi Three.js followers,
+
+Funny umbrella for a virtual rainy day
+
+Once upon a time there was a book, 'Funny things for a rainy day'.
+
+the link:
+
+http://jrlazz.eu5.org/anim/umbrella.html
+
+Again, Thanks for the great Three.js Team!
+
+Jose Roberto Lazzareschi
+
+
+*/
+
+</script>
+
+<script>
+
+const ctx=document.querySelector("canvas").getContext("2d");
+const numRain=500;
+function render(time){
+	time *= 0.001;
+  	resizeCanvasToDisplaySize(ctx.canvas);
+  	const width=ctx.canvas.width;
+	const height=ctx.canvas.height;
+	ctx.fillStyle="transparent";
+	ctx.fillRect(0,0,width,height);
+	ctx.clearRect(0,0,width,height);  
+  
+	resetPseudoRandom();
+	const speed=time*400;
+	ctx.fillStyle="#ccf";
+	ctx.strokeStyle="#ccf";
+	for (let i=0; i<numRain; ++i){
+		const x=pseudoRandomInt(width);
+		const y=(pseudoRandomInt(height)+speed)%height;
+		ctx.beginPath();
+		ctx.ellipse(x,y,0.7,3,0,0,2*Math.PI,0);
+		ctx.closePath();
+		ctx.stroke();
+		ctx.fill();
+	}
+	requestAnimationFrame(render);
+}
+
+requestAnimationFrame(render);
+
+let randomSeed=0;
+const RANDOM_RANGE_=Math.pow(2,32);
+function pseudoRandom(){return (randomSeed_=(134775813*randomSeed_+1)%RANDOM_RANGE_)/RANDOM_RANGE_;};
+function resetPseudoRandom(){randomSeed_=0;}
+function pseudoRandomInt(n){return pseudoRandom()*n | 0;}
+function resizeCanvasToDisplaySize(canvas) {
+	const width=canvas.clientWidth;
+	const height=canvas.clientHeight;
+	if (canvas.width !== width || canvas.height !== height){canvas.width=width;canvas.height=height;}
+}
+
+function rainyes(){document.getElementById("canvasRain").style.display="block";}
+function rainno(){document.getElementById("canvasRain").style.display="none";}
+
+</script>
+</body>
+</html>
