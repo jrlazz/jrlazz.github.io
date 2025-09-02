@@ -1,0 +1,33 @@
+# Created with Anim8or 1.00
+# Object "diode":
+
+newmtl material01
+Ka 0.4 0.3 0.0
+Kd 0.4 0.3 0.0
+Ks 0 0 0
+Ns 0.0
+
+newmtl material02
+Ka 0.3 0.3 0.3
+Kd 0.3 0.3 0.3
+Ks 0 0 0
+Ns 0.0
+
+newmtl material03
+Ka 0.8 0.0 0.8
+Kd 0.8 0.0 0.8
+Ks 0 0 0
+Ns 0.0
+
+newmtl material04
+Ka 0.09 0.8 0.05
+Kd 0.09 0.8 0.05
+Ks 0 0 0
+Ns 0.0
+
+newmtl material05
+Ka 0.0 0.2 1.0
+Kd 0.0 0.2 1.0
+Ks 0 0 0
+Ns 0.0
+

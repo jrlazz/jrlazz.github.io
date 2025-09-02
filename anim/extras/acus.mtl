@@ -1,0 +1,39 @@
+# Created with Anim8or 1.00
+# Object "acus2":
+
+newmtl material01
+Ka 0.922 0.451 0.2
+Kd 0.922 0.451 0.2
+Ks 1 1 1
+Ns 752.6
+
+newmtl material02
+Ka 0.91 0.784 0.482
+Kd 0.91 0.784 0.482
+Ks 1 1 1
+Ns 752.6
+
+newmtl material03
+Ka 0.0157 0.0157 0.0157
+Kd 0.0157 0.0157 0.0157
+Ks 1 1 1
+Ns 752.6
+
+newmtl guitar_type_1Material
+Ka 1 1 1
+Kd 1 1 1
+Ks 1 1 1
+Ns 738.6
+
+newmtl ___default___
+Ka 0.333 0.459 0.824
+Kd 0.333 0.459 0.824
+Ks 1 1 1
+Ns 752.6
+
+newmtl material04
+Ka 0.18 0.914 0.122
+Kd 0.18 0.914 0.122
+Ks 1 1 1
+Ns 752.6
+
