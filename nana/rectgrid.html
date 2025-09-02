@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>rectgrid.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="../three.js.ico">
+<style>
+body{overflow:hidden;margin:0px;font-family:Monospace;background-color:#048;}
+span{position:absolute;left:5px;top:5px;color:#ff0;cursor:pointer;z-index:1;}
+</style>
+
+</head>
+
+<script src="../js/pipeline_js/three.js"></script>
+<script src="../js/pipeline_js/OrbitControls.js"></script>
+	
+<body>
+
+<span>right click inspect</span>
+
+<script>
+
+var camera, scene, renderer, controls, loader, ambLight, text, mattext, geotext, outtext;
+var mat, geohz, linehz, geovt, linevt;
+var points=[];
+
+	camera=new THREE.PerspectiveCamera(70,window.innerWidth/window.innerHeight,1,1000);
+	camera.position.set(0,40,40);
+	scene=new THREE.Scene();
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	document.body.appendChild(renderer.domElement);
+	renderer.setClearColor('#048',1.0);
+
+	controls=new THREE.OrbitControls(camera,renderer.domElement);
+
+// ******** ******** ******** ******** 
+	var plane=[];
+	var qty=6;
+	var hz_qty=20;
+	var vt_qty=10;
+	var half_hz=(qty*hz_qty)/2;
+	for(let p=1;p<=qty;p++){
+		plane[p]=new THREE.GridHelper(hz_qty,vt_qty,'#666','#666');
+		plane[p].position.set(-half_hz+(hz_qty*p)-hz_qty/2,0,0);
+		scene.add(plane[p]);
+	}
+// if needed ...
+	mat=new THREE.LineBasicMaterial({color:'#999'});
+	points.push(new THREE.Vector3(-half_hz,0,0));points.push(new THREE.Vector3( half_hz,0,0));
+	geohz=new THREE.BufferGeometry().setFromPoints(points);
+	linehz=new THREE.Line(geohz,mat);
+	scene.add(linehz);
+	points=[];
+	points.push(new THREE.Vector3(0,0,-hz_qty/2));points.push(new THREE.Vector3(0,0, hz_qty/2));
+	geovt=new THREE.BufferGeometry().setFromPoints(points);
+	linevt=new THREE.Line(geovt,mat);
+	scene.add(linevt);
+// ******** ******** ******** ******** 
+
+
+	ambLight=new THREE.AmbientLight("#fff",0.5);
+	scene.add(ambLight);
+
+	text="rectangular grid",font=undefined,hover=30;
+	mattext=[new THREE.MeshStandardMaterial({color:'#ff0',emissive:'#ff0',emissiveIntensity:1,metalness:0.5,roughness:0.2}),new THREE.MeshStandardMaterial({color:'#f33',emissive:'#f33',emissiveIntensity:1,metalness:0.5,roughness:0.2})];
+	loader=new THREE.FontLoader();
+	loader.load('../fonte/Cascadia_Regular.json',function(response){font=response;createText();});
+	function createText(){
+		geotext=new THREE.TextGeometry(text,{font:font,size:5,height:1,
+		curveSegments:16,bevelThickness:1,bevelSize:1,bevelEnabled:false});
+      	  	geotext.center();
+		outtext=new THREE.Mesh(geotext,mattext);
+		outtext.position.set(0,1.8,0);
+		scene.add(outtext);
+	}
+
+function animate() {
+	requestAnimationFrame(animate);
+	renderer.render(scene, camera);
+}
+
+animate();
+
+/*
+
+Rectangular GridHelper possibility
+
+Hello discourse.threejs.org Friends,
+
+It may be interest to have a particular GridHelper.
+
+here:
+
+http://jrlazz.eu5.org/nana/rectgrid.html
+
+Thanks for the great Three.js Team!
+
+Jose Roberto Lazzareschi
+
+*/
+
+</script>
+</body>
+</html>
