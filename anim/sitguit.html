@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>sitguit.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="https://threejs.org/files/favicon.ico"/>
+
+<style>
+span{position:absolute;font-family:Monospace;font-size:11pt;color:#ff0;z-index:2;cursor:pointer;}
+body{margin:0px;background-color:#001144;overflow:hidden;}
+input{width:45px;font-size:16pt;font-family:Monospace;background-color:#001144;color:#0ff;border:none;}
+audio{position:absolute;left:0px;top:30px;filter:invert(20%) saturate(4000%) hue-rotate(60deg) brightness(100%) contrast(100%); opacity:0.5;}
+</style>
+
+</head>
+
+<body>
+<span id="spanA" style="left:10px;top:5px;">right click &rarr; inspect &rarr; source code</span>
+<audio id="myAudio" controls loop><source src="mp3/within_r.mp3" type="audio/mpeg"></audio>
+<script type="module">
+
+import * as THREE from '../js/three.module_res_res.js';
+import { OrbitControls } from '../js/OrbitControls_res_res.js';
+import { Line2 } from '../js/Line2_res_res.js';
+import { LineMaterial } from '../js/LineMaterial_res_res.js';
+import { LineGeometry } from '../js/LineGeometry_res_res.js';
+import { DDSLoader } from '../js/DDSLoader_res_res.js';
+import { MTLLoader } from '../js/MTLLoader_res_res.js';
+import { OBJLoader } from '../js/OBJLoader_res_res.js';
+
+var renderer, scene, camera, controls, manager, t;
+
+var point=[];
+var cor=[];
+var matLine=[];
+var line=[];
+var spline=[];
+var divs=[];
+var lineGeo=[];
+var positions=[];for(let c=0;c<31;c++){positions[c]=[];}
+var colors=[];for(let c=0;c<31;c++){colors[c]=[];}
+var BI, CH;
+var curvefactor=1;
+var w=0;
+var q=0;
+var d=0;
+var di=0;
+var x=0;
+var c=0;
+var gui;
+var traste=[];
+var tarra=[];
+var tarra11=[];
+var bol=[];
+var con=0;
+var conta=[];
+conta[1]=6.092;
+conta[2]=5.750;
+conta[3]=5.428;
+conta[4]=5.123;
+conta[5]=4.835;
+conta[6]=4.564;
+conta[7]=4.308;
+conta[8]=4.066;
+conta[9]=3.838;
+conta[10]=3.622;
+conta[11]=3.419;
+conta[12]=3.227;
+conta[13]=3.046;
+conta[14]=2.875;
+conta[15]=2.714;
+conta[16]=2.561;
+conta[17]=2.418;
+conta[18]=2.282;
+conta[19]=2.154;
+conta[20]=2.033;
+var desloc=0;
+var oco=[];
+var circoco=[];
+var hole;
+
+var p=[];for(let c=0;c<21;c++){p[c]=[];}
+
+function init(){
+
+	renderer = new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setPixelRatio( window.devicePixelRatio );
+	renderer.setClearColor(0x000000,0);
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	document.body.appendChild(renderer.domElement);
+
+	scene=new THREE.Scene();
+
+	camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight,1,1000);
+	camera.position.set(80,60,40);
+	controls=new OrbitControls(camera,renderer.domElement);
+	controls.minDistance=5;
+	controls.maxDistance=300;
+	controls.enablePan=true;
+	controls.enableZoom=true;
+	controls.enableRotate=true;
+	controls.enableDamping=true;
+
+	manager=new THREE.LoadingManager();
+	manager.onStart=function(url,itemsLoaded,itemsTotal){console.log('Started loading file:'+url+'.\nLoaded '+itemsLoaded+' of '+itemsTotal + ' files.' );};
+	manager.onLoad=function(){console.log('Loading complete!');};
+	manager.onProgress=function(url,itemsLoaded,itemsTotal){console.log('loading texture'+url+' '+(itemsLoaded/itemsTotal*100)+'%');};
+	manager.onError=function(url){console.log('Error loading texture:'+url);};
+	manager.addHandler(/\.dds$/i,new DDSLoader());
+
+	new MTLLoader(manager).load('models/extras/bojo_drop33.mtl',function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load('models/extras/bojo_drop33.obj',function(object){gui=object;},manager.onProgress,manager.onError);});
+	new MTLLoader(manager).load('models/extras/traste.mtl',function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load('models/extras/traste.obj',function(object){traste[0]=object;},manager.onProgress,manager.onError);});
+
+	p[1][0]=new THREE.Vector2(-31.5,0);
+	p[1][1]=new THREE.Vector2(-31.5,3);
+	p[1][2]=new THREE.Vector2(80,3);
+	p[1][3]=new THREE.Vector2(80,0);
+	spline[1]=new THREE.SplineCurve(p[1]);
+	divs[1]=curvefactor*(p[1].length-1);point[1]=new THREE.Vector3();
+	cor[1]=new THREE.Color();
+	for(let i=0;i<divs[1];i++){
+		t=i/divs[1];spline[1].getPoint(t,point[1]);
+		positions[1].push(point[1].x,point[1].y,point[1].z);
+		cor[1].setHSL(t,1.0,0.5);colors[1].push(cor[1].r,cor[1].g,cor[1].b);
+	}
+	matLine[1]=new LineMaterial({color:0x00ccff,linewidth:1});
+	lineGeo[1]=new LineGeometry();lineGeo[1].setPositions(positions[1]);
+	lineGeo[1].setColors(colors[1]);line[1]=new Line2(lineGeo[1],matLine[1]);
+	line[1].computeLineDistances();line[1].rotation.set(0,1.57,0);
+	line[1].position.set(-7.0,-2,0.5);
+	line[50]=line[1].clone();line[50].position.set(-7.5,-2, -3.5);line[50].scale.x=0.95;
+	line[51]=line[1].clone();line[51].position.set(-8.0,-2, -7.5);line[51].scale.x=0.90;
+	line[52]=line[1].clone();line[52].position.set(-8.5,-2,-11.5);line[52].scale.x=0.85;
+	line[53]=line[1].clone();line[53].position.set(-9.0,-2,-15.5);line[53].scale.x=0.80;
+	line[54]=line[1].clone();line[54].position.set(-9.5,-2,-19.5);line[54].scale.x=0.75;
+	line[55]=line[1].clone();line[55].position.set(-10.0,-2,-23.5);line[55].scale.x=0.70;
+	line[56]=line[1].clone();line[56].position.set(-10.5,-2,-27.5);line[56].scale.x=0.65;
+	line[57]=line[1].clone();line[57].position.set(-11.0,-2,-31.5);line[57].scale.x=0.60;
+	line[58]=line[1].clone();line[58].position.set(-11.5,-2,-35.5);line[58].scale.x=0.55;
+	line[59]=line[1].clone();line[59].position.set(-12.0,-2,-39.5);line[59].scale.x=0.50;
+
+	q=2;d=80.0;di=44.5;c=0.05;x=- 8;qd(q,d,di,x,c);
+	q=3;d=81.7;di=47.0;c=0.10;x=- 9;qd(q,d,di,x,c);
+	q=4;d=83.4;di=49.5;c=0.15;x=-10;qd(q,d,di,x,c);
+	q=5;d=85.1;di=52.0;c=0.20;x=-11;qd(q,d,di,x,c);
+	q=6;d=86.8;di=54.5;c=0.30;x=-12;qd(q,d,di,x,c);
+	q=7;d=88.5;di=57.0;c=0.50;x=-13;qd(q,d,di,x,c);
+
+	var texhole=new THREE.TextureLoader(manager).load('img/morco.png');
+	var mathole=new THREE.MeshStandardMaterial({map:texhole,color:'#fff',transparent:true});
+	var geobox=new THREE.BoxGeometry(36,0.1,18);
+	hole=new THREE.Mesh(geobox,mathole);
+	hole.position.set(-10,0.1,-64);
+
+	var texGGK=new THREE.TextureLoader(manager).load('img/sitGGK.png');
+	var matGGK=new THREE.MeshStandardMaterial({map:texGGK,color:'#fff',transparent:true});
+	var geoGGK=new THREE.BoxGeometry(8,0.1,2);
+	var GGK=new THREE.Mesh(geoGGK,matGGK);
+	GGK.rotation.set(1.57,0,0);
+	GGK.position.set(-10,-1,60);
+	scene.add(GGK);
+
+	var flow1=new THREE.TextureLoader(manager).load('img/flow_gold.png');
+	var matflow1=new THREE.MeshStandardMaterial({map:flow1,color:'#fff',transparent:true});
+	var geoflow1=new THREE.BoxGeometry(18,0.1,18);
+	flow1=new THREE.Mesh(geoflow1,matflow1);
+	flow1.scale.set(0.7,0.1,0.7);
+	flow1.position.set(-10,0.2,-42);
+	scene.add(flow1);
+
+	var texcyl=new THREE.TextureLoader(manager).load('img/bojomad2.jpg');
+
+	var matcyl=new THREE.MeshStandardMaterial({map:texcyl,color:'#fff',metalness:0.2,roughness:0.5,side:THREE.DoubleSide});
+	var geocyl=new THREE.CylinderGeometry(1,1,24,32,1,true,0,Math.PI);
+	var cyl=new THREE.Mesh(geocyl,matcyl);
+	cyl.position.set(-10,0,0);
+	cyl.rotation.set(1.57,-1.57,0);
+	cyl.scale.set(5,5,5);
+	scene.add(cyl);
+
+	var texcylb=new THREE.TextureLoader(manager).load('img/bojomad2.jpg');
+	texcylb.wrapS=THREE.RepeatWrapping;texcylb.wrapT=THREE.RepeatWrapping;
+	texcylb.repeat.set(1,9);
+	var matbra=new THREE.MeshStandardMaterial({map:texcylb,color:'#fff',metalness:0.2,roughness:0.5,side:THREE.DoubleSide});
+	var geobra=new THREE.BoxGeometry(9.9,0.4,115);
+	var bra=new THREE.Mesh(geobra,matbra);
+	bra.position.set(-10,-0.1,-17);
+	scene.add(bra);
+
+	var geobra1=new THREE.BoxGeometry(1,2,115);
+	var bra1=new THREE.Mesh(geobra1,matbra);
+	bra1.position.set(-13,-1,-17);
+	bra1.rotation.set(0,0,0);
+	scene.add(bra1);
+
+	var matcirc=new THREE.MeshStandardMaterial({map:texcyl,color:'#fff',metalness:0.2,roughness:0.5,side:THREE.DoubleSide});
+	const geocirc=new THREE.CircleGeometry(5,32,0,3.14);
+	const circle=new THREE.Mesh(geocirc,matcirc);
+	circle.rotation.set(0,0,3.14);
+	circle.position.set(-10,0,60);
+	scene.add(circle);
+
+	var texbojinho=new THREE.TextureLoader(manager).load('img/bojomad2.jpg');
+	texbojinho.wrapS=THREE.RepeatWrapping;texbojinho.wrapT=THREE.RepeatWrapping;
+	texbojinho.repeat.set(5,1);
+	var materialIn=new THREE.MeshStandardMaterial({color:'#990',metalness:0.7,roughness:0.5,side:THREE.DoubleSide});
+	var materialOut=new THREE.MeshStandardMaterial({map:texbojinho,color:'#fff',metalness:0.3,roughness:0.5,side:THREE.DoubleSide});
+
+	var geocyl2=new THREE.CylinderGeometry(0.4,0.4,1,32,1,true);
+	var meshb=new THREE.Mesh(geocyl2,matcyl);
+	meshb.position.set(-10,-7,30);
+	meshb.rotation.set(0,0,0);
+	meshb.scale.set(5,5,5);
+	scene.add(meshb);
+
+	var bojoG1=new THREE.SphereGeometry(12,32,32,0,Math.PI*2,Math.PI/9,Math.PI/1.2);
+	var bojo1=new THREE.Mesh(bojoG1,materialOut);
+	bojo1.position.set(-10,-15,30);
+	bojo1.rotation.set(0,0,3.14);
+	bojo1.scale.set(1,0.6,1);
+	scene.add(bojo1);
+
+	var ambient=new THREE.AmbientLight("#fc9",0.8);
+	scene.add(ambient);
+	var starA=new THREE.PointLight("#ff0",0.5);starA.position.set( 50, 10, 150);scene.add(starA);
+	var starB=new THREE.PointLight("#f00",0.5);starB.position.set(-50,-10, 150);scene.add(starB);
+	var starC=new THREE.PointLight("#f0f",0.5);starC.position.set( 50, 50,-150);scene.add(starC);
+	var starD=new THREE.PointLight("#0f0",0.5);starD.position.set(-50,-100,-50);scene.add(starD);
+
+	var matcyl5=new THREE.MeshStandardMaterial({map:texcyl,color:'#fff',metalness:0.2,roughness:0.5});
+	var geocyl5=new THREE.CylinderGeometry(0.5,0.75,12,16);
+	tarra[1]=new THREE.Mesh(geocyl5,matcyl5);
+	tarra[1].position.set(-10,10,0);
+	tarra[1].rotation.set(0,0,1.57);
+
+	var matcyl6=new THREE.MeshStandardMaterial({color:'#333',metalness:0.5,roughness:0.1});
+	var geocyl6=new THREE.SphereGeometry(2,32);
+	tarra[0]=new THREE.Mesh(geocyl6,matcyl6);
+	tarra[0].scale.set(1,0.5,1);
+	tarra[0].position.set(0,-7,0);
+	tarra[0].rotation.set(0,0,1.57);
+
+	tarra[1].add(tarra[0]);
+	tarra[1].position.set(-10,-1,0);
+
+	for(let c=1;c<12;c++){tarra[c]=tarra[1].clone();tarra[c].position.z=37.5-(5.55*c);}//scene.add(tarra[c]);}
+	for(let c=12;c<15;c++){tarra[c]=tarra[1].clone();tarra[c].position.z=55-(5*(c-12.5));tarra[c].rotation.x=c;scene.add(tarra[c]);}
+	for(let c=15;c<18;c++){tarra[c]=tarra[1].clone();tarra[c].position.z=55-(5*(c-15.0));tarra[c].rotation.x=c;tarra[c].rotation.z=-1.57;scene.add(tarra[c]);}
+	for(let c=1;c<12;c++){tarra[c].position.x=-8;tarra[c].rotation.x=c;scene.add(tarra[c]);}
+
+	var matbra=new THREE.MeshStandardMaterial({color:'#fff'});
+
+	var geoup6=new THREE.BoxGeometry(1.5,2,16);
+	var up6=new THREE.Mesh(geoup6,matcyl5);
+	up6.position.set(-10.5,0.7,51);
+	up6.rotation.set(0,-0.37,1.57);
+	scene.add(up6);
+
+	var geotampo=new THREE.BoxGeometry(9.9,0.4,19.9);
+	var tampo=new THREE.Mesh(geotampo,matcyl5);
+	tampo.position.set(-10,-0.1,50);
+	tampo.rotation.set(0,0,0);
+	scene.add(tampo);
+
+	var geosupup6=new THREE.BoxGeometry(0.5,2,6);
+	var supup6=new THREE.Mesh(geosupup6,matbra);
+	supup6.position.set(-10.5,1,41);
+	supup6.rotation.set(0,1.57,0);
+	scene.add(supup6);
+
+	var geosupdown6=new THREE.BoxGeometry(0.5,1,14);
+	var supdown6=new THREE.Mesh(geosupdown6,matbra);
+	supdown6.position.set(-10.5,2,-74.5);
+	supdown6.rotation.set(0,1.57,0);
+	scene.add(supdown6);
+	var geosupdown6latD=new THREE.BoxGeometry(0.5,2,2);
+	var supdown6latD=new THREE.Mesh(geosupdown6latD,matbra);
+	supdown6latD.position.set(-4.5,0.5,-74.5);
+	supdown6latD.rotation.set(0,1.57,0);
+	scene.add(supdown6latD);
+	var supdown6latE=new THREE.Mesh(geosupdown6latD,matbra);
+	supdown6latE.position.set(-16.5,0.5,-74.5);
+	supdown6latE.rotation.set(0,1.57,0);
+	scene.add(supdown6latE);
+
+	var geosupdown13=new THREE.BoxGeometry(0.5,2,6);
+	var supdown13=new THREE.Mesh(geosupdown13,matbra);
+	supdown13.position.set(-9.5,1,-79);
+	supdown13.rotation.set(0,1.57,0);
+	scene.add(supdown13);
+
+	var matbol=new THREE.MeshStandardMaterial({color:'#999',metalness:0.7,roughness:0.2});
+	var geobol=new THREE.SphereGeometry(0.5,16,16);
+	bol[0]=new THREE.Mesh(geobol,matbol);
+                              bol[0].position.set( -8,1.45,45.0);scene.add(bol[0]);
+	bol[1]=bol[0].clone();bol[1].position.set( -9,1.45,47.5);scene.add(bol[1]);
+	bol[2]=bol[0].clone();bol[2].position.set(-10,1.45,50.0);scene.add(bol[2]);
+	bol[3]=bol[0].clone();bol[3].position.set(-11,1.45,52.5);scene.add(bol[3]);
+	bol[4]=bol[0].clone();bol[4].position.set(-12,1.45,55.0);scene.add(bol[4]);
+	bol[5]=bol[0].clone();bol[5].position.set(-13,1.45,57.5);scene.add(bol[5]);
+
+	bol[10]=bol[0].clone();bol[10].position.set(-8,2,-75.15);bol[10].scale.set(0.8,0.8,0.8);scene.add(bol[10]);
+	bol[11]=bol[10].clone();bol[11].position.x= -9;scene.add(bol[11]);
+	bol[12]=bol[10].clone();bol[12].position.x=-10;scene.add(bol[12]);
+	bol[13]=bol[10].clone();bol[13].position.x=-11;scene.add(bol[13]);
+	bol[14]=bol[10].clone();bol[14].position.x=-12;scene.add(bol[14]);
+	bol[15]=bol[10].clone();bol[15].position.x=-13;scene.add(bol[15]);
+
+	bol[50]=bol[0].clone();bol[50].position.set(-7,1,-79.5);bol[50].scale.set(0.5,0.4,0.4);scene.add(bol[50]);
+	bol[51]=bol[50].clone();bol[51].position.x=-7.5;scene.add(bol[51]);
+	bol[52]=bol[50].clone();bol[52].position.x=-8.0;scene.add(bol[52]);
+	bol[53]=bol[50].clone();bol[53].position.x=-8.5;scene.add(bol[53]);
+	bol[54]=bol[50].clone();bol[54].position.x=-9.0;scene.add(bol[54]);
+	bol[55]=bol[50].clone();bol[55].position.x=-9.5;scene.add(bol[55]);
+	bol[56]=bol[50].clone();bol[56].position.x=-10.0;scene.add(bol[56]);
+	bol[57]=bol[50].clone();bol[57].position.x=-10.5;scene.add(bol[57]);
+	bol[58]=bol[50].clone();bol[58].position.x=-11.0;scene.add(bol[58]);
+	bol[59]=bol[50].clone();bol[59].position.x=-11.5;scene.add(bol[59]);
+	bol[60]=bol[50].clone();bol[60].position.x=-12.0;scene.add(bol[60]);
+
+	var matbol13=new THREE.MeshStandardMaterial({color:'#999',metalness:0.7,roughness:0.2});
+	var geobol13=new THREE.SphereGeometry(0.5,16,16);
+	bol[20]=new THREE.Mesh(geobol13,matbol13);
+                                bol[20].position.set(- 8.0,5.45, 45.0);
+	bol[21]=bol[20].clone();bol[21].position.set(- 7.0,0.40, 32.0);bol[21].scale.set(0.7,1,0.7);scene.add(bol[21]);
+	bol[22]=bol[21].clone();bol[22].position.set(- 7.5,0.40, 26.4);scene.add(bol[22]);
+	bol[23]=bol[21].clone();bol[23].position.set(- 8.0,0.40, 20.9);scene.add(bol[23]);
+	bol[24]=bol[21].clone();bol[24].position.set(- 8.5,0.40, 15.3);scene.add(bol[24]);
+	bol[25]=bol[21].clone();bol[25].position.set(- 9.0,0.40,  9.8);scene.add(bol[25]);
+	bol[26]=bol[21].clone();bol[26].position.set(- 9.5,0.40,  4.1);scene.add(bol[26]);
+	bol[27]=bol[21].clone();bol[27].position.set(-10.0,0.40, -1.4);scene.add(bol[27]);
+	bol[28]=bol[21].clone();bol[28].position.set(-10.5,0.40, -6.9);scene.add(bol[28]);
+	bol[29]=bol[21].clone();bol[29].position.set(-11.0,0.40,-12.6);scene.add(bol[29]);
+	bol[30]=bol[21].clone();bol[30].position.set(-11.5,0.40,-18.2);scene.add(bol[30]);
+	bol[31]=bol[21].clone();bol[31].position.set(-12.0,0.40,-23.7);scene.add(bol[31]);
+
+	var matbolmarca=new THREE.MeshStandardMaterial({color:'#0f0'});
+	var geobolmarca=new THREE.SphereGeometry(0.5,16,16);
+	bol[40]=new THREE.Mesh(geobolmarca,matbolmarca);
+	bol[40].position.set(-8,1.45,45.0);
+	bol[41]=bol[40].clone();bol[41].position.set(-5.5,0,16);bol[41].scale.set(0.4,0.4,2);scene.add(bol[41]);
+	bol[42]=bol[41].clone();bol[42].position.z=7;scene.add(bol[42]);
+	bol[43]=bol[41].clone();bol[43].position.z=-1;scene.add(bol[43]);
+	bol[44]=bol[41].clone();bol[44].position.z=-11.7;scene.add(bol[44]);
+
+	window.addEventListener('resize',onWindowResize);
+	onWindowResize();
+}
+
+function qd(q,d,di,x,c){
+	p[q][0]=new THREE.Vector2(-di,-2);
+	p[q][1]=new THREE.Vector2(-di,2);
+	p[q][2]=new THREE.Vector2(d*1.5-di,2);
+	p[q][3]=new THREE.Vector2(d*1.5-di,0);
+	spline[q]=new THREE.SplineCurve(p[q]);
+	divs[q]=curvefactor*(p[q].length-1);
+	point[q]=new THREE.Vector3();
+	cor[q]=new THREE.Color();
+	for(let i=0;i<divs[q];i++){
+		t=i/divs[q];spline[q].getPoint(t,point[q]);
+		positions[q].push(point[q].x,point[q].y,point[q].z);
+		cor[q].setHSL(c,1.0,0.5);colors[q].push(cor[q].r,cor[q].g,cor[q].b);
+	}
+	matLine[q]=new LineMaterial({color:0xffffff,linewidth:4,vertexColors:true});
+	lineGeo[q]=new LineGeometry();lineGeo[q].setPositions(positions[q]);
+	lineGeo[q].setColors(colors[q]);line[q]=new Line2(lineGeo[q],matLine[q]);
+	line[q].computeLineDistances();line[q].rotation.set(0,1.57,0);
+	line[q].position.set(x,0,0.5);
+}
+
+function ex1(){
+	matLine[2].linewidth=3.0;
+	matLine[3].linewidth=2.7; 
+	matLine[4].linewidth=2.4;
+	matLine[5].linewidth=2.1; 
+	matLine[6].linewidth=1.8;
+	matLine[7].linewidth=1.5; 
+}
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	renderer.render(scene,camera);
+	controls.update();
+	w++;
+
+	if(w==60){
+		for(let c=1;c<8;c++){matLine[c].resolution.set(window.innerWidth,window.innerHeight);}
+		for(let c=1;c<8;c++){scene.add(line[c]);}
+		for(let c=50;c<60;c++){scene.add(line[c]);}
+	}
+
+	if(w==90){
+		gui.scale.set(39,29,49);
+		gui.rotation.set(1.57,0,0);
+		gui.position.set(-10,0.1,-60);
+		scene.add(gui);
+		traste[0].scale.set(0.5,0.5,0.5);
+		traste[0].position.set(-10,1,36);
+		traste[1]=traste[0].clone();traste[1].position.set(-10,1,30);
+		con=64.54-23.5;traste[0].position.set(-10,0.8,con);
+		for(let c=1;c<20;c++){con=con-conta[c];traste[c]=traste[0].clone();traste[c].position.z=con;scene.add(traste[c]);}
+		for(let c=1;c<20;c++){scene.add(traste[c]);}
+		scene.add(hole);
+	}
+}
+
+init();
+
+animate();
+
+ex1();
+
+document.getElementById("myAudio").volume=0.2; 
+
+/*
+
+Hi Three.js followers,
+
+Sitguit idea ... sitar and guitar together
+
+Maybe easier for guitarist to enjoy it.
+
+
+the link:
+
+http://jrlazz.eu5.org/anim/sitguit.html
+
+Again, Thanks for the great Three.js Team!
+
+Jose Roberto Lazzareschi
+
+
+*/
+
+</script>
+</body>
+</html>

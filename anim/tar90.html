@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>tar90</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="https://threejs.org/files/favicon.ico"/>
+
+<style>
+
+body{margin:0px;border:0px;font-family:Monospace;background-color:#069;overflow:hidden;}
+span{font-size:40pt;font-family:Arial;color:#ff0;}
+.draggable{width:50px; height:50px; position:absolute; transform:rotate(0deg) translateX(0px);}
+img{position:absolute;top:12px;width:100px;cursor:pointer;z-index:2;}
+a{text-decoration:none;font-size:32pt;color:#0f0;}
+.classimg{width:100px;}
+
+</style>
+
+<script src="../js/three.min90.js"></script>
+
+</head>
+
+<body>
+
+<span onclick="javascript:teclaC=1;" style="position:absolute;left:10px;top:20px;cursor:ponter;">B</span>
+<span onclick="javascript:teclaB=1;"  style="position:absolute;left:10px;top:120px;cursor:ponter;">C</span>
+
+<span onclick="javascript:teclaC=1;" id="spanaux" style="position:absolute;left:10px;top:200px;"></span>
+
+<div id="container"></div>
+
+<script>
+
+//import * as THREE from '../js/three.module90.js';
+
+var container=document.getElementById('container');
+
+var target=new THREE.Vector3();
+var altera=0;
+var completo=0;
+var conta=0;
+var mov=0.15;
+var point;
+var axes;
+var circle;
+
+const objects = [];
+
+var k=0;
+
+var rot=new Array();
+rot[1]=0;
+
+var w=0;
+var ww=0;
+var etapa=0;
+
+var heli=[];
+var nave=[];
+var de2ra=function(degree){return degree*(Math.PI/180);};
+
+var teclaA=0;var teclaD=0;
+var teclaW=0;var teclaS=0;
+var teclaG=0;var teclaH=0;
+var teclaC=0;var teclaB=0;
+var teclaV=0;
+var setaE=0;var setaD=0;
+var setaC=0;var setaB=0;
+
+
+
+
+var mousedu=0;var movemouse=0;
+
+var box=[];var geo=[];var mat=[];
+var axes,cube;
+
+var xx=0;var yy=0;var xxant=0;var yyant=0;
+var p=Math.PI;
+var w=60;
+var dire=0;var zooo=0;var hori=0;var vert=0;var conta=0;
+var gru,ball,ballGeo,material,boxgeo,boxmat;
+var steve,cab,tor,bds,bdi,bes,bei,pds,pdi,pes,pei;
+var steve,acab,ator,abds,abdi,abes,abei,apds,apdi,apes,apei;
+
+var plomat,plogeo,plo;
+var mov=0.1;var mousedu=0;var movemouse=0;
+var mH=0;var mV=0;var mob=0;var hip=0;
+
+var ma=[];var ka=[];var alvos=[];
+
+var cuma,kuma,stegeo,plotex;
+
+var cabgeo;
+
+
+var keys=[];
+var ang=0;
+
+
+
+
+
+
+
+		const renderer = new THREE.WebGLRenderer( { antialias: true } );
+		renderer.setPixelRatio( window.devicePixelRatio );
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		container.appendChild( renderer.domElement );
+
+		const scene=new THREE.Scene();
+		scene.background=new THREE.Color(0x006699);
+		const camera=new THREE.PerspectiveCamera(80,window.innerWidth/window.innerHeight,.5,200);
+		//camera.position.set(0,5,30);
+		camera.position.set(0,-30,10);
+
+// luzes
+	const ambientLight=new THREE.AmbientLight("#fff",1);
+	ambientLight.position.set(30,20,30);
+	scene.add(ambientLight);
+
+	point=new THREE.PointLight(0xff9900,3,3,2);//color,intensity,range,decay
+	point.position.set(0,-1,27);
+
+
+	//goldenrod
+		const textureA=new THREE.TextureLoader().load('img/fl4.jpg');
+		textureA.wrapS=THREE.RepeatWrapping;
+		textureA.wrapT=THREE.RepeatWrapping;
+		textureA.repeat.set(5,1);
+		var geoA=new THREE.BoxGeometry(5,10,5);
+		const matA=new THREE.MeshBasicMaterial({map:textureA,side:THREE.DoubleSide});
+		var ACube=new THREE.Mesh(geoA,matA);
+		ACube.position.set(-15,5,-9);
+		scene.add(ACube);
+
+
+nave[0]=ACube.clone();
+
+	var goldenrodT=new THREE.TextureLoader().load('models/lajinha_amarela-are-1.jpg');
+	goldenrodT.wrapS=THREE.RepeatWrapping;
+	goldenrodT.wrapT=THREE.RepeatWrapping;
+	goldenrodT.repeat.set(12,6);
+	var goldenrodG=new THREE.BoxGeometry(22,0.1,9);
+	var goldenrodM=new THREE.MeshBasicMaterial({map:goldenrodT});
+	var goldenrodB=new THREE.Mesh(goldenrodG,goldenrodM);
+	goldenrodB.position.set(-13,0.1,-9);
+	scene.add(goldenrodB);
+
+
+
+	// teal
+	var cubeGeometry=new THREE.BoxGeometry(1.5,1,1.5);
+	var cubeMaterial=new THREE.MeshBasicMaterial({color:'#c00',transparent:true,opacity:1});
+	var BCube=new THREE.Mesh(cubeGeometry,cubeMaterial);
+	BCube.position.set(3,5,-5);
+//	scene.add(BCube);
+
+heli[0]=BCube.clone();
+heli[0].scale.set(5,1,5);
+
+
+heli[1]=ACube.clone();
+heli[1].rotation.z=1.57;
+
+
+heli[2]=BCube.clone();
+//heli[2].rotation.z=1.57;
+heli[2].scale.set(1,20,1);
+
+		const textureY=new THREE.TextureLoader().load('img/fl1.jpg');
+		textureY.wrapS=THREE.RepeatWrapping;
+		textureY.wrapT=THREE.RepeatWrapping;
+		textureY.repeat.set(6,1);
+		var metryY=new THREE.BoxGeometry(1.5,8,1.5);
+		const erialY=new THREE.MeshBasicMaterial({map:textureY});
+		var mesh=new THREE.Mesh(metryY,erialY);
+		mesh.position.set(10,4,-5);
+		scene.add(mesh);
+
+		const textureZ=new THREE.TextureLoader().load('img/fl5.jpg');
+		textureZ.wrapS=THREE.RepeatWrapping;
+		textureZ.wrapT=THREE.RepeatWrapping;
+		textureZ.repeat.set(10,1);
+		var metryZ=new THREE.BoxGeometry(1.5,8,1.5);
+		const erialZ=new THREE.MeshBasicMaterial({map:textureZ});
+		mesh=new THREE.Mesh(metryZ,erialZ);
+		mesh.position.set(15,4,-5);
+		scene.add(mesh);
+
+
+
+
+	cubeGeometry=new THREE.BoxGeometry(1.5,5,1.5);
+	cubeMaterial=new THREE.MeshBasicMaterial({color:0x990000,transparent:true,opacity:1});
+	var CCube=new THREE.Mesh(cubeGeometry,cubeMaterial);
+	CCube.position.set(5,2.5,-5);
+scene.add(CCube);
+
+	cubeGeometry=new THREE.BoxGeometry(1.5,5,1.5);
+	cubeMaterial=new THREE.MeshBasicMaterial({color:0x006699});
+	var DCube=new THREE.Mesh(cubeGeometry,cubeMaterial);
+DCube.receiveShadow=true;
+	DCube.position.set(3,2.5,0);
+scene.add(DCube);
+
+	cubeMaterial=new THREE.MeshBasicMaterial({color:0x996699});
+	var ECube=new THREE.Mesh(cubeGeometry,cubeMaterial);
+ECube.receiveShadow=true;
+	ECube.position.set(6,2.5,0);
+scene.add(ECube);
+
+	cubeMaterial=new THREE.MeshBasicMaterial({color:0x000099});
+	var FCube=new THREE.Mesh(cubeGeometry,cubeMaterial);
+FCube.receiveShadow=true;
+	FCube.position.set(9,2.5,0);
+scene.add(FCube);
+
+	cubeGeometry=new THREE.BoxGeometry(1,1,1);
+	cubeMaterial=new THREE.MeshBasicMaterial({color:0x000000});
+	var camA=new THREE.Mesh(cubeGeometry,cubeMaterial);
+	//camA.scale.set(125,125,125);
+	//camA.position.set(0,15,0);
+
+	cubeGeometry=new THREE.BoxGeometry(0.7,0.7,0.7);
+	cubeMaterial=new THREE.MeshBasicMaterial({color:0xffff00});
+	var camB=new THREE.Mesh(cubeGeometry,cubeMaterial);
+	//camB.scale.set(25,25,25);
+	//camB.position.set(0,15,40);
+/*
+var group1=new THREE.Group();
+var group2=new THREE.Group();
+var group3=new THREE.Group();
+*/
+/*
+group1.add(DCube);
+group1.add(ECube);
+group1.add(FCube);scene.add(group1);
+group2=group1.clone();group2.position.set(0,0,3);scene.add(group2);
+group3=group1.clone();group3.position.set(0,0,6);scene.add(group3);
+*/
+
+// GRIDS
+	var gridBaseGeo=new THREE.BoxGeometry(100,100,0.01);
+	var gridBaseMat=new THREE.MeshPhongMaterial({color:0x444444});
+	var gridBase=new THREE.Mesh(gridBaseGeo,gridBaseMat);
+	gridBase.position.set(0,0,0);
+	gridBase.rotation.x=de2ra(90);
+	gridBase.receiveShadow=true;
+	scene.add(gridBase);
+
+	var gridBaseMat=new THREE.MeshPhongMaterial({color:0x001122});
+	var gridBase=new THREE.Mesh(gridBaseGeo,gridBaseMat);
+	gridBase.position.set(0,-0.1,0);
+	gridBase.rotation.x=de2ra(90);
+	gridBase.receiveShadow=true;
+	scene.add(gridBase);
+
+	var grid=new THREE.GridHelper(100,50);//size,divisions
+	grid.material.color.setHex(0xffffff);
+	grid.position.set(0,0.1,0);
+	scene.add(grid);
+
+//RUAS
+	var ruaGeo=new THREE.BoxGeometry(100,2,0.01);
+	var ruaMat=new THREE.MeshPhongMaterial({color:0x303030});
+	var Arua=new THREE.Mesh(ruaGeo,ruaMat);
+	Arua.position.set(0,0.2,0);
+	Arua.rotation.set(de2ra(90),0,de2ra(90));
+	Arua.receiveShadow=true;
+	scene.add(Arua);
+
+	ruaGeo=new THREE.BoxGeometry(100,2,0.01);
+	ruaMat=new THREE.MeshPhongMaterial({color:0x303030});
+	var Brua=new THREE.Mesh(ruaGeo,ruaMat);
+	Brua.position.set(0,0.2,-25);
+	Brua.rotation.set(de2ra(90),0,de2ra(0));
+	Brua.receiveShadow=true;
+	scene.add(Brua);
+
+// sky
+	const loader = new THREE.TextureLoader();
+	loader.load('models/sky_cores_3.jpg',function(texture){
+	//texture.encoding=THREE.sRGBEncoding;
+	texture.mapping=THREE.EquirectangularReflectionMapping;
+	scene.background=texture;  
+});
+
+
+//	animate();
+
+window.onresize=function(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+};
+
+
+
+
+// **** touchmove ini ****
+
+document.addEventListener("touchmove", mymove);
+document.addEventListener("touchend", myend);
+
+function mymove(event) {
+	xx=parseInt(event.touches[0].clientX);
+	yy=parseInt(event.touches[0].clientY);
+	//document.getElementById("spanaux").innerText="touch";
+	compu();
+	repo();
+}
+
+function myend(event) {
+	teclaW=0;
+	teclaV=0;
+	teclaH=0;
+	teclaG=0;
+	teclaB=0;
+	teclaC=0;
+}
+// **** touchmove end ****
+
+
+
+// **** mousemove ini ****
+
+
+document.addEventListener("mousemove",function(){
+	if(mousedu==1){
+		movemouse=1;
+		xx=event.pageX;yy=event.pageY;
+		compu();
+//		if(plo){plo.rotation.y=-camera.rotation.y;}
+	}
+});
+
+document.addEventListener("mousedown",function(){
+	mousedu=1;
+	if(mousedu==1){
+		movemouse=1;
+		xx=event.pageX;yy=event.pageY;
+		compu();
+	}
+});
+
+document.addEventListener("mouseup",function(){
+	mousedu=0;
+	movemouse=0;
+
+	teclaW=0;
+	teclaV=0;
+	teclaH=0;
+	teclaG=0;
+	teclaB=0;
+	teclaC=0;
+
+});
+
+// **** mousemove fim ****
+
+function compu(){
+repo();
+/*
+	if(xx>xxant){
+		if(camera.position.x<1600){teclaG=1;}
+	}else{
+		if(camera.position.x>-1600){teclaH=1;}
+	}
+	if(yy>yyant){
+		if(camera.position.y>-1600){teclaW=1;}
+	}else{
+		if(camera.position.y<1600){teclaV=1;}
+	}
+
+*/
+	if(xx<=mH && yy<mV){
+		teclaW=0;teclaV=0;teclaH=0;teclaG=0;
+		teclaW=1;teclaG=1;
+	}
+	if(xx<=mH && yy>mV){
+		teclaW=0;teclaV=0;teclaH=0;teclaG=0;
+		teclaV=1;teclaG=1;
+	}
+	if(xx>=mH && yy<mV){
+		teclaW=0;teclaV=0;teclaH=0;teclaG=0;
+		teclaW=1;teclaH=1;
+	}
+	if(xx>=mH && yy>mV){
+		teclaW=0;teclaV=0;teclaH=0;teclaG=0;
+		teclaV=1;teclaH=1;
+	}
+
+	xxant=xx;
+	yyant=yy;
+document.getElementById("spanaux").innerText=xxant+ " ...  " + yyant;
+
+}
+
+
+function repo(){
+	mH=window.innerWidth/2;mV=window.innerHeight/2;
+}
+
+function animate() {
+	requestAnimationFrame(animate);
+
+	ww++;
+
+	if(ww==5){
+	//camA.position.set(0,-5,-50);
+	camA.position.set(0,40,-50);
+	camB.position.set(0,0,40);
+		heli[0].add(heli[1]);
+		heli[0].add(heli[2]);
+		//heli[0].add(bone[20]);
+		heli[0].add(point);
+	heli[0].add(camA);
+	heli[0].add(camB);
+		heli[1].position.set(0,7.9,12);
+		heli[1].scale.set(2,1,2);
+
+		heli[2].position.set(0,12.5,12);
+		heli[2].rotation.set(0,0,1.57);
+
+		heli[0].scale.set(.05,.05,.05);
+		heli[0].rotation.set(0,3.14,0);
+		heli[0].position.set(0,1,0);
+		scene.add(heli[0]);
+
+	}
+
+		scene.updateMatrixWorld(true);
+			//target.getPositionFromMatrix(bone[0].matrixWorld);
+		target.setFromMatrixPosition(camB.matrixWorld);
+			//alert(target.x + ',' + target.y + ',' + target.z);
+		camera.lookAt(target.x,target.y,target.z);
+
+		scene.updateMatrixWorld(true);
+		target.setFromMatrixPosition(camA.matrixWorld);
+		camera.position.set(target.x,target.y,target.z);
+
+		w++;
+
+		//heli[1].rotation.y -=0.1;
+		heli[2].rotation.y -=0.1;
+
+		if(teclaW==1){heli[0].rotation.y=-3.14+ang;	heli[0].position.z +=Math.cos(heli[0].rotation.y=-3.14+ang)*mov;	heli[0].position.x +=Math.sin(heli[0].rotation.y=-3.14+ang)*mov;		scene.position.z -=Math.cos(heli[0].rotation.y=-3.14+ang)*mov;	scene.position.x -=Math.sin(heli[0].rotation.y=+3.14+ang)*mov;}//W
+		if(teclaV==1){heli[0].rotation.y=-3.14+ang;	heli[0].position.z -=Math.cos(heli[0].rotation.y=-3.14+ang)*mov;	heli[0].position.x -=Math.sin(heli[0].rotation.y=-3.14+ang)*mov;		scene.position.z +=Math.cos(heli[0].rotation.y=-3.14+ang)*mov;	scene.position.x +=Math.sin(heli[0].rotation.y=+3.14+ang)*mov;}//V
+		if(teclaH==1){heli[0].rotation.y -=.04;ang-=.04;}//G
+		if(teclaG==1){heli[0].rotation.y +=.04;ang+=.04;}//H
+
+		if(teclaB==1){if(heli[0].position.y>1){heli[0].position.y -=mov/2;}}//Cima
+		if(teclaC==1){heli[0].position.y +=mov/2;}//Baixo
+/*
+teclaW=0;
+teclaV=0;
+teclaH=0;
+teclaG=0;
+teclaB=0;
+teclaC=0;
+*/
+
+	renderer.render( scene, camera );
+}
+
+
+animate();
+
+</script>
+
+</body>
+</html>

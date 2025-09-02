@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>solidlight.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="ok.ico"/>
+
+<style>
+body{margin:0;background-color:#000;font-family:Monospace;font-size:12pt;color:#cff;overflow:hidden;}
+</style>
+
+<script type="importmap">
+	{
+	  "imports": {
+		"three": "https://unpkg.com/three@0.171.0/build/three.module.min.js",
+		"three/addons/": "https://unpkg.com/three@0.171.0/examples/jsm/"
+	  }
+	}
+  </script>
+</head>
+
+<body>
+
+<span id="nome" style="position:absolute;left:45%;top:10px;font-size:21pt;color:#ff0;opacity:0.5;"></span>
+
+<label>color:</label>
+<input type="color" id="color" value="#ff0000" autocomplete="off" style="border:1px solid black;"><br><br>
+
+<button id="BA" onclick="javascript:location.href='solidlight.html';" style="position:absolute;left:80%;top:28px;width:200px;background-color:#900;color:#fff;display:;">Restart</button>
+<a href="solidlight.txt" target="_blank" class="bu" style="position:absolute;left:80%;top:68px;width:200px;background-color:#060;color:#fff;text-align:center;text-decoration:none;border:2px outset #ff0;">View code</a>
+
+<code id="mus" style="display:none;">
+<img src="img\music.png" style="position:absolute;left:10px;top:10px;width:40px;height:40px;"></img>
+<input id="gai" type="range" value="1" min="0" max="5" step="0.1" autocomplete="off" style="position:absolute;left:60px;top:20px;width:120px;"></input>
+<span id="spanB" style="position:absolute;left:190px;top:20px;">1</span>
+</code>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+var scene, camera, renderer, controls;
+var ambLight, pointLight, moon, PP, BM, ground, groundhide, spot, spotHelper, spotHolder;
+var iW=window.innerWidth, iH=window.innerHeight, mouse={x:0,y:0};
+var t=0;
+var g=[];
+var m=[];
+var mesh=[];
+var axes=[];
+
+var dcolor=document.getElementById("color");
+
+	dcolor.onchange=function DCOR(){mudacor();}
+
+	scene=new THREE.Scene();
+
+	camera=new THREE.PerspectiveCamera(60,iW/iH,1,1000);
+	camera.position.set(0,10,40);
+	scene.add(camera);
+	scene.position.set(0,-7,0);
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setSize(iW,iH);
+	renderer.setClearColor(0x222222,0);
+	renderer.shadowMap.enabled=true;
+	document.body.appendChild(renderer.domElement);
+	window.addEventListener('resize',onWindowResize);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+
+	ambLight=new THREE.AmbientLight('#fff',1);scene.add(ambLight);
+	pointLight=new THREE.PointLight('#fff',100);pointLight.position.set(10,40,20);scene.add(pointLight);
+
+	g[11]=new THREE.SphereGeometry(1,32,32);
+	m[11]=new THREE.MeshStandardMaterial({color:'#333'});
+	moon=new THREE.Mesh(g[11],m[11]);
+	moon.position.set(0,-40,0);
+	scene.add(moon);
+
+	g[12]=new THREE.CircleGeometry(30,64);
+	m[12]=new THREE.MeshStandardMaterial({color:'#555',side:THREE.DoubleSide});
+	ground=new THREE.Mesh(g[12],m[12]);
+	ground.rotation.set(Math.PI/2,0,0);
+	ground.position.set(0,0,0);
+	ground.receiveShadow=true;
+	scene.add(ground);
+
+	g[13]=new THREE.CylinderGeometry(30,30,64,32,32,true);
+	m[13]=new THREE.MeshStandardMaterial({color:'#000',side:THREE.DoubleSide});
+	groundhide=new THREE.Mesh(g[13],m[13]);
+	groundhide.position.set(0,-32.01,0);
+	scene.add(groundhide);
+	
+	g[14]=new THREE.SphereGeometry(1,64,64,0,Math.PI*2,0,Math.PI/2);
+	m[14]=new THREE.MeshStandardMaterial({color:'#ccc',metalness:0.7,roughness:0.3});
+	spotHolder=new THREE.Mesh(g[14],m[14]);
+	spotHolder.scale.set(1,4,1);
+	spotHolder.position.set(0,-4,0);
+
+	spot= new THREE.SpotLight('#f00',60,40,Math.PI/12);
+	spot.target=moon
+	spot.castShadow=true;
+	spot.position.set(0,25,0);
+	spot.decay=0;
+	spotHelper=new THREE.SpotLightHelper(spot);
+	scene.add(spot);
+	scene.add(spotHelper);
+
+	g[12]=new THREE.SphereGeometry(1.5,32,32);
+	m[12]=new THREE.MeshStandardMaterial({color:'#ccc'});
+	PP=new THREE.Mesh(g[12],m[12]);
+	PP.position.set(0,9,4);
+	PP.castShadow=true;
+	PP.name="Asteroid B-612";
+	scene.add(PP);
+
+	g[13]=new THREE.BoxGeometry(1,12,2,64,64);
+	m[13]=new THREE.MeshStandardMaterial({color:'#393'});
+	BM=new THREE.Mesh(g[13],m[13]);
+	BM.position.set(7,4,2);
+	BM.castShadow=true;
+	BM.name="Blue Mountain";
+	scene.add(BM);
+
+	g[40]=new THREE.CylinderGeometry(0,8,30);
+	m[40]=new THREE.MeshBasicMaterial({color:'#f00',side:THREE.DoubleSide,transparent:true,opacity:0.3});
+	mesh[40]=new THREE.Mesh(g[40],m[40]);
+	mesh[40].position.set(0,-15,0);
+
+	axes[1]=new THREE.AxesHelper(0.01);
+	axes[1].add(mesh[40]);
+	axes[1].add(moon);
+	axes[1].add(spotHolder);
+	axes[1].position.set(0,25,0);
+	scene.add(axes[1]);
+
+function onWindowResize(){
+	iW=window.innerWidth;iH=window.innerHeight;
+	camera.aspect=iW/iH;
+	camera.updateProjectionMatrix();
+	renderer.setSize(iW,iH);
+}
+
+function mudacor(){
+	mesh[40].material.color.set(dcolor.value);
+	spot.color.set(dcolor.value);
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	if(spot){
+		axes[1].rotation.y +=0.01;
+		axes[1].rotation.z=0.3;
+		spotHelper.update();
+		t++;
+		if(t>100){scene.remove(spotHelper);}
+		if(t>200){scene.add(spotHelper);t=0;}
+
+	}
+	controls.update();
+	renderer.render(scene, camera);
+}
+
+animate();
+
+</script>
+</body>
+</html>

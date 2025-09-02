@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>paintfatA1.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="https://threejs.org/files/favicon.ico"/>
+
+<style>
+body{margin:0px;background-color:#042;overflow:hidden;font-family:Monospace;}
+select,input,span{position:absolute;font-family:Arial;font-size:10pt;font-weight:bold;color:#008;}
+@font-face {font-family:tipo;src:url('../fonte/MysteryQuest-Regular.ttf');}
+</style>
+
+</head>
+
+<body>
+
+<button id="rdm" onclick="corrdm()" style="position:absolute;top:12px;left:10px;width:80px;height:20px;border:1px solid transparent;cursor:pointer;">RANDOM</button>
+<span style="top:14px;left:100px;color:#ff0;">COLOR</span>
+<input type="color" id="favcolor" name="favcolor" autocomplete="off"; value="#ff0000" onchange="mudacor();" style="top:10px;left:155px;border:1px solid black;padding:0px;height:24px;cursor:pointer;"></input>
+<span style="top:14px;left:230px;color:#ff0;">SIZE</span>
+<input type="number" id="diam" name="diam" min="1" max="20" value="8" onchange="altsize();" autocomplete="off" style="top:11px;left:270px;width:40px;height:16px;color:#008;"></input>
+<span style="top:14px;left:820px;color:#ff0;">BGCOLOR</span>
+<input type="color" id="bgcolor" name="bgcolor" autocomplete="off"; value="#5493de" onchange="mudabgcor();" style="top:10px;left:900px;border:1px solid black;padding:0px;height:24px;cursor:pointer;"></input>
+
+<button id="butrot" onclick="rota();" style="position:absolute;top:12px;left:1000px;width:100px;height:20px;border:1px solid transparent;cursor:pointer;">ROTATE</button>
+<button id="butrotx" onclick="rotax();" style="position:absolute;font-size:8pt;font-weight:bold;color:#090;top:12px;left:1120px;width:20px;height:20px;border-radius:30%;cursor:pointer;">X</button>
+<button id="butroty" onclick="rotay();" style="position:absolute;font-size:8pt;font-weight:bold;color:#f00;top:12px;left:1150px;width:18px;height:20px;border-radius:30%;cursor:pointer;">Y</button>
+<button id="butrotz" onclick="rotaz();" style="position:absolute;font-size:8pt;font-weight:bold;color:#f00;top:12px;left:1180px;width:18px;height:20px;border-radius:30%;cursor:pointer;">Z</button>
+
+<span style="font-family:tipo;font-size:18pt;color:#ff0;top:7px;left:30%;width:300px;height:20px;font-weight:normal;">Painting <font style="color:#0f0;">with</font><font style="color:#f9f;"> fat</font><font style="color:#0ff;"> lines 1</font></span>
+<br><br><br>
+<center>
+<iframe id="ifr" style="width:100px;height:100px;border:1px solid #ff0;"></iframe>
+</center>
+<script type="text/javascript">
+	var ifra=window.document.getElementById("ifr");
+	ifra.cor=document.getElementById("favcolor").value;
+	ifra.bgcor=document.getElementById("bgcolor").value;
+	ifra.size=document.getElementById("diam").value;
+	ifra.src="paintfatB1.html";
+	ifra.rota=0;
+	ifra.rotax=1;
+	ifra.rotay=0;
+	ifra.rotaz=0;
+
+function corrdm(){ifra.cor="R";}
+
+function mudacor(){ifra.cor=document.getElementById("favcolor").value;}
+function mudabgcor(){ifra.bgcor=document.getElementById("bgcolor").value;}
+
+function altsize(){ifra.size=document.getElementById("diam").value;}
+
+function rota(){
+	ifra.rota=1-ifra.rota;
+	if(ifra.rota==0){
+		document.getElementById("butrot").innerText="ROTATE";
+	}else{
+		document.getElementById("butrot").innerText="STOP ROTATE";
+	}
+}
+
+function rotax(){
+	ifra.rotax=1-ifra.rotax;
+	if(ifra.rotax==1){
+		document.getElementById("butrotx").style.color="#090";
+	}else{
+		document.getElementById("butrotx").style.color="#f00";
+	}
+}
+
+function rotay(){
+	ifra.rotay=1-ifra.rotay;
+	if(ifra.rotay==1){
+		document.getElementById("butroty").style.color="#090";
+	}else{
+		document.getElementById("butroty").style.color="#f00";
+	}
+}
+function rotaz(){
+	ifra.rotaz=1-ifra.rotaz;
+	if(ifra.rotaz==1){
+		document.getElementById("butrotz").style.color="#090";
+	}else{
+		document.getElementById("butrotz").style.color="#f00";
+	}
+}
+
+document.getElementById("ifr").style.width=window.innerWidth-2+"px";
+document.getElementById("ifr").style.height=window.innerHeight-50+"px";
+
+//https://stackoverflow.com/questions/13757943/access-a-variable-of-iframe-from-parent
+
+</script>
+
+</body>
+</html>

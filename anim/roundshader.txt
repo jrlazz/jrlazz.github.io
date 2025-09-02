@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>roundshader.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="ok.ico"/>
+
+<style>
+body{margin:0px;background-color:#024;font-family:Monospace;overflow:hidden;}
+a{font-size:12pt;color:#0c0;text-decoration:none;}
+</style>
+
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+	{
+		"imports":{
+			"three":"https://unpkg.com/three@0.160.0/build/three.module.js",
+			"three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"
+		}
+	}
+</script>
+
+</head>
+
+<body>
+
+<span style="position:absolute;left:10px;top:10px;color:#fc0;font-size:20.5pt;">
+Cheap round-edged box (vertex shader)</span>
+<span style="position:absolute;left:10px;top:40px;color:#fc0;font-size:10.25pt;">
+@prisoner849 (jun 2019) <a href="https://discourse.threejs.org/t/cheap-round-edged-box-vertex-shader/8066" target="_blank">prisoner849 (Discourse)</a>
+<a href="https://codepen.io/prisoner849/pen/OeJGjB" target="_blank">prisoner849 (Codepen)</a><br>
+Based on @Fyrestar's code: <a href="https://codepen.io/prisoner849/pen/qzZaye?editors=0010 target="_blank">Fyrestar (Codepen) A</a>
+<br>Reviewed by @Fyrestar <a href="https://codepen.io/Fyrestar/pen/pXJoda?editors=1010" target="_blank">Fyrestar (Codepen) B</a>
+</span>
+
+<button style="position:absolute;left:84%;top:84%;background-color:transparent;border-color:#fc0;text-align:center;"><a id="code" href="roundshader.txt" target="_blank" style="color:#fc0;text-decoration:none;font-size:20.5px;">The Code</a></button>
+
+<script type="module">
+
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+var scene,camera,renderer,controls,light,loader,cubeTexture,settings,boxGeom,boxMat,box,gui;
+
+	scene=new THREE.Scene();
+	camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,1,1000);
+	camera.position.set(0,0,60);
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.setClearColor('#068',1);
+	renderer.outputColorSpace=THREE.LinearSRGBColorSpace;
+	document.body.appendChild(renderer.domElement);
+
+	window.addEventListener('resize',onResize,false);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+
+	light=new THREE.DirectionalLight(0xffffff,50);
+	light.position.set(30,-40,40);
+	scene.add(light);
+
+	scene.add(new THREE.AmbientLight(0xffffff,10));
+
+	loader=new THREE.CubeTextureLoader();
+	loader.setCrossOrigin("");
+	loader.setPath('https://threejs.org/examples/textures/cube/pisa/');
+
+	cubeTexture=loader.load(['px.png','nx.png','py.png','ny.png','pz.png','nz.png']);
+
+	var settings={segments:16,radius:{value:1},size:{value:new THREE.Vector3(4,4,4)}}
+
+	boxGeom=new THREE.BoxGeometry(2,2,2,9,9,9);
+	boxMat=new THREE.MeshPhongMaterial({color:'#fff',envMap:cubeTexture});
+	boxMat.onBeforeCompile=shader => {
+  		shader.uniforms.boxSize=settings.size;
+		shader.uniforms.radius=settings.radius;
+		shader.vertexShader=`
+		uniform vec3 boxSize;
+		uniform float radius;
+		` + shader.vertexShader;
+  		shader.vertexShader=shader.vertexShader.replace(
+			`#include <begin_vertex>`,
+			`#include <begin_vertex>
+    			vec3 signs=sign(position);
+			vec3 box=boxSize-vec3(radius);
+			box=vec3(max(0.0,box.x),max(0.0,box.y),max(0.0,box.z));
+			vec3 p=signs*box;
+			transformed=signs*box+normalize(position)*radius;
+			objectNormal=all(equal(p,transformed)) ? normal:normalize(position); 
+			transformedNormal=normalize(normalMatrix*objectNormal);
+			vNormal=transformedNormal;			`
+		);
+	};
+
+	box=new THREE.Mesh(boxGeom,boxMat);
+	box.position.set(0,0,0);
+	box.scale.set(4,4,4);
+	scene.add(box);
+
+	gui=new GUI();
+	gui.add(settings.radius,"value",0,4).name("radius");
+	gui.add(settings.size.value,"x",1,6).name("x");
+	gui.add(settings.size.value,"y",1,6).name("y");
+	gui.add(settings.size.value,"z",1,6).name("z");
+	gui.add(settings,"segments",1,30).step(1).onFinishChange(function(){
+  		box.geometry.dispose();
+		settings.segments=settings.segments-((settings.segments%2) ? 0 : 1);
+  		box.geometry=new THREE.BoxGeometry(2,2,2,settings.segments,settings.segments,settings.segments);
+	});
+	gui.add(boxMat,"wireframe");
+
+	render();
+
+function render(){
+	renderer.render(scene,camera);
+	requestAnimationFrame(render);
+}
+
+function onResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+</script>
+
+</body>
+
+</html>

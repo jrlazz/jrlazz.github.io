@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>svg_extrude_6.html</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<link rel="shortcut icon" href="https://threejs.org/files/favicon.ico"/>
+<!-- https://www.svgrepo.com/ -->
+
+</head>
+
+<body style="margin:0;overflow:hidden;background-color:#002244;font-family:Monospace;">
+
+<span style="position:absolute;left:5px;top:5px;color:#cc0;font-size:12pt;cursor:pointer;">right click &rarr; inspect &rarr; source code<br><br>
+<select autocomplete="off" style="position:relative;width:150px;background-color:#630;color:#ff0;font-size:12pt;border:1px inset #999;" onchange="troca();" id="svg">
+<option data-multi=1.10 value="adafruit.svg">adafruit</option>
+<option data-multi=1.10 value="aerlingus.svg">aerlingus</option>
+<option data-multi=0.25 value="house.svg">house</option>
+<option data-multi=0.35 value="ladybug.svg">ladybug</option>
+<option data-multi=0.25 value="ring.svg">ring</option>
+<option data-multi=0.35 value="assist.svg">assist</option>
+<option data-multi=0.35 value="bike.svg">bike</option>
+<option data-multi=0.35 value="train.svg">train</option>
+</select>&nbsp;extrusion:<input style="position:relative;top:8px;width:100px;" autocomplete="off" type="range" min="1" max="30" value="10" id="input" />
+</span>
+
+<script type="module">
+
+import * as THREE from "https://cdn.skypack.dev/three@0.130.0";
+import { OrbitControls } from 'https://cdn.skypack.dev/three@0.130.0/examples/jsm/controls/OrbitControls.js';
+import { SVGLoader } from 'https://cdn.skypack.dev/three@0.130.0/examples/jsm/loaders/SVGLoader.js';
+import { GUI } from 'https://cdn.skypack.dev/three@0.130.0/examples/jsm/libs/dat.gui.module.js';
+
+var renderer, scene, camera, loader, geometry, material, mesh, controls;
+var iW=window.innerWidth; var iH=window.innerHeight;	
+var group=new THREE.Group();
+var paths=[]; var shapes=[];
+var depth, bevelEnabled, starA, starB, starC, starD;
+var extrusion=4;
+var multi=1.1;
+var select, value;
+
+var inpA=document.getElementById('input');inpA.onchange=function StartAnimation(){muda();}
+var inpB=document.getElementById('svg');inpB.onchange=function StartAnimation(){troca();}
+
+function init(){
+	camera=new THREE.PerspectiveCamera(50,iW/iH,1,1000);
+	camera.position.set(0,20,120);
+	scene=new THREE.Scene();
+	scene.position.set(-20,30,0);
+	scene.rotation.set(0,0.7,0);
+	scene.background=new THREE.Color(0x002244);
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(iW,iH);
+	document.body.appendChild(renderer.domElement);
+	window.addEventListener('resize', onWindowResize);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+
+	starA=new THREE.PointLight("#ff0",1);starA.position.set( 50, 10, 150);scene.add(starA);
+	starB=new THREE.PointLight("#f00",2);starB.position.set(-50,-10, 150);scene.add(starB);
+	starC=new THREE.PointLight("#f0f",1);starC.position.set( 50, 50,-150);scene.add(starC);
+	starD=new THREE.PointLight("#0f0",2);starD.position.set(-50,-100,-50);scene.add(starD);
+
+	loadSVG('img/adafruit.svg');
+}
+
+function loadSVG(url){
+	loader=new SVGLoader();
+	loader.load(url,function(data){
+		paths=data.paths;
+		group.scale.multiplyScalar(multi);
+		group.position.set(0,0,0);
+		group.scale.y *= - 1;
+		for(let i=0;i<paths.length;i++){
+			material=new THREE.MeshStandardMaterial({color:('#ccc'),metalness:0.5,roughness:0.2});
+			shapes=SVGLoader.createShapes(paths[i]);
+			for(let j=0;j<shapes.length;j++){
+				geometry=new THREE.ExtrudeBufferGeometry(shapes[j],{depth:extrusion,bevelEnabled:false});
+				mesh=new THREE.Mesh(geometry,material);
+				mesh.scale.set(2,2,2);
+				group.add(mesh);
+			}
+		}
+		scene.add(group);
+	});
+
+}
+
+function muda(){
+	extrusion=document.getElementById("input").value;
+	selval();
+	loadSVG("img/"+value);
+}
+
+function selval(){
+	group.remove(mesh);scene.remove(group);paths=[];shapes=[];
+	group=new THREE.Group();
+	select=document.getElementById('svg');
+	value=select.options[select.selectedIndex].value;
+}
+
+function troca(){
+	selval();
+	multi=select.options[select.selectedIndex].dataset.multi;
+	loadSVG("img/"+value);
+}
+
+function onWindowResize(){
+	iW=window.innerWidth;iH=window.innerHeight;
+	camera.aspect=iW/iH;
+	camera.updateProjectionMatrix();
+	renderer.setSize(iW,iH);
+}
+
+function animate(){
+	renderer.render(scene,camera);
+	controls.update();
+	requestAnimationFrame(animate);
+}
+
+function render(){
+	renderer.render(scene,camera);
+}
+
+init();
+animate();
+
+
+/*
+
+Hi Three.js followers,
+
+SVG extruded with lightweight page code
+
+NO ARROW JAVASCRIPT inside.
+
+the link:
+
+http://jrlazz.eu5.org/anim/svg_extrude_6.html
+
+Again, Thanks for the great Three.js Team!
+
+Jose Roberto Lazzareschi
+
+*/
+
+</script>
+</body>
+</html>
+

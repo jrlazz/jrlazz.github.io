@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>text_centered.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="https://threejs.org/files/favicon.ico"/>
+</head>
+
+<body style="overflow:hidden;margin:0px;background-color:#000;">
+
+<span style="color:#09f;">... click right to inspect ...</span>
+
+<script type="module">
+
+import * as THREE from '../js/three.module_res_res.js';
+import { FontLoader} from '../js/FontLoader_res_res.js';
+import { TextGeometry } from '../js/TextGeometry_res_res.js';
+
+var spa='                                        ';
+var w=0;
+
+let container,camera,scene,ambient,renderer,loader,Mesh,Geo,Mat;
+let text="  Font\nLoader",bevelEnabled=true,font=undefined;
+let wW=window.innerWidth,wH=window.innerHeight;
+const height=20,size=40,hover=30,curveS=3,bevT=2,bevS=2;
+
+function init() {
+	container=document.createElement('div');
+	document.body.appendChild(container);
+
+	camera=new THREE.PerspectiveCamera(30,wW/wH,1,1000);
+	camera.position.set(0,10,200);
+
+	scene=new THREE.Scene();
+
+	ambient=new THREE.AmbientLight("#cff",1);
+	scene.add(ambient);
+
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(wW,wH);
+	container.appendChild(renderer.domElement);
+}
+
+loader=new FontLoader();
+//loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json',function(response){font=response;createText();});
+loader.load('../js/roboto_italic.typeface.json',function(response){font=response;createText();});
+//https://gero3.github.io/facetype.js/... to convert to json
+
+Mat=[new THREE.MeshPhongMaterial({color:'#ff0',flatShading:true}),new THREE.MeshPhongMaterial({color:'#00f'})];// front,side
+
+function createText(){
+	Geo=new TextGeometry(text,{
+	font:font,size:size,height:height,
+	curveSegments:curveS,
+	bevelThickness:bevT,bevelSize:bevS,bevelEnabled:bevelEnabled
+});
+        Geo.center();
+	//Geo.computeBoundingBox();
+	Mesh=new THREE.Mesh(Geo,Mat);
+	Mesh.position.set(0,5,0);
+	Mesh.scale.set(0.1,0.1,0.1);
+	scene.add(Mesh);
+}
+
+
+
+function animate() {
+	requestAnimationFrame(animate);
+	renderer.render(scene,camera);
+	w++;
+	if(w==40){text="Quo usque tandem abutere, Catilina, patientia nostra?\n";
+	text+=spa.substring(0,12)+"Quam diu etiam furor iste tuus eludet?\n";
+	text+=spa.substring(0,5)+"Quem ad finem sese effrenata iactabit audacia?\n";
+	text+=spa.substring(0,10)+"Nihilne te nocturnum praesidium Palatii,\n";
+	text+=spa.substring(0,30)+"nihil urbis vigiliae,...\n";
+	scene.remove(Mesh);createText();}
+}
+
+
+init();
+
+animate();
+
+</script>
+</body>
+</html>
+

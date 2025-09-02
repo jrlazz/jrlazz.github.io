@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>tobias_01.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="ok.ico"/>
+
+<style>
+body{margin:0px;background-color:#69c;font-family:Monospace;font-size:12pt;font-weight:bold;overflow:hidden;}
+input{width:60px;font-weight:bold;}
+</style>
+
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+	{
+		"imports":{
+			"three":"https://unpkg.com/three@0.158.0/build/three.module.js",
+			"three/addons/":"https://unpkg.com/three@0.158.0/examples/jsm/"
+		}
+	}
+</script>
+
+</head>
+
+<body>
+
+<canvas></canvas>
+
+<div style="position:absolute;top:10px;left:15%;width:75%;text-align:center;color:#fff;background-color:#048;padding:4px;" id="actions">
+	<label>Polar angle: <input type="number" value="270" min="180", max="270" autocomplete="off" id="polar"></label>
+	<label>Distance from origin: <input type="number" value="480" min="1", max="500" step="10" autocomplete="off" id="dist"></label>
+	<label>Field of view: <input type="number" min="45", max="150" value="150" autocomplete="off"id="fove"></label>
+	<label>Azimuth angle: <input type="number" min="1", max="180" value="1" autocomplete="off" id="azimu"></label>
+</div>
+
+<div style="position:absolute;top:50px;left:30%;width:40%;text-align:center;color:#fff;background-color:#048;padding:4px;" id="info">
+	"Little Planet": 0/500/150/0 Panorama: 100/0/45/70
+</div>
+
+<button style="position:absolute;left:84%;top:84%;background-color:#ccc;text-align:center;"><a id="code" href="tobias_01.txt" target="_blank" style="color:#009;text-decoration:none;font-size:20.5pt;">The Code</a></button>
+
+<span id="sp" style="position:absolute;left:20px;top:100px;font-size:20.5pt;background-color:#ccc;text-align:center;"></span>
+
+<script type="module">
+
+import * as THREE from "three";
+
+var imageUrl,angle,canvas,envLoader,envMap,scene,environment,renderer,camera;
+var Mount=new THREE.Group();
+var degrad=0.0174532925;
+var bId=function(id){return document.getElementById(id);}
+var ddist=bId("dist");
+var dfove=bId("fove");
+var dazimu=bId("azimu");
+var dpolar=bId("polar");
+
+canvas=document.querySelector('canvas');
+
+envLoader=new THREE.TextureLoader();
+envMap=await envLoader.loadAsync('https://i.ibb.co/bvNfJdR/palermo-square.jpg');
+
+envMap.mapping=THREE.EquirectangularReflectionMapping;
+envMap.colorSpace=THREE.SRGBColorSpace;
+envMap.wrapS=THREE.RepeatWrapping;
+envMap.repeat.x=-1;
+
+scene=new THREE.Scene();
+
+environment=new THREE.Mesh(new THREE.SphereGeometry(500,100,50 ),new THREE.MeshBasicMaterial({map:envMap,side:THREE.BackSide}));
+
+scene.add(environment);
+
+renderer=new THREE.WebGLRenderer({antialias:true,canvas});
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.setSize(window.innerWidth,window.innerHeight);
+
+camera=new THREE.PerspectiveCamera(40,window.innerWidth/window.innerHeight,0.2,2000);
+
+window.addEventListener('resize',onResize,false);
+
+Mount.add(camera);
+
+function animate() {
+	requestAnimationFrame(animate);
+	Mount.rotation.set(dpolar.value*degrad,dazimu.value*degrad,0);
+	//document.getElementById("sp").innerText=(dpolar.value)+" "+dpolar.value*degrad;
+	camera.position.z=ddist.value; 
+	camera.fov=dfove.value;
+	camera.lookAt(0,0,0 );
+	camera.updateProjectionMatrix();
+	renderer.render(scene,camera );
+}
+
+function onResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+animate();
+
+</script>
+
+</body>
+
+</html>

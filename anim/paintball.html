@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>paintball.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="../three.js.ico">
+
+<style>
+span{position:absolute;font-family:Arial;font-size:16pt;color:#ffcc00;font-style:italic;text-align:center;z-index:1;}
+body{margin:0px;background-color:#001144;overflow:hidden;}
+</style>
+
+</head>
+
+<body>
+
+<span style="left:5px;top:5px;font-size:9pt;cursor:pointer;">click right to inspect</span>
+<span id="spanB" style="left:10px;top:125px;z-index:2;"></span>
+<span id="spanC" style="left:90px;top:125px;color:#f00;z-index:2;"></span>
+<span id="spanD" style="left:10px;top:150px;color:#f00;z-index:2;"></span>
+<img id="imgA" src="img/objs/gameover.png" style="position:absolute;left:100px;top:280px;width:150px;display:none;z-index:2;"></img>
+
+<script type="module">
+
+import * as THREE from '../js/three.module_res_res.js';
+import { OrbitControls } from '../js/OrbitControls_res_res.js';
+import { MTLLoader } from '../js/MTLLoader_res_res.js';
+import { OBJLoader } from '../js/OBJLoader_res_res.js';
+import { DDSLoader } from '../js/DDSLoader_res_res.js';
+
+
+var renderer,scene,camera,geometry,material,controls,loader,mesh,objLoader;;
+var altera=0;
+var body=new Array();
+var existe=new Array();
+var str;
+var xiste;
+var color;
+var sub;
+var dis=32;
+var theta=new Array;
+var num=13;
+var k=0;
+var w1=0;
+var w2=0;
+var w3=0;
+var w4=0;
+var w5=0;
+var w6=0;
+var w7=0;
+var w8=0;
+var w9=0;
+
+var objmtl,objobj;
+var sphere, ball, cube;
+var geo=new Array;
+var mat=new Array;
+var points=new Array;
+
+var w=0, wX=0, wY=0, wZ=0, wscreen=0, wp=0, passo=0.5;
+var dX=0, dY=0, dZ=0;
+var mesh,intersection,clicked;
+var intersected=new Array();
+var raycaster=new THREE.Raycaster();
+var mouse=new THREE.Vector2(1,1);
+
+var dir;
+var origin=new THREE.Vector3(0,0,0);
+var length=15;
+var hex=0xff0000;
+var arrowHelper;
+
+// ******** ******** ******** ********
+
+function init(){
+
+	renderer=new THREE.WebGLRenderer();
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	document.body.appendChild(renderer.domElement);
+	renderer.setClearColor(0x001144);
+	window.addEventListener('resize',onResize,false);
+	document.addEventListener('pointerdown',onMouseDown);
+	document.addEventListener('pointermove',onMouseOver);
+
+	scene=new THREE.Scene();
+
+	camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,1,1000);
+	camera.position.set(0,3,40);
+	scene.position.set(0,-16,0);
+
+	var ambientLight=new THREE.AmbientLight("#fff",0.5);
+	ambientLight.position.set(30,20,30);
+	scene.add(ambientLight);
+
+	var sun=new THREE.PointLight("#996",1);
+	sun.position.set(0,10,100);
+	scene.add(sun);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	controls.minDistance=25;
+	controls.maxDistance=150;
+	controls.enablePan=true;
+	controls.enableDamping=true;
+
+	const textureLoader=new THREE.TextureLoader();
+
+	function get_random_color(){
+		color="";
+		for(let i=0;i<3;i++){
+        		sub=Math.floor(Math.random()*256).toString(16);
+        		color +=(sub.length==1?"0"+sub:sub);
+    		}
+    	return "#"+color;
+	}
+
+	const manager=new THREE.LoadingManager();
+	manager.onStart=function(url,itemsLoaded,itemsTotal){console.log('Started loading file:'+url+'.\nLoaded '+itemsLoaded+' of '+itemsTotal + ' files.' );};
+	manager.onLoad=function(){console.log('Loading complete!');};
+	manager.onProgress=function(url,itemsLoaded,itemsTotal){console.log('loading texture'+url+' '+(itemsLoaded/itemsTotal*100)+'%');};
+	manager.onError=function(url){console.log('Error loading texture:'+url);};
+	manager.addHandler(/\.dds$/i,new DDSLoader());
+
+	geo[1]=new THREE.SphereGeometry(1,32,32);
+	mat[1]=new THREE.MeshStandardMaterial({color:0xff0000,roughness:0.2, metalness:0.6});
+	sphere=new THREE.Mesh(geo[1],mat[1]);
+	sphere.position.set(0,18,20);
+	sphere.name="@sphere";
+	scene.add(sphere);
+
+	new MTLLoader(manager).load("img/objs/red13.mtl",function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load("img/objs/red13.obj",function(object){
+	body[13]=object;
+	object.traverse(function(child){if(child instanceof THREE.Mesh){body[13]=child;}});
+	body[13].name="red1";body[13].scale.set(2,2,2);},manager.onProgress,manager.onError);});
+
+	objmtl="img/objs/obj1.mtl";
+	objobj="img/objs/obj1.obj";
+
+	for(let j=0;j<num;j++){
+		objmtl="img/objs/obj"+j+".mtl";
+		new MTLLoader(manager).load(objmtl,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(objobj,function(object){
+		body[j]=object;
+		object.traverse(function(child){if(child instanceof THREE.Mesh){body[j]=child;}});
+		switch(j){
+			case  0:body[j].name="Vivi 0";break;
+			case  1:body[j].name="Mick 1";break;
+			case  2:body[j].name="Jerry2";break;
+			case  3:body[j].name="Dean 3";break;
+			case  4:body[j].name="Smith4";break;
+			case  5:body[j].name="Steve5";break;
+			case  6:body[j].name="Beard6";break;
+			case  7:body[j].name="Sheen7";break;
+			case  8:body[j].name="Kim  8";break;
+			case  9:body[j].name="Noel 9";break;
+			case 10:body[j].name="Nancy10";break;
+			case 11:body[j].name="Kelly11";break;
+			case 12:body[j].name="John 12";break;
+		}
+		},manager.onProgress,manager.onError);});
+	}
+
+	geo[50]=new THREE.SphereGeometry(0.5,32,32);
+	mat[50]=new THREE.MeshStandardMaterial({color:0xff0000,roughness:0.2,metalness:0.6});
+	ball=new THREE.Mesh(geo[50],mat[50]);
+	ball.position.set(0,18,20);
+	scene.add(ball);
+
+	for(let u=0;u<13;u++){existe[u]="no";}
+	w3=0;
+
+	//return true;
+
+	// animate();
+}
+
+// ******** ******** ******** ********
+
+function onResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function onMouseDown(event){
+	var e=window.event;
+	// comment next line for MouseOver
+	if(e.which==1){clicked=1;}
+	mouse.x=(event.clientX/window.innerWidth)*2-1;
+	mouse.y=-(event.clientY/window.innerHeight)*2+1;
+}
+
+function onMouseOver(event) {
+	var x=event.clientX;
+	var y=event.clientY;
+	// uncomment next line for MouseOver
+	//clicked=1;
+	mouse.x=(event.clientX/window.innerWidth)*2-1;
+	mouse.y=-(event.clientY/window.innerHeight)*2+1;
+	let vx=parseInt(mouse.x*1000)/1000;
+	let vy=parseInt(mouse.y*1000)/1000;
+	//document.getElementById("spanC").innerHTML=vx+" "+vy;
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	controls.update();
+	render();
+}
+
+function render(){
+	renderer.render(scene,camera);
+
+	if(altera==0){alterando();}
+
+	w1++;
+	if(w1==40){
+		w2=w2-0.02;
+		for(let j=0;j<num;j++){
+			scene.remove(body[j]);
+			body[j].position.set(dis*Math.sin(theta[j]+w2)*Math.cos(theta[j]+w2),dis*Math.sin(theta[j]+w2)*Math.sin(theta[j]+w2),0);
+			scene.add(body[j]);
+    		}
+		w1=0;
+	}
+
+	raycaster.setFromCamera(mouse,camera);
+	intersection=raycaster.intersectObjects(scene.children,true);
+	if(intersection.length>0 && intersection[0].uv){
+		if(intersection[0].object.name.substring(0,1)!="@"){
+			wX=intersection[0].object.position.x;
+			wY=intersection[0].object.position.y;
+			wZ=intersection[0].object.position.z;
+			if(clicked){
+				intersected[1]=intersection[0].object;
+				xiste=Number(intersection[0].object.name.substring(5));
+				existe[xiste]=intersection[0].object.name.substring(0,5);
+				document.getElementById("spanC").innerText=intersection[0].object.name.substring(0,5);
+				w6=1;w5=1;
+				dX=(sphere.position.x-wX)/20;
+				dY=(sphere.position.y-wY)/20;
+				dZ=(sphere.position.z-wZ)/20;
+				w7=1;	
+			}else{
+				document.getElementById("spanB").innerText=intersection[0].object.name.substring(0,5);
+				scene.remove(arrowHelper);
+				dir=new THREE.Vector3(wX,wY-18,-20);
+				dir.normalize();
+				origin=new THREE.Vector3(sphere.position.x,sphere.position.y,sphere.position.z);
+				arrowHelper=new THREE.ArrowHelper(dir,origin,length,hex);
+				scene.add(arrowHelper);
+			}
+		}
+	}
+	clicked=0;
+
+	if(intersection.length==0){scene.remove(arrowHelper);document.getElementById("spanB").innerText="";}
+
+	if(w6==1){
+		w6=0;
+		w3++;
+		if(w3>12){
+			document.getElementById("divA").style.display="";
+			document.getElementById("spanB").innerText="";
+		}
+	}
+
+	if(w7==1){
+		w9++;
+		w8++;
+		if(w8==1){
+			ball.position.x -=dX;
+			ball.position.y -=dY;
+			ball.position.z -=dZ;
+			if(w9>17){ball.scale.set(3,3,3);}
+			w8=0;
+		}
+		if(w9==20){
+			ball.scale.set(1,1,1);
+			w9=0;w7=0;
+			ball.position.x=sphere.position.x;
+			ball.position.y=sphere.position.y;
+			ball.position.z=sphere.position.z;
+			//scene.remove(intersected[1]);
+			scene.remove(body[xiste]);
+			body[xiste]=body[13].clone();
+			body[xiste].name="@red"+xiste;
+			str="";
+			for(let u=0;u<13;u++){
+				if(existe[u]!="no"){str=str+existe[u]+"<br>";}
+			}
+
+			if(w3==13){document.getElementById("imgA").style.display="";}
+			document.getElementById("spanD").innerHTML=str;
+			document.getElementById("spanC").innerText="";
+		}
+		//alert(w3);
+	}
+}
+
+function alterando(){
+	const myTimeout=setTimeout(segue,800);
+	function segue(){
+		let c=0;
+		for(let j=0;j<num;j++){
+			c=c+0.239;
+			theta[j]=c;
+			body[j].position.set(dis*Math.sin(theta[j])*Math.cos(theta[j]),dis*Math.sin(theta[j])*Math.sin(theta[j]),0);
+			body[j].scale.set(2,2,2);
+			scene.add(body[j]);
+    		}
+	}
+	altera++;
+}
+
+init();
+
+animate();
+
+
+//if(init()){animate();}
+
+
+/*
+
+Simple paintball game
+
+Hi discourse.threejs.org followers...
+
+Based on Three.js module and OBJLoader objects.
+
+Please try it here:
+
+http://jrlazz.eu5.org/anim/paintball.html
+
+Jose Roberto Lazzareschi
+
+*/
+</script>
+</body>
+</html>

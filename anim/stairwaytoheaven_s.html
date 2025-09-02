@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<head>
+<title>stairwaytoheaven_s.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="ok.ico"/>
+<style>
+@font-face{font-family:tipo;src:url('../fonte/MysteryQuest-Regular.ttf');}
+body{margin:0px;background-color:#048;font-family:tipo;overflow:hidden;background-image:linear-gradient(#09f,#016);}
+a{font-size:12pt;color:#0c0;text-decoration:none;}
+</style>
+
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+	{
+		"imports":{
+			"three":"https://unpkg.com/three@0.160.0/build/three.module.js",
+			"three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"
+		}
+	}
+</script>
+
+<script>
+function inicia(){
+	audio.play();
+	document.getElementById("sim").value=1;
+	document.getElementById("paraclick").innerText="";
+}
+</script>
+
+</head>
+
+<body onclick="inicia();">
+
+<img id="star" src="img/star_0.png" style="position:absolute;left:5%;top:5%;width:20px;height:20px;display:none;"></img>
+
+<div style="position:absolute;font-size:20.1px;top:5px;width:99%;text-align:center;color:#fc0;">
+<span style="color:#016;font-size:20.5pt;">Stairway to Heaven</span>
+</select>
+</div>
+<button id="paracode" style="position:absolute;left:84%;top:84%;background-color:transparent;border-color:#09f;text-align:center;display:none;"><a id="code" href="stairwaytoheaven_s.txt" target="_blank" style="color:#09f;text-decoration:none;font-size:20.5px;">The Code</a></button>
+<span style="position:absolute;left:2%;top:84%;width:300px;color:#09f;font-size:12pt;font-style:italic;text-align:center;">Led Zeppelin
+<br>
+<audio id="audio" controls loop style="opacity:0.3;"><source src="mp3/lz_stoheaven.mp3" type="audio/mpeg"></audio> 
+</span>
+<input id="sim" type="number" value=0 autocomplete="off" style="display:none;"></input>
+<div id="fundo" style="position:absolute;left:0px;top:0px;width:100%;height:100%;text-align:center;background-image:linear-gradient(#09f,#016);opacity:1.0;">
+<span id="paraclick" style="position:relative;top:30px;font-size:20.5pt;color:#016;cursor:pointer;">... click
+</span>
+</div>
+
+<script type="module">
+
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
+
+var camera,scene,renderer,controls,manager,light,shape;
+var p=Math.PI;
+var extrudeSettings=[];
+var geo=[];var mat=[];var mesh=[];var posi=[];
+var gA=new THREE.Group();var gB=new THREE.Group();
+var clock=new THREE.Clock();
+var dt=0;
+var w=0;
+
+var rot=0;
+var ango=0;
+var sca=1;
+
+let BD,BE,PD,PE,CA,TR;
+var group=new THREE.Group();
+var groupCATR=new THREE.Group();
+
+var p=Math.PI;
+
+var ax,bx;
+
+var pedaco=[];
+
+var bId=function(id){return document.getElementById(id);}
+var dstar=bId("star");
+
+var simA=0;
+var simB=0;
+var simC=0;
+var Timeout;
+var passo=0;
+
+function init() {
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.setClearColor('#068',0);
+	renderer.outputColorSpace=THREE.LinearSRGBColorSpace;
+	document.body.appendChild(renderer.domElement);
+	window.addEventListener('resize',onResize,false);
+
+	scene=new THREE.Scene();
+	camera=new THREE.PerspectiveCamera(40,innerWidth/innerHeight,1,1000);
+	camera.position.set(0,0,340);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+
+	light=new THREE.PointLight('#fff',1000);
+	light.position.set(-10,20,-20);
+
+	var light2=new THREE.PointLight('#fff',5000);
+	light2.position.set(-20,-90,40);
+	scene.add(light2);
+	
+	scene.add(new THREE.AmbientLight('#fff',5));
+
+
+	var onProgress=function(xhr){
+		if(xhr.lengthComputable){
+			var percentComplete=xhr.loaded/xhr.total* 100;
+			console.log(Math.round(percentComplete,2)+'% downloaded');
+		}
+	};
+	var mo="models/steve/partesfoscas.mtl";
+	new MTLLoader().load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load('models/steve/separa9.obj',function(object){
+			for(let k=0;k<6;k++){
+				if(object.children[k]){pedaco[k]=object.children[k];}
+			}
+	},onProgress);});
+
+	ax=new THREE.AxesHelper(5);
+	ax.position.set(0,-100,0);
+
+	shape=new THREE.Shape();
+	shape.moveTo(0,0);
+	shape.lineTo(2,0);
+	shape.lineTo(4,24);
+	shape.lineTo(-2,24);
+	shape.lineTo(0,0);
+
+	extrudeSettings={steps:2,depth:2,bevelEnabled:false,bevelThickness:1,bevelSize:1,bevelOffset:0,bevelSegments:1}
+	geo[0]=new THREE.ExtrudeGeometry(shape,extrudeSettings);
+	mat[0]=new THREE.MeshStandardMaterial({color:'#069',wireframe:false});
+	mesh[0]=new THREE.Mesh(geo[0],mat[0]);
+	for(let z=1;z<100;z++){
+		mat[z]=new THREE.MeshStandardMaterial({color:'#069',wireframe:false});
+		mesh[z]=new THREE.Mesh(geo[0],mat[z]);mesh[z].position.set(z*2,0,0);mesh[z].rotation.set(z/3,p/2,p/2);mesh[z].scale.setScalar(2-z/50);
+		gA.add(mesh[z]);
+	}
+	gA.position.set(0,-100,0);
+	gA.rotation.set(0,-0.3,p/2);
+	scene.add(gA);
+
+	geo[200]=new THREE.CylinderGeometry(0.2,2,200);
+	mat[200]=new THREE.MeshStandardMaterial({color:'#069',wireframe:false});
+	mesh[200]=new THREE.Mesh(geo[200],mat[200]);
+	mesh[200].position.set(0,1,0);
+	scene.add(mesh[200]);
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	dt=clock.getDelta();
+	if(document.getElementById("sim").value==1){
+		w=w+(dt*60);
+		if(w<399){document.getElementById("fundo").style.opacity=1-w/400;}
+		if(w>400){
+			document.getElementById("sim").value=0;
+			document.getElementById("fundo").style.display="none";
+			document.getElementById("paracode").style.display="";
+			simA=1;
+		}
+	}
+
+	CA=pedaco[0];
+	TR=pedaco[2];
+	BD=pedaco[3];
+	BE=pedaco[1];
+	PD=pedaco[5];
+	PE=pedaco[4];
+
+	if(CA && TR && BD && BE && PD && PE && simB==0){
+		CA.position.set(0,3.1,0);
+		TR.position.set(0,2,0);
+		BD.rotation.z=p/2;
+		BE.rotation.z=-p/2;
+		groupCATR.add(CA);groupCATR.add(TR);
+		PD.scale.set(4,6,4);PD.position.set(-2,0,0);
+		PE.scale.set(4,6,4);PE.position.set( 2.5,0,0);
+		BD.scale.set(5,4,4);BD.position.set(-6.5,12.5,0);
+		BE.scale.set(5,4,4);BE.position.set( 6.5,12.5,0);
+		groupCATR.scale.set(4,4,4);groupCATR.position.set(0,4,0);
+		group.add(groupCATR);group.add(PD);group.add(PE);group.add(BD);group.add(BE);
+		group.position.set(0,16,-40);
+		group.rotation.y=-p/2;
+		group.scale.setScalar(0.5);
+		ax.add(group);
+		ax.add(light);
+		scene.add(ax);
+		ax.rotation.y=p;
+		passo=0.02;
+		simB=1;
+	}
+
+	if(dstar.style.display==""){dstar.style.opacity=Math.random();}
+
+	function goB(){Timeout=setTimeout(goA,10);}
+
+	function goA(){
+		Timeout=setTimeout(goB,10);
+		simC=1;
+		ax.rotation.y +=0.02;
+		ax.position.y +=0.12;
+		sca -=0.0006;if(sca<0.0006){
+			sca=1;ax.position.y=-100;
+			dstar.style.display="";//dstar.style.left=10+"%";
+			ax.rotation.y=p;
+			simA=0;
+			scene.remove(ax);
+		}
+		ax.scale.setScalar(sca);
+
+		if(ango>0.3){rot=1; PE.rotation.x=-0.3;}
+		if(ango<-0.3){rot=0;PD.rotation.x=-0.3;}
+		if(rot==0){
+			ango +=0.03;
+			BD.rotation.x -=passo;
+			BE.rotation.x +=passo;
+			PD.rotation.x +=passo;
+			PE.rotation.x -=passo;
+		}else{
+			ango -=0.03;
+			BD.rotation.x +=passo;
+			BE.rotation.x -=passo;
+			PD.rotation.x -=passo;
+			PE.rotation.x +=passo;
+		}
+	}
+
+	if(simA==1 && simB==1 && simC==0){goA();}
+
+	renderer.render(scene,camera);
+}
+
+function onResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+init();
+animate();
+
+
+/*
+Thank you very much @ip3ly5 !!!
+I accepted your challenge and created the new _S version.
+I invited Steve to participate in the scene.
+He only accepted it because he becomes a star when he reaches the Heaven.
+
+The link:
+
+https://jrlazz.eu5.org/anim/stairwaytoheaven_s.html
+
+And... Thanks for the Tree.js Team!
+
+Jose Roberto Lazzareschi - jrlazz
+*/
+
+</script>
+</body>
+</html>
+
+

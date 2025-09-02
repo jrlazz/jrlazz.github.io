@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>rays4.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="ok.ico"/>
+
+<style>
+html,body{margin: 0;padding: 0;height: 100%;background-color:#000;font-family:Monospace;font-size:12pt;overflow: hidden;}
+</style>
+
+<script type="importmap">
+	{
+		"imports":{
+			"three":"https://unpkg.com/three@0.171.0/build/three.module.js",
+			"three/addons/":"https://unpkg.com/three@0.171.0/examples/jsm/"
+		}
+	}
+</script>
+
+</head>
+
+<body>
+
+<span id="nome" style="position:absolute;left:50%;top:5px;color:#ff0;"></span>
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+
+<script type="module" >
+
+import * as THREE from "three";
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+var scene, camera, renderer, controls, ambLight, dirLight, LaserBeam1, geo, mat, Mash, LaserBeam1, canvas, context;
+var objectArray=[];
+var mish=[];
+var iW=window.innerWidth;
+var iH=window.innerHeight;
+var mouse={x:0,y:0};
+
+var dnome=document.getElementById("nome");
+
+	scene=new THREE.Scene();
+
+	camera=new THREE.PerspectiveCamera(60,iW/iH,1,20000);
+	camera.position.set(0,10,15);
+	camera.lookAt(0,0,0);
+	scene.add(camera);
+
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setSize(iW,iH);
+	renderer.setClearColor(0x222222);
+
+	document.body.appendChild(renderer.domElement);
+
+	//controls=new OrbitControls(camera,renderer.domElement);
+
+	window.addEventListener('resize', onWindowResize, false);
+	document.addEventListener('mousemove',function (event){mouse.x=event.clientX/iW-0.5;mouse.y=event.clientY/iH-0.5;},false);
+
+	ambLight=new THREE.AmbientLight('#fff',0.1);
+	scene.add(ambLight);
+
+	dirLight=new THREE.DirectionalLight('#fff',1);
+	dirLight.position.set(5,0,-5);
+	scene.add(dirLight);
+
+	for(var i=0;i<3;i++){
+		geo=new THREE.BoxGeometry(0.5,4,4);
+		mat=new THREE.MeshPhongMaterial({color:'#cf0',transparent:false,opacity:0.5});
+		mish[i]=new THREE.Mesh(geo,mat);
+		mish[i].position.set(0+(i % 2 * 5 - 2.5),0,i * -5);
+		mish[i].name="misha"+i+"";
+		objectArray.push(mish[i]);
+		scene.add(mish[i]);
+	}
+
+
+
+	geo=new THREE.SphereGeometry(0.5,8,8);
+	mat=new THREE.MeshPhongMaterial({color:'#f0f',wireframe:true});
+	mish[10]=new THREE.Mesh(geo,mat);
+	mish[10].position.set(4.5, 0, 7);//4.8,-0.1,7.2
+	mish[10].rotation.set(0,-0.7+Math.PI,Math.PI/2);
+	scene.add(mish[10]);
+
+	var texture1 = new THREE.TextureLoader().load('img/Equirectangular_projection_SW_3.jpg');
+
+	geo=new THREE.SphereGeometry(4,32,32);
+	mat=new THREE.MeshPhongMaterial({color:'#fff',map:texture1});
+	mish[11]=new THREE.Mesh(geo,mat);
+	mish[11].position.set(-15,0,0);
+	mish[11].name="Earth";
+	objectArray.push(mish[11]);
+	scene.add(mish[11]);
+
+	LaserBeam1=new LaserBeam({reflectMax:5});
+	add2Scene(LaserBeam1);
+
+
+
+
+function add2Scene(obj){
+	scene.add(obj.object3d);
+	scene.add(obj.pointLight);
+	if(obj.reflectObject != null){add2Scene(obj.reflectObject);}
+}
+
+
+function LaserBeam(iconfig){
+	var config={length:100,reflectMax:1};
+	config=$.extend(config, iconfig);
+
+	this.object3d=new THREE.Object3D();
+	this.reflectObject=null;
+	this.pointLight=new THREE.PointLight('#0f0',4,0);//4,4,2
+		//intensity - (optional) numeric value of the light's strength/intensity. Default is 1.
+		//distance - Maximum range of the light. Default is 0 (no limit).
+		//decay - The amount the light dims along the distance of the light. Default is 2.
+
+	var raycaster=new THREE.Raycaster();
+	var texture = new THREE.TextureLoader().load('img/gradient250.jpg');
+	texture.anisotropy = renderer.capabilities.getMaxAnisotropy();//this value is usually a power of 2. 
+
+
+	//texture
+	var material=new THREE.MeshBasicMaterial({
+		map:texture,
+		blending: THREE.AdditiveBlending,
+		color:0x4444aa,
+		side:THREE.DoubleSide,
+		depthWrite:false,
+		transparent:true,
+		opacity:0.5
+	});
+
+	var geometry=new THREE.PlaneGeometry(1,0.1*3);
+	geometry.rotateY(0.5 * Math.PI);
+
+	//use planes to simulate laserbeam
+	var i,nPlanes=10;
+	for(let i=0;i<nPlanes;i++){
+		var mesh=new THREE.Mesh(geometry,material);
+		mesh.position.z=1/2;
+		mesh.rotation.z=i/nPlanes*Math.PI;
+		this.object3d.add(mesh);
+	}
+
+	if(config.reflectMax>0){this.reflectObject=new LaserBeam($.extend(config,{reflectMax:config.reflectMax-1}))}
+
+
+	this.intersect=function (direction, objectArray=[]) {
+
+		raycaster.set(this.object3d.position.clone(),direction.clone().normalize());
+
+		var intersectArray=[];
+		intersectArray=raycaster.intersectObjects(objectArray, true);
+
+//	dnome.innerText="?";
+	
+		//have collision
+		if(intersectArray.length>0){
+//if(intersectArray[0].object.name=="Earth"){
+	dnome.innerText=intersectArray[0].object.name;
+//}else{
+//	dnome.innerText="?";
+//}
+			this.object3d.scale.z=intersectArray[0].distance;
+			this.object3d.lookAt(intersectArray[0].point.clone());
+			this.pointLight.visible=true;
+
+			//get normal vector
+			var normalMatrix=new THREE.Matrix3().getNormalMatrix(intersectArray[0].object.matrixWorld);
+			var normalVector=intersectArray[0].face.normal.clone().applyMatrix3(normalMatrix).normalize();
+
+			//set pointLight under plane
+			this.pointLight.position.x=intersectArray[0].point.x+normalVector.x*0.5;
+			this.pointLight.position.y=intersectArray[0].point.y+normalVector.y*0.5;
+			this.pointLight.position.z=intersectArray[0].point.z+normalVector.z*0.5;
+
+			//calculation reflect vector
+			var reflectVector=new THREE.Vector3(intersectArray[0].point.x-this.object3d.position.x,intersectArray[0].point.y-this.object3d.position.y,intersectArray[0].point.z-this.object3d.position.z).normalize().reflect(normalVector);
+
+if(intersectArray[0].object.name!="Earth"){
+			//set reflectObject
+			if (this.reflectObject != null) {
+				this.reflectObject.object3d.visible=true;
+				this.reflectObject.object3d.position.set(intersectArray[0].point.x,intersectArray[0].point.y,intersectArray[0].point.z);
+				//iteration reflect
+				this.reflectObject.intersect(reflectVector.clone(),objectArray);
+			}
+}
+
+		}else {
+		//non collision
+
+			this.object3d.scale.z=100;//config.length;
+			this.pointLight.visible=false;
+			this.object3d.lookAt(this.object3d.position.x+direction.x,this.object3d.position.y+direction.y,this.object3d.position.z+direction.z);
+			this.hiddenReflectObject();
+		}
+
+	};
+
+//if(intersectArray.length<=0){
+//	dnome.innerText="?";
+//}
+
+	this.hiddenReflectObject=function(){
+		if (this.reflectObject != null){
+			this.reflectObject.object3d.visible=false;
+			this.reflectObject.pointLight.visible=false;
+			this.reflectObject.hiddenReflectObject();
+		}
+	};
+
+
+
+	return;
+}
+
+function onWindowResize(){
+	iW=window.innerWidth;
+	iH=window.innerHeight;
+	camera.aspect=iW/iH;
+	camera.updateProjectionMatrix();
+	renderer.setSize(iW,iH);
+}
+
+function animate() {
+	requestAnimationFrame(animate);
+
+	LaserBeam1.object3d.position.set(4.5, 0, 7);
+	//alert(Date.now());
+	LaserBeam1.intersect(  new THREE.Vector3(-4.5, 0, -4.5 + Math.cos(Date.now()*0.05 * Math.PI/180) * 2.5),  objectArray);
+
+	camera.position.x +=(mouse.x * 30 - camera.position.x) * 0.05;
+	camera.position.y +=(mouse.y * -10 - camera.position.y + 5) * 0.05;
+	camera.lookAt(scene.position);
+
+mish[11].rotation.y +=0.01;
+
+	renderer.render(scene, camera);
+}
+
+animate();
+
+</script>
+
+</body>
+</html>
+
+

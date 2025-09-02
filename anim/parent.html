@@ -1,0 +1,654 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>parent.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="ok.ico"/>		
+
+<style>
+body{margin:0px;font-family:Lucida Console;background-color:#256;overflow:hidden;}
+a,span{text-decoration:none;font-size:12pt;}
+button{border-width:2px; border-style:outset; border-color:#cc0 #000 #000 #cc0;}
+button:active{ border-style:inset; border-color:#000 #cc0 #cc0 #000;}
+img{position:absolute;left:620px;width:64px;height:22px;cursor:pointer;opacity:0.3;}
+.fa{filter:hue-rotate(180deg) saturate(16) contrast(100%) brightness(200%);}
+button{font-family:Lucida Console;font-size:12pt;width:50px;background-color:#256;color:#ff0;}
+table,tr,td{padding:0px;}
+td{font-size:12pt;color:#ff0;text-align:left;}
+input{width:80px;}
+#spanvol,#spanvibfre,#spanvibgai,#spandelay,#spanfeedback{position:relative;top:-7px;}
+.cen{text-align:center;}
+.rig{text-align:right;}
+#oct0,#oct12,#oct24,#oct36{opacity:0.5;}
+</style>
+
+<script type="importmap">
+	{
+		"imports":{
+	"three":"https://unpkg.com/three@0.164.0/build/three.module.min.js",
+	"three/addons/":"https://unpkg.com/three@0.164.0/examples/jsm/"
+		}
+	}
+</script>
+</head>
+
+<body>
+
+<hr id="cor" style="position:absolute;top:200px;left:0px;width:10px;height:10px;background-color:#256;border:none;z-index:1;"></hr>
+
+<button id="toc" style="position:absolute;left:500px;top:-200px;width:400px;height:119px;cursor:pointer;display:none;font-size:20.5pt;font-style:italic;background-image:url('img/initec.png');border:none;">click...</button>
+<img id="boy" src="img\ag_baboy.gif" style="left:-80px;top:-200px;height:187px;width:76px;opacity:0.99;"></img>
+<span id="perc" style="position:absolute;left:-100px;top:-100px;font-size:32pt;color:#478;display:"></span>
+
+<iframe id="ifra" name="ifra" src="keybd_sen.html" onload="frameLoaded();" style="position:absolute;left:20px;top:10px;width:580px;height:153px;visibility:hidden;border:none;"></iframe>
+
+<span id="obs" style="position:absolute;width:99%;top:85%;font-size:12pt;color:#ff0;text-align:center;display:none;">
+<a href="parent.txt" target="_blank" style="color:#ff0;">View code</a>
+<br><a href="http://datagenetics.com/blog/may32016/index.html" target="_blank" style="color:#9ff;">Nick Berry blog about keyboard</a>
+<br><a href="https://rawcdn.githack.com/voscarmv/coding_behind_the_scenes/c7d78652b72093cd5afcdd4d6267d76864119abd/soundwave/synth/sound.html" target="_blank" style="color:#f9f;">base html page</a>
+&nbsp;<a href="https://github.com/voscarmv/" target="_blank" style="color:#9f9;">Oscar Mier (voscarmv)</a>
+</span>
+
+<button id="butcli" onclick="cli();" style="position:absolute;left:1100px;top:20px;cursor:pointer;display:none;">Play</button>
+<button id="limpa" style="position:absolute;left:1200px;top:20px;width:60px;cursor:pointer;display:none;">clear</button>
+
+<img id="sen" src="img\si.png" class="fa" style="top: 30px;display:none;opacity:9.9;"></img>
+<img id="qua" src="img\sq.png" class="fa" style="top: 60px;display:none;"></img>
+<img id="tri" src="img\tr.png" class="fa" style="top: 90px;display:none;"></img>
+<img id="rra" src="img\st.png" class="fa" style="top:120px;display:none;"></img>
+
+<span id="spr" style="font-size:7pt;position:absolute;left:1100px;top:100px;color:#ff0;display:none;">SPReal</span>
+<span id="spi" style="font-size:7pt;position:absolute;left:1100px;top:115px;color:#ff0;display:none;;">SPImag</span>
+<span id="frty" style="font-size:8pt;position:absolute;left:700px;top:10px;color:#ff0;display:none;">freq.:<span id="ps"></span>&nbsp;type:<span id="res"></span></span>
+<canvas id="can" style="position:absolute;-webkit-transform:scaleX(-1);transform:scaleX(-1);-webkit-transform:scaleY(-1);transform:scaleY(-1);left:700px;top:40px;width:200px;height:100px;border:none;background-color:#256;display:none;"></canvas>
+
+<iframe src="ahdn.html" id="hard" style="position:absolute;left:20px;top:300px;width:70px;height:20px;border:none;visibility:hidden;"></iframe>
+
+<table id="tab" style="position:absolute;left:65%;top:10px;display:none;">
+<tr><td class="rig">volume</td><td colspan="3"><input id="vol" type="range" value="0.5" min="0.0" max="20" step="0.5" autocomplete="off" style="width:160px;"></input> <span id="spanvol">0.5</span></td></tr>
+<tr><td class="rig">vib. freq.</td><td><input id="vibfre" type="range" value="4.5" min="1.0" max="6" step="0.1" autocomplete="off" class="hz"></input> <span id="spanvibfre">4.5</span></td><td class="rig">gain</td><td><input id="vibgai" type="range" value="0" min="0" max="10" step="0.2" autocomplete="off" class="hz"></input>&nbsp;<span id="spanvibgai">0</span></td></tr>
+<tr><td class="rig">delay</td><td><input id="delayval" type="range" value="0.3" min="0.0" max="1" step="0.1" onchange="delayval()" autocomplete="off" class="hz"></input> <span id="spandelay">0.2</span></td><td class="rig">feedback</td><td><input id="feedbackval" type="range" value="0.6" min="0.0" max="1" step="0.1" onchange="feedbackval()" autocomplete="off" class="hz"></input> <span id="spanfeedback">0.6</span></td></tr>
+<tr><td class="rig">octave</td><td colspan="2" class="cen"><button id="oct0">-12</button>&nbsp;&nbsp;<button id="oct12" style="opacity:1;">0</button>&nbsp;&nbsp;<button id="oct24">+12</button>&nbsp;&nbsp;<button id="oct36">+24</button></td><td></tr>
+</table>
+
+<script type="module">
+
+import * as THREE from "three";
+import{OrbitControls} from "three/addons/controls/OrbitControls.js";
+import{MTLLoader} from "three/addons/loaders/MTLLoader.js";
+import{OBJLoader} from "three/addons/loaders/OBJLoader.js";
+
+var renderer,scene,camera,light,controls;
+var convolver,delayNode,feedbackGain;
+var dela=0.295;
+var feed=0.59;
+
+var d0=25.4*0.125;
+var d1=25.4*0.175;
+var d2=25.4*0.245;
+var d3=25.4*0.455;
+var d4=25.4*0.525;
+var d5=25.4*0.610;
+var d6=25.4*0.685;
+var d7=25.4*0.665;
+var d8=25.4*0.840;
+var extru;
+var foi=0;
+var mostra=0;
+var myTimeout;
+var obj;
+var sha;
+var sim=0;
+var sphere;
+var tipo;
+var topi="sine";
+var w=0;
+var iw=window.innerWidth;
+var ih=window.innerHeight;
+
+var myVar;
+
+var ebony=[];
+var geo=[];
+var geometry=[];
+var ivory=[];
+var light=[];
+var line=[];
+var mat=[];
+var mesh=[];
+var pe=[];
+var po=[];for(let z=1;z<100;z++){po[z]=[];}
+var sus=[];
+var wood=[];
+
+var clock=new THREE.Clock();
+var raycaster=new THREE.Raycaster();
+var mouse=new THREE.Vector2();
+var cylinder, selected;
+var intersects=[];
+var alvos=[];
+
+var bId=function(id){return document.getElementById(id);}
+	var dbutcli=bId("butcli");
+	var dspr=bId("spr");
+	var dspi=bId("spi");
+	var dps=bId("ps");
+	var dres=bId("res");
+	var dtoc=bId("toc");
+	var dlimpa=bId("limpa");
+	var dqua=bId("qua");
+	var dsen=bId("sen");
+	var dtri=bId("tri");
+	var drra=bId("rra");
+	var difra=bId("ifra");
+	var can=bId("can");
+	var dobs=bId("obs");
+	var dtab=bId("tab");
+	var dboy=bId("boy");
+	var dperc=bId("perc");
+	var dfrty=bId("frty");
+	var dhard=bId("hard");
+
+	var dvol=bId("vol");			var dspanvol=bId("spanvol");
+	var ddelayval=bId("delayval");		var dspandelay=bId("spandelay");
+	var dfeedbackval=bId("feedbackval");	var dspanfeedback=bId("spanfeedback");
+
+	var dvibfre=bId("vibfre");
+	var dspanvibfre=bId("spanvibfre");
+	var dvibgai=bId("vibgai");
+	var dspanvibgai=bId("spanvibgai");
+	var doct0=bId("oct0");	var doct12=bId("oct12");	var doct24=bId("oct24");	var doct36=bId("oct36");
+
+var quant=64;
+var arrayreal=[];
+var arrayimag=[];
+
+var audioContext=null;
+
+var osc=[];
+var customWave;
+var lfo;
+var lfoGain;
+var ana;
+var bufferLength;
+var dataArray;
+var ctx;
+var width;
+var height;
+var sliceWidth;
+var gNode,MNode
+var aC;
+var now,attack,decay,sustain,release;
+
+var lator;
+var lope;
+var drawscope;
+var isPlaying;
+var freq=30;
+var oct=12;
+var vbg=2;
+var vbf=4.5;
+
+var nota=[];
+var fre=[];
+for(let z=0;z<109;z++){fre[z+1]=(27.5*Math.pow(2, z*1/12)).toFixed(3);}
+for(let z=1;z<107;z++){fre[z]=fre[z+3];}
+var xa=[];
+var ya=[];
+var k=0;
+xa=[" ","A","A#","B","C","C#","D","D#","E","F","F#","G","G#"];
+for(let u=1;u<13;u++){for(let z=(u*12-11);z<((u*12-11)+12);z++){k++;nota[z]=xa[k]+u;}k=0;}
+for(let z=1;z<107;z++){nota[z]=nota[z+3];}
+
+function begin(){
+
+	dbutcli.onclick=function BC(){cli();}
+	dtoc.onclick=function TO(){init();}
+	dboy.onclick=function TO(){init();}
+	dlimpa.onclick=function LI(){limpa();}
+	dqua.onclick=function QUA(){tipqua("qua","square");}
+	dsen.onclick=function SEN(){tipsen("sen","sine");}
+	dtri.onclick=function TRI(){tiptri("tri","triangle");}
+	drra.onclick=function RRA(){tiprra("rra","sawtooth");}
+	doct0.onclick=function OCT0(){oct=0;opac();doct0.style.opacity=1;}
+	doct12.onclick=function OCT12(){oct=12;opac();doct12.style.opacity=1;}
+	doct24.onclick=function OCT24(){oct=24;opac();doct24.style.opacity=1;}
+	doct36.onclick=function OCT36(){oct=36;opac();doct36.style.opacity=1;}
+	ddelayval.onchange=function DELA(){dela=ddelayval.value;dspandelay.innerText=ddelayval.value;}
+	dfeedbackval.onchange=function FEED(){feed=feedbackval.value;dspanfeedback.innerText=feedbackval.value;}
+	dvibfre.onchange=function FRE(){vbf=dvibfre.value;dspanvibfre.innerText=dvibfre.value;}
+	dvibgai.onchange=function GAI(){vbg=dvibgai.value;dspanvibgai.innerText=dvibgai.value;}
+	dvol.onchange=function VOLE(){MNode.gain.value=dvol.value;dspanvol.innerText=dvol.value;}
+	
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setSize(iw,ih);
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setClearColor(0x002244,0);
+	//renderer.colorSpace=THREE.SRGBColorSpace;
+
+	document.body.appendChild(renderer.domElement);
+
+	window.addEventListener('resize',onWindowResize);
+	window.addEventListener("click",onClick);
+
+	scene=new THREE.Scene();
+
+	camera=new THREE.PerspectiveCamera(50,iw/ih,1,1000,1);
+	camera.position.set(0,0,450);
+
+	scene.position.set(-210,40,0);
+	scene.rotation.set(-0.9,0,0);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	controls.enablePan=true;
+	controls.enableRotate=false;
+
+if(sim==0){
+
+	var texGGK=new THREE.TextureLoader().load('models/extras/bojomad2.jpg');
+	texGGK.colorSpace=THREE.SRGBColorSpace;
+	
+	geo[200]=new THREE.BoxGeometry(700,200,10);
+	mat[200]=new THREE.MeshStandardMaterial({map:texGGK,color:'#fc0'});
+	mesh[200]=new THREE.Mesh(geo[200],mat[200]);
+	mesh[200].position.set(210,-60,-10);
+
+	light[0]=new THREE.AmbientLight('#fff',1.5);
+	scene.add(light[0]);
+	light[1]=new THREE.PointLight('#fc9',20000);
+	light[1].position.set(180,60,50);
+	scene.add(light[1]);
+
+	new MTLLoader().load('models/extras/susteni2.mtl',function(mat){mat.preload();new OBJLoader().setMaterials(mat).load('models/extras/susteni2.obj',function(object){
+		object.traverse(function(child){
+			if(child.isMesh){
+				child.material=new THREE.MeshStandardMaterial({color:'#000',metalness:0.2,roughness:0.7});
+				obj=child;
+			}
+		});
+	});});
+
+	pe[1]=new THREE.Shape();
+	pe[1].moveTo(0,0);	pe[1].lineTo(0,150);	pe[1].lineTo(d4,150);
+	pe[1].lineTo(d4,60);	pe[1].lineTo(d8,60);	pe[1].lineTo(d8,0);
+
+	po[1]=[
+	new THREE.Vector3(0,0,0),	new THREE.Vector3(0,150,0),	new THREE.Vector3(d4,150,0),
+	new THREE.Vector3(d4,60,0),	new THREE.Vector3(d8,60,0),	new THREE.Vector3(d8,0,0),
+	new THREE.Vector3(0,0,0),	new THREE.Vector3(0,0,-d7),	new THREE.Vector3(d8,0,-d7),
+	new THREE.Vector3(d8,0,0),	new THREE.Vector3(0,0,0)]
+
+	pe[3]=new THREE.Shape();
+	pe[3].moveTo(0,0);	pe[3].lineTo(0,60);	pe[3].lineTo(d1,60);	pe[3].lineTo(d1,150);
+	pe[3].lineTo(d7,150);	pe[3].lineTo(d7,60);	pe[3].lineTo(d8,60);	pe[3].lineTo(d8,0);
+
+	po[3]=[
+	new THREE.Vector3(0,0,0),	new THREE.Vector3(0,60,0),	new THREE.Vector3(d1,60,0),
+	new THREE.Vector3(d1,150,0),	new THREE.Vector3(d7,150,0),	new THREE.Vector3(d7,60,0),
+	new THREE.Vector3(d8,60,0),	new THREE.Vector3(d8,0,0),	new THREE.Vector3(0,0,0),
+	new THREE.Vector3(0,0,-d7),	new THREE.Vector3(d8,0,-d7),	new THREE.Vector3(d8,0,0),
+	new THREE.Vector3(0,0,0)];
+
+	pe[5]=new THREE.Shape();
+	pe[5].moveTo(0,0);	pe[5].lineTo(0,150);	pe[5].lineTo(-d4,150);
+	pe[5].lineTo(-d4,60);	pe[5].lineTo(-d8,60);	pe[5].lineTo(-d8,0);
+
+	po[5]=[
+	new THREE.Vector3(0,0,0),	new THREE.Vector3(0,150,0),	new THREE.Vector3(-d4,150,0),
+	new THREE.Vector3(-d4,60,0),	new THREE.Vector3(-d8,60,0),	new THREE.Vector3(-d8,0,0),
+	new THREE.Vector3(0,0,0),	new THREE.Vector3(0,0,-d7),	new THREE.Vector3(-d8,0,-d7),
+	new THREE.Vector3(-d8,0,0),	new THREE.Vector3(0,0,0)];
+
+	pe[6]=new THREE.Shape();
+	pe[6].moveTo(0,0);	pe[6].lineTo(0,150);	pe[6].lineTo(d3,150);	pe[6].lineTo(d3,60);
+	pe[6].lineTo(d8,60);	pe[6].lineTo(d8,0);
+
+	po[6]=[
+	new THREE.Vector3(0,0,0),	new THREE.Vector3(0,150,0),	new THREE.Vector3(d3,150,0),
+	new THREE.Vector3(d3,60,0),	new THREE.Vector3(d8,60,0),	new THREE.Vector3(d8,0,0),
+	new THREE.Vector3(0,0,0),	new THREE.Vector3(0,0,-d7),	new THREE.Vector3(d8,0,-d7),
+	new THREE.Vector3(d8,0,0),	new THREE.Vector3(0,0,0)];
+	
+	pe[8]=new THREE.Shape();
+	pe[8].moveTo(0,0);	pe[8].lineTo(0,60);	pe[8].lineTo(d0,60);	pe[8].lineTo(d0,150);
+	pe[8].lineTo(d5,150);	pe[8].lineTo(d5,60);	pe[8].lineTo(d8,60);	pe[8].lineTo(d8,0);
+
+	po[8]=[
+	new THREE.Vector3(0,0,0),	new THREE.Vector3(0,60,0),	new THREE.Vector3(d0,60,0),
+	new THREE.Vector3(d0,150,0),	new THREE.Vector3(d5,150,0),	new THREE.Vector3(d5,60,0),
+	new THREE.Vector3(d8,60,0),	new THREE.Vector3(d8,0,0),	new THREE.Vector3(0,0,0),
+	new THREE.Vector3(0,0,-d7),	new THREE.Vector3(d8,0,-d7),	new THREE.Vector3(d8,0,0),
+	new THREE.Vector3(0,0,0)];
+
+	pe[10]=new THREE.Shape();
+	pe[10].moveTo(0,0);	pe[10].lineTo(0,60);	pe[10].lineTo(d2,60);	pe[10].lineTo(d2,150);
+	pe[10].lineTo(d6,150);	pe[10].lineTo(d6,60);	pe[10].lineTo(d8,60);	pe[10].lineTo(d8,0);
+
+	po[10]=[
+	new THREE.Vector3(0,0,0),	new THREE.Vector3(0,60,0),	new THREE.Vector3(d2,60,0),
+	new THREE.Vector3(d2,150,0),	new THREE.Vector3(d6,150,0),	new THREE.Vector3(d6,60,0),
+	new THREE.Vector3(d8,60,0),	new THREE.Vector3(d8,0,0),	new THREE.Vector3(0,0,0),
+	new THREE.Vector3(0,0,-d7),	new THREE.Vector3(d8,0,-d7),	new THREE.Vector3(d8,0,0),
+	new THREE.Vector3(0,0,0)];
+
+	pe[12]=new THREE.Shape();
+	pe[12].moveTo(0,0);	pe[12].lineTo(0,150);	pe[12].lineTo(-d3,150);	pe[12].lineTo(-d3,60);
+	pe[12].lineTo(-d8,60);	pe[12].lineTo(-d8,0);
+
+	po[12]=[
+	new THREE.Vector3(0,0,0),	new THREE.Vector3(0,150,0),	new THREE.Vector3(-d3,150,0),
+	new THREE.Vector3(-d3,60,0),	new THREE.Vector3(-d8,60,0),	new THREE.Vector3(-d8,0,0),
+	new THREE.Vector3(0,0,0),	new THREE.Vector3(0,0,-d7),	new THREE.Vector3(-d8,0,-d7),
+	new THREE.Vector3(-d8,0,0),	new THREE.Vector3(0,0,0)];
+
+	extru={steps:1,depth:16,bevelEnabled:false,bevelThickness:0.1,bevelSize:0.1,bevelOffset:0,bevelSegments:1};
+
+	mat[1]=new THREE.MeshStandardMaterial({color:0xfffff0,metalness:0.5,roughness:0.2});
+	mat[2]=new THREE.MeshStandardMaterial({color:'#333'});
+
+	for(let z=1;z<49;z++){
+		if(z==1||z==3||z==5||z==6||z==8||z==10||z==12||z==13||z==15||z==17||z==18||z==20||z==22||z==24||z==25||z==27||z==29||z==30||z==32||z==34||z==36||z==37||z==39||z==41||z==42||z==44||z==46||z==48){
+			sha=z;
+			if(z>12){sha=z-12;}
+			if(z>24){sha=z-24;}
+			if(z>36){sha=z-36;}
+			geo[z]=new THREE.ExtrudeGeometry(pe[sha],extru);
+			mesh[z]=new THREE.Mesh(geo[z],mat[1]);
+			mesh[z].position.set(0,-150,0);
+			ivory[z]=new THREE.AxesHelper(0.1);
+			geometry[z]=new THREE.BufferGeometry().setFromPoints(po[sha]);
+			line[z]=new THREE.Line(geometry[z],mat[2]);
+			line[z].position.set(0,-150,16.2);
+			mesh[z].name=z;alvos.push(mesh[z]);
+		}
+	}
+	ivory[1].position.x=-90;
+	ivory[3].position.x=-90+(d8*1);
+	ivory[5].position.x=-90+(d8*3);
+	ivory[6].position.x=-90+(d8*3);
+	ivory[8].position.x=-90+(d8*4);
+	ivory[10].position.x=-90+(d8*5);
+	ivory[12].position.x=-90+(d8*7);
+	for(let z=1;z<13;z++){
+		if(z==1||z==3||z==5||z==6||z==8||z==10||z==12){
+			ivory[z].add(mesh[z]);ivory[z].add(line[z]);
+			ivory[12+z].add(mesh[12+z]);ivory[12+z].add(line[12+z]);
+			ivory[24+z].add(mesh[24+z]);ivory[24+z].add(line[24+z]);
+			ivory[36+z].add(mesh[36+z]);ivory[36+z].add(line[36+z]);
+			ivory[12+z].position.x=ivory[z].position.x+d8*7;
+			ivory[24+z].position.x=ivory[z].position.x+(d8*7*2);
+			ivory[36+z].position.x=ivory[z].position.x+(d8*7*3);
+		}
+	}
+}
+
+function cli(){
+	dbutcli.style.display="none";
+	var h=0;
+	const myInterval=setInterval(clicli,120);
+	function pos(){
+		for(let z=1;z<50;z++){
+			if(ivory[z]){ivory[z].rotation.x=0;}
+			if(ebony[z]){ebony[z].rotation.x=3.14;}
+		}
+	}
+	function wec(t){pos();ivory[h].rotation.x=0.1;freq=fre[h+12];dps.innerText=nota[h+12] + " " +fre[h+12];}
+	function bec(t){pos();ebony[h].rotation.x=3.3;freq=fre[h+12];dps.innerText=nota[h+12] + " " +fre[h+12];}
+
+	function clicli(){
+		h++;
+		if(h==49){pos();clearInterval(myInterval);dbutcli.style.display="";}
+		if(h<49){
+			if(h==2||h==4||h==7||h==9||h==11||h==14||h==16||h==19||h==21||h==23||h==26||h==28||h==31||h==33||h==35||h==38||h==40||h==43||h==45||h==47){
+				bec(h);
+			}else{
+				wec(h);
+			}
+		}
+	}
+}
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function onClick(event){
+	mouse.x=event.clientX/iw*2-1;
+	mouse.y=-(event.clientY/ih)*2+1;
+	raycaster.setFromCamera(mouse,camera);
+	intersects=raycaster.intersectObjects(alvos,true);
+	if(intersects.length>0){
+		selected=intersects[0].object;
+		if(ivory[selected.name]){ivory[selected.name].rotation.x=0.1;volta(selected.name);}
+		if(ebony[selected.name]){ebony[selected.name].rotation.x=3.3;volta(selected.name);}
+	}
+}
+
+function volta(i){
+	if(dtoc.style.display=="none"){
+	freq=fre[selected.name+oct];
+	lator.frequency.setValueAtTime(freq,aC.currentTime);
+	lope.startEnvelope();drawscope();isPlaying=true;
+	if(dspr.innerText.length>8){arrayreal=dspr.innerText.split(",");arrayimag=dspi.innerText.split(",");}
+	lfo.frequency.value=vbf;
+	lfoGain.gain.value=vbg;
+	delayNode.delayTime.value=dela;
+	feedbackGain.gain.value=feed;
+	if(arrayreal[1]==arrayimag[1]){
+		lator.frequency.setValueAtTime(freq,aC.currentTime);
+		lator.type=topi;dres.innerText=lator.type;
+	}else{
+		customWave=aC.createPeriodicWave(arrayreal,arrayimag);
+		lator.frequency.setValueAtTime(freq,aC.currentTime);
+		lator.setPeriodicWave(customWave);dres.innerText=lator.type;
+	}
+	dps.innerText=fre[selected.name+oct]+ " Hz";
+	myTimeout=setTimeout(function(){if(isPlaying){lope.stopEnvelope();isPlaying=false;}},3000);
+	myTimeout=setTimeout(function(){if(ivory[i]){ivory[i].rotation.x=0;};if(ebony[i]){ebony[i].rotation.x=3.14;}},200);
+	}
+}
+
+function init(){
+	if(foi==0){
+		function setupscope(audioContext,gNode,canvas){
+			ana=aC.createAnalyser();
+			gNode.connect(ana);
+			ana.connect(delayNode);
+			ana.fftSize=2048;
+			bufferLength=ana.fftSize;
+			dataArray=new Uint8Array(bufferLength);
+			ctx=canvas.getContext('2d');
+			width=canvas.width;
+			height=canvas.height;
+			function drawscope(){
+				ana.getByteTimeDomainData(dataArray);
+				ctx.fillStyle='#256';
+				ctx.fillRect(0,0,width,height);
+				ctx.lineWidth=1;
+				ctx.strokeStyle='#fc0';
+				ctx.beginPath();
+				sliceWidth=width*1.0/bufferLength;
+				let x=0;let y=0;
+				for(let i=0;i<bufferLength;i++){y=dataArray[i]/128*height/2;if(i==0){ctx.moveTo(x,y);}else{ctx.lineTo(x,y);};x += sliceWidth;}
+				ctx.lineTo(width, height/2);
+				ctx.stroke();
+				requestAnimationFrame(drawscope);
+			}
+			return drawscope;
+		}
+
+		function createADSR(aC,attack,decay,sustain,release){
+			gNode.gain.setValueAtTime(0,aC.currentTime);
+			function startEnvelope(){
+				now=aC.currentTime;
+				gNode.gain.cancelScheduledValues(now);
+				gNode.gain.setValueAtTime(0,now);
+				gNode.gain.exponentialRampToValueAtTime(1,now+attack);
+				gNode.gain.exponentialRampToValueAtTime(sustain,now+attack+decay);
+			}
+			function stopEnvelope(){
+				now=aC.currentTime;
+				gNode.gain.cancelScheduledValues(now);
+				gNode.gain.setValueAtTime(gNode.gain.value,now);
+				gNode.gain.exponentialRampToValueAtTime(0.0001,now+release);
+			}
+			return {gNode,startEnvelope,stopEnvelope};
+		}
+		aC=new (window.AudioContext || window.webkitAudioContext)();
+		gNode=aC.createGain();
+		MNode=aC.createGain();
+		convolver=aC.createConvolver();
+		fetch('mp3/quadraccipavilion.mp3')
+  			.then(response => response.arrayBuffer())
+  			.then(data => aC.decodeAudioData(data, buffer => {
+    			convolver.buffer=buffer;
+  		}));
+		delayNode=aC.createDelay();
+		delayNode.delayTime.value=dela;
+		feedbackGain=aC.createGain();
+		feedbackGain.gain.value=feed;
+		delayNode.connect(feedbackGain);
+		feedbackGain.connect(delayNode);
+		convolver.connect(delayNode);
+		delayNode.connect(MNode);
+
+		attack=0.01;decay=0.07;sustain=0.8;release=4.7;
+		lator=aC.createOscillator();
+		lfo=aC.createOscillator();
+		lfo.frequency.value=vbf;
+		lfo.start(0);
+		lfoGain=aC.createGain();
+		lfoGain.gain.value=vbg;
+		lfo.connect(lfoGain);
+		lfoGain.connect(lator.frequency);
+		lope=createADSR(aC,attack,decay,sustain,release);
+		drawscope=setupscope(aC,lope.gNode,can);
+		lator.connect(lope.gNode);
+		lope.gNode.connect(MNode);
+		MNode.connect(aC.destination);
+		isPlaying=false;
+		lator.start();
+		foi=1;mostra=1;
+	}
+} // fim init
+
+function tipqua(ti,to){opa();tipo=ti;topi=to;dqua.style.opacity=9.9;difra.src="keybd_qua.html";}
+function tipsen(ti,to){opa();tipo=ti;topi=to;dsen.style.opacity=9.9;difra.src="keybd_sen.html";}
+function tiptri(ti,to){opa();tipo=ti;topi=to;dtri.style.opacity=9.9;difra.src="keybd_tri.html";}
+function tiprra(ti,to){opa();tipo=ti;topi=to;drra.style.opacity=9.9;difra.src="keybd_rra.html";}
+function opa(){
+	arrayreal=new Float32Array([0,0,0,0]);
+	arrayimag=new Float32Array([0,0,0,0]);
+	dqua.style.opacity=0.3;dsen.style.opacity=0.3;dtri.style.opacity=0.3;drra.style.opacity=0.3;
+}
+
+function opac(){
+	doct0.style.opacity=0.5;
+	doct12.style.opacity=0.5;
+	doct24.style.opacity=0.5;
+	doct36.style.opacity=0.5;
+}
+
+} // fim sim
+
+function animate(){
+	requestAnimationFrame(animate);
+	controls.update();
+	if(w<120){w=w+0.1;}
+	if(w<=100){dperc.innerText=w.toFixed(1)+" %";}
+	if(obj && sim==0){
+	for(let z=2;z<48;z++){
+		if(z==2||z==4||z==7||z==9||z==11||z==14||z==16||z==19||z==21||z==23||z==26||z==28||z==31||z==33||z==35||z==38||z==40||z==43||z==45||z==47){
+			sha=z;
+			if(z>12){sha=z-12;}
+			if(z>24){sha=z-24;}
+			if(z>36){sha=z-36;}
+			ebony[z]=new THREE.AxesHelper(0.1);
+			sus[z]=obj.clone();
+			sus[z].position.set(0,45,0);
+			ebony[z].add(sus[z]);
+			ebony[z].rotation.x=3.14;
+			ebony[z].position.set(0,0,15);
+			sus[z].name=z;alvos.push(sus[z]);
+		}
+	}
+	ebony[ 2].position.x=-71;
+	ebony[ 4].position.x=-44.5
+	ebony[ 7].position.x=-6.5;
+	ebony[ 9].position.x=18.5;
+	ebony[11].position.x=42;
+	for(let z=2;z<13;z++){
+		if(z==2||z==4||z==7||z==9||z==11){
+			ebony[12+z].position.x=ebony[z].position.x+d8*7;
+			ebony[24+z].position.x=ebony[z].position.x+(d8*7*2);
+			ebony[36+z].position.x=ebony[z].position.x+(d8*7*3);
+		}
+	}
+
+	dtoc.style.display="";
+
+	dperc.style.display="none";
+
+	sim=1;
+
+	}
+
+if(mostra==1){
+	mostra=0;
+	dqua.style.display="";
+	dsen.style.display="";
+	dtri.style.display="";
+	drra.style.display="";
+	dtab.style.display="";
+	dfrty.style.display="";
+	dobs.style.display="";
+	//dhard.style.display="";
+	dtoc.style.display="none";
+	dboy.style.left="920px";dboy.style.top="50px";dboy.style.height="93.5px";dboy.style.width="38px";
+	can.style.display="";
+	scene.add(mesh[200]);
+	for(let z=1;z<100;z++){if(ivory[z]){scene.add(ivory[z])};if(ebony[z]){scene.add(ebony[z]);}}
+	for(let z=1;z<100;z++){
+		if(ivory[z]){ivory[z].rotation.x=0;}
+		if(ebony[z]){ebony[z].rotation.x=3.14;}
+	}
+	difra.style.visibility="visible";
+	dhard.style.visibility="visible";
+}
+	renderer.render(scene,camera);
+}
+
+begin();
+
+animate();
+
+dtoc.style.left=iw/2-200+"px";dboy.style.left=iw/2-200+260+"px";
+dtoc.style.top=ih/2-60+"px";dboy.style.top=ih/2-73+"px";
+dperc.style.left=iw/2-100+"px";dperc.style.top=ih/2-15+"px";
+
+
+/*
+Create and listen to your own waveforms
+
+the link:
+
+https://jrlazz.eu5.org/anim/parent.html
+
+
+*/
+
+
+</script>
+
+<script>
+function frameLoaded() {
+	document.getElementById("spr").innerText=window.ifra.document.getElementById("spb").value;
+	document.getElementById("spi").innerText=window.ifra.document.getElementById("spb").value;
+}
+</script>
+
+</body>
+</html>

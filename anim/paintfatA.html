@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>paintfatA.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="https://threejs.org/files/favicon.ico"/>
+
+<style>
+body{margin:0px;background-color:#046;overflow:hidden;font-family:Monospace;}
+select,input,span{position:absolute;font-family:Arial;font-size:10pt;font-weight:bold;color:#008;}
+@font-face {font-family:tipo;src:url('../fonte/MysteryQuest-Regular.ttf');}
+</style>
+
+</head>
+
+<body>
+<select id="mySelect" onchange="myFunction()" style="position:absolute;top:12px;left:10px;width:80px;height:20px;border:1px solid transparent;">
+  <option value="S" selected >Select</option>
+  <option value="">Erase</option>
+  <option value="#ccc">Gray</option>
+  <option value="#f00">Red</option>
+  <option value="#090">Green</option>
+  <option value="#06f">Blue</option>
+  <option value="#fc0">Yellow</option>
+  <option value="#a22">Brown</option>
+  <option value="#f6b">Pink</option>
+  <option value="R">Random</option>
+</select>
+<span id="spancor" style="top:11px;left:100px;width:80px;height:20px;background-color:#fff;border:1px solid black;color:#008;text-align:center;"></span>
+<input type="number" id="diam" name="diam" min="1" max="20" value="4" onchange="altsize();" autocomplete="off" style="top:11px;left:192px;width:40px;height:16px;color:#008;"></input>
+<span style="font-family:tipo;font-size:18pt;color:#ff0;top:7px;left:40%;width:400px;height:20px;font-weight:normal;">Painting with fat lines</span>
+<br><br><br>
+<center>
+<iframe id="ifr" style="width:1024px;height:512px;border:1px solid #ff0;"></iframe>
+</center>
+<script type="text/javascript">
+	var ifra=window.document.getElementById("ifr");
+	ifra.cor="#ccc";
+	ifra.size=4;
+	ifra.src="paintfatB.html";
+	document.getElementById("spancor").style.backgroundColor=ifra.cor;
+
+function myFunction() {
+	var x = document.getElementById("mySelect").value;
+	if(x=="R"){
+		ifra.cor="R";document.getElementById("spancor").innerText="Random";
+		document.getElementById("spancor").style.backgroundColor="#fff";
+	}else{
+		document.getElementById("spancor").innerText="";
+		if(x!="0"){ifra.cor=x;document.getElementById("spancor").style.backgroundColor=x;}
+	}
+}
+
+function altsize() {
+	ifra.size=document.getElementById("diam").value;
+}
+
+function get_random_color(){
+	var color="";
+	for(let i=0;i<3;i++){
+        	var sub=Math.floor(Math.random()*256).toString(16);
+        	color +=(sub.length==1?"0"+sub:sub);
+    	}
+	ifra.cor="#"+color;
+}
+
+document.getElementById("mySelect").value="S";
+
+//https://stackoverflow.com/questions/13757943/access-a-variable-of-iframe-from-parent
+
+</script>
+
+</body>
+</html>

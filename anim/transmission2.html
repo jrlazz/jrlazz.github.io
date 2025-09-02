@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>transmission2.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="ok.ico"/>
+<style>
+@font-face {font-family:myq;src:url('../fonte/MysteryQuest-Regular.ttf');}
+body{background-color:#024;color:#fc0;margin:0px;overflow:hidden;font-family:myq;font-size:16pt;}
+span{position:absolute;top:10px;width:100%;text-align:center;font-family:myq;font-weight:bold;font-size:16pt;color:#0ff;}
+</style>
+</head>
+<body>
+<span style="position:absolute,width:100%;text-align:center;">Transmission</span>
+<script type="importmap">
+	{
+		"imports":{
+			"three":"https://unpkg.com/three@0.158.0/build/three.module.js",
+			"three/addons/":"https://unpkg.com/three@0.158.0/examples/jsm/"
+		}
+	}
+</script>
+<script type="module">
+	import * as THREE from 'three';
+	import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+	var camera,scene,renderer,video, axes;
+	var amb, tex, axes;
+	var geo=[];var mat=[];var mesh=[];
+	init();
+	animate();
+function init() {
+	camera=new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
+	camera.position.z=15;
+	scene=new THREE.Scene();
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.setClearColor('#063',0);
+	renderer.outputColorSpace=THREE.SRGBColorSpace;
+	document.body.appendChild(renderer.domElement);
+
+	const controls = new OrbitControls( camera, renderer.domElement );
+	
+	tex=new THREE.TextureLoader().load("img/pcb03a.png");
+	tex.colorSpace = THREE.SRGBColorSpace;
+	mat[1]=new THREE.MeshBasicMaterial({map:tex});
+	geo[1]= new THREE.PlaneGeometry(8,8);
+	mesh[1]=new THREE.Mesh(geo[1],mat[1]);
+	scene.add(mesh[1]);
+
+	geo[2]=new THREE.BoxGeometry(4,4,0.1);
+	mat[2]=new THREE.MeshPhysicalMaterial({transmission:1,roughness: 0.2});
+	mesh[2]=new THREE.Mesh(geo[2],mat[2]);
+	mesh[2].position.set(0,0,0);
+	mesh[2].rotation.set(0,0,0);
+	scene.add(mesh[2]);
+
+
+}
+function animate(){
+	requestAnimationFrame(animate);
+	renderer.render(scene,camera);
+}
+</script>
+</body>
+</html>

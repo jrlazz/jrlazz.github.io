@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>target79</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="https://threejs.org/files/favicon.ico"/>
+
+<style>
+
+body{margin:0px;border:0px;font-family:Monospace;background-color:#069;overflow:hidden;}
+span{font-size:40pt;font-family:Arial;color:#ff0;}
+.draggable{width:50px; height:50px; position:absolute; transform:rotate(0deg) translateX(0px);}
+img{position:absolute;top:12px;width:100px;cursor:pointer;z-index:2;}
+a{text-decoration:none;font-size:32pt;color:#0f0;}
+.classimg{width:100px;}
+
+</style>
+
+<script src="../js/three.min90.js"></script>
+
+<!--
+<script type"module">
+import * as THREE from '../js/three.module_res_res.js';
+-->
+
+</head>
+
+<body>
+
+<span onclick="sobe();" style="position:absolute;left:10px;top:10px;cursor:ponter;z-index:2;">C</span>
+<span onclick="desce();" style="position:absolute;left:200px;top:10px;cursor:ponter;z-index:2;">B</span>
+
+<span id="spanaux1" style="position:absolute;left: 10px;top:80px;">1</span>
+<span id="spanaux2" style="position:absolute;left: 10px;top:140px;color:#0f0;">2</span>
+<span id="spanaux3" style="position:absolute;left: 10px;top:200px;color:#ff0;background-color:#009;font-size:18pt;"></span>
+<span id="spanaux4" style="position:absolute;left: 10px;top:260px;color:#ff0;background-color:#009;font-size:18pt;"></span>
+<span id="spanaux5" style="position:absolute;left:400px;top:260px;color:#ff0;background-color:#009;font-size:18pt;"></span>
+<div id="container"></div>
+
+<script>
+
+var alvos=[];
+var ang=0;
+var axes;
+
+var beater;
+
+var camA,camB;
+var camera;
+var CCube,DCube,ECube,FCube;
+var collisionResults=[];
+var container=document.getElementById('container');
+var cubeGeo;
+var cubeGeometry,cubeMaterial;
+var cuma;
+
+var de2ra=function(degree){return degree*(Math.PI/180);}
+var directionVector;
+
+var k=0;
+var keys=[];
+var kuma;
+
+var geo=[];
+var globalVertex;
+var goldenrodT,goldenrodG,goldenrodM,goldenrodB;
+var gridBaseGeo,gridBaseMat,gridBaseA,gridBaseB,grid;
+
+var heli=[];
+var hip=0;
+var Hper=0;
+var Hval=0;
+
+var localVertex;
+
+var mat=[];
+var mov=0.1;
+var movemouse=0;
+var movetouch=0
+
+var originPoint;
+
+var p=Math.PI;
+var point;
+
+var ray;
+var renderer;
+var ruaGeo,ruaMat,Arua,Brua;
+
+var steve;
+	var cab,tor,bds,bdi,bes,bei,pds,pdi,pes,pei;
+	var acab,ator,abds,abdi,abes,abei,apds,apdi,apes,apei;
+var scene;
+
+var target=new THREE.Vector3();
+var teclaW=0;var teclaV=0;
+var teclaG=0;var teclaH=0;
+var teclaC=0;var teclaB=0;
+var textureA,geoA,matA,ACube;
+
+var vertexIndex;
+var Vval=0;
+var Vper=0;
+
+var xx=0;
+var yy=0;
+
+var w=0;
+var wW=window.innerWidth;
+var wH=window.innerHeight;
+
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setPixelRatio( window.devicePixelRatio );
+	renderer.setSize(wW,wH);
+	container.appendChild(renderer.domElement);
+
+	//renderer.shadowMapEnabled=true;
+
+
+	scene=new THREE.Scene();
+	scene.background=new THREE.Color(0x006699);
+	camera=new THREE.PerspectiveCamera(100,wW/wH,100,2000);
+	//camera.position.set(0,5,30);
+	camera.position.set(0,-30,10);
+	camera.position.set(0,0,100);
+
+	// luzes
+	const ambientLight=new THREE.AmbientLight("#fff",1);
+	ambientLight.position.set(30,20,30);
+	ambientLight.castShadow=true;
+	scene.add(ambientLight);
+
+	point=new THREE.PointLight(0xffcc00,2,3,2);//color,intensity,range,decay
+//	point.position.set(0,10,0);
+
+	var sun=new THREE.PointLight(0xffcc99,3,3,2);
+	sun.castShadow=true;
+	sun.position.set(-100,200,27);
+	scene.add(sun);
+
+	axes=new THREE.AxesHelper(2);
+
+	goldenrodT=new THREE.TextureLoader().load('models/lajinha_amarela-are-1.jpg');
+	goldenrodT.wrapS=THREE.RepeatWrapping;
+	goldenrodT.wrapT=THREE.RepeatWrapping;
+	goldenrodT.repeat.set(12,6);
+	goldenrodG=new THREE.PlaneGeometry(22,9);
+	goldenrodM=new THREE.MeshBasicMaterial({map:goldenrodT,side:THREE.DoubleSide});
+	goldenrodB=new THREE.Mesh(goldenrodG,goldenrodM);
+	goldenrodB.position.set(-12,0.01,-9);
+	goldenrodB.rotation.set(p/2,0,0);
+
+	cubeGeometry=new THREE.BoxGeometry(1.5,5,1.5);
+	cubeMaterial=new THREE.MeshBasicMaterial({color:0x990000,transparent:true,opacity:1});
+	CCube=new THREE.Mesh(cubeGeometry,cubeMaterial);
+	CCube.position.set(5,2.5,-5);
+
+	cubeMaterial=new THREE.MeshBasicMaterial({color:0x006699});
+	DCube=new THREE.Mesh(cubeGeometry,cubeMaterial);
+	DCube.castShadow=true;
+	DCube.position.set(3,2.5,0);
+
+	cubeMaterial=new THREE.MeshBasicMaterial({color:0x996699});
+	ECube=new THREE.Mesh(cubeGeometry,cubeMaterial);
+	//ECube.castShadow=true;
+	ECube.position.set(6,2.5,0);
+
+	cubeMaterial=new THREE.MeshBasicMaterial({color:0x000099});
+	FCube=new THREE.Mesh(cubeGeometry,cubeMaterial);
+	//FCube.castShadow=true;
+	FCube.position.set(9,2.5,0);
+
+	cubeMaterial=new THREE.MeshLambertMaterial({color:0xff00ff,wireframe:true,transparent:true,opacity:0.3});
+	beater=new THREE.Mesh(cubeGeometry,cubeMaterial);
+	beater.position.set(0,0,0);
+	beater.scale.set(0.2,0.2,0.2);
+
+	cubeGeo=new THREE.BoxGeometry(1,1,1);
+	cubeMaterial=new THREE.MeshBasicMaterial({color:0x000000});
+	camA=new THREE.Mesh(cubeGeo,cubeMaterial);
+
+	cubeMaterial=new THREE.MeshBasicMaterial({color:0xffff00});
+	camB=new THREE.Mesh(cubeGeo,cubeMaterial);
+	camB.scale.set(5,5,5);
+
+	// GRIDS
+	gridBaseGeo=new THREE.BoxGeometry(100,100,0.01);
+	gridBaseMat=new THREE.MeshPhongMaterial({color:0x444444});
+	gridBaseA=new THREE.Mesh(gridBaseGeo,gridBaseMat);
+	gridBaseA.position.set(0,0,0);
+	gridBaseA.rotation.x=de2ra(90);
+	gridBaseA.receiveShadow=true;
+
+	gridBaseMat=new THREE.MeshPhongMaterial({color:0x001122});
+	gridBaseB=new THREE.Mesh(gridBaseGeo,gridBaseMat);
+	gridBaseB.position.set(0,-0.01,0);
+	gridBaseB.rotation.x=de2ra(90);
+	gridBaseB.receiveShadow=true;
+
+	grid=new THREE.GridHelper(100,50);//size,divisions
+	grid.material.color.setHex(0xffffff);
+	grid.position.set(0,0.1,0);
+	grid.receiveShadow=true;
+
+	//RUAS
+	ruaGeo=new THREE.BoxGeometry(100,2,0.001);
+	ruaMat=new THREE.MeshPhongMaterial({color:0x303030});
+	Arua=new THREE.Mesh(ruaGeo,ruaMat);
+	Arua.position.set(0,0.01,0);
+	Arua.rotation.set(de2ra(90),0,de2ra(90));
+	Arua.receiveShadow=true;
+
+	ruaGeo=new THREE.BoxGeometry(100,2,0.001);
+	ruaMat=new THREE.MeshPhongMaterial({color:0x303030});
+	Brua=new THREE.Mesh(ruaGeo,ruaMat);
+	Brua.position.set(0,0.01,-25);
+	Brua.rotation.set(de2ra(90),0,de2ra(0));
+	Brua.receiveShadow=true;
+
+	// sky
+	const loader = new THREE.TextureLoader();
+	loader.load('models/sky_cores_3.jpg',function(texture){
+	texture.mapping=THREE.EquirectangularReflectionMapping;
+	scene.background=texture;  
+	});
+
+	//goldenrod
+	textureA=new THREE.TextureLoader().load('img/fl4.jpg');
+	textureA.wrapS=THREE.RepeatWrapping;
+	textureA.wrapT=THREE.RepeatWrapping;
+	textureA.repeat.set(5,1);
+	geoA=new THREE.BoxGeometry(5,10,5);
+	matA=new THREE.MeshBasicMaterial({map:textureA,side:THREE.DoubleSide});
+	ACube=new THREE.Mesh(geoA,matA);
+	ACube.position.set(-15,5,-9);
+
+	// steve
+	geo[1]=new THREE.BoxGeometry(1,1,1);
+	mat[1]=new THREE.MeshBasicMaterial({color:'#f00',wireframe:false,transparent:true,opacity:0.0});
+
+	var cuma=[
+	new THREE.MeshBasicMaterial({map:loader.load('images/leg2.png')}),
+	new THREE.MeshBasicMaterial({map:loader.load('images/leg2.png')}),
+	new THREE.MeshBasicMaterial({map:loader.load('images/leg11.png')}),
+	new THREE.MeshBasicMaterial({map:loader.load('images/leg10.png')}),
+	new THREE.MeshBasicMaterial({map:loader.load('images/leg10.png')}),
+	new THREE.MeshBasicMaterial({map:loader.load('images/leg10.png')}),
+	];
+	var kuma=[
+	new THREE.MeshBasicMaterial({map:loader.load('images/steve_xpos.png')}),
+	new THREE.MeshBasicMaterial({map:loader.load('images/steve_xneg.png')}),
+	new THREE.MeshBasicMaterial({map:loader.load('images/steve_ypos.png')}),
+	new THREE.MeshBasicMaterial({map:loader.load('images/steve_yneg.png')}),
+	new THREE.MeshBasicMaterial({map:loader.load('images/steve_zpos.png')}),
+	new THREE.MeshBasicMaterial({map:loader.load('images/steve_zneg.png')}),
+	];
+
+	mat[20]=mat[1].clone();mat[20].color.set('#06c');
+	tor=new THREE.Mesh(geo[1],cuma);
+	tor.scale.set(4,2,6);// Larg Espe Altu
+	tor.position.set(0,-1,2);
+
+	cab=new THREE.Mesh(geo[1],kuma);
+	cab.scale.set(3.5,3.5,3.5);
+	cab.rotation.set(p/2,-p/2,0);
+	cab.position.set(0,-1,6.75);
+
+	abds=new THREE.Mesh(geo[1],cuma);
+	abds.scale.set(2,2,6);
+	abds.position.set(0,0,2);
+	bds=axes.clone();
+	bds.position.set(-3,-1,4);
+	bds.add(abds);
+
+	abes=new THREE.Mesh(geo[1],cuma);
+	abes.scale.set(2,2,6);
+	abes.position.set(0,0,2);
+	bes=axes.clone();
+	bes.position.set(3,-1,4);
+	bes.add(abes);
+
+	apds=new THREE.Mesh(geo[1],cuma);
+	apds.scale.set(2,2,6);
+	apds.position.set(0,0,-2);
+	pds=axes.clone();
+	pds.position.set(-1,-1,-2);
+	pds.add(apds);
+
+	apes=new THREE.Mesh(geo[1],cuma);
+	apes.scale.set(2,2,6);
+	apes.position.set(0,0,-2);
+	pes=axes.clone();
+	pes.position.set(1,-1,-2);
+	pes.add(apes);
+
+	steve=new THREE.Mesh(geo[1],mat[1]);
+	steve.rotation.set(-p/2,0,p);
+
+	steve.add(tor);
+	steve.add(cab);
+	bds.rotation.x=3;steve.add(bds);
+	bes.rotation.x=3;steve.add(bes);
+	steve.add(pds);
+	steve.add(pes);
+	steve.scale.set(0.05,0.05,0.05);
+	//scene.add(steve);
+
+
+	// heli[0]
+	var cubeGeometry=new THREE.SphereGeometry(1,16,16);
+	var cubeMaterial=new THREE.MeshBasicMaterial({color:'#f00',transparent:true,opacity:0.1});
+	heli[0]=new THREE.Mesh(cubeGeometry,cubeMaterial);
+
+	ACube.name="Gigante";
+	CCube.name="Vermelho";
+	DCube.name="Azul claro";
+	ECube.name="Pink";
+	FCube.name="Azul";
+
+	alvos.push(ACube);
+	alvos.push(CCube);
+	alvos.push(DCube);
+	alvos.push(ECube);
+	alvos.push(FCube);
+
+window.onresize=function(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+};
+
+// **** touchmove ini ****
+document.addEventListener("touchstart",Tstart);
+document.addEventListener("touchmove",Tmove);
+document.addEventListener("touchend",Tend);
+
+function Tstart(event){
+	limpatec();
+	movetouch=1;
+	xx=parseInt(event.touches[0].clientX);yy=parseInt(event.touches[0].clientY);
+	compu();
+}
+
+function Tmove(event){
+	if(movetouch==1){
+		xx=parseInt(event.touches[0].clientX);
+		yy=parseInt(event.touches[0].clientY);
+		compu();
+	}
+}
+
+function Tend(event){limpatec();movetouch=0;compu();}
+// **** touchmove end ****
+
+// **** mousemove ini ****
+document.addEventListener("mousedown",Mdown);
+document.addEventListener("mousemove",Mmove);
+document.addEventListener("mouseup",Mup);
+
+function Mdown(){
+	limpatec();
+	movemouse=1;
+	xx=event.pageX;yy=event.pageY;
+	compu();
+}
+
+function Mmove(){
+	if(movemouse==1){
+		xx=event.pageX;yy=event.pageY;
+		compu();
+	}
+}
+
+function Mup(){movemouse=0;limpatec();}
+// **** mousemove fim ****
+
+function sobe(){teclaC=1;}
+
+function desce(){teclaB=1;}
+
+function limpatec(){teclaW=0;teclaV=0;teclaH=0;teclaG=0;teclaB=0;teclaC=0;}
+
+function compu(){
+	Hval=window.innerWidth/2;Vval=window.innerHeight/2;
+	if(xx<=Hval && yy<Vval){limpatec();teclaW=1;teclaG=1;}
+	if(xx<=Hval && yy>Vval){limpatec();teclaV=1;teclaG=1;}
+	if(xx>=Hval && yy<Vval){limpatec();teclaW=1;teclaH=1;}
+	if(xx>=Hval && yy>Vval){limpatec();teclaV=1;teclaH=1;}
+	document.getElementById("spanaux1").innerText=xx+" ...  "+yy;
+	if(xx<=Hval){
+		if(yy<=Vval){
+			hip=Math.sqrt(Math.pow((xx-Hval),2)+Math.pow((Vval-yy),2));
+			steve.rotation.z=-Math.asin((xx-Hval)/hip);
+			Hper=parseInt(100-(xx/Hval)*100);Vper=parseInt(100-(yy/Vval)*100);
+		}else{
+			hip=Math.sqrt(Math.pow((xx-Hval),2)+Math.pow((Vval-yy),2));
+			steve.rotation.z=Math.asin((xx-Hval)/hip)-p;
+			Hper=parseInt(100-(xx/Hval)*100);Vper=parseInt(-(100-(yy/Vval)*100));
+		}
+	}
+	if(xx>Hval){
+		if(yy<=Vval){
+			hip=Math.sqrt(Math.pow((xx-Hval),2)+Math.pow((Vval-yy),2));
+			steve.rotation.z=-Math.asin((xx-Hval)/hip);
+			Hper=parseInt(-(100-(xx/Hval)*100));Vper=parseInt(100-(yy/Vval)*100);
+		}else{
+			hip=Math.sqrt(Math.pow((xx-Hval),2)+Math.pow((yy-Vval),2));
+			steve.rotation.z=p+Math.asin((xx-Hval)/hip);
+			Hper=parseInt(-(100-(xx/Hval)*100));Vper=parseInt(-(100-(yy/Vval)*100));
+		}
+	}
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+
+	w++;
+	if(w==5){
+		camA.position.set(0,20,-40);
+		camB.position.set(0,20,40);
+		beater.position.set(0,0,5);
+		beater.scale.set(0.5,0.5,1);
+		steve.add(beater);
+
+		steve.position.set(0,-9,12);
+		steve.scale.set(2,2,2);
+
+		heli[0].add(steve);
+		heli[0].add(point);
+		heli[0].add(camA);
+		heli[0].add(camB);
+
+		heli[0].scale.set(.01,.01,.01);
+		heli[0].rotation.set(0,p,0);
+		heli[0].position.set(0,0.5,0);
+
+		scene.add(goldenrodB);
+		scene.add(CCube);
+		scene.add(DCube);
+		scene.add(ECube);
+		scene.add(FCube);
+		scene.add(gridBaseA);
+		scene.add(gridBaseB);
+		scene.add(grid);
+		scene.add(Arua);
+		scene.add(Brua);
+		scene.add(ACube);
+
+		scene.add(heli[0]);
+
+		camera=new THREE.PerspectiveCamera(100,wW/wH,0.1,2000);
+	}
+
+		scene.updateMatrixWorld(true);
+			//target.getPositionFromMatrix(bone[0].matrixWorld);
+		target.setFromMatrixPosition(camB.matrixWorld);
+			//alert(target.x + ',' + target.y + ',' + target.z);
+		camera.lookAt(target.x,target.y,target.z);
+
+		scene.updateMatrixWorld(true);
+		target.setFromMatrixPosition(camA.matrixWorld);
+		camera.position.set(target.x,target.y,target.z);
+
+//		heli[1].rotation.y -=0.1;
+//		beater.rotation.z -=0.1;
+
+//heli[0].rotation.y -=0.01;
+
+
+
+//if(scene.position.x>-30 && scene.position.x<30 && scene.position.z>-30 && scene.position.z<30){
+
+//document.getElementById("spanaux5").innerText=Hper+Vper;
+mov=(Hper+Vper)/800;
+
+		if(teclaW==1){heli[0].rotation.y=-p+ang;	heli[0].position.z +=Math.cos(heli[0].rotation.y=-p+ang)*mov;	heli[0].position.x +=Math.sin(heli[0].rotation.y=-p+ang)*mov;		scene.position.z -=Math.cos(heli[0].rotation.y=-p+ang)*mov;	scene.position.x -=Math.sin(heli[0].rotation.y=+p+ang)*mov;}//W
+		if(teclaV==1){heli[0].rotation.y=-p+ang;	heli[0].position.z -=Math.cos(heli[0].rotation.y=-p+ang)*mov;	heli[0].position.x -=Math.sin(heli[0].rotation.y=-p+ang)*mov;		scene.position.z +=Math.cos(heli[0].rotation.y=-p+ang)*mov;	scene.position.x +=Math.sin(heli[0].rotation.y=+p+ang)*mov;}//V
+
+		if(teclaH==1){heli[0].rotation.y -=(.02*((Hper+Vper)/50));ang-=(.02*((Hper+Vper)/50));}//G
+		if(teclaG==1){heli[0].rotation.y +=(.02*((Hper+Vper)/50));ang+=(.02*((Hper+Vper)/50));}//H
+
+		if(teclaB==1){if(heli[0].position.y>0.3){heli[0].position.y -=0.01;}}//Cima
+		if(teclaC==1){heli[0].position.y +=0.01;}//Baixo
+
+		//document.getElementById("spanaux4").innerText="Sceneposz:" +parseInt(scene.position.z)+" Sceneposx:" +parseInt(scene.position.x);
+
+//}
+
+	if(beater){
+		scene.updateMatrixWorld(true);
+		originPoint=target.setFromMatrixPosition(beater.matrixWorld);
+		for(vertexIndex=0;vertexIndex<beater.geometry.vertices.length;vertexIndex++){		
+			localVertex=beater.geometry.vertices[vertexIndex].clone();
+			globalVertex=localVertex.applyMatrix4(beater.matrix);
+			directionVector=globalVertex.sub(beater.position);
+			ray=new THREE.Raycaster(originPoint,directionVector.clone().normalize());
+			collisionResults=ray.intersectObjects(alvos);
+			if(collisionResults.length>0 && collisionResults[0].distance<directionVector.length()){
+			document.getElementById("spanaux2").innerText="Hit ... "+ collisionResults[0].object.name;
+			}	
+		}
+	}
+
+	renderer.render(scene,camera);
+}
+
+animate();
+
+</script>
+
+</body>
+</html>

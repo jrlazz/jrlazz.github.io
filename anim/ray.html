@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>ray.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="https://threejs.org/files/favicon.ico"/>
+
+<style type="text/css">
+body {margin:0;padding:0;overflow:hidden;background-color:#000;color:#ff0;font-family:Lucida Console;}
+span{position:absolute;left:200px;top:20px;font-size:12pt;}
+</style>
+</head>
+<body>
+
+<span id="sp" style="left:10px;top:5px;">right click &rarr; inspect &rarr; source code</span>
+
+
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.155.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.155.0/examples/jsm/"}}</script>
+
+
+<script type="module">
+
+import * as THREE from 'three';
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { Line2 } from 'three/addons/lines/Line2.js';
+import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
+
+var renderer, scene, camera, controls, renderScene;
+var bloomPass, bloomComposer, mixPass, outputPass, finalComposer, gui, bloomFolder, pointL, ambL;
+var geo=[];
+var mat=[];
+var mesh=[];
+var line, matLine, divs, color, spline, t, lineGeometry;
+var point=new THREE.Vector3();
+var pp=[];
+var positions=[];
+var colors=[];
+var points=[];
+var curvefactor=3;
+var v=0;
+var vv=0;
+var vvv=0;
+var vvvv=0;
+var ggk=1;
+var r=0;
+var arc=0;
+
+var w=window.innerWidth;
+var h=window.innerHeight;
+var wh=window.innerWidth/window.innerHeight;
+
+const bloomLayer=new THREE.Layers();bloomLayer.set(true);
+const params={strength:0.7};
+const darkMaterial=new THREE.MeshBasicMaterial({color:'black'});
+const materials={};
+
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(w,h);
+	document.body.appendChild(renderer.domElement);
+
+	scene=new THREE.Scene();
+
+	camera=new THREE.PerspectiveCamera(40,w/h,1,200);
+	camera.position.set(0,0,20);
+	camera.lookAt(0,0,0);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+
+	renderScene=new RenderPass(scene,camera);
+
+	bloomPass=new UnrealBloomPass(new THREE.Vector2(w,h),1.5,0.4,0.85);
+	bloomPass.threshold=params.threshold;
+	bloomPass.strength=params.strength;
+	bloomPass.radius=params.radius;
+
+	bloomComposer=new EffectComposer(renderer);
+	bloomComposer.renderToScreen=false;
+	bloomComposer.addPass(renderScene);
+	bloomComposer.addPass(bloomPass);
+
+	mixPass=new ShaderPass(
+		new THREE.ShaderMaterial({
+		uniforms:{
+			baseTexture:{value:null},
+			bloomTexture:{value:bloomComposer.renderTarget2.texture}
+	},
+	vertexShader:"varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix* vec4(position,1.0);}",fragmentShader:"uniform sampler2D baseTexture;uniform sampler2D bloomTexture;varying vec2 vUv;void main(){gl_FragColor=(texture2D(baseTexture,vUv)+vec4(1.0)* texture2D(bloomTexture,vUv));}", defines:{}}), 'baseTexture');
+	mixPass.needsSwap=true;
+
+	outputPass=new OutputPass();
+
+	finalComposer=new EffectComposer(renderer);
+	finalComposer.addPass(renderScene);
+	finalComposer.addPass(mixPass);
+	finalComposer.addPass(outputPass);
+
+
+	gui=new GUI();
+
+	bloomFolder=gui.addFolder('bloom');
+		bloomFolder.add(params,'strength',0.0,3).onChange(function(value){bloomPass.strength=Number(value);render();});
+
+	window.onresize=function(){
+		w=window.innerWidth;h=window.innerHeight;
+		camera.aspect=w/h;
+		camera.updateProjectionMatrix();
+		renderer.setSize(w,h);
+		bloomComposer.setSize(w,h);
+		finalComposer.setSize(w,h);
+		render();
+	};
+
+	pointL=new THREE.PointLight(0xffffff,3000);pointL.position.set(0,0,30);scene.add(pointL);
+	ambL=new THREE.AmbientLight(0xffffff,0.5);scene.add(ambL);
+
+
+	geo[1]=new THREE.SphereGeometry(0.5,16,16);
+	mat[1]=new THREE.MeshStandardMaterial({color:'#fc0',metalness:0.4,roughness:0.1});
+	mesh[1]=new THREE.Mesh(geo[1],mat[1]);
+	mesh[1].position.set(0,0,0);
+	scene.add(mesh[1]);
+
+	geo[2]=new THREE.SphereGeometry(0.1,16,16);
+	mat[2]=new THREE.MeshStandardMaterial({color:'#0f0',metalness:0.4,roughness:0.1});
+	mesh[2]=new THREE.Mesh(geo[2],mat[2]);
+	mesh[2].position.set(-5,0,0);
+	scene.add(mesh[2]);
+
+	geo[3]=new THREE.SphereGeometry(0.1,16,16);
+	mat[3]=new THREE.MeshStandardMaterial({color:'#f00',metalness:0.4,roughness:0.1});
+	mesh[3]=new THREE.Mesh(geo[3],mat[3]);
+	mesh[3].position.set(0,5,0);
+	scene.add(mesh[3]);
+
+	geo[4]=new THREE.SphereGeometry(0.1,16,16);
+	mat[4]=new THREE.MeshStandardMaterial({color:'#f0f',metalness:0.4,roughness:0.1});
+	mesh[4]=new THREE.Mesh(geo[4],mat[4]);
+	mesh[4].position.set(5,0,0);
+	scene.add(mesh[4]);
+
+
+	pp[0]=new THREE.Vector2(0,0);
+	pp[1]=new THREE.Vector2(0,4);
+	pp[2]=new THREE.Vector2(0.5,3);
+	pp[2]=new THREE.Vector2(-0.5,3);
+	pp[3]=new THREE.Vector2(0,0);
+	//pp[4]=new THREE.Vector2(0,0);
+	//pp[5]=new THREE.Vector2(0,0);
+	//pp[6]=new THREE.Vector2(0,0);
+	//pp[7]=new THREE.Vector2(0,-2.5);
+	//pp[8]=new THREE.Vector2(-2.5,-2.5);
+	//pp[9]=new THREE.Vector2(-2.5,0);
+	//pp[10]=new THREE.Vector2(0,0);
+
+	spline=new THREE.SplineCurve(pp);
+
+	divs=curvefactor*(pp.length-1);
+	point=new THREE.Vector3();
+	color=new THREE.Color();
+
+	for(let i=0;i<divs;i++){
+t=i/divs;
+spline.getPoint(t,point);
+positions.push(point.x,point.y,point.z);
+color.setHSL(1-t,1,0.5);
+colors.push(color.r,color.g,color.b);
+	}
+
+	matLine=new LineMaterial({color:0xffffff,linewidth:1,vertexColors:true});
+	matLine.resolution.set(w,h);
+
+	lineGeometry=new LineGeometry();
+	lineGeometry.setPositions(positions);
+	lineGeometry.setColors(colors);
+	line=new Line2(lineGeometry,matLine);
+	line.computeLineDistances();
+	line.position.set(0,0,0);
+	line.rotation.set(0,0,0);
+	line.scale.set(0.1,0.1,0.1);
+	line.layers.enable(true);
+
+
+
+function render(){
+	scene.traverse(darkenNonBloomed);
+	bloomComposer.render();
+	scene.traverse(restoreMaterial);
+	finalComposer.render();
+}
+
+function darkenNonBloomed(obj){
+	if(obj.isMesh && bloomLayer.test(obj.layers)===false){
+		materials[obj.uuid]=obj.material;
+		obj.material=darkMaterial;
+	}
+}
+
+function restoreMaterial(obj){
+	if(materials[obj.uuid]){
+		obj.material=materials[obj.uuid];
+		delete materials[obj.uuid];
+	}
+}
+
+
+function animate(){
+	requestAnimationFrame(animate);
+
+	v++;
+	if(v<20 && vvv==0){line.scale.y +=0.1;matLine.linewidth -=0.8;}
+	if(v>20 && vvv==0){line.scale.y -=0.1;}//line.scale.z -=0.3;
+	if(v==20 && vvv==0){
+v=0;vvv=1;
+line.scale.set(0.1,0.1,0.1);
+matLine.linewidth=16;
+line.rotation.z=r;
+scene.remove(line);
+	}
+
+	if(vv==0 && ggk==1){vvvv=0;r=0;remo();scene.add(mesh[3]);}
+	if(vv==1 && ggk==1){vvvv=1;r=Math.PI/2;remo();scene.add(mesh[2]);}
+	if(vv==2 && ggk==1){vvvv=2;r=-Math.PI/2;remo();scene.add(mesh[4]);}
+
+	function remo(){scene.remove(mesh[2]);scene.remove(mesh[3]);scene.remove(mesh[4]);}
+
+	if(vvvv==1){
+		ggk=0;
+		if(mesh[2]){mesh[2].position.x +=0.1;}
+		if(mesh[2].position.x>-0.2){
+			v=0;
+			line.scale.set(0.1,0.1,0.1);
+			mesh[2].position.x=-5;
+			line.rotation.z=r;
+			vvv=0;scene.add(line);
+			vv++;
+			ggk=1;
+		}
+	}
+
+	if(vvvv==0){
+		ggk=0;
+		if(mesh[3]){mesh[3].position.y -=0.1;}
+		if(mesh[3].position.y<0.2){
+			v=0;
+			line.scale.set(0.1,0.1,0.1);
+			mesh[3].position.y=5;
+			line.rotation.z=r;
+			vvv=0;scene.add(line);
+			vv++;
+			ggk=1;
+		}
+	}
+
+	if(vvvv==2){
+		ggk=0;
+		if(mesh[4]){mesh[4].position.x -=0.1;arc++;mesh[4].position.y=Math.sin(arc/4);}
+		if(mesh[4].position.x<-0.2){
+			v=0;
+			line.scale.set(0.1,0.1,0.1);
+			mesh[4].position.x=5;
+			line.rotation.z=r;
+			vvv=0;scene.add(line);
+			vv++;if(vv>2){vv=0;arc=0;}
+			ggk=1;
+		}
+	}
+
+	render();
+}
+
+animate();
+
+/*
+
+Colorful light ray
+
+It can probably be coded in a simpler way...
+
+the link:
+
+http://jrlazz.eu5.org/anim/ray.html
+
+Again, Thanks for the great Three.js Team!
+
+Jose Roberto Lazzareschi
+
+*/
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>roof.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="ok.ico" />
+<style>
+body{overflow:hidden;margin:0px;background-color:#048;font-family:Monospace;}
+span{position:absolute;font-size:41px;text-align:center;}
+a{font-size:16pt;}
+</style>
+
+<script type="importmap">
+	{
+		"imports":{
+	"three":"https://unpkg.com/three@0.164.0/build/three.module.js",
+	"three/addons/":"https://unpkg.com/three@0.164.0/examples/jsm/"
+		}
+	}
+</script>
+
+</head>
+
+<body>
+<span style="left:84%;top:3%;width:120px;text-align:center;color:#fc0;">Roof</span>
+<span id="spa" style="left:20%;width:60%;top:35%;font-size:82pt;color:#069;display:''"></span>
+<button style="position:absolute;left:84%;top:33%;width:120px;height:30px;background-color:#c90;text-align:center;"><a id="code" href="roof.txt" target="_blank" style="color:#024;font-weight:bold;text-decoration:none;">The Code</a></button>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
+
+
+var renderer, scene, camera, loader, geometry, controls;
+var steps, depth, bevelEnabled, bevelThickness, bevelSize, bevelOffset, bevelSegments;
+var font, texto, measure, bbox, helper, size, grid;;
+
+var iW=window.innerWidth;
+var iH=window.innerHeight;
+
+var geo;
+var luz=[];
+var mat=[];
+var mesh=[];
+
+var par=[];
+var gar=[];
+var paths=[];
+var shapes=[];
+
+var group=new THREE.Group();
+
+var p=Math.PI;
+
+function init(){
+	camera=new THREE.PerspectiveCamera(60,iW/iH,1,1000,1);
+	camera.position.set(0,10,130);
+	scene=new THREE.Scene();
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(iW,iH);
+	renderer.colorSpace=THREE.SRGBColorSpace;
+
+	document.body.appendChild(renderer.domElement);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+
+	luz[1]=new THREE.AmbientLight("#fff",2);scene.add(luz[1]);
+	luz[2]=new THREE.PointLight('#fff',6000);luz[2].position.set(0,30,0);scene.add(luz[2]);
+	luz[3]=new THREE.PointLight('#fff',6000);luz[3].position.set(40,30,60);scene.add(luz[3]);
+
+	var texLoader=new THREE.TextureLoader();
+	var tex=new THREE.TextureLoader().load('img/bojomad2.jpg');
+	tex.wrapS=THREE.RepeatWrapping;tex.wrapT=THREE.RepeatWrapping;
+	tex.repeat.set(0.3,0.3);
+
+	mat[1]=new THREE.MeshStandardMaterial({color:'#960',map:tex});
+	mat[2]=new THREE.MeshStandardMaterial({color:'#cc3'});
+
+	loadSVGindA();
+	loadSVGindB();
+
+}
+
+function loadSVGindA(){
+	loader=new SVGLoader();
+	loader.load('img/roof.svg',function(data){
+		paths=data.paths;
+		shapes=SVGLoader.createShapes(paths[0]);
+		geometry=new THREE.ExtrudeGeometry(shapes[0],{depth:0.25,curveSegments:1});
+		geometry.translate(-50,-30,0);
+		for(let z=1;z<17;z++){
+			mesh[z]=new THREE.Mesh(geometry,mat[1]);
+		}
+		let a=1;
+		let b=0;
+		for(let z=1;z<17;z++){
+			mesh[z].position.set(0,a*2,b);
+			mesh[z].scale.set(a,a-a/2,1);
+			a=a-0.0125;
+			b=b+0.5;
+			group.add(mesh[z]);
+		}
+		group.rotation.set(-p/2,0,p/2+0.5);
+		group.position.set(0,20,0);
+		scene.add(group)
+	})
+}
+
+function loadSVGindB(){
+	loader=new SVGLoader();
+	loader.load('img/roof.svg',function(data){
+		paths=data.paths;
+		shapes=SVGLoader.createShapes(paths[0]);
+		geometry=new THREE.ExtrudeGeometry(shapes[0],{depth:10, steps: 10, depth: 9, bevelEnabled: true, bevelThickness: 15, bevelSize: 15, bevelOffset: 5, bevelSegments: 1,curveSegments:0});
+		geometry.translate(-50,-30,0);
+		mesh[100]=new THREE.Mesh(geometry,mat[1]);
+		mesh[100].scale.set(0.499,0.499,0.499);
+		mesh[100].rotation.set(-p/2,0,p/2+0.5);
+		mesh[100].position.set(0,-20,0);
+		scene.add(mesh[100]);
+	})
+
+	loader=new SVGLoader();
+	loader.load('img/roof.svg',function(data){
+		paths=data.paths;
+		shapes=SVGLoader.createShapes(paths[0]);
+		geometry=new THREE.ExtrudeGeometry(shapes[0],{depth:10, steps: 10, depth: 30, bevelEnabled: true, bevelThickness: 1, bevelSize: 15, bevelOffset: 5, bevelSegments: 1,curveSegments:0});
+		geometry.translate(-50,-30,0);
+		mesh[101]=new THREE.Mesh(geometry,mat[2]);
+		mesh[101].scale.set(0.5,0.5,0.5);
+		mesh[101].rotation.set(-p/2,0,p/2+0.5);
+		mesh[101].position.set(0,-31,0);
+		scene.add(mesh[101]);
+	})
+	
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	renderer.render(scene,camera);
+}
+
+init();
+
+animate();
+
+</script>
+</body>
+</html>
+
