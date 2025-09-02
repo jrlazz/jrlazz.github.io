@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>mine_udlr.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="ok.ico"/>
+
+<style>
+body{margin:0px;border:0px;background-color:#016;background-image:linear-gradient(#09f,#016);background-repeat:no-repeat;font-family:Monospace;overflow:hidden;}
+span{color:#eee;font-size:14pt;font-style:italic;}
+table{position:absolute;}
+td{padding:2px;}
+button{background-color:#eee;color:#900;font-family:Arial;font-size:10pt;font-weight:bold;cursor:pointer;}
+a{color:#ff0;text-decoration:none;}
+</style>
+
+<!--
+<script type='text/javascript' src='//www.midijs.net/lib/midi.js'></script>	
+-->
+
+<!--
+<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+-->
+<script type="importmap">
+	{
+		"imports":{
+	"three":"https://unpkg.com/three@0.164.0/build/three.module.js",
+	"three/addons/":"https://unpkg.com/three@0.164.0/examples/jsm/"
+		}
+	}
+</script>
+
+</head>
+
+<body id="som">
+
+<span style="position:absolute;left:83%;top:15%;width:150px;text-align:center;"><img id="mus" src="img/music.png" style="width:40px;width:40px;display:none;"></img></span>
+
+<audio id="audio" loop controls style="position:absolute;left:-500px;"><source src="mp3/mine.mp3" type="audio/mpeg"></audio> 
+
+<img id="ima" src="models/extras/bojomad2.jpg" style="display:none;"></img>
+<img src="models/skins/ski49.png" style="display:none;"></img>
+<img src="models/skins/ski37.png" style="display:none;"></img>
+
+<span id="spa" style="position:absolute;left:20%;width:60%;top:35%;font-size:64pt;color:#09f;text-align:center;display:''"></span>
+
+<table id="bb" style="left:10px;top:10px;display:none;"><tr>
+<td><button id="b1">He</button></td>
+<td><button id="b2">Vi</button></td>
+<td><button id="b3">Wi</button></td>
+<td><button id="b4">An</button></td>
+<td><button id="b13">St</button></td>
+<td><button id="b5">Luffy</button></td>
+<td><button id="b6">Head</button></td>
+<td><button id="b7">Arm R</button></td>
+<td><button id="b8">Arm L</button></td>
+<td><button id="b9">Leg R</button></td>
+<td><button id="b10">Leg L</button></td>
+<td><button id="b11">Woo</button></td>
+<td><button id="b12">random</button></td>
+<td><button id="runUD">U/D</button></td>
+<td><button id="runLR">L/R</button></td>
+<td><span> ... fun with voxel game's skins</span></td>
+</tr>
+</table>
+
+<p id="bc" style="position:absolute;left:10px;top:40px;display:none;">
+<span style="color:#ff0;font-size:12pt;">Old Showbiz Clothes
+<button id="c1">With</button>&nbsp;&nbsp;<button id="c2">Without</button>
+</span></p>
+
+<button style="position:absolute;left:84%;top:3%;width:120px;background-color:#ccc;text-align:center;"><a id="code" href="mine_udlr.txt" target="_blank" style="color:#009;font-weight:bold;text-decoration:none;font-size:16pt;">The Code</a></button>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+
+var camera, scene, renderer, controls, textureLoader;
+
+var geo=[];
+var luz=[];
+var mat=[];
+var mesh=[];
+var chi=[];
+var tex=[];
+
+var r=0;
+var sim=0;
+var sha=0;
+var w=0;
+var w2=0;
+var som=0;
+var muka;
+var p=Math.PI;
+var alea=0;
+var biz=0;
+
+var iw=window.innerWidth;
+var ih=window.innerHeight;
+ 
+var BD,BE,PD,PE,CA,TR;
+var group=new THREE.Group();
+var groupTR=new THREE.Group();
+var groupCATR=new THREE.Group();
+
+var bId=function(id){return document.getElementById(id);}
+var db=[];
+var dc1=bId("c1");
+var dc2=bId("c2");
+var dbb=bId("bb");
+var dbc=bId("bc")
+var drunUD=bId("runUD");
+var drunLR=bId("runLR");
+var dima=bId("ima");
+var dspa=bId("spa");
+var dsom=bId("som");
+var daudio=bId("audio");
+var dmus=bId("mus");
+
+for(let z=1;z<14;z++){db[z]=bId("b"+z);}
+
+var run="UD";
+
+function init() {
+
+	db[1].onclick=function Xb1(){troca(203);}
+	db[2].onclick=function Xb2(){troca(202);}
+	db[3].onclick=function Xb3(){troca(10);}
+	db[4].onclick=function Xb4(){troca(9);}
+	db[5].onclick=function Xb5(){troca(7);}
+	db[6].onclick=function Xb10(){rand(0);}
+	db[7].onclick=function Xb6(){rand(3);}
+	db[8].onclick=function Xb7(){rand(5);}
+	db[9].onclick=function Xb8(){rand(2);}
+	db[10].onclick=function Xb9(){rand(4);}
+	db[11].onclick=function Xb11(){troca(201);}
+	db[12].onclick=function Xb12(){aleat();}
+	db[13].onclick=function Xb13(){troca(200);}
+	drunUD.onclick=function XUD(){paraUD();}
+	drunLR.onclick=function XLR(){paraRL();}
+	dsom.onclick=function Xsom(){playSound();}
+	dmus.onmouseover=function Xmus(){pauseSound();}
+	dc1.onclick=function Xc1(){biz=1;troca(203);}
+	dc2.onclick=function Xc2(){biz=0;troca(203);}
+
+
+function paraUD(){
+	BD.position.set(-7.5,0,0);
+	BD.rotation.set(0,-p/2,-0.5);
+	BE.position.set(7.5,0,0);
+	BE.rotation.set(p/2,p/2,0);
+	PD.position.set(-2.49,-14.75,0);
+	PE.position.set(2.49,-14.75,0);
+		BD.rotation.x=1.75;
+		BE.rotation.x=-1;
+	PD.rotation.x=-1;
+	PE.rotation.x=1;
+	CA.rotation.y=-0.5;
+	w=0;
+	run="UD";
+}
+
+function paraRL(){
+	BD.position.set(-7.5,0,0);
+	BE.position.set(7.5,0,0);
+	PD.position.set(-2.49,-14.75,0);
+	PE.position.set(2.49,-14.75,0);
+		BD.rotation.set(0,0,0);
+		BE.rotation.set(0,p,0);
+	PD.rotation.x=-1;
+	PE.rotation.x=1;
+	CA.rotation.y=-0.5;
+	w=0;
+	run="LR";
+}
+
+	camera = new THREE.PerspectiveCamera(40,iw/ih,0.1,1000);
+	camera.position.set(80,25,50);
+	scene=new THREE.Scene();
+
+	renderer= new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(iw,ih);
+	renderer.setClearColor(0x002244,0);
+	renderer.colorSpace=THREE.SRGBColorSpace;
+
+	document.body.appendChild(renderer.domElement);
+
+	window.addEventListener('resize',onWindowResize);
+	
+	controls=new OrbitControls(camera,renderer.domElement);
+	controls.enablePan=false;
+
+	tex[200]=new THREE.TextureLoader().load('models/steve/Steve_hd.png');
+	tex[200].colorSpace=THREE.SRGBColorSpace;
+
+	tex[201]=new THREE.TextureLoader().load('models/extras/bojomad2.jpg');
+	tex[201].wrapS=THREE.RepeatWrapping;tex[201].wrapT=THREE.RepeatWrapping;
+	tex[201].repeat.set(6,0.1);
+	tex[201].colorSpace=THREE.SRGBColorSpace;
+
+	tex[202]=new THREE.TextureLoader().load('models/skins/ski49.png');
+	tex[202].colorSpace=THREE.SRGBColorSpace;
+
+	tex[203]=new THREE.TextureLoader().load('models/skins/ski37.png');
+	tex[203].colorSpace=THREE.SRGBColorSpace;
+
+	for(let z=200;z<204;z++){tex[z].minFilter=THREE.NearestFilter;tex[z].magFilter=THREE.NearestFilter;}
+
+	for(let z=1;z<63;z++){dima.src="models/skins/ski"+z+".png";tex[z]=new THREE.TextureLoader().load('models/skins/ski'+z+'.png');tex[z].colorSpace=THREE.SRGBColorSpace;tex[z].minFilter=THREE.NearestFilter;tex[z].magFilter=THREE.NearestFilter;}	
+
+	mat[1]=new THREE.MeshStandardMaterial({map:tex[201],color:'#ca0'});
+	geo[1]=new THREE.CylinderGeometry(80,80,80,64,16,false);
+	mesh[1]=new THREE.Mesh(geo[1],mat[1]);
+	mesh[1].rotation.set(p/2,0,p/2);
+	mesh[1].position.set(0,-99,0);
+
+	new MTLLoader().load('models/steve/sk_pos_ble.mtl',function(mat){mat.preload();new OBJLoader().setMaterials(mat).load('models/steve/sk_pos_ble.obj',function(object){
+	for(let z=0;z<4;z++){chi[z]=object.children[z];}
+	});});
+
+	luz[1]=new THREE.AmbientLight("#fff",2);
+	luz[2]=new THREE.PointLight('#00f',2000);luz[2].position.set(-100,  0, 0);
+	luz[3]=new THREE.PointLight('#0f0',1000);luz[3].position.set( 100, 20,-5);
+	luz[4]=new THREE.PointLight('#fff',5000);luz[4].position.set(  20, 30,-5);
+}
+
+function onWindowResize() {
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function rdm(){
+	alea=Math.floor(1+Math.random()*61);
+}
+
+function aleat(){
+	rdm();
+	for(let z=0;z<6;z++){chi[z].material=new THREE.MeshStandardMaterial({map:tex[alea]});}
+	textur();
+}
+
+function textur(){
+	if(biz==1){
+	textureLoader=new THREE.TextureLoader();
+		textureLoader.load('img/ped02.png',function(map){
+		map.wrapS=THREE.RepeatWrapping;
+		map.wrapT=THREE.RepeatWrapping;
+		map.repeat.set(3,3);
+		map.colorSpace=THREE.SRGBColorSpace;
+		for(let z=1;z<6;z++){
+			chi[z].material.metalness=0.5;
+			chi[z].material.bumpScale=80;
+			chi[z].material.roughness=0.3;
+			chi[z].material.bumpMap=map;
+			chi[z].material.needsUpdate=true;
+		}
+	});
+	textureLoader.load('img/ped02.png',function(map){	//img/pedras_02.jpg
+		map.wrapS=THREE.RepeatWrapping;
+		map.wrapT=THREE.RepeatWrapping;
+		map.repeat.set(3,3);
+		map.colorSpace=THREE.SRGBColorSpace;
+		for(let z=1;z<6;z++){
+			chi[z].material.roughnessMap=map;
+			chi[z].material.needsUpdate=true;
+		}
+	});
+	}
+}
+
+function rand(qual){
+	rdm();
+	chi[qual].material=new THREE.MeshStandardMaterial({map:tex[alea]});
+	if(qual>0){
+		textur();
+	}
+}
+
+function troca(num){
+	for(let z=0;z<6;z++){chi[z].material=new THREE.MeshStandardMaterial({map:tex[num]});}
+	if(biz==1){
+	textureLoader=new THREE.TextureLoader();
+		textureLoader.load('img/ped02.png',function(map){
+		map.wrapS=THREE.RepeatWrapping;
+		map.wrapT=THREE.RepeatWrapping;
+		map.repeat.set(3,3);
+		map.colorSpace=THREE.SRGBColorSpace;
+		for(let z=1;z<6;z++){
+			chi[z].material.metalness=0.5;
+			chi[z].material.bumpScale=80;
+			chi[z].material.roughness=0.3;
+			chi[z].material.bumpMap=map;
+			chi[z].material.needsUpdate=true;
+		}
+	});
+	textureLoader.load('img/ped02.png',function(map){	//img/pedras_02.jpg
+		map.wrapS=THREE.RepeatWrapping;
+		map.wrapT=THREE.RepeatWrapping;
+		map.repeat.set(3,3);
+		map.colorSpace=THREE.SRGBColorSpace;
+		for(let z=1;z<6;z++){
+			chi[z].material.roughnessMap=map;
+			chi[z].material.needsUpdate=true;
+		}
+	});
+	}
+}
+
+function playSound(){
+	daudio.play();
+	dmus.style.display="";
+}
+
+function pauseSound(){
+	daudio.pause();
+	dmus.style.display="none";
+}
+
+
+function animate(){
+	requestAnimationFrame(animate);
+
+	controls.update();
+
+	w2=w2+0.1;
+
+	if(w2<=100){dspa.innerText=w2.toFixed(1)+" %";}
+
+	if(chi[3] && mesh[1] && tex[62] && luz[4] && sim==0){
+
+		for(let z=0;z<4;z++){chi[z].scale.setScalar(5);}
+
+		chi[5]=chi[3].clone();
+		chi[4]=chi[2].clone();
+		CA=chi[0];TR=chi[1];
+		BD=chi[3];BE=chi[5];
+		PD=chi[2];PE=chi[4];
+
+		if(sha==1){
+			renderer.shadowMap.enabled=true;
+			luz[4].castShadow=true;
+			for(let z=0;z<6;z++){chi[z].castShadow=true;}
+			mesh[1].receiveShadow=true;
+		}
+
+		BD.position.set(-7.5,0,0);BD.rotation.set(0,-p/2,-0.5);
+		BE.position.set(7.5,0,0);BE.rotation.set(p/2,p/2,0);
+		PD.position.set(-2.49,-14.75,0);
+		PE.position.set(2.49,-14.75,0);
+
+		// arms up down
+			BD.rotation.x=1.75;
+			BE.rotation.x=-1;
+			PD.rotation.x=-1;
+			PE.rotation.x=1;
+			CA.rotation.y=-0.5;
+
+		groupTR.add(TR);groupTR.add(BD);groupTR.add(BE);groupTR.add(PD);groupTR.add(PE);
+		group.add(CA);
+		group.add(groupTR);
+		group.position.y +=7;
+		scene.add(group);
+
+		sim=1;
+	}
+
+	if(sim==1){
+		dbb.style.display="";
+		dbc.style.display="";
+		dspa.style.display="none";
+		for(let z=1;z<5;z++){scene.add(luz[z]);}
+		scene.add(mesh[1]);
+		troca(203);
+		sim=2;
+	}
+
+	if(sim==2 && run=="UD"){
+
+		mesh[1].rotation.x -=0.005;
+
+		w++;
+		if(w<60){
+			BD.rotation.x +=0.04;
+			BE.rotation.x -=0.04;
+			PD.rotation.x +=0.04;
+			PE.rotation.x -=0.04;
+			CA.rotation.y +=0.02;
+			//TR.rotation.y -=0.02;
+		}
+		if(w>59){
+			BD.rotation.x -=0.04;
+			BE.rotation.x +=0.04;
+			PD.rotation.x -=0.04;
+			PE.rotation.x +=0.04;
+			CA.rotation.y -=0.02;
+			//TR.rotation.y +=0.02;
+		}
+		if(w>=120){
+			BD.rotation.x=1.75;
+			BE.rotation.x=-1;
+			PD.rotation.x=-1;
+			PE.rotation.x=1;
+			CA.rotation.y=-0.5;
+			//TR.rotation.y=0;
+			w=0;
+		}
+	}
+
+	if(sim==2 && run=="LR"){
+		mesh[1].rotation.x -=0.005;
+
+		w++;
+		if(w<60){
+			BD.rotation.y +=0.02;
+			BE.rotation.y -=0.02;
+			PD.rotation.x +=0.04;
+			PE.rotation.x -=0.04;
+			CA.rotation.y +=0.02;
+			//TR.rotation.y -=0.02;
+		}
+		if(w>59){
+			BD.rotation.y -=0.02;
+			BE.rotation.y +=0.02;
+			PD.rotation.x -=0.04;
+			PE.rotation.x +=0.04;
+			CA.rotation.y -=0.02;
+			//TR.rotation.y +=0.02;
+		}
+		if(w>=120){
+			BD.rotation.y=0;
+			BE.rotation.y=p;
+			PD.rotation.x=-1;
+			PE.rotation.x=1;
+			CA.rotation.y=-0.5;
+			//TR.rotation.y=0;
+			w=0;
+		}
+	}
+
+	renderer.render(scene,camera);
+}
+
+init();
+animate();
+
+
+/*
+
+Fun with voxel game's skins
+
+Now with old showbiz clothes and midi sound.
+
+the link:
+
+https://jrlazz.eu5.org/anim/mine_ud.html
+
+Thanks to the Three.js Team,
+
+Jose Roberto Lazzareschi
+
+*/
+
+</script>
+<!--
+<p style="position:absolute;left:10px;top:400px;color:#0ff;">
+<a href="javascript:void(0);" onclick="toca();" style="border:2px outset #ff0;padding:4px;">PLAY</a>
+<a href="javascript:void(0);" onclick="para();" style="border:2px outset #ff0;padding:4px;">STOP</a>
+Time (s): <input autocomplete="off" id="MIDIjs.audio_time" style="background-color:transparent;color:#0f0;width:18px;border:none;"></input>
+cakewalk.mid duration: <span style="font-size:9pt;" id="duration-rock"></span>
+</p>
+-->
+<script>
+
+/*
+function displayDurations(){
+	var rockSpan=document.getElementById('duration-rock');
+	MIDIjs.get_duration('cakewalk.mid',function(seconds){rockSpan.innerHTML=seconds;});
+}
+		
+var time_span=document.getElementById('MIDIjs.audio_time');
+MIDIjs.player_callback=display_time;
+
+function display_time(player_event){
+	time_span.value=player_event.time;
+}
+
+var myInterval;
+var tocou=0;
+
+function toca(){
+	if(tocou==0){
+	document.getElementById("mus").style.display="";
+	MIDIjs.play('cakewalk.mid');
+	displayDurations();
+	if(time_span.value<21.595){myInterval=setInterval(pausa, 1000);}
+	}
+	tocou=1;
+}
+
+function pausa(){
+	if(time_span.value>41.2){clearInterval(myInterval);time_span.value=1;poca();}	
+}
+
+function poca(){
+	MIDIjs.play('cakewalk.mid');
+	displayDurations();
+	if(time_span.value<21.595){myInterval=setInterval(pausa, 1000);}
+}
+
+function para(){
+	MIDIjs.stop();
+	clearInterval(myInterval);
+	document.getElementById("mus").style.display="none";
+}
+*/
+
+</script>
+
+</body>
+</html>
+

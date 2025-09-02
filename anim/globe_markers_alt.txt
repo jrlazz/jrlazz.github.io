@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>globe_markers_alt.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="ok.ico" />
+
+<style>
+body{margin:0px;border:none;background-color:#024;font-family:Monospace;overflow:hidden;}
+td{text-align:center;padding:0px;color:#fff;font-family:Monospace;font-size:12pt;}
+span{position:absolute;font-family:Arial;font-size:12pt;text-align:center;z-index:1;}
+</style>
+
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+	{
+		"imports":{
+			"three":"https://unpkg.com/three@0.156.0/build/three.module.js",
+			"three/addons/":"https://unpkg.com/three@0.156.0/examples/jsm/"
+		}
+	}
+</script>
+
+</head>
+
+<body>
+
+<img src="img/earth_800.jpg" style="width:50;display:none;"></img>
+
+<div id="dedo" style="position:absolute;left:10px;top:10px;padding:4px;color:#fff;background-color:#000;border:2px outset #cc6;display:none;">?</div>
+
+<span id="spanC" style="left:0%;top:10px;width:99%;color:#0cf;font-size:20.5pt;">Globe Markers</span>
+
+<button style="position:absolute;left:84%;top:84%;background-color:transparent;text-align:center;"><a id="code" href="globe_markers_alt.txt" target="_blank" style="color:#fc0;text-decoration:none;font-size:16pt;">The Code</a></button>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js';
+
+var alvos=[];
+var w=0;
+
+var bId=function(id){return document.getElementById(id);}
+var ddedo=bId("dedo");
+
+var mouse=new THREE.Vector2();
+var raycaster=new THREE.Raycaster();
+var alvos=[];
+var isected,isects;
+var scene,camera,renderer,controls,globe,color,sub;
+var composer,renderPass,outlinePass;
+var selectedObjects=[];
+var selectedObject;
+var group=new THREE.Group();
+var dummy=[];
+var markerCount=60;
+var amb,textureLoader,textu,Earthmat,Earthgeo,icosaedron,markerInfo,gMarker,mMarker,markers;
+
+var sim=0;
+
+function init(){
+	scene=new THREE.Scene();
+
+	camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,1,2000);
+	camera.position.set(0,0,14);
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.setClearColor('#079',0);
+	//renderer.outputColorSpace=THREE.LinearSRGBColorSpace;
+	
+	document.body.appendChild(renderer.domElement);
+
+	document.addEventListener('mousemove',onMouse);
+
+	window.addEventListener("resize",onWindowResize);
+
+	controls = new OrbitControls(camera,renderer.domElement);
+
+	composer=new EffectComposer(renderer);
+	renderPass=new RenderPass(scene,camera );
+	composer.addPass(renderPass);
+	outlinePass=new OutlinePass(new THREE.Vector2(window.innerWidth,window.innerHeight),scene,camera);
+	composer.addPass(outlinePass);
+
+	outlinePass.edgeStrength=3;
+	outlinePass.edgeGlow=3;
+	outlinePass.edgeThickness3;
+
+	amb=new THREE.AmbientLight("#fff",3);
+//	scene.add(amb);
+
+	textureLoader=new THREE.TextureLoader();
+	textu=new THREE.TextureLoader().load("img/earth_800.jpg");
+	//textu.outputColorSpace=THREE.SRGBColorSpace;
+	Earthmat=new THREE.MeshStandardMaterial({color:"#fff",map:textu,transparent:true,opacity:1});
+
+	Earthgeo=new THREE.SphereGeometry(3.8,32,32);
+	globe=new THREE.Mesh(Earthgeo,Earthmat);
+	group.add(globe);
+
+	icosaedron=new THREE.Mesh(new THREE.IcosahedronGeometry(3.85,5),new THREE.MeshStandardMaterial({color:'#08b',wireframe:true}));
+//	globe.add(icosaedron);
+
+	markerInfo=[];
+	gMarker=new THREE.CircleGeometry(0.15,32);
+	mMarker=new THREE.MeshBasicMaterial({color: 0xcc00ff,});
+	mMarker.defines={ USE_UV: " " }; // needed to be set to be able to work with UVs
+	markers=new THREE.InstancedMesh(gMarker, mMarker, markerCount);
+
+	for (let i=0;i<markerCount;i++){
+		dummy[i]=new THREE.Mesh(new THREE.SphereGeometry(0.1,16,16),new THREE.MeshLambertMaterial({color:get_random_color()}));
+		dummy[i].position.randomDirection().setLength(3.8);
+		dummy[i].updateMatrix();
+  		markers.setMatrixAt(i, dummy[i].matrix);
+			dummy[i].name="Id: "+i;
+			dummy[i].kx=dummy[i].position.clone().x;
+			dummy[i].ky=dummy[i].position.y;
+			dummy[i].kz=dummy[i].position.z;
+		alvos.push(dummy[i]);
+		group.add(dummy[i]);
+	}
+}
+
+function onMouse(event){
+	ddedo.style.top=-20+event.clientY+"px";
+	ddedo.style.left=30+event.clientX+"px";
+	mouse.x=(event.clientX/window.innerWidth)*2-1;
+	mouse.y=-(event.clientY/window.innerHeight)*2+1;
+	mouse.z=0;
+	raycaster.setFromCamera(mouse,camera);
+	isects=raycaster.intersectObjects(alvos,false);
+	if(isects.length>0 && isects[0].object.kx ){
+		isected=isects[0].object;//dspanC.innerText=isected.name;
+		ddedo.style.display="";
+		//ddedo.animate([{backgroundColor:'#fcc'},{backgroundColor:'#909'}],{duration: 250});
+		ddedo.innerHTML="<table><tr><td colspan='2'>" + isected.name + "&nbsp;&nbsp;Mag: " + THREE.MathUtils.randInt(1, 10) + "</td></tr><tr><td style='text-align:left;'>X:</td><td style='text-align:right;'>" + Number(isected.kx).toFixed(2) + "</td></tr><tr><td style='text-align:left;'>Y:</td><td style='text-align:right;'>" + Number(isected.ky).toFixed(2) + "</td></tr><tr><td style='text-align:left;'>Z:</td><td style='text-align:right;'>" + Number(isected.kz).toFixed(2) + "</td></tr></table>";
+		selectedObject=isects[0].object;
+		addSelectedObject(selectedObject);
+		outlinePass.selectedObjects=selectedObjects;
+	}else{
+		isected=null;
+		ddedo.style.display="none";
+		outlinePass.selectedObjects=false;
+	}
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	if(sim==0 && globe && icosaedron && Earthmat){scene.add(group);scene.add(amb);globe.add(icosaedron);sim=1;}
+	controls.update();
+	group.rotation.y +=1/1000;
+	w++;	if(w==30){outlinePass.visibleEdgeColor.set(get_random_color());w=0;}
+	composer.render();
+}
+
+function get_random_color(){
+	color="";
+	for(let i=0;i<3;i++){
+        	sub=Math.floor(Math.random()*(256-64)+64).toString(16);
+	       	color +=(sub.length==1?"0"+sub:sub);
+    	}
+    	return "#"+color;
+}
+
+function onWindowResize() {
+	camera.aspect = innerWidth / innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(innerWidth, innerHeight);
+}
+
+function addSelectedObject(object){
+	selectedObjects=[];
+	selectedObjects.push(object);
+}
+
+init();
+animate();
+
+
+</script>
+
+</body>
+</html>

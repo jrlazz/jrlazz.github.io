@@ -1,0 +1,306 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="shortcut icon" href="ok.ico">
+<title>delaye.html</title>
+
+<style>
+body{margin:0px;background-color:#048;font-family:monospace;font-size:12pt;color:#ff0;overflow:hidden;}
+td{padding:2px;}
+input{width:50px;border:2px outset #fc0;text-align:right;}
+button{width:100px;border:2px outset #fc0;font-family:monospace;font-size:12pt;opacity:0.3;cursor:pointer;}
+</style>
+
+</head>
+<script type="importmap">
+	{
+		"imports":{
+			"three":"https://unpkg.com/three@0.164.0/build/three.module.min.js",
+			"three/addons/":"https://unpkg.com/three@0.164.0/examples/jsm/"
+		}
+	}
+</script>
+
+<body>
+
+<img id="po" src="img/pointer.png" style="position:absolute;left:-100px;top:40px;width:19px;height:22px;display:none;"></img>
+
+<table style="position:absolute;left:10px;top:10px;"><tr>
+<td><button id="pl" style="opacity:0.9;">Play</button></td>
+<td><button id="pa" style="opacity:0.3;">Pause</button></td>
+<td id="tds" style="display:none;">&nbsp;VOLUME(%)<input type="number" min="0.0" max="1.0" step="0.1" value="0.7" id="volume" autocomplete="off">
+&nbsp;ECHO Delay(s)<input type="number" min="0.0" max="1.0" step="0.01" value="0.5" id="delay" autocomplete="off">
+&nbsp;ECHO Feedback(%):<input type="number" min="0.0" max="1.0" step="0.01" value="0.5" id="feedback" autocomplete="off"></td>
+</tr>
+</table>
+
+<audio id="audio" controls loop style="position:absolute;left:600px;top:-200px;"><source src="mp3/voices.mp3" type="audio/mpeg"></audio>
+<a id="code" style="position:absolute;left:80%;top:80%;border:2px outset #fc0;background-color:#ccc;color:#009;text-decoration:none;font-size:16pt;padding:4px;" href="delaye.txt" target="_blank">The Code</a>
+<span id="sp" style="position:absolute;left:80%;top:75%;width:104px;font-size:9pt;text-align:center;color:#999;"></span>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+var camera,scene,renderer,controls,luz;
+var sim=0;
+var cha=0;
+
+var box=[];
+var geo=[];
+var mat=[];
+var mesh=[];
+var p=Math.PI;
+var group=new THREE.Group();
+var passo=0.005;
+
+var bId=function(id){return document.getElementById(id);}
+var dsp=bId("sp");
+var volumeControl=bId("volume");
+var delayControl=bId("delay");
+var feedbackControl=bId("feedback");
+var dpa=bId("pa");
+var dpl=bId("pl");
+var dpo=bId("po");
+var dtds=bId("tds");
+var w=800;
+var go=0;
+var audioContext,tpressed,gainNode,analyser,delayNode,feedbackGainNode,mp3;
+var volume,delay,feedback;
+var timeScale=1.0;
+var attackDuration=0.1;
+var decayDuration=0.2;
+var sustainLevel=0.5;
+var detune1=12.0;
+var detune2=12.0;
+var freqByteData,timeByteData;
+var ff=[];
+var al=0;
+
+volumeControl.onchange=function(){fcha();}
+delayControl.onchange=function(){fcha();}
+feedbackControl.onchange=function fC(){fcha();}
+dpa.onclick=function(){dpa.style.opacity=0.3;dpl.style.opacity=0.9;audio.pause();dpo.style.display="none";}
+dpl.onclick=function(){
+	dpl.style.opacity=0.3;
+	dpa.style.opacity=0.9;
+	if(go==0){
+		audioContext=new (window.AudioContext || window.webkitAudioContext)();
+		tpressed=audioContext.currentTime;
+		gainNode=audioContext.createGain();
+		analyser=audioContext.createAnalyser();
+		delayNode=audioContext.createDelay(1.0);
+		feedbackGainNode=audioContext.createGain();
+		mp3=audioContext.createMediaElementSource(audio);
+		volume=parseFloat(volumeControl.value);
+		delay=parseFloat(delayControl.value);
+		feedback=parseFloat(feedbackControl.value);
+ 		mp3.connect(analyser);
+		mp3.connect(gainNode);
+		gainNode.gain.setValueAtTime(0,tpressed);
+		gainNode.gain.linearRampToValueAtTime(volume,tpressed+attackDuration);
+		gainNode.gain.setTargetAtTime(sustainLevel*volume,tpressed+attackDuration,decayDuration);
+ 		delayNode.delayTime.value=delay;
+ 		feedbackGainNode.gain.value=feedback;
+		gainNode.connect(feedbackGainNode).connect(delayNode).connect(audioContext.destination);
+		delayNode.connect(feedbackGainNode);
+		go=1;
+	}
+	dtds.style.display="";
+	dpo.style.display="";
+	audio.play();
+	w=0;
+}
+
+function start(){
+	camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,1,1000,1);
+	camera.position.set(0,0,70);
+	scene=new THREE.Scene();
+	scene.position.set(0,12,0);
+	scene.rotation.set(0.4,-p/2,0);
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	document.body.appendChild(renderer.domElement);
+	renderer.setClearColor('#048',0);
+	renderer.colorSpace=THREE.SRGBColorSpace;
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	controls.enablePan=true;
+	controls.enableRotate=true;
+	controls.enableDamping=false;
+
+	window.addEventListener('resize',onWindowResize,false);
+
+	luz=new THREE.AmbientLight("#fc9",5);scene.add(luz);
+
+	geo[1]=new THREE.SphereGeometry(16,64,64);
+	mat[1]=new THREE.MeshStandardMaterial({color:'#fc9',side:THREE.DoubleSide });
+	mesh[1]=new THREE.Mesh(geo[1],mat[1]);
+	mesh[1].scale.set(1,0.4,1);
+	mesh[1].rotation.set(0,0,p/2);
+	scene.add(mesh[1]);
+
+	geo[2]=new THREE.SphereGeometry(4,32,32);
+	mat[2]=new THREE.MeshStandardMaterial({color:'#f00'});
+	mesh[2]=new THREE.Mesh(geo[2],mat[2]);
+	mesh[2].scale.set(1,0.4,1);
+	mesh[2].position.set(5,-3.8,0);
+	mesh[2].rotation.set(p/2,0,p/2);
+	scene.add(mesh[2]);
+
+	geo[8]=new THREE.SphereGeometry(3,32,32);
+	mat[8]=new THREE.MeshStandardMaterial({color:'#600'});
+	mesh[8]=new THREE.Mesh(geo[8],mat[8]);
+	mesh[8].scale.set(1,0.4,1);
+	mesh[8].position.set(5,-4,0);
+	mesh[8].rotation.set(p/2,0,p/2);
+	scene.add(mesh[8]);
+
+	geo[3]=new THREE.SphereGeometry(2,32,32);
+	mat[3]=new THREE.MeshStandardMaterial({color:'#630'});
+	mesh[3]=new THREE.Mesh(geo[3],mat[3]);
+	mesh[3].position.set(4,10,-5);
+	scene.add(mesh[3]);
+		mesh[4]=mesh[3].clone();
+		mesh[4].position.set(4,10,5);
+		scene.add(mesh[4]);
+
+	geo[31]=new THREE.SphereGeometry(0.5,16,16);
+	mat[31]=new THREE.MeshStandardMaterial({color:'#fff'});
+	mesh[31]=new THREE.Mesh(geo[31],mat[31]);
+	mesh[31].position.set(5.7,10.5,-5);
+	scene.add(mesh[31]);
+		mesh[41]=mesh[31].clone();
+		mesh[41].position.set(5.7,10.5,5);
+		scene.add(mesh[41]);
+
+	geo[5]=new THREE.ConeGeometry(5,20,32);
+	mat[5]=new THREE.MeshStandardMaterial({color:'#da7'});
+	mesh[5]=new THREE.Mesh(geo[5],mat[5]);
+	mesh[5].position.set(7,5,0);
+	mesh[5].rotation.set(p/2,0,-p/2);
+	scene.add(mesh[5]);
+
+	geo[6]=new THREE.SphereGeometry(3,32,32);
+	mat[6]=new THREE.MeshStandardMaterial({color:'#da7'});
+	mesh[6]=new THREE.Mesh(geo[6],mat[6]);
+	mesh[6].scale.set(0.4,1,1);
+	mesh[6].position.set(0,0,16);
+	scene.add(mesh[6]);
+		mesh[7]=mesh[6].clone();
+		mesh[7].position.set(0,0,-16);
+		scene.add(mesh[7]);
+
+	geo[9]=new THREE.CylinderGeometry(1.5,1.5,12,16,16);
+	mat[9]=new THREE.MeshStandardMaterial({color:'#fa7'});
+	mesh[9]=new THREE.Mesh(geo[9],mat[9]);
+	mesh[9].position.set(0,24,16);
+	geo[10]=new THREE.CylinderGeometry(1.5,1.5,12,16,16);
+	geo[10].translate(0,-6,0);
+	mat[10]=new THREE.MeshStandardMaterial({color:'#da7'});
+	mesh[10]=new THREE.Mesh(geo[10],mat[10]);
+	mesh[10].position.set(0,24,16);
+	mesh[13]=mesh[10].clone();
+	mesh[13].rotation.set(p/4,-p/4,0);
+	mesh[14]=mesh[10].clone();
+	mesh[14].rotation.set(-p/4,-p/4,0);
+	mesh[15]=mesh[10].clone();
+	mesh[15].rotation.set(p/8,p/4,0);
+	mesh[15].position.set(0,12,16);
+	mesh[16]=mesh[15].clone();
+	mesh[16].rotation.set(-p/8,-p/4,0);
+
+	geo[17]=new THREE.CylinderGeometry(16,16,1,32);
+	mat[17]=new THREE.MeshStandardMaterial({color:'#037'});
+	mesh[17]=new THREE.Mesh(geo[17],mat[17]);
+	mesh[17].position.set(0,-44,0);
+	scene.add(mesh[17]);
+
+	group.add(mesh[9]);
+	group.add(mesh[10]);
+	group.add(mesh[13]);
+	group.add(mesh[14]);
+	group.add(mesh[15]);
+	group.add(mesh[16]);
+	group.position.set(0,-44,-16);
+	scene.add(group);
+
+	mesh[2].scale.z=0.2;mesh[8].scale.z=0.2;
+}
+
+function fcha(){cha=1;}
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function animate() {
+	requestAnimationFrame(animate);
+	controls.update();
+	if(go==1 && cha==1){
+		volume=parseFloat(volumeControl.value);
+		delay=parseFloat(delayControl.value);
+		feedback=parseFloat(feedbackControl.value);
+		gainNode.gain.setValueAtTime(0,tpressed);
+		gainNode.gain.linearRampToValueAtTime(volume,tpressed+attackDuration);
+		gainNode.gain.setTargetAtTime(sustainLevel*volume,tpressed+attackDuration,decayDuration);
+ 		delayNode.delayTime.value=delay;
+ 		feedbackGainNode.gain.value=feedback;
+		gainNode.connect(feedbackGainNode).connect(delayNode).connect(audioContext.destination);
+		delayNode.connect(feedbackGainNode);
+		cha=0;
+	}
+	if(analyser){
+		function getDataFromAudio(){
+			analyser.fftSize=512;
+			freqByteData=new Uint8Array(analyser.fftSize/2);
+			timeByteData=new Uint8Array(analyser.fftSize/2);
+			analyser.getByteFrequencyData(freqByteData);
+			analyser.getByteTimeDomainData(timeByteData);
+			return{f:freqByteData,t:timeByteData};
+		}
+		var data=[];
+		data=getDataFromAudio();
+		ff=[];ff=data.f;var tt=[];tt=data.t;
+ 		for (let j=1;j<129;j++){
+			if(ff[j]>0){
+				mesh[2].scale.z=ff[j]/90;mesh[8].scale.z=ff[j]/90;//dsp.innerText=ff[j]/90;
+				mesh[2].position.x=5+ff[j]/870;mesh[8].position.x=5.5+ff[j]/870;
+				mesh[13].rotation.x=ff[j]/90;
+				mesh[14].rotation.x=-ff[j]/90;
+			}
+		}
+	}
+
+	scene.rotation.y -=passo;
+	if(scene.rotation.y<-2){passo=-passo;}
+	if(scene.rotation.y>-0.9){passo=-passo;}
+
+	mesh[13].rotation.x +=passo;
+	mesh[14].rotation.x -=passo;
+
+	if(go==1){
+		w++;
+		if(w==120){po.style.left="350px";}
+		if(w==240){po.style.left="540px";}
+		if(w==360){po.style.left="765px";}
+		if(w==480){po.style.left="-100px";}
+		if(w>600){w=0;}
+	}
+
+	if(al==0 && audio.readyState===4){dsp.innerText="Audio loaded";al=1;} 
+
+	renderer.render(scene,camera);
+}
+
+start();
+animate();
+
+</script>
+
+</body>
+</html>

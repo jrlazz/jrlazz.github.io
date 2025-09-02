@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>logoplay.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="ok.ico" />
+<style>
+body{overflow:hidden;margin:0px;background-color:#024;font-family:Monospace;}
+span{position:absolute;font-size:20.5px;text-align:center;}
+a{font-size:16pt;}
+</style>
+
+<script type="importmap">
+	{
+		"imports":{
+	"three":"https://unpkg.com/three@0.171.0/build/three.module.js",
+	"three/addons/":"https://unpkg.com/three@0.171.0/examples/jsm/"
+		}
+	}
+</script>
+
+</head>
+
+<body>
+<img src="img/logoplay.png" style="position:absolute;left:1%;top:2%;width:120px;"></img>
+<span style="position:absolute;left:20%;top:10%;width:60%;text-align:center;color:#fc0;">logoplay ball ... without textures</span>
+<span id="spa" style="left:20%;width:60%;top:35%;font-size:82pt;color:#069;display:''"></span>
+<button style="position:absolute;left:10%;top:10%;width:120px;height:30px;background-color:#c90;text-align:center;"><a id="code" href="logoplay.txt" target="_blank" style="color:#024;font-weight:bold;text-decoration:none;">The Code</a></button>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
+
+var renderer, scene, camera, loader, geometry, controls ;
+var steps, depth, bevelEnabled, bevelThickness, bevelSize, bevelOffset, bevelSegments;
+
+var iW=window.innerWidth;
+var iH=window.innerHeight;
+
+var geo=[];
+var luz=[];
+var mat=[];
+var mesh=[];
+
+var paths=[];
+var shapes=[];
+var dep=2;
+var cur=5;
+
+var group=new THREE.Group();
+var gro=[];for(let z=1;z<300;z++){gro[z]=new THREE.Group();}
+
+var sim=0;
+
+function init(){
+	camera=new THREE.PerspectiveCamera(70,iW/iH,1,1000,1);
+	camera.position.set(40,-40,200);
+	scene=new THREE.Scene();
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(iW,iH);
+	renderer.colorSpace=THREE.SRGBColorSpace;
+
+	document.body.appendChild(renderer.domElement);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+
+	luz[1]=new THREE.AmbientLight("#fff",0.5);scene.add(luz[1]);
+	luz[2]=new THREE.PointLight('#fff',6000);luz[2].position.set(20,0,90);scene.add(luz[2]);
+	luz[3]=new THREE.PointLight('#fff',6000);luz[3].position.set(20,0,-90);scene.add(luz[3]);
+
+	mat[3]=new THREE.MeshStandardMaterial({color:'#0a0',wireframe:false});
+	mat[2]=new THREE.MeshStandardMaterial({color:'#fb0',wireframe:false});
+	mat[1]=new THREE.MeshStandardMaterial({color:'#f00',wireframe:false});
+	mat[4]=new THREE.MeshStandardMaterial({color:'#09f',wireframe:false});
+
+	loader=new SVGLoader();
+	loader.load('img/yel.svg',function(data){
+		paths=data.paths;
+		shapes=SVGLoader.createShapes(paths[0]);
+		geo[1]=new THREE.ExtrudeGeometry(shapes[0],{depth:dep,curveSegments:cur});
+		mesh[1]=new THREE.Mesh(geo[1],mat[1]);
+		mesh[1].position.set(0,0,0);
+	})
+	loader=new SVGLoader();
+	loader.load('img/red.svg',function(data){
+		paths=data.paths;
+		shapes=SVGLoader.createShapes(paths[0]);
+		geo[2]=new THREE.ExtrudeGeometry(shapes[0],{depth:dep,curveSegments:cur});
+		mesh[2]=new THREE.Mesh(geo[2],mat[2]);
+		mesh[2].position.set(0,0,0);
+	})
+	loader=new SVGLoader();
+	loader.load('img/blu.svg',function(data){
+		paths=data.paths;
+		shapes=SVGLoader.createShapes(paths[0]);
+		geo[3]=new THREE.ExtrudeGeometry(shapes[0],{depth:dep,curveSegments:cur});
+		mesh[3]=new THREE.Mesh(geo[3],mat[3]);
+		mesh[3].position.set(0,0,0);
+	})
+	loader=new SVGLoader();
+	loader.load('img/gre.svg',function(data){
+		paths=data.paths;
+		shapes=SVGLoader.createShapes(paths[0]);
+		geo[4]=new THREE.ExtrudeGeometry(shapes[0],{depth:dep,curveSegments:cur});
+		mesh[4]=new THREE.Mesh(geo[4],mat[4]);
+		mesh[4].position.set(0,0,0);
+	})
+
+	geo[5]=new THREE.SphereGeometry(3,3,3);
+	mat[5]=new THREE.MeshStandardMaterial({color:'#fff',wireframe:true});
+	mesh[5]=new THREE.Mesh(geo[5],mat[5]) ;
+	mesh[5].position.set(0,0,90);
+	scene.add(mesh[5]);
+
+	mesh[6]=new THREE.Mesh(geo[5],mat[5]) ;
+	mesh[6].position.set(0,0,-90);
+	scene.add(mesh[6]);
+
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	if(mesh[1] && mesh[2] && mesh[3] && mesh[4] && sim==0){
+		group.add(mesh[1]);
+		group.add(mesh[2]);
+		group.add(mesh[3]);
+		group.add(mesh[4]);
+		group.position.set(0,0,0);
+		let k=0;
+		for(let z=1;z<248;z++){
+			k=k+0.0125;
+			gro[z]=group.clone();
+			gro[z].scale.set(Math.sin(k),Math.sin(k),1);
+			gro[z].position.set(0,0,Math.cos(k)*64);
+			scene.add(gro[z]);
+		}
+		sim=1;
+	}
+	renderer.render(scene,camera);
+}
+
+init();
+animate();
+
+</script>
+</body>
+</html>
+

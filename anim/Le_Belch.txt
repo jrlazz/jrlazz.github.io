@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<head>
+<title>Le_Belch.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="ok.ico"/>
+<style>
+body{margin:0px;background-color:#036;font-family:Lucida Console;overflow:hidden;}
+</style>
+
+<script type="importmap">
+	{
+		"imports":{
+			"three":"https://unpkg.com/three@0.160.0/build/three.module.js",
+			"three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"
+		}
+	}
+</script>
+
+</head>
+
+<body>
+
+<span style="position:absolute;left:20px;color:#fc0;">Le_Belch<br>
+<a href="Le_Belch.txt" target="_blank" style="color:#ff0;">View code</a></span>
+
+<script type="module">
+
+import * as THREE from "three";
+import {OrbitControls} from "three/addons/controls/OrbitControls.js";
+
+/// declaration element de base de three.js
+
+// declaration scene
+const scene = new THREE.Scene();
+// declaration moteur de rendu
+//const renderer = new THREE.WebGLRenderer();
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+
+// declaration came´ra
+const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+	//var camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,1,1000);
+	camera.position.set(0,0,20);
+
+	var controls=new OrbitControls(camera,renderer.domElement);
+	
+	var light=new THREE.AmbientLight('#fff',1);
+	scene.add(light);
+
+/// declaration mesh cylindre
+
+//  declaration de la forme du mesh
+const geometry = new THREE.CylinderGeometry( 5, 5, 20, 32 );
+// declaration du materiel(texture) du mesh + couleur
+const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+// declaration du mesh et mise en commun des forme et du materiel
+const cylinder = new THREE.Mesh( geometry, material );
+// ajout du mesh dans la scene
+scene.add( cylinder );
+
+// moteur de rendu plein ecran
+renderer.setSize( window.innerWidth, window.innerHeight );
+
+// ajout dans la page via canvas html 5
+document.body.appendChild( renderer.domElement );
+
+// animation de rotation dans les trois dimensions
+function animate() {
+    requestAnimationFrame( animate );
+    cylinder.rotation.x += 0.01;
+    cylinder.rotation.y += 0.01;
+    cylinder.rotation.z += 0.01;
+
+    renderer.render( scene, camera );
+
+  //  requestAnimationFrame( animate );
+}
+
+animate();
+
+</script>
+</body>
+</html>

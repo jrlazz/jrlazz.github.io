@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>fogos.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="ok.ico"/>
+<style>
+body{margin:0px;background-color:#000;font-family:Lucida Console;font-size:12pt;overflow:hidden;}
+#gui { position: absolute; top:40px; left:10px }
+</style>
+
+<script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.164.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.164.0/examples/jsm/"
+        }
+    }
+    </script>
+</head>
+
+<body>
+
+<span id="spa" style="position:absolute;color:#ccc;left:10px;;top:5px;z-index:2;font-size:9pt;">based on ... https://manthrax.github.io/atos/ ... click to hear sounds...</span>
+<a id="code" href="fogos.txt" target="_blank" style="position:absolute;left:-200px;top:-100px;width:100px;text-align:center;padding:4px;background-color:#00f;color:#ff0;text-decoration:none;border:1px outset #ff0;z-index:2;">View code</a>
+
+<script type='module'">
+
+import *as THREE from "three"
+import {OrbitControls} from "three/addons/controls/OrbitControls.js";
+import {RGBELoader} from "three/addons/loaders/RGBELoader.js";
+import {TextGeometry} from 'three/addons/geometries/TextGeometry.js';
+import {FontLoader} from 'three/addons/loaders/FontLoader.js';
+import {MeshSurfaceSampler} from 'three/addons/math/MeshSurfaceSampler.js';
+import {GUI} from "three/addons/libs/lil-gui.module.min.js";
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+
+	var dspa=document.getElementById("spa");
+	dspa.onclick=function SPA(){sounda();}
+
+function PostProcessing({THREE,renderer,scene,camera,gui}){
+	let composer=new EffectComposer(renderer);
+	composer.renderTarget1.samples=8;
+	composer.renderTarget2.samples=8;
+	const renderPass=new RenderPass(scene,camera);
+	composer.addPass(renderPass);
+	const params={threshold:.8,strength:.003,radius:0};
+	const bloomPass=new UnrealBloomPass(new THREE.Vector2(window.innerWidth,window.innerHeight),1.5,0.4,0.85);
+	bloomPass.threshold=params.threshold;
+	bloomPass.strength=params.strength;
+	bloomPass.radius=params.radius;
+	composer.addPass(bloomPass);
+	let bloom=this.bloom={
+		set threshold(v){bloomPass.threshold=Number(v);},
+		set strength(v){bloomPass.strength=Number(v);},
+		set radius(v){bloomPass.radius=Number(v);bloomUniforms.bloomRadius.value=bloomPass.radius}
+	}
+	const bloomFolder=gui.addFolder('bloom');
+	let bloomUniforms=bloomPass.compositeMaterial.uniforms;
+	let bfac= bloomUniforms.bloomFactors.value;
+	for(let i=0;i<5;i++)bfac[i]=10.1-(2.02*i);
+	bloomFolder.add(params,'threshold',0.0, 1.0).onChange((v)=>bloom.threshold=v);
+	bloomFolder.add(params,'strength',0.0, 3.0).onChange((v)=>bloom.strength=v);
+	bloomFolder.add(params,'radius',0.0, 1.0).step(0.01).onChange((v)=>bloom.radius=v);
+	const wwidth=window.innerWidth;
+	const wheight=window.innerHeight;
+	let resize=this.resize=(width,height)=>{composer.setSize(width, height);}
+	function onWindowResize(){
+		const width=window.innerWidth;
+		const height=window.innerHeight;
+		resize(width,height)
+	}
+	window.addEventListener('resize',onWindowResize);
+	const outputPass=new OutputPass();
+	composer.addPass(outputPass);
+	this.render=()=>{composer.render(scene,camera)}
+}
+
+// ********
+
+let gui=new GUI();
+
+gui.domElement.id ='gui';
+
+function Easing(){}
+
+let x=Math.pow,C=Math.sqrt,T=Math.sin,q=Math.cos,B=Math.PI,F=1.70158,M=1.525*F,Q=2*B/3,j=2*B/4.5;
+
+function N(t) {
+	let e=7.5625,n=2.75;
+	return t < 1 / n ? e * t * t : t < 2 / n ? e * (t -= 1.5 / n) * t + .75 : t < 2.5 / n ? e * (t -= 2.25 / n) * t + .9375 : e * (t -= 2.625 / n) * t + .984375
+}
+Object.assign(Easing, {
+	InQuad: t=>t * t,
+	OutQuad: t=>1 - (1 - t) * (1 - t),
+	InOutQuad: t=>t < .5 ? 2 * t * t : 1 - x(-2 * t + 2, 2) / 2,
+	InCubic: t=>t * t * t,
+	OutCubic: t=>1 - x(1 - t, 3),
+	InOutCubic: t=>t < .5 ? 4 * t * t * t : 1 - x(-2 * t + 2, 3) / 2,
+	InQuart: t=>t * t * t * t,
+	OutQuart: t=>1 - x(1 - t, 4),
+	InOutQuart: t=>t < .5 ? 8 * t * t * t * t : 1 - x(-2 * t + 2, 4) / 2,
+	InQuint: t=>t * t * t * t * t,
+	OutQuint: t=>1 - x(1 - t, 5),
+	InOutQuint: t=>t < .5 ? 16 * t * t * t * t * t : 1 - x(-2 * t + 2, 5) / 2,
+	InSine: t=>1 - q(t * B / 2),
+	OutSine: t=>T(t * B / 2),
+	InOutSine: t=>-(q(B * t) - 1) / 2,
+	InExpo: t=>0 === t ? 0 : x(2, 10 * t - 10),
+	OutExpo: t=>1 === t ? 1 : 1 - x(2, -10 * t),
+	InOutExpo: t=>0 === t ? 0 : 1 === t ? 1 : t < .5 ? x(2, 20 * t - 10) / 2 : (2 - x(2, -20 * t + 10)) / 2,
+	InCirc: t=>1 - C(1 - x(t, 2)),
+	OutCirc: t=>C(1 - x(t - 1, 2)),
+	InOutCirc: t=>t < .5 ? (1 - C(1 - x(2 * t, 2))) / 2 : (C(1 - x(-2 * t + 2, 2)) + 1) / 2,
+	InBack: t=>2.70158 * t * t * t - F * t * t,
+	OutBack: t=>1 + 2.70158 * x(t - 1, 3) + F * x(t - 1, 2),
+	InOutBack: t=>t < .5 ? x(2 * t, 2) * (2 * (M + 1) * t - M) / 2 : (x(2 * t - 2, 2) * ((M + 1) * (2 * t - 2) + M) + 2) / 2,
+	InElastic: t=>0 === t ? 0 : 1 === t ? 1 : -x(2, 10 * t - 10) * T((10 * t - 10.75) * Q),
+	OutElastic: t=>0 === t ? 0 : 1 === t ? 1 : x(2, -10 * t) * T((10 * t - .75) * Q) + 1,
+	InOutElastic: t=>0 === t ? 0 : 1 === t ? 1 : t < .5 ? -x(2, 20 * t - 10) * T((20 * t - 11.125) * j) / 2 : x(2, -20 * t + 10) * T((20 * t - 11.125) * j) / 2 + 1,
+	InBounce: t=>1 - N(1 - t),
+	OutBounce: N,
+	InOutBounce: t=>t < .5 ? (1 - N(1 - 2 * t)) / 2 : (1 + N(2 * t - 1)) / 2
+})
+
+class FlowInstance {
+	constructor(fn){this.fn=fn;}
+	update(now=performance.now()) {
+		//console.log('pnow', performance.now())
+		if(!this.prev)this.prev=now;
+		this.dt=(now-this.prev)/1000;
+		if(typeof this.waitCondition == 'number'){
+			if (now < this.waitCondition)
+				return 0;
+		} else if (typeof this.waitCondition == 'function')
+			if (!this.waitCondition())
+				return this.waitCondition;
+
+		this.waitCondition=this.flow.next().value;
+		if(typeof this.waitCondition == 'number')
+			this.waitCondition += now;
+		if(this.waitCondition === undefined)
+			this.thenCb && this.thenCb()
+		return this.waitCondition;
+	}
+	then(something) {
+		this.thenCb=something;
+	}
+}
+class Flow {
+	flows=[];
+	waitCondition;
+	constructor(fn){this.fn=fn;}
+	updateAll(now=performance.now()){
+		let fl=this.flows;
+		let write=0;
+		for(let i=0;i<fl.length;i++){
+			let f=fl[i];
+			let wait=f.update(now);
+			if(wait === undefined){
+				f.onDone&&f.onDone();
+				write--;
+			}else
+				(write !== i) && (fl[write]=fl[i]);
+			write++;
+		}
+		fl.length=write;
+	}
+	/*
+	start(target){
+		Flow.flows.push(this);
+		this.flow=this.fn(...arguments)
+		return this;
+	}*/
+	start(fn,target){
+		let fi=new FlowInstance(fn)
+		this.flows.push(fi)
+		fi.flow=fi.fn(...[...arguments].slice(1))
+		return fi;
+	}
+	tweenVector3=function({object,value='position',start,end,delay=0,duration=250,easing}){
+		this.start(function*({object,value,start,end,delay,duration,easing}){
+			let saveAutoUpdate=object.matrixAutoUpdate
+			object.matrixAutoUpdate=true;
+			let vEnd=end || new Vector3().copy(object[value]);
+			let vStart=start || new Vector3().copy(Vector3.prototype.set.call(object[value], .01, .01, .01));
+			yield delay;
+			let tStart=performance.now();
+			let tNow=tStart;
+			while(tNow < (tStart + duration)){
+				let alpha=(tNow-tStart)/duration;
+				Vector3.prototype.lerpVectors.call(object[value],vStart,vEnd,easing ? easing(alpha) : alpha);
+				yield 0;
+				tNow=performance.now();
+			}
+			Vector3.prototype.copy.call(object[value],vEnd);
+			object.updateMatrix();
+			object.matrixAutoUpdate=saveAutoUpdate;
+		}, {
+			object,value,start,end,delay,duration,easing
+		})
+	}
+}
+
+// ********
+
+function Renderer(){
+	
+	let {Scene,WebGLRenderer,PerspectiveCamera,Mesh,BufferGeometry,CircleGeometry,BoxGeometry,MeshBasicMaterial,Vector3,AnimationMixer,Object3D,Sprite,SpriteMaterial,RepeatWrapping,}=THREE;
+	this.THREE=THREE;
+
+	let flow=this.flow=new Flow();
+
+	this.vec3=(x,y,z) => new THREE.Vector3(x,y,z);
+	let {random, abs, sin, cos, min, max}=Math;
+	let rnd=(rng=1)=>random() * rng;
+	let srnd=(rng=1)=>random() * rng * 2 - rng;
+	console.log("thx??");
+
+	let renderer=this.renderer=new WebGLRenderer({antialias:true,alpha:true});
+	renderer.setClearColor(0);
+
+	const container=document.createElement('div')
+	Object.assign(container.style,{position:'fixed',top:'0',left:'0',right:'0',bottom:'0'})
+	document.body.appendChild(container)
+	container.appendChild(renderer.domElement);
+
+	let scene=this.scene=new Scene();
+	let camera=this.camera=new PerspectiveCamera(75,1,0.01,1000);
+	scene.add(camera);
+	camera.position.set(-24., 54., -26.)
+
+	let controls=this.controls=new OrbitControls(camera,renderer.domElement);
+	controls.target.set(0, 40, 0);
+	controls.enableDamping=true;
+
+	let postProcessing=this.postProcessing=new PostProcessing({THREE, renderer, scene, camera, gui});
+	postProcessing.pauseBloom={threshold:.8,strength:.003,radius:.5}
+	postProcessing.defaultBloom={threshold:.8,strength:.003,radius:.5}
+	Object.assign(postProcessing.bloom,postProcessing.defaultBloom);
+
+	let onWindowResize=(event)=>{
+		let width=window.innerWidth;
+		let height=window.innerHeight;
+		renderer.setSize(width, height);
+		camera.aspect=width / height;
+		camera.updateProjectionMatrix();
+		postProcessing && postProcessing.resize(width,height);
+	}
+	
+	onWindowResize();
+	window.addEventListener("resize", onWindowResize, false);
+
+	document.body.oncontextmenu=()=>false
+
+	this.onFrame=null;
+	let lastTime;
+	let animationLoop=(time)=>{
+		let dt=lastTime?(time-lastTime):0;
+		lastTime=time;
+		this.onFrame && this.onFrame(dt,time)
+		flow.updateAll();
+		controls.update();
+		postProcessing&&postProcessing.render()
+		//renderer.render(scene,camera);
+	}
+	this.start=()=>renderer.setAnimationLoop(animationLoop)
+}
+
+class DebugDrawer{
+	set color(v){this._currentColor=v;this._color.set(v)}	
+	get color(){return this._currentColor}
+	constructor({THREE,count=100000}){
+		let {sin,cos,PI,max,min,abs}=Math;
+		let vec3=(x,y,z)=>new THREE.Vector3(x,y,z)
+		let v0=vec3()
+		let v1=vec3()
+		let v2=vec3()
+		let cursor=vec3()
+		this._color=new THREE.Color('white');
+		let material=new THREE.LineBasicMaterial({
+			color: 0xffffff,
+			vertexColors: true,
+			toneMapped: false,
+			transparent:true,
+			blending:THREE.AdditiveBlending
+		});
+		this.lines=new THREE.LineSegments(new THREE.BufferGeometry(),material);
+		this.lines.frustumCulled=false;
+		let geometry=this.geometry=this.lines.geometry;
+		let points=new THREE.BufferAttribute(new Float32Array(count*3),3).setUsage(THREE.DynamicDrawUsage)
+		let colors=new THREE.BufferAttribute(new Float32Array(count*3),3).setUsage(THREE.DynamicDrawUsage)
+		geometry.setAttribute('position', points)
+		geometry.setAttribute('color', colors)
+		let top=0;
+		let lastVersion=0;
+		let version=0;
+		this.lines.onBeforeRender=()=>{
+			if(version==lastVersion)return
+			geometry.setDrawRange(0, top>points.count ? Infinity : top)
+			points.needsUpdate=true;
+			colors.needsUpdate=true;
+			lastVersion=version;
+		}
+		this.lineCol=(c=this._color,scl=1)=>{
+			let r=c.r*scl;
+			let g=c.g*scl;
+			let b=c.b*scl;
+			colors.setXYZ(top%points.count,r,g,b)
+			top++;
+			colors.setXYZ(top%points.count,r,g,b)
+			top++;
+			version++;
+		}
+		let vt=(p,c=this._color)=>{
+			points.setXYZ(top%points.count, p.x, p.y, p.z)
+			colors.setXYZ(top%points.count, c.r, c.g, c.b)
+			top++;
+		}
+		let stack=[]
+		this.poptop=()=>top=stack.pop();
+		this.pushtop=(ntop)=>{
+			stack.push(top);
+			top=ntop;
+		}
+		this.top=()=>top%points.count;
+		let moveto=this.moveto=(p,d,q)=>((d !== undefined) && cursor.set(p, d, q)) || cursor.copy(p)
+		let lineto=this.lineto=(p,d,q)=>{
+			vt(cursor);
+			moveto(p, d, q);
+			vt(cursor);
+			version++;
+		}
+		this.cls=()=>{
+			top=0;
+			version++;
+		}
+		this.circle=(radius=.1,sides=16)=>{
+			v2.copy(cursor)
+			for (let i=0; i <= sides; i++) {
+				v1.copy(v2);
+				let th=i * PI * 2 / sides
+				v1.x += sin(th) * radius
+				v1.z += cos(th) * radius
+				if (!i)
+					moveto(v1);
+				else
+					lineto(v1);
+			}
+			cursor.copy(v2);
+		}
+		{   
+			let n=vec3()
+			let p=vec3()
+			this.aabox=(x=0,y=0,z=0,sx=.5,sy=sx,sz=sx)=>{
+				n.set( x-sx,y-sy,z-sz);
+				p.set( x+sx,y+sy,z+sz);
+				moveto(n.x,n.y,n.z);
+				lineto(p.x,n.y,n.z);
+				lineto(p.x,p.y,n.z);
+				lineto(n.x,p.y,n.z);
+				lineto(n.x,n.y,n.z);
+				moveto(n.x,n.y,p.z);
+				lineto(p.x,n.y,p.z);
+				lineto(p.x,p.y,p.z);
+				lineto(n.x,p.y,p.z);
+				lineto(n.x,n.y,p.z);
+				moveto(p.x,n.y,n.z);
+				lineto(p.x,n.y,p.z); 
+				moveto(n.x,p.y,n.z);
+				lineto(n.x,p.y,p.z);
+				moveto(p.x,p.y,n.z);
+				lineto(p.x,p.y,p.z); 
+				moveto(n.x,n.y,n.z);
+				lineto(n.x,n.y,p.z);
+			}
+		}
+	}
+}
+
+async function startApp({renderer3}){
+	let {THREE, renderer, scene, camera, controls, flow, buttons, vec3, gui,postProcessing}=renderer3;
+	let dd=renderer3.dd=new DebugDrawer({THREE});
+	scene.add(dd.lines);
+	let v0=vec3();
+	let {min, max}=Math;
+	let camVel=0;
+	let minCamDist=1.;
+	let maxCamDist=130.0;
+	let camDist=1.9;
+	let targetCamDist=camera.position.distanceTo(controls.target);
+	let clamp=(v,min,max)=>v<min?min:(v>max)?max:v
+	document.addEventListener('wheel',e=>{
+		let dlt=e.deltaY;
+		targetCamDist += dlt*.001*camDist; //Scale by distance
+		targetCamDist=clamp(targetCamDist,minCamDist,maxCamDist)	 
+	})
+	let activeControls={camera,controls}
+	flow.start(function*(){
+		while(1){
+			if(targetCamDist!==camDist){
+				camDist += (targetCamDist-camDist)*.05;
+				camDist=clamp(camDist,minCamDist,maxCamDist)
+				activeControls.camera.position.sub(activeControls.controls.target).setLength(camDist).add(activeControls.controls.target);
+			}
+			yield 0;
+		}
+	})
+	return{activeControls}
+}
+
+
+// ********
+
+let renderer3=new Renderer();
+
+let {scene,camera,renderer,controls,flow,buttons,vec3}=renderer3;
+window.app=await startApp({
+	renderer3
+})
+
+let {dd}=renderer3;
+
+renderer3.start();
+
+function ParticleContext({renderer}){
+	let camera=new THREE.OrthographicCamera(-1,1,1,-1,0.1,10);
+	camera.position.z=1;
+	const nextPowerOfTwo=value => (value <= 0) ? 1 : 1 << 32-Math.clz32(value-1);
+	const particleCount=512*512;
+	const textureSize=Math.ceil(Math.sqrt(particleCount));
+	let ntex=nextPowerOfTwo(textureSize);
+	const posData=new Float32Array(textureSize*textureSize*4);
+	const quatData=new Float32Array(textureSize*textureSize*4);
+	const stateData=new Float32Array(textureSize*textureSize*4);
+	for (let i=0;i<particleCount;i++) {
+		posData[i*4+0]=(Math.random()-0.5)*10;
+		posData[i*4+1]=(Math.random()-0.5)*10;
+		posData[i*4+2]=(Math.random()-0.5)*10;
+		posData[i*4+3]=1.0;
+		quatData[i*4+0]=Math.random();
+		quatData[i*4+1]=Math.random();
+		quatData[i*4+2]=Math.random();
+		quatData[i*4+3]=Math.random();
+		stateData[i*4+0]=(Math.random()-0.5)*0.1;
+		stateData[i*4+1]=(Math.random()-0.5)*0.1;
+		stateData[i*4+2]=(Math.random()-0.5)*0.1;
+		stateData[i*4+3]=0.0;
+	}
+	const posTexture=new THREE.DataTexture(posData, textureSize, textureSize, THREE.RGBAFormat, THREE.FloatType);
+	const quatTexture=new THREE.DataTexture(quatData, textureSize, textureSize, THREE.RGBAFormat, THREE.FloatType);
+	const stateTexture=new THREE.DataTexture(stateData, textureSize, textureSize, THREE.RGBAFormat, THREE.FloatType);
+	const multiRenderTarget=new THREE.WebGLRenderTarget(textureSize, textureSize, {
+		format: THREE.RGBAFormat,
+		type: THREE.FloatType,
+		depthBuffer: false,
+		stencilBuffer: false,
+		count: 3 // Enable MRT with 3 textures
+	});
+	for (let i=0;i<3;i++) {
+		multiRenderTarget.textures[i].minFilter=THREE.NearestFilter;
+		multiRenderTarget.textures[i].magFilter=THREE.NearestFilter;
+		multiRenderTarget.textures[i].wrapS=THREE.RepeatWrapping;
+		multiRenderTarget.textures[i].wrapT=THREE.RepeatWrapping;
+	}
+	const initShader=new THREE.ShaderMaterial({
+		uniforms:{
+			posTexture:{value:posTexture},
+			quatTexture:{value:quatTexture},
+			stateTexture:{value:stateTexture}
+		},
+		glslVersion:"300 es",
+		vertexShader: `
+			varying vec2 vUv;
+			void main(){
+				vUv=uv;
+				gl_Position=vec4(position,1.0);
+			}
+		`,
+		fragmentShader: `
+			layout(location=0) out vec4 fragData0;
+			layout(location=1) out vec4 fragData1;
+			layout(location=2) out vec4 fragData2;
+			varying vec2 vUv;
+			uniform sampler2D posTexture;
+			uniform sampler2D quatTexture;
+			uniform sampler2D stateTexture;
+			void main() {
+				fragData0=texture(posTexture, vUv);
+				fragData1=texture(quatTexture, vUv);
+				fragData2=texture(stateTexture, vUv);
+			}
+		`,
+		depthWrite:false,
+		depthTest:false
+	});
+	initShader.onBeforeCompile=(s)=>{
+	}
+}
+
+// ********
+
+class Audio{
+	constructor(camera){
+		this.sounds={};
+		this.soundsLoading={}
+		this.play=(name,position,volume,detune)=>{}
+		let firstClick=()=>{
+			document.removeEventListener('pointerdown',firstClick)
+			let listener=new THREE.AudioListener()
+			camera.add(listener)
+			this.audioLoader=new THREE.AudioLoader();
+			this.load('boom0','mp3/boom0.mp3')
+			this.load('launch0','mp3/launch0.mp3')
+			this.load('pop0','mp3/pop0.mp3')
+			this.load('bas','mp3/bassoone.mp3')
+			this.listener=listener;
+			this.play=this._play;
+			setTimeout(()=>{this.play('boom0')},1000)
+	}
+		document.addEventListener('pointerdown',firstClick)
+	}
+	load(name,url){
+		this.soundsLoading[name]=url;
+		this.audioLoader.load(url,(buffer)=>{
+			this.sounds[name]={name,buffer,maxInstances:6,instanceCount:0};}
+		);
+	}
+	_play(name,position,gain,detune){
+		let snd=this.sounds[name];
+		if(!snd){
+			if(!this.soundsLoading[name])
+				console.error(`Sound ${name} not found...`);
+			return;
+		}
+	if(snd.instanceCount >= snd.maxInstances)
+	return;
+	const sound=new THREE.PositionalAudio(this.listener);
+	sound.setBuffer(snd.buffer);
+	sound.setRefDistance(5);
+	detune &&(sound.detune=detune);
+	gain &&(sound.gain.gain.value=gain);
+	position && sound.position.copy(position);
+	sound.play();
+	sound.gain.gain.value=7;
+	snd.instanceCount++;
+	sound.source.onended=()=>{
+		sound.disconnect();
+		sound.removeFromParent();
+		snd.instanceCount--;
+	}
+	return sound;
+	}
+}
+
+let audio=new Audio(camera);
+
+let sfx=({name,position,minGain=.05,maxGain=.3,minDetune=-700,maxDetune=-200})=>{
+	audio.play(name,position,rrng(minGain,maxGain),rrng(minDetune,maxDetune))
+}
+
+let {abs,min,max,random,PI,sin,cos}=Math;
+let rrng=(n=0,p=1)=>(random()*(p-n))+n;
+let irrng=(n=0,p=1)=>((random()*(p-n))+n)|0;
+let grav=-.0098;
+function* mt(){}
+
+class sys{
+	constructor(){
+		this.nodes=[]
+		this.now=performance.now()/1000;
+	}
+	step(){
+		let now=performance.now()/1000;
+		this.dt=now-this.now;
+		this.now=now;
+		this.ndt=this.dt/(1/60)
+		let i=0,w=0;
+		for(;i<this.nodes.length;i++){
+			let n=this.nodes[i];
+			if(!n.step()){this.nodes[w++]=n}
+		}
+		this.nodes.length=w;
+	}
+	emit(fn=mt,ctx){
+		let n=new sys.node(this);
+		n.flow=flow.start(fn,n,ctx);
+		n.flow.onDone=()=>n.dead=true;
+		n.velocity.randomDirection();
+		n.velocity.x *= .1;
+		n.velocity.z *= .1;
+		n.velocity.y=abs(n.velocity.y);
+		n.velocity.y *= .4;
+		this.nodes.push(n)
+		return n;
+	}
+}
+
+	let _p=vec3();
+	let _n=vec3();
+	let cscale=(c,v)=>{
+		return (((((c>>0)&255)*v)|0)<<0)
+			(((((c>>8)&255)*v)|0)<<8)
+			(((((c>>16)&255)*v)|0)<<16);
+	}
+sys.node=class{
+	constructor(sys){
+		this.sys=sys;
+		this.life=.2;
+		this.spawntime=sys.now
+		this.mass=1.;
+		this.drag=0;
+		this.position=vec3()
+		this.velocity=vec3()
+		this.color=(Math.random()*(1<<24))|0;
+		this.prims=new Array(8);
+		this.ptop=0;
+	}
+	destroyPrim(p){
+		dd.pushtop(p)
+		dd.moveto(0,0,0)
+		dd.lineto(0,0,0)
+		dd.poptop()
+	}
+	dispose(){
+		let t=this.ptop;
+		if(this.ptop>=this.prims.length)t=this.prims.length;
+		for(let i=0;i<t;i++)
+			this.destroyPrim(this.prims[i])
+	}
+	step(){
+		dd.color=this.color;
+		let age=min(1,(this.sys.now-this.spawntime)/this.life);
+		if(this.ptop>=this.prims.length){
+			let p=this.prims[this.ptop%this.prims.length]
+			dd.pushtop(p)
+			dd.moveto(0,0,0)
+			dd.lineto(0,0,0)
+			dd.poptop()
+		}
+		this.prims[this.ptop%this.prims.length]=dd.top();
+		this.ptop++;
+		dd.moveto(this.position)
+		_p.copy(this.velocity);
+		_p.multiplyScalar(this.sys.ndt);
+		this.position.add(_p);
+		dd.lineto(this.position)
+		this.velocity.y += grav*this.mass*this.sys.ndt;
+		if(this.position.y<0){
+			this.position.y=0-this.position.y;
+			this.velocity.y *= -1.;
+			this.velocity.multiplyScalar(.5);
+		}else{
+			if(this.drag){this.velocity.multiplyScalar(this.drag);}		
+		}
+		for(let i=0,t=min(this.prims.length,this.ptop);i<t;i++){
+			let id=(this.ptop+i)%this.prims.length;
+			let p=this.prims[id]
+			let brightness=(i/t)*(((1-age)**2)*2.0);
+			dd.pushtop(p)
+			dd.lineCol(dd._color,brightness);
+			dd.poptop()
+		}
+		if(this.dead){this.dispose();return true;}
+	}
+}
+
+function* spark(n,shell){
+	n.position.copy(shell.position);
+	n.velocity.randomDirection().multiplyScalar(.23*shell.power);
+	n.velocity.add(shell.velocity);
+	n.life=rrng(.8,1.);
+	n.mass=rrng(0.5,1.);
+	n.drag=rrng(.95,.99);
+	yield n.life*1000;
+}
+
+function* shell(shell){
+	shell.velocity.y+=.7;
+	shell.velocity.x*=1.5;
+	shell.velocity.z*=1.5;
+	shell.power=rrng(1,2);
+	shell.life=1.05*shell.power;
+	yield shell.life*1000;// (1900*shell.velocity.y)|0;
+	shell.dead=true;
+	sfx({name:(random()>.1)?'boom0':'pop0',position:shell.position,minDetune:-2000,maxDetune:500,minGain:.5,maxGain:.7});
+	if(thraxBomb&&(!irrng(0,20))){shell.sys.emit(thraxBomb,shell);}
+	for(let i=0;i<50;i++){shell.sys.emit(spark,shell);}
+}
+
+function* launcher(launcher){
+	launcher.velocity.set(0,0,0);
+	while(1){
+		yield irrng(10,30);
+		if(rrng()>.95)
+			yield 3000;
+		sfx({name:'launch0',position:launcher.position,minDetune:-500,maxDetune:3500});
+		launcher.sys.emit(shell,launcher)
+	}
+}
+let msys=new sys;
+msys.emit(launcher);
+
+flow.start(function*(){
+	while(1){
+		msys.step()
+		yield 0;
+	}
+})
+
+const loader=new FontLoader();
+
+let thraxBomb;
+
+loader.load('fonte/Cascadia_Regular.json',function(font){
+	const geometry=new TextGeometry('Manthrax',{font:font,size:16,depth:4.0,curveSegments:1,bevelEnabled:false});
+	let mesh=new THREE.Mesh(geometry,new THREE.MeshBasicMaterial({color:'#300'}))
+	scene.add(mesh)
+	let bnds=new THREE.Box3().setFromObject(mesh);
+	bnds.getCenter(_p);
+	mesh.geometry.translate(-_p.x,-_p.y,-_p.z)
+	bnds.getSize(_p);
+	let sc=1/_p.x;
+	mesh.geometry.scale(sc,sc,sc);
+	let mss=new MeshSurfaceSampler(mesh)
+		.setWeightAttribute(  null )
+		.build();
+	function* meshSpark(n,shell){
+		mss.sample(_p,_n);
+		_p.applyQuaternion(camera.quaternion);//localToWorld(_p);
+		n.position.copy(shell.position);
+		n.position.add(_p);
+		_p.multiplyScalar(1.5);
+		n.velocity.copy(_p);
+		n.velocity.add(shell.velocity);
+		n.life=rrng(1.5,3);
+		n.mass=1.2;//rrng(0.1,0.11);
+		n.drag=.99;//rrng(.95,.95);
+		yield n.life*1000;
+	}
+	thraxBomb=function*(n,shell){
+		for(let i=0;i<1200;i++){
+			let spark=n.sys.emit(meshSpark,shell)
+			spark.color=n.color;
+		}
+	}
+});
+
+function sounda(){
+	sfx({name:'bas',position:launcher.position,minDetune:-500,maxDetune:1500});
+}
+
+document.getElementById("code").style.left=window.innerWidth-110+"px";
+document.getElementById("code").style.top="5px";
+
+</script>
+
+</body>
+</html>

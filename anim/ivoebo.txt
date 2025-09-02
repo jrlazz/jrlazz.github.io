@@ -1,0 +1,918 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>ivoebo.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="https://threejs.org/files/favicon.ico"/>		
+
+<style>
+
+body{background-color:#135;margin:0px;overflow:hidden;}
+a,span{font-family:Lucida Console;}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {-webkit-appearance:none;margin:0;}
+input[type=number] {-moz-appearance:textfield;}
+button{border-width:4px; border-style:outset; border-color:#cc0 #000 #000 #cc0;}
+button:active{ border-style:inset; border-color:#000 #cc0 #cc0 #000;}
+
+</style>
+
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.155.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.155.0/examples/jsm/"}}</script>
+
+</head>
+
+<body>
+
+<button id="butcli" onclick="cli();" style="position:absolute;left:10px;top:18px;font-size:48pt;background-color:#2678cf;color:#cc0;z-index:2;cursor:pointer;">Play</button>
+
+<img id="imamus" src="img\music-symbol.png" width="108" style="position:absolute;left:10px;top:10px;filter: invert(33%) sepia(100%) saturate(6230%) hue-rotate(200deg) brightness(101%) contrast(101%);opacity:0.75;display:none;"></img>
+
+<span id="num" style="position:absolute;left:10px;top:200px;color:#ff0;font-size:20pt;"></span>
+
+
+<span style="position:absolute;left:center;top:10px;width:100%;font-size:12pt;color:#ff0;text-align:center;">
+Based on Musical Keyboard - JS Dynamic Audio Synth<br>
+Created by Keith William Horwood © 2013<br>
+<a href="https://github.com/keithwhor/audiosynth" target="_blank" style="font-style:italic;font-size:10pt;color:#9ff;">https://github.com/keithwhor/audiosynth</a><br>
+<a href="ivoebo.txt" target="_blank" style="color:#ff0;">View code</a>
+</span>
+
+<span style="position:absolute;left:center;top:85%;width:100%;font-size:12pt;color:#ff0;text-align:center;">
+Keys dimensions based on Piano Keyboards' blog, Nick Berry<br>
+<a href="http://datagenetics.com/blog/may32016/index.html" target="_blank" style="font-style:italic;font-size:10pt;color:#9ff;">http://datagenetics.com/blog/may32016/index.html</a><br>
+</span>
+
+
+<script type="module">
+
+import * as THREE from "three";
+import{ GUI} from "three/addons/libs/lil-gui.module.min.js";
+import{OrbitControls} from "three/addons/controls/OrbitControls.js";
+import{DDSLoader} from "three/addons/loaders/DDSLoader.js";
+import{MTLLoader} from "three/addons/loaders/MTLLoader.js";
+import{OBJLoader} from "three/addons/loaders/OBJLoader.js";
+
+var renderer,scene,camera,light,controls,cubeGeometry,material,mesh,gui,pose,manager;
+
+var x=35;
+var w=0;
+var v=0;
+var passo=0.005;
+
+var light=[];
+
+var ivory=[];
+var ebony=[];
+
+var shape=[];
+var points=[];for(let z=1;z<20;z++){points[z]=[];}
+var extrudeSettings=[];
+var geo=[];
+var mat=[];
+var geometry=[];
+var material=[];
+var mesh=[];
+var line=[];
+
+var wood=[];
+
+var mtl;
+var obj;
+var sus=[];
+
+var inch=25.4;
+var cc=16.5;
+var cc7=16.5/7;
+
+var ivo=25.4*0.840;
+var ebo=25.4*0.490;
+
+var d125=25.4*0.125;
+var d175=25.4*0.175;
+var d245=25.4*0.245;
+
+var d455=25.4*0.455;
+var d490=25.4*0.490;
+var d525=25.4*0.525;
+
+var d610=25.4*0.610;
+var d685=25.4*0.685;
+var d665=25.4*0.665;
+var d840=25.4*0.840;
+
+var guiK0,guiK1;
+
+var pode=0;
+
+var bId=function(id){return document.getElementById(id);}
+var dbutcli=bId("butcli");
+var dimamus=bId("imamus");
+var dnum=bId("num");
+
+const clock = new THREE.Clock();
+
+var object;
+var sphere;
+
+
+// ******** Audiosynth ********
+
+var f,o;
+var dura=1;
+var Synth, AudioSynth, AudioSynthInstrument;
+!function(){
+	var _encapsulated = false;
+	var AudioSynthInstance = null;
+	var pack = function(c,arg){return [String.fromCharCode(arg&255,(arg>>8)&255),String.fromCharCode(arg&255,(arg>>8)&255,(arg>>16)&255,(arg>>24)&255)][c];};
+	var setPrivateVar = function(n,v,w,e){Object.defineProperty(this,n,{value:v,writable:!!w,enumerable:!!e});};
+	var setPublicVar = function(n,v,w){setPrivateVar.call(this,n,v,w,true);};
+	AudioSynthInstrument = function AudioSynthInstrument(){this.__init__.apply(this,arguments);};
+	var setPriv = setPrivateVar.bind(AudioSynthInstrument.prototype);
+	var setPub = setPublicVar.bind(AudioSynthInstrument.prototype);
+	setPriv('__init__', function(a,b,c) {
+		if(!_encapsulated) { throw new Error('AudioSynthInstrument can only be instantiated from the createInstrument method of the AudioSynth object.'); }
+		setPrivateVar.call(this, '_parent', a);
+		setPublicVar.call(this, 'name', b);
+		setPrivateVar.call(this, '_soundID', c);
+	});
+
+	setPub('play', function(note, octave, duration) {
+		return this._parent.play(this._soundID, note, octave, duration);
+	});
+
+	AudioSynth = function AudioSynth(){if(AudioSynthInstance instanceof AudioSynth){return AudioSynthInstance;}else{ this.__init__(); return this; }};
+	setPriv = setPrivateVar.bind(AudioSynth.prototype);
+	setPub = setPublicVar.bind(AudioSynth.prototype);
+	setPriv('_debug',false,true);
+	setPriv('_bitsPerSample',16);
+	setPriv('_channels',1);
+	setPriv('_sampleRate',44100,true);
+	setPub('setSampleRate', function(v) {
+		this._sampleRate = Math.max(Math.min(v|0,44100), 4000);
+		this._clearCache();
+		return this._sampleRate;
+	});
+	setPub('getSampleRate', function() { return this._sampleRate; });
+	setPriv('_volume',32768,true);
+	setPub('setVolume', function(v) {
+		v = parseFloat(v); if(isNaN(v)) { v = 0; }
+		v = Math.round(v*32768);
+		this._volume = Math.max(Math.min(v|0,32768), 0);
+		this._clearCache();
+		return this._volume;
+	});
+	setPub('getVolume', function() { return Math.round(this._volume/32768*10000)/10000; });
+
+	setPriv('_notes',{'C':261.63,'C#':277.18,'D':293.66,'D#':311.13,'E':329.63,'F':349.23,'F#':369.99,'G':392.00,'G#':415.30,'A':440.00,'A#':466.16,'B':493.88});
+	//setPriv('_notes',{'C':261.63,'C#':272.54,'D':293.33,'D#':313.96,'E':327.03,'F':348.83,'F#':369.92,'G':392.44,'G#':418.60,'A':436.05,'A#':470.93,'B':490.55});
+
+	setPriv('_fileCache',[],true);
+	setPriv('_temp',{},true);
+	setPriv('_sounds',[],true);
+	setPriv('_mod',[function(i,s,f,x){return Math.sin((2 * Math.PI)*(i/s)*f+x);}]);
+	setPriv('_resizeCache', function() {
+		var f = this._fileCache;
+		var l = this._sounds.length;
+		while(f.length<l) {
+			var octaveList = [];
+			for(var i = 0; i < 8; i++) {
+				var noteList = {};
+				for(var k in this._notes) {
+					noteList[k] = {};
+				}
+				octaveList.push(noteList);
+			}
+			f.push(octaveList);
+		}
+	});
+	setPriv('_clearCache', function() {
+		this._fileCache = [];
+		this._resizeCache();
+	});
+
+	setPub('generate', function(sound, note, octave, duration) {
+		var thisSound = this._sounds[sound];
+		if(!thisSound) {
+			for(var i=0;i<this._sounds.length;i++) {
+				if(this._sounds[i].name==sound) {
+					thisSound = this._sounds[i];
+					sound = i;
+					break;
+				}
+			}
+		}
+
+		if(!thisSound) { throw new Error('Invalid sound or sound ID: ' + sound); }
+		var t = (new Date).valueOf();
+		this._temp = {};
+		octave |= 0;
+		octave = Math.min(8, Math.max(1, octave));
+		var time = parseFloat(dura);
+		if(typeof(this._notes[note])=='undefined') { throw new Error(note + ' is not a valid note.'); }
+		if(typeof(this._fileCache[sound][octave-1][note][time])!='undefined') {
+			if(this._debug) { console.log((new Date).valueOf() - t, 'ms to retrieve (cached)'); }
+			return this._fileCache[sound][octave-1][note][time];
+		} else {
+			var frequency = this._notes[note] * Math.pow(2,octave-4);
+			var data = [];
+			var sampleRate = this._sampleRate;
+			var volume = this._volume;
+			var channels = this._channels;
+			var bitsPerSample = this._bitsPerSample;
+			var attack = thisSound.attack(sampleRate, frequency, volume);
+			var dampen = thisSound.dampen(sampleRate, frequency, volume);
+			var wave = thisSound.wave.bind({modulate: this._mod, vars: this._temp});
+			var val = 0;
+			var curVol = 0;
+
+			for (var i = 0; i < (sampleRate * time); i++) {
+				if(i<=sampleRate*attack) {
+					curVol = volume * (i/(sampleRate*attack));
+				} else {
+					curVol = volume * Math.pow((1-((i-(sampleRate*attack))/(sampleRate*(time-attack)))),dampen);
+				}
+
+				val = curVol * Math.min(Math.max(wave(i, sampleRate, frequency, volume), -1), 1);
+				val = String.fromCharCode(val&255, (val>>>8)&255);
+				data.push(val);
+			}
+
+			data = data.join('');
+
+			// Format sub-chunk
+			var chunk1 = [
+				'fmt ', // Sub-chunk identifier
+				pack(1, 16), // Chunk length
+				pack(0, 1), // Audio format (1 is linear quantization)
+				pack(0, channels),
+				pack(1, sampleRate),
+				pack(1, sampleRate * channels * bitsPerSample / 8), // Byte rate
+				pack(0, channels * bitsPerSample / 8),
+				pack(0, bitsPerSample)
+			].join('');
+			// Data sub-chunk (contains the sound)
+			var chunk2 = [
+				'data', // Sub-chunk identifier
+				pack(1, data.length * channels * bitsPerSample / 8), // Chunk length
+				data
+			].join('');
+			// Header
+			var header = [
+				'RIFF',
+				pack(1, 4 + (8 + chunk1.length) + (8 + chunk2.length)), // Length
+				'WAVE'
+			].join('');
+			var out = [header, chunk1, chunk2].join('');
+			var dataURI = 'data:audio/wav;base64,' + escape(window.btoa(out));
+			this._fileCache[sound][octave-1][note][time] = dataURI;
+			if(this._debug) { console.log((new Date).valueOf() - t, 'ms to generate'); }
+			return dataURI;
+		}
+	});
+
+
+	setPub('play', function(note, octave, duration) {
+		var src = this.generate(note, octave, duration);
+		var audio = new Audio(src);
+		audio.addEventListener('ended', function() { audio = null; });
+		audio.autoplay = true;
+		audio.setAttribute('type', 'audio/wav');
+		return true;
+	});
+
+	setPub('debug', function() { this._debug = true; });
+	setPub('createInstrument', function(sound) {
+		var n = 0;
+		var found = false;
+		if(typeof(sound)=='string') {
+			for(var i=0;i<this._sounds.length;i++) {
+				if(this._sounds[i].name==sound) {
+					found = true;
+					n = i;
+					break;
+				}
+			}
+		} else {
+			if(this._sounds[sound]) {
+				n = sound;
+				sound = this._sounds[n].name;
+				found = true;
+			}
+		}
+		if(!found) { throw new Error('Invalid sound or sound ID: ' + sound); }
+		_encapsulated = true;
+		var ins = new AudioSynthInstrument(this, sound, n);
+		_encapsulated = false;
+		return ins;
+	});
+	setPub('listSounds', function() {
+		var r = [];
+		for(var i=0;i<this._sounds.length;i++) {
+			r.push(this._sounds[i].name);
+		}
+		return r;
+	});
+	setPriv('__init__', function(){
+		this._resizeCache();
+	});
+	setPub('loadSoundProfile', function() {
+		for(var i=0,len=arguments.length;i<len;i++) {
+			o = arguments[i];
+			if(!(o instanceof Object)) { throw new Error('Invalid sound profile.'); }
+			this._sounds.push(o);
+		}
+		this._resizeCache();
+		return true;
+	});
+
+	setPub('loadModulationFunction', function() {
+		for(var i=0,len=arguments.length;i<len;i++) {
+			f = arguments[i];
+			if(typeof(f)!='function') { throw new Error('Invalid modulation function.'); }
+			this._mod.push(f);
+		}
+		return true;
+	});
+
+	AudioSynthInstance = new AudioSynth();
+	Synth = AudioSynthInstance;
+}();
+
+Synth.loadModulationFunction(
+	function(i, sampleRate, frequency, x) { return 1 * Math.sin(2 * Math.PI * ((i / sampleRate) * frequency) + x); },
+	function(i, sampleRate, frequency, x) { return 1 * Math.sin(4 * Math.PI * ((i / sampleRate) * frequency) + x); },
+	function(i, sampleRate, frequency, x) { return 1 * Math.sin(8 * Math.PI * ((i / sampleRate) * frequency) + x); },
+	function(i, sampleRate, frequency, x) { return 1 * Math.sin(0.5 * Math.PI * ((i / sampleRate) * frequency) + x); },
+	function(i, sampleRate, frequency, x) { return 1 * Math.sin(0.25 * Math.PI * ((i / sampleRate) * frequency) + x); },
+	function(i, sampleRate, frequency, x) { return 0.5 * Math.sin(2 * Math.PI * ((i / sampleRate) * frequency) + x); },
+	function(i, sampleRate, frequency, x) { return 0.5 * Math.sin(4 * Math.PI * ((i / sampleRate) * frequency) + x); },
+	function(i, sampleRate, frequency, x) { return 0.5 * Math.sin(8 * Math.PI * ((i / sampleRate) * frequency) + x); },
+	function(i, sampleRate, frequency, x) { return 0.5 * Math.sin(0.5 * Math.PI * ((i / sampleRate) * frequency) + x); },
+	function(i, sampleRate, frequency, x) { return 0.5 * Math.sin(0.25 * Math.PI * ((i / sampleRate) * frequency) + x); }
+);
+
+Synth.loadSoundProfile({
+	name: 'piano',
+	attack: function() { return 0.002; },
+	dampen: function(sampleRate, frequency, volume) {
+		return Math.pow(0.5*Math.log((frequency*volume)/sampleRate),2);
+	},
+	wave: function(i, sampleRate, frequency, volume) {
+		var base = this.modulate[0];
+		return this.modulate[1](
+			i,
+			sampleRate,
+			frequency,
+			Math.pow(base(i, sampleRate, frequency, 0), 1.8) +
+				(0.75 * base(i, sampleRate, frequency, 0.25)) +
+				(0.1 * base(i, sampleRate, frequency, 0.5))+
+			Math.pow(base(i, sampleRate, frequency*3.5, 0), 2) +
+				(0.75 * base(i, sampleRate, frequency*3.5, 0.25)) +
+				(0.1 * base(i, sampleRate, frequency*3.5, 0.5)) +
+			Math.pow(base(i, sampleRate*2, frequency*2, 0), 2) +
+				(0.75 * base(i, sampleRate, frequency*2, 0.25)) +
+				(1 * base(i, sampleRate, frequency*2, 0.5))
+		);
+	}
+});
+
+			//Math.pow(base(i, sampleRate, frequency, 0), 2) +
+			//	(0.75 * base(i, sampleRate, frequency, 0.25)) +
+			//	(0.1 * base(i, sampleRate, frequency, 0.5))
+
+
+// ******** Audiosynth ********
+
+
+function init(){
+
+	dbutcli.onclick=function BC(){cli();}
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.outputColorSpace=THREE.LinearSRGBColorSpace;
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	document.body.appendChild(renderer.domElement);
+
+	scene=new THREE.Scene();
+
+	camera=new THREE.PerspectiveCamera(50,window.innerWidth/window.innerHeight,1,1000);
+	camera.position.set(0,0,350);
+
+	scene.position.set(-90,-10,0);
+	scene.rotation.set(-0.5,-0.3,0);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	controls.enablePan=true;
+	controls.enableRotate=true;
+	controls.enableDamping=true;
+	controls.saveState();
+
+	manager=new THREE.LoadingManager();
+	manager.onStart=function(url,itemsLoaded,itemsTotal){console.log('Started loading file: '+url+'.\nLoaded '+itemsLoaded+' of '+itemsTotal+' files.');};
+	manager.onLoad=function(){console.log('Loading complete!');};
+	manager.onProgress=function(url,itemsLoaded,itemsTotal){console.log('loading texture'+url+' '+parseInt(itemsLoaded/itemsTotal*100)+'%');};
+	manager.onError=function(url){console.log('Error loading texture:'+url);};
+	manager.addHandler(/\.dds$/i,new DDSLoader());
+
+	sphere = new THREE.SphereGeometry( 0.1, 16, 16 );
+
+	light[0]=new THREE.AmbientLight('#fc9',0.1);
+	scene.add(light[0]);
+
+
+
+
+				light[1] = new THREE.PointLight( 0xff0040, 4000 );
+				light[1].add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xff0040 } ) ) );
+	light[1].position.set(60,20,50);
+				scene.add( light[1] );
+
+				light[2] = new THREE.PointLight( 0x0040ff, 4000 );
+				light[2].add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0x0040ff } ) ) );
+	light[2].position.set(-10,20,50);
+				scene.add( light[2] );
+
+				light[3] = new THREE.PointLight( 0x80ff80, 9000 );
+				light[3].add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0x80ff80 } ) ) );
+	light[3].position.set(-100,20,50);
+				scene.add( light[3] );
+
+				light[4] = new THREE.PointLight( 0xffaa00, 8400 );
+				light[4].add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) ) );
+	light[4].position.set(160,-20,50);
+				scene.add( light[4] );
+
+	const loader=new OBJLoader();
+	loader.load('models/extras/susteni2.obj',function(obj){
+		object=obj;
+		object.scale.multiplyScalar(1);
+		object.position.set(-50,-30,-50);
+	});
+
+	
+shape[1]=new THREE.Shape();
+shape[1].moveTo(   0,  0);
+shape[1].lineTo(   0,150);
+shape[1].lineTo(d525,150);
+shape[1].lineTo(d525, 60);
+shape[1].lineTo(d840, 60);
+shape[1].lineTo(d840,  0);
+	points[1].push(new THREE.Vector3(   0,  0,0));
+	points[1].push(new THREE.Vector3(   0,150,0));
+	points[1].push(new THREE.Vector3(d525,150,0));
+	points[1].push(new THREE.Vector3(d525, 60,0));
+	points[1].push(new THREE.Vector3(d840, 60,0));
+	points[1].push(new THREE.Vector3(d840,  0,0));
+	points[1].push(new THREE.Vector3(   0,  0,0));
+
+shape[3]=new THREE.Shape();
+shape[3].moveTo(   0,  0);
+shape[3].lineTo(   0, 60);
+shape[3].lineTo(d175, 60);
+shape[3].lineTo(d175,150);
+shape[3].lineTo(d665,150);
+shape[3].lineTo(d665, 60);
+shape[3].lineTo(d840, 60);
+shape[3].lineTo(d840,  0);
+	points[3].push(new THREE.Vector3(   0,  0,0));
+	points[3].push(new THREE.Vector3(   0, 60,0));
+	points[3].push(new THREE.Vector3(d175, 60,0));
+	points[3].push(new THREE.Vector3(d175,150,0));
+	points[3].push(new THREE.Vector3(d665,150,0));
+	points[3].push(new THREE.Vector3(d665, 60,0));
+	points[3].push(new THREE.Vector3(d840, 60,0));
+	points[3].push(new THREE.Vector3(d840,  0,0));
+	points[3].push(new THREE.Vector3(   0,  0,0));
+
+shape[5]=new THREE.Shape();
+shape[5].moveTo(    0,  0);
+shape[5].lineTo(    0,150);
+shape[5].lineTo(-d525,150);
+shape[5].lineTo(-d525, 60);
+shape[5].lineTo(-d840, 60);
+shape[5].lineTo(-d840,  0);
+	points[5].push(new THREE.Vector3(    0,  0,0));
+	points[5].push(new THREE.Vector3(    0,150,0));
+	points[5].push(new THREE.Vector3(-d525,150,0));
+	points[5].push(new THREE.Vector3(-d525, 60,0));
+	points[5].push(new THREE.Vector3(-d840, 60,0));
+	points[5].push(new THREE.Vector3(-d840,  0,0));
+	points[5].push(new THREE.Vector3(    0,  0,0));
+
+shape[6]=new THREE.Shape();
+shape[6].moveTo(   0,  0);
+shape[6].lineTo(   0,150);
+shape[6].lineTo(d455,150);
+shape[6].lineTo(d455, 60);
+shape[6].lineTo(d840, 60);
+shape[6].lineTo(d840,  0);
+	points[6].push(new THREE.Vector3(   0,  0,0));
+	points[6].push(new THREE.Vector3(   0,150,0));
+	points[6].push(new THREE.Vector3(d455,150,0));
+	points[6].push(new THREE.Vector3(d455, 60,0));
+	points[6].push(new THREE.Vector3(d840, 60,0));
+	points[6].push(new THREE.Vector3(d840,  0,0));
+	points[6].push(new THREE.Vector3(   0,  0,0));
+
+shape[8]=new THREE.Shape();
+shape[8].moveTo(   0,  0);
+shape[8].lineTo(   0, 60);
+shape[8].lineTo(d125, 60);
+shape[8].lineTo(d125,150);
+shape[8].lineTo(d610,150);
+shape[8].lineTo(d610, 60);
+shape[8].lineTo(d840, 60);
+shape[8].lineTo(d840,  0);
+	points[8].push(new THREE.Vector3(   0,  0,0));
+	points[8].push(new THREE.Vector3(   0, 60,0));
+	points[8].push(new THREE.Vector3(d125, 60,0));
+	points[8].push(new THREE.Vector3(d125,150,0));
+	points[8].push(new THREE.Vector3(d610,150,0));
+	points[8].push(new THREE.Vector3(d610, 60,0));
+	points[8].push(new THREE.Vector3(d840, 60,0));
+	points[8].push(new THREE.Vector3(d840,  0,0));
+	points[8].push(new THREE.Vector3(   0,  0,0));
+
+shape[10]=new THREE.Shape();
+shape[10].moveTo(   0,  0);
+shape[10].lineTo(   0, 60);
+shape[10].lineTo(d245, 60);
+shape[10].lineTo(d245,150);
+shape[10].lineTo(d685,150);
+shape[10].lineTo(d685, 60);
+shape[10].lineTo(d840, 60);
+shape[10].lineTo(d840,  0);
+	points[10].push(new THREE.Vector3(   0,  0,0));
+	points[10].push(new THREE.Vector3(   0, 60,0));
+	points[10].push(new THREE.Vector3(d245, 60,0));
+	points[10].push(new THREE.Vector3(d245,150,0));
+	points[10].push(new THREE.Vector3(d685,150,0));
+	points[10].push(new THREE.Vector3(d685, 60,0));
+	points[10].push(new THREE.Vector3(d840, 60,0));
+	points[10].push(new THREE.Vector3(d840,  0,0));
+	points[10].push(new THREE.Vector3(   0,  0,0));
+
+shape[12]=new THREE.Shape();
+shape[12].moveTo(    0,  0);
+shape[12].lineTo(    0,150);
+shape[12].lineTo(-d455,150);
+shape[12].lineTo(-d455, 60);
+shape[12].lineTo(-d840, 60);
+shape[12].lineTo(-d840,  0);
+	points[12].push(new THREE.Vector3(    0,  0,0));
+	points[12].push(new THREE.Vector3(    0,150,0));
+	points[12].push(new THREE.Vector3(-d455,150,0));
+	points[12].push(new THREE.Vector3(-d455, 60,0));
+	points[12].push(new THREE.Vector3(-d840, 60,0));
+	points[12].push(new THREE.Vector3(-d840,  0,0));
+	points[12].push(new THREE.Vector3(    0,  0,0));
+
+extrudeSettings[1]={ steps:1, depth:16, bevelEnabled:true, bevelThickness:0.1, bevelSize:0.1, bevelOffset:0, bevelSegments:1};
+
+
+geo[1]=new THREE.ExtrudeGeometry(shape[1],extrudeSettings[1]);
+mat[1]=new THREE.MeshBasicMaterial({color:0xfffff0});
+
+
+mesh[1]=new THREE.Mesh(geo[1],mat[1]);
+mesh[1].position.set(0,-150,0);
+	geometry[1]=new THREE.BufferGeometry().setFromPoints(points[1]);
+	material[1]=new THREE.MeshBasicMaterial({color:'#999'});
+	line[1]=new THREE.Line(geometry[1],material[1]);
+	line[1].position.set(0,-150,16.2);
+ivory[1]=new THREE.AxesHelper(0.1);
+ivory[1].position.set(-89.75,70,0);
+ivory[1].add(mesh[1]);
+ivory[1].add(line[1]);
+	ivory[21]=ivory[1].clone();
+	ivory[21].position.set(-89.75+162,70,0);
+
+geo[3]=new THREE.ExtrudeGeometry(shape[3],extrudeSettings[1]);
+mesh[3]=new THREE.Mesh(geo[3],mat[1]);
+mesh[3].position.set(0,-150,0);
+	geometry[3]=new THREE.BufferGeometry().setFromPoints(points[3]);
+	material[3]=new THREE.MeshBasicMaterial({color:'#999'});
+	line[3]=new THREE.Line(geometry[3],material[3]);
+	line[3].position.set(0,-150,16.2);
+ivory[3]=new THREE.AxesHelper(0.1);
+ivory[3].position.set(-66.5,70,0);
+ivory[3].add(mesh[3]);
+ivory[3].add(line[3]);
+	ivory[23]=ivory[3].clone();
+	ivory[23].position.set(-66.5+161,70,0);
+
+geo[5]=new THREE.ExtrudeGeometry(shape[5],extrudeSettings[1]);
+mesh[5]=new THREE.Mesh(geo[5],mat[1]);
+mesh[5].position.set(0,-150,0);
+	geometry[5]=new THREE.BufferGeometry().setFromPoints(points[5]);
+	material[5]=new THREE.MeshBasicMaterial({color:'#999'});
+	line[5]=new THREE.Line(geometry[5],material[5]);
+	line[5].position.set(0,-150,16.2);
+ivory[5]=new THREE.AxesHelper(0.1);
+ivory[5].position.set(-22,70,0);
+ivory[5].add(mesh[5]);
+ivory[5].add(line[5]);
+	ivory[25]=ivory[5].clone();
+	ivory[25].position.set(-22+160,70,0);
+
+geo[6]=new THREE.ExtrudeGeometry(shape[6],extrudeSettings[1]);
+mesh[6]=new THREE.Mesh(geo[6],mat[1]);
+mesh[6].position.set(0,-150,0);
+	geometry[6]=new THREE.BufferGeometry().setFromPoints(points[6]);
+	material[6]=new THREE.MeshBasicMaterial({color:'#999'});
+	line[6]=new THREE.Line(geometry[6],material[6]);
+	line[6].position.set(0,-150,16.2);
+ivory[6]=new THREE.AxesHelper(0.1);
+ivory[6].position.set(-19.5,70,0);
+ivory[6].add(mesh[6]);
+ivory[6].add(line[6]);
+	ivory[26]=ivory[6].clone();
+	ivory[26].position.set(-19.5+158.5,70,0);
+
+geo[8]=new THREE.ExtrudeGeometry(shape[8],extrudeSettings[1]);
+mesh[8]=new THREE.Mesh(geo[8],mat[1]);
+mesh[8].position.set(0,-150,0);
+	geometry[8]=new THREE.BufferGeometry().setFromPoints(points[8]);
+	material[8]=new THREE.MeshBasicMaterial({color:'#999'});
+	line[8]=new THREE.Line(geometry[8],material[8]);
+	line[8].position.set(0,-150,16.2);
+ivory[8]=new THREE.AxesHelper(0.1);
+ivory[8].position.set(3.5,70,0);
+ivory[8].add(mesh[8]);
+ivory[8].add(line[8]);
+	ivory[28]=ivory[8].clone();
+	ivory[28].position.set(3.5+158,70,0);
+
+geo[10]=new THREE.ExtrudeGeometry(shape[10],extrudeSettings[1]);
+mesh[10]=new THREE.Mesh(geo[10],mat[1]);
+mesh[10].position.set(0,-150,0);
+	geometry[10]=new THREE.BufferGeometry().setFromPoints(points[10]);
+	material[10]=new THREE.MeshBasicMaterial({color:'#999'});
+	line[10]=new THREE.Line(geometry[10],material[10]);
+	line[10].position.set(0,-150,16.2);
+ivory[10]=new THREE.AxesHelper(0.1);
+ivory[10].position.set(27,70,0);
+ivory[10].add(mesh[10]);
+ivory[10].add(line[10]);
+	ivory[210]=ivory[10].clone();
+	ivory[210].position.set(27+157,70,0);
+
+geo[12]=new THREE.ExtrudeGeometry(shape[12],extrudeSettings[1]);
+mesh[12]=new THREE.Mesh(geo[12],mat[1]);
+mesh[12].position.set(0,-150,0);
+	geometry[12]=new THREE.BufferGeometry().setFromPoints(points[12]);
+	material[12]=new THREE.MeshBasicMaterial({color:'#999'});
+	line[12]=new THREE.Line(geometry[12],material[12]);
+	line[12].position.set(0,-150,16.2);
+ivory[12]=new THREE.AxesHelper(0.1);
+ivory[12].position.set(71.5,70,0);
+ivory[12].add(mesh[12]);
+ivory[12].add(line[12]);
+	ivory[212]=ivory[12].clone();
+	ivory[212].position.set(71.5+156,70,0);
+
+
+var piano=Synth.createInstrument('piano');
+
+
+function cli(){
+
+
+	dimamus.style.display="";
+	dbutcli.style.display="none";
+
+	var t=-3;
+
+	const myInterval=setInterval(clicli,240);
+
+	Synth.setVolume(1.0);
+
+	function pos(){
+		for(let z=1;z<300;z++){
+			if(ivory[z]){ivory[z].rotation.x=0;}
+			if(ebony[z]){ebony[z].rotation.x=3.14;}
+		}
+	}
+
+	function wec(t){ivory[t].rotation.x=0.1;}
+
+	function bec(t){ebony[t].rotation.x=3.3;}
+
+
+	function clicli() {
+
+		t++;
+
+  		switch(t){
+
+			case   1:dura=4.0;piano.play('C',3);pos();wec( 1);break;
+			case   2:dura=2.0;piano.play('G',3);pos();wec( 8);break;
+			case   3:dura=8.0;piano.play('E',4);pos();wec(25);break;
+
+			case   9:dura=4.0;piano.play('C',3);pos();wec( 1);break;
+			case  10:dura=2.0;piano.play('A',3);pos();wec(10);break;
+			case  11:dura=8.0;piano.play('F#',4);pos();bec(19);break;
+
+			case  17:dura=4.0;piano.play('B',3);pos();wec(12);break;
+
+			case  23:dura=2.0;piano.play('D',4);pos();wec(23);break;
+			case  25:dura=6.0;piano.play('A',3);pos();wec(10);break;
+
+			case  31:dura=2.0;piano.play('G',3);pos();wec( 8);break;
+			case  32:dura=2.0;piano.play('A',3);pos();wec(10);break;
+			case  33:dura=4.0;piano.play('B',3);pos();wec(12);break;
+
+			case  40:dura=4.0;piano.play('D',4);pos();wec(23);break;
+			case  43:dura=4.0;piano.play('A',3);pos();wec(10);break;
+
+			case  50:dura=2.0;piano.play('B',3);pos();wec(12);break;
+			case  51:dura=2.0;piano.play('D',3);pos();wec( 3);break;
+			case  52:dura=4.0;piano.play('A',3);pos();wec(10);break;
+
+			case  57:dura=4.0;piano.play('G',3);pos();wec( 8);break;
+			case  61:dura=6.0;piano.play('D',4);pos();wec(23);break;
+
+			case  70:dura=2.0;piano.play('C',4);pos();wec(21);break;
+			case  71:dura=2.0;piano.play('B',3);pos();wec(12);break;
+			case  72:dura=6.0;piano.play('A',3);pos();wec(10);break;
+
+			case  78:dura=4.0;piano.play('D',4);pos();wec(23);break;
+			case  82:dura=2.0;piano.play('E',4);pos();wec(25);break;
+			case  83:dura=2.0;piano.play('C',4);pos();wec(21);break;
+			case  84:dura=2.0;piano.play('B',3);pos();wec(12);break;
+			case  85:dura=2.0;piano.play('C',4);pos();wec(21);break;
+			case  86:dura=2.0;piano.play('B',3);pos();wec(12);break;
+			case  87:dura=6.0;piano.play('A',3);pos();wec(10);break;
+
+			case  92:dura=4.0;piano.play('D',4);pos();wec(23);break;
+			case  96:dura=2.0;piano.play('E',4);pos();wec(25);break;
+			case  97:dura=2.0;piano.play('C',4);pos();wec(21);break;
+			case  98:dura=2.0;piano.play('B',3);pos();wec(12);break;
+			case  99:dura=2.0;piano.play('C',4);pos();wec(21);break;
+			case 100:dura=2.0;piano.play('B',3);pos();wec(12);break;
+			case 101:dura=6.0;piano.play('G',3);pos();wec( 8);break;
+
+			case 106:dura=8.0;piano.play('G',4);pos();wec(28);piano.play('G',3);wec(8);break;
+
+			case 120:pos();break;
+		}
+		if(t==120){clearInterval(myInterval);dimamus.style.display="none";dbutcli.style.display="";}
+	}
+
+}
+
+// wec(1)= C 3 wec(21)= C 4 wec(31)= C 5
+// wec(3)= D 3 wec(23)= D 4 wec(33)= D 5
+// wec(5)= E 3 wec(25)= E 4 wec(35)= E 5
+// wec(6)= F 3 wec(26)= F 4 wec(36)= F 5
+// wec(8)= G 3 wec(28)= G 4 wec(38)= G 5
+// wec(10)=A 3 wec(210)=A 4 wec(310)=A 5
+// wec(12)=B 3 wec(212)=B 4 wec(312)=B 5
+
+// bec(2)=  C# 3 bec(22)=  C# 4 bec(32)=  C# 5
+// bec(4)=  D# 3 bec(24)=  D# 4 bec(34)=  D# 5
+// bec(7)=  F# 3 bec(27)=  F# 4 bec(37)=  F# 5
+// bec(9)=  G# 3 bec(29)=  G# 4 bec(39)=  G# 5
+// bec(11)= A# 3 bec(211)= A# 4 bec(311)= A# 5
+
+}
+
+function animate(){
+
+	requestAnimationFrame(animate);
+	controls.update();
+
+	w++;
+
+
+	if(w==60){
+		ebony[2]=new THREE.AxesHelper(0.1);
+		ebony[2].position.set(-69,70,15);
+		sus[2]=object.clone();
+		sus[2].position.set(0,45,0);
+		ebony[2].add(sus[2]);
+		ebony[2].rotation.x=3.14;
+		scene.add(ebony[2]);
+			ebony[4]=new THREE.AxesHelper(0.1);
+			ebony[4].position.set(-42.5,70,15);
+			sus[4]=object.clone();
+			sus[4].position.set(0,45,0);
+			ebony[4].add(sus[4]);
+			ebony[4].rotation.x=3.14;
+			scene.add(ebony[4]);
+		ebony[7]=new THREE.AxesHelper(0.1);
+		ebony[7].position.set(-1,70,15);
+			sus[7]=object.clone();
+			sus[7].position.set(0,45,0);
+		ebony[7].add(sus[7]);
+		ebony[7].rotation.x=3.14;
+		scene.add(ebony[7]);
+			ebony[9]=new THREE.AxesHelper(0.1);
+			ebony[9].position.set(26.5,70,15);
+			sus[9]=object.clone();
+			sus[9].position.set(0,45,0);
+			ebony[9].add(sus[9]);
+			ebony[9].rotation.x=3.14;
+			scene.add(ebony[9]);
+		ebony[11]=new THREE.AxesHelper(0.1);
+		ebony[11].position.set(52,70,15);
+			sus[11]=object.clone();
+			sus[11].position.set(0,45,0);
+		ebony[11].add(sus[11]);
+		ebony[11].rotation.x=3.14;
+		scene.add(ebony[11]);
+			ebony[14]=new THREE.AxesHelper(0.1);
+			ebony[14].position.set(92,70,15);
+			sus[14]=object.clone();
+			sus[14].position.set(0,45,0);
+			ebony[14].add(sus[14]);
+			ebony[14].rotation.x=3.14;
+			scene.add(ebony[14]);
+		ebony[16]=new THREE.AxesHelper(0.1);
+		ebony[16].position.set(118,70,15);
+			sus[16]=object.clone();
+			sus[16].position.set(0,45,0);
+		ebony[16].add(sus[16]);
+		ebony[16].rotation.x=3.14;
+		scene.add(ebony[16]);
+			ebony[19]=new THREE.AxesHelper(0.1);
+			ebony[19].position.set(158,70,15);
+			sus[19]=object.clone();
+			sus[19].position.set(0,45,0);
+			ebony[19].add(sus[19]);
+			ebony[19].rotation.x=3.14;
+			scene.add(ebony[19]);
+		ebony[21]=new THREE.AxesHelper(0.1);
+		ebony[21].position.set(184,70,15);
+			sus[21]=object.clone();
+			sus[21].position.set(0,45,0);
+		ebony[21].add(sus[21]);
+		ebony[21].rotation.x=3.14;
+		scene.add(ebony[21]);
+			ebony[23]=new THREE.AxesHelper(0.1);
+			ebony[23].position.set(210,70,15);
+			sus[23]=object.clone();
+			sus[23].position.set(0,45,0);
+			ebony[23].add(sus[23]);
+			ebony[23].rotation.x=3.14;
+			scene.add(ebony[23]);
+	scene.add(ivory[1]);
+	scene.add(ivory[21]);
+	scene.add(ivory[3]);
+	scene.add(ivory[23]);;
+	scene.add(ivory[5]);
+	scene.add(ivory[25]);
+	scene.add(ivory[6]);
+	scene.add(ivory[26]);
+	scene.add(ivory[8]);
+	scene.add(ivory[28]);
+	scene.add(ivory[10]);
+	scene.add(ivory[210]);
+	scene.add(ivory[12]);
+	scene.add(ivory[212]);
+
+	}
+
+	const time=Date.now()*0.0005;
+	const delta=clock.getDelta();
+	light[3].position.y = Math.cos( time * 0.3 ) * 80;
+
+	renderer.render(scene,camera);
+
+}
+
+init();
+
+animate();
+
+
+/*
+
+Piano keys playing in Three.js
+
+Starting up!
+
+Special Thanks to Keith William Horwood and Nick Berry, for the masterpieces!
+
+If Some Special One teaches me how to change the colors of the THREE.MeshNormalMaterial, the appearance would be much better!
+
+The link:
+
+TTTTT,
+
+Jose Roberto Lazzareschi
+
+PS: TTTTT is Thanks To The Three.js Team
+
+
+*/
+
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>mineru.html</title>
+    <link rel="shortcut icon" href="ok.ico">
+<!--
+    <script src="./three.js"></script>
+    <script src="./OrbitControls.js"></script>
+    <script src="./Stats.js"></script>
+    <script src="./dat.gui.js"></script>
+    <script src="./three.module.js"></script>
+    <script src="./WebGL.js"></script>  
+
+
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap"> 
+      { "imports": 
+        { "three": 
+          "https://cdn.skypack.dev/three@0.142.0/build/three.module", "three/": "https://cdn.skypack.dev/three@0.142.0/" 
+        } 
+      } </script>
+
+-->
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+    </style>
+
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+	{
+		"imports":{
+			"three":"https://unpkg.com/three@0.156.0/build/three.module.js",
+			"three/addons/":"https://unpkg.com/three@0.156.0/examples/jsm/"
+		}
+	}
+</script>
+
+
+  </head>
+  <body>
+
+<button style="position:absolute;left:84%;top:84%;background-color:#ccc;text-align:center;"><a id="code" href="mineru.txt" target="_blank" style="color:#000;text-decoration:none;font-size:16pt;">The Code</a></button>
+
+
+    <div id="webgl-output"></div>
+
+    <script type="module">
+      import * as THREE from 'three';
+      import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+      import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+var group=new THREE.Group();
+
+      function init() {
+        // create a scene, that will hold all our elements such as objects, cameras and lights.
+
+        var scene = new THREE.Scene();
+        const loader = new THREE.TextureLoader();
+        
+        // create a camera, which defines where we're looking at.
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        // create a render and set the size
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setClearColor(new THREE.Color(0xAFD7DE));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMapEnabled = true;
+        
+        
+        //get texture from root
+        const grass = loader.load('img/music.png');
+        const tile = loader.load('img/music.png');
+        const road = loader.load('img/music.png');
+        const cement = loader.load('img/music.png');
+        const soil = loader.load('img/music.png');
+        const cement_o = loader.load('img/music.png');
+        const tile_p = loader.load('img/music.png');
+        const tile_g = loader.load('img/music.png');
+        const tile_w = loader.load('img/music.png');
+
+        // create controls for camera manipulation
+        var controls = new OrbitControls(camera, renderer.domElement);
+        const color = 0xCCCCCC;
+        const inten = 0.2;
+        const alight = new THREE.AmbientLight(color, inten);
+        scene.add(alight);
+
+        const color1 = 0xAAAAAA;
+        const intensity1 = 0.3;
+        const dlight = new THREE.DirectionalLight(color1, intensity1);
+        dlight.target.position.set(1.3, 0.63, 6.06);
+        dlight.castShadow = true;
+        dlight.position.set(15, 10, 13);
+        scene.add(dlight);
+        scene.add(dlight.target);
+
+        const skyColor = 0xB1E1FF;  // ???
+        const groundColor = 0xB97C22;  // ??? ???
+        const intensity = 1;
+        const light = new THREE.HemisphereLight(skyColor, groundColor, intensity);
+        scene.add(light);
+        
+        function createMesh(geometry, material, position, rotation, castShadow = true, receiveShadow = true) {
+          var mesh = new THREE.Mesh(geometry, material);
+          mesh.receiveShadow = true;
+          mesh.position.set(...position);
+          if (rotation) mesh.rotation.set(...rotation);
+          mesh.castShadow = castShadow;
+          mesh.receiveShadow = receiveShadow;
+          return mesh;
+        }
+
+        // create a cylinder
+        var cylinderGeometry = new THREE.CylinderGeometry(1, 1, 1, 32);
+        var cylinderMaterial = new THREE.MeshStandardMaterial({
+          map: cement,
+          normalMap: cement,
+          displacementMap: cement, displacementScale:0.5,
+          roughnessMap: cement, roughness: 0.25
+        });
+        
+        var cylinderMaterial2 = new THREE.MeshStandardMaterial({
+          map: cement_o,
+          normalMap: cement_o,
+          displacementMap: cement_o, displacementScale:0.5,
+          roughnessMap: cement_o, roughness: 0.25
+        });
+        var cylinderGround = new THREE.MeshStandardMaterial({
+          map : soil,
+          normalMap: soil,
+          displacementMap: soil, displacementScale:0.5,
+        })
+
+        var cylinder = createMesh(cylinderGeometry, cylinderMaterial, [0.804, 0.003, 6.06]);
+        var cylinder2 = createMesh(new THREE.CylinderGeometry(1,1,0.13,32), cylinderMaterial2, [0.804, 0.003, 6.06]);
+        cylinder2.position.set(0.804, 0.63, 6.06);
+        var cylinder3 = createMesh(new THREE.CylinderGeometry(0.9,0.9,0.13,32), cylinderMaterial, [0.804, 0.003, 6.06]);
+        cylinder3.position.set(0.804, 0.55, 6.06);
+        var groundC = createMesh(new THREE.CylinderGeometry(0.8, 0.8, 1, 32), cylinderGround, [0.804, 0.008, 6.06]);
+        groundC.position.set(0.804, 0.2, 6.06);
+        scene.add(cylinder);
+        scene.add(cylinder2);
+        scene.add(cylinder3);
+        scene.add(groundC);
+
+        ///create a yard 
+        var planeGeometry = new THREE.PlaneGeometry(50,50);
+        var planeMaterial = new THREE.MeshStandardMaterial({
+          color: 0xffffff,
+          map: tile,
+          normalMap: tile,
+          displacementMap: tile, displacementScale:0.5,
+          roughnessMap: tile, roughness: 0.25
+        });
+        var planeMaterial2 = new THREE.MeshStandardMaterial({
+          map: grass,
+          normalMap: grass,
+          displacementMap: grass, displacementScale:0.5,
+          roughnessMap: grass, roughness: 0.25
+        });
+        var planeMaterial3 = new THREE.MeshStandardMaterial({
+          map: road,
+          normalMap: road,
+          displacementMap: road, displacementScale:0.5,
+          roughnessMap: road, roughness: 0.25
+        });
+        
+        var yardMaterials = [planeMaterial, planeMaterial2, planeMaterial2, planeMaterial2, planeMaterial3, planeMaterial3, planeMaterial3, planeMaterial2];
+        var yardGeometries = [planeGeometry, new THREE.PlaneGeometry(6.5,4), new THREE.PlaneGeometry(6.5,4), new THREE.PlaneGeometry(6.5,7), new THREE.PlaneGeometry(50,8), new THREE.PlaneGeometry(50,8), new THREE.PlaneGeometry(50,5), new THREE.PlaneGeometry(6.5,4)];
+        var yardPositions = [[0,-0.038,0],[3, 0.028, -5.5],[-5.3, 0.028, -5.5],[9, 0.028, -4],[0,0.033, 20],[18,0.033, 0],[-24,0.028,0], [5, 0.03, -12.4]];
+        var yardRotations = [[-89.53, 0, 0],[-89.53, 0, 0],[-89.53, 0, 0],[-89.53, 0, 0],[-89.53, 0, 0],[-89.53, 0, -89.53],[-89.53, 0, -89.53],[-89.53, 0, 0]];
+
+        for (let i = 0; i < yardMaterials.length; i++) {
+          var yard = createMesh(yardGeometries[i], yardMaterials[i], yardPositions[i], yardRotations[i]);
+          
+          scene.add(yard);
+        }
+
+        // create a Pillars
+        
+        var cubeMaterial = new THREE.MeshStandardMaterial({
+          map: cement,
+          normalMap: cement,
+          displacementMap: cement, displacementScale:0.5,
+          roughnessMap: cement, roughness: 0.25
+        });
+        var cubeMaterial1 = new THREE.MeshStandardMaterial({
+          map: cement_o,
+          normalMap: cement_o,
+          displacementMap: cement_o, displacementScale:0.5,
+          roughnessMap: cement_o, roughness: 0.25
+        });
+
+        var pillars = [
+          {geometry: new THREE.BoxGeometry(1, 5, 1), position: [0.181, 2.5, -0.562]},
+          {geometry: new THREE.BoxGeometry(1, 5, 1), position: [-2.597, 2.5, 0.330], rotation: [0, 24.6, 0]},
+          {geometry: new THREE.BoxGeometry(1, 5, 1), position: [7.285, 2.5, 5.776]},
+          {geometry: new THREE.BoxGeometry(1, 5, 1), position: [4.727, 2.5, 0.767], rotation: [0, 2.4, 0]},
+          {geometry: new THREE.BoxGeometry(1, 5, 1), position: [6.615, 2.5, 3.067], rotation: [0, 26, 0]},
+          {geometry: new THREE.BoxGeometry(1, 5, 1), position: [2.545, 2.5, -0.295], rotation: [0, -14.6, 0]},
+          {geometry: new THREE.BoxGeometry(1, 5, 1), position: [-4.447, 2.5, 2.179], rotation: [0, -35.2, 0]},
+          {geometry: new THREE.BoxGeometry(1, 5, 1), position: [-5.625, 2.5, 4.818], rotation: [0, -11.4, 0]},
+          {geometry: new THREE.BoxGeometry(1, 5, 1), position: [-5.329, 2.5, 8.403]},
+          //
+          {geometry: new THREE.BoxGeometry(1, 4.45, 1), position: [-3.523, 0.33, -1.385], rotation: [48.7, 0, -24.6], scale: [1, 0.95, 1]},
+          {geometry: new THREE.BoxGeometry(1, 5, 1), position: [-11.711, 0.33, -3], rotation: [0, 0, 48.7], scale: [1, 3, 1]},
+          {geometry: new THREE.BoxGeometry(1, 5, 1), position: [-9, 0.33, -4.5], rotation: [-48.7, 0, 0], scale: [1, 0.8, 1]},
+          {geometry: new THREE.BoxGeometry(1, 5, 1), position: [-13.5, 0.33, -7], rotation: [-48.7, 0, 48.7], scale: [1, 2, 1]},
+          //
+          {geometry: new THREE.BoxGeometry(0.7, 4.45, 1), position: [-3.523, 0.5, -1.385], rotation: [48.7, 0, -24.6], scale: [1, 0.95, 1]},
+          {geometry: new THREE.BoxGeometry(0.7, 5, 1), position: [-11.711, 0.5, -3], rotation: [0, 0, 48.7], scale: [1, 3, 1]},
+          {geometry: new THREE.BoxGeometry(0.7, 5, 0.6), position: [-9, 0.5, -4.5], rotation: [-48.7, 0, 0], scale: [1, 0.8, 1]},
+          {geometry: new THREE.BoxGeometry(1, 5, 0.7), position: [-13.5, 0.5, -7], rotation: [-48.7, 0, 48.7], scale: [1, 2, 1]},
+          
+        ];
+        var pillars2 = [
+          {geometry: new THREE.BoxGeometry(1, 5, 0.13), position: [-13.5, 0.96, -7], rotation: [-48.7, 0, 48.7], scale: [1, 2, 1]},
+          {geometry: new THREE.BoxGeometry(1, 5, 0.13), position: [-9, 0.96, -4.5], rotation: [-48.7, 0, 0], scale: [1, 0.8, 1]},
+          {geometry: new THREE.BoxGeometry(1, 4.45, 0.13), position: [-3.523, 0.96, -1.385], rotation: [48.7, 0, -24.6], scale: [1, 0.95, 1]},
+          {geometry: new THREE.BoxGeometry(0.13, 5, 1), position: [-11.711, 0.96, -3], rotation: [0, 0, 48.7], scale: [1, 3, 1]},
+        ];
+
+        for (let pillar of pillars) {
+          var mesh = createMesh(pillar.geometry, cubeMaterial, pillar.position, pillar.rotation);
+          if (pillar.scale) mesh.scale.set(...pillar.scale);
+          scene.add(mesh);
+        }
+        for (let pillar of pillars2) {
+          var mesh = createMesh(pillar.geometry, cubeMaterial1, pillar.position, pillar.rotation);
+          if (pillar.scale) mesh.scale.set(...pillar.scale);
+          scene.add(mesh);
+        }
+
+        // create a house
+        var boxMaterial = new THREE.MeshStandardMaterial({
+          map: cement,
+          normalMap: cement,
+          displacementMap: cement, displacementScale:0.5,
+          roughnessMap: cement, roughness: 0.25
+        });
+
+        var houseParts = [
+          {geometry: new THREE.BoxGeometry(6, 25, 0.5), position: [5, 12.5, -14.870]},
+          {geometry: new THREE.BoxGeometry(7, 25, 0.5), position: [-8.95, 12.5, -12.870]},
+          {geometry: new THREE.BoxGeometry(20.5, 25, 0.5), position: [-2.2, 12.5, -24.870]},
+          {geometry: new THREE.BoxGeometry(19, 1, 10), position: [-2, 0.5, -19.9]},
+          {geometry: new THREE.BoxGeometry(8, 1, 12), position: [-8, 0.5, -18.9]},
+          {geometry: new THREE.BoxGeometry(19, 0.38, 10), position: [-2, 24.5, -19.9]},
+          {geometry: new THREE.BoxGeometry(8, 0.38, 12), position: [-8, 24.5, -18.9]},
+          {geometry: new THREE.BoxGeometry(19, 0.38, 10), position: [-2, 20, -19.9]},
+          {geometry: new THREE.BoxGeometry(8, 0.38, 12), position: [-8, 20, -18.9]},
+          {geometry: new THREE.BoxGeometry(19, 0.38, 10), position: [-2, 15.5, -19.9]},
+          {geometry: new THREE.BoxGeometry(8, 0.38, 12), position: [-8, 15.5, -18.9]},
+          {geometry: new THREE.BoxGeometry(19, 0.38, 10), position: [-2, 11.0, -19.9]},
+          {geometry: new THREE.BoxGeometry(8, 0.38, 12), position: [-8, 11.0, -18.9]},
+          {geometry: new THREE.BoxGeometry(19, 0.38, 10), position: [-2, 6.5, -19.9]},
+          {geometry: new THREE.BoxGeometry(8, 0.38, 12), position: [-8, 6.5, -18.9]},
+          {geometry: new THREE.BoxGeometry(12, 25, 0.5), position: [-12.2, 12.5, -18.9], rotation: [0, -48.7, 0]},
+          {geometry: new THREE.BoxGeometry(10, 25, 0.5), position: [7.73, 12.5, -19.9], rotation: [0, -48.7, 0]},
+        ];
+        var houseParts2 = [
+          {geometry: new THREE.BoxGeometry(3.5, 25, 0.5), position: [-5.7, 12.5, -14.7], rotation: [0, -48.7, 0]},
+          {geometry: new THREE.BoxGeometry(2, 25, 0.5), position: [2, 12.5, -15.6], rotation: [0, -48.7, 0]},
+        ]
+        var houseParts3 = [
+        {geometry: new THREE.BoxGeometry(3, 2.5, 0.5), position: [-3.7, 1.5, -14.6], rotation: [0, -48.7, 0]},
+        {geometry: new THREE.BoxGeometry(2, 2.5, 0.5), position: [-4.5, 1.5, -12.9]},
+        {geometry: new THREE.BoxGeometry(2, 2.5, 0.5), position: [-4.5, 6.0, -12.9]},
+        {geometry: new THREE.BoxGeometry(2, 2.5, 0.5), position: [-4.5, 10.5, -12.9]},
+        {geometry: new THREE.BoxGeometry(2, 2.5, 0.5), position: [-4.5, 15.0, -12.9]},
+        {geometry: new THREE.BoxGeometry(2, 2.5, 0.5), position: [-4.5, 19.5, -12.9]},
+        {geometry: new THREE.BoxGeometry(2, 2.5, 0.5), position: [-4.5, 24.0, -12.9]},
+        //
+        {geometry: new THREE.BoxGeometry(3, 2.5, 0.5), position: [-3.7, 1.5, -14.6],rotation: [0, -48.7, 0]},
+        {geometry: new THREE.BoxGeometry(3, 2.5, 0.5), position: [-3.7, 6.0, -14.6],rotation: [0, -48.7, 0]},
+        {geometry: new THREE.BoxGeometry(3, 2.5, 0.5), position: [-3.7, 10.5, -14.6],rotation: [0, -48.7, 0]},
+        {geometry: new THREE.BoxGeometry(3, 2.5, 0.5), position: [-3.7, 15, -14.6],rotation: [0, -48.7, 0]},
+        {geometry: new THREE.BoxGeometry(3, 2.5, 0.5), position: [-3.7, 19.5, -14.6],rotation: [0, -48.7, 0]},
+        {geometry: new THREE.BoxGeometry(3, 2.5, 0.5), position: [-3.7, 24.0, -14.6],rotation: [0, -48.7, 0]},
+        //
+        {geometry: new THREE.BoxGeometry(6, 2.5, 0.5), position: [-1, 6.0, -14.9]},
+        {geometry: new THREE.BoxGeometry(6, 2.5, 0.5), position: [-1, 10.5, -14.9]},
+        {geometry: new THREE.BoxGeometry(6, 2.5, 0.5), position: [-1, 15.0, -14.9]},
+        {geometry: new THREE.BoxGeometry(6, 2.5, 0.5), position: [-1, 19.5, -14.9]},
+        {geometry: new THREE.BoxGeometry(6, 2.5, 0.5), position: [-1, 24.0, -14.9]},
+        ]
+
+        for (let part of houseParts) {
+          var mesh = createMesh(part.geometry, boxMaterial, part.position, part.rotation);
+          scene.add(mesh);
+        }
+        for (let part of houseParts2) {
+          var mesh = createMesh(part.geometry, boxMaterial, part.position, part.rotation);
+          scene.add(mesh);
+        }
+        
+        for (let part of houseParts3) {
+          var mesh = createMesh(part.geometry, boxMaterial, part.position, part.rotation);
+          scene.add(mesh);
+        }
+
+        //create the floor circle
+        
+        var CircleGeometry = new THREE.CircleGeometry(1,32);
+        var CircleMaterial1 = new THREE.MeshStandardMaterial({
+          
+          map:tile_p, //color pink
+          normalMap: tile_p,
+          displacementMap: tile_p, displacementScale:0.5,
+          roughnessMap: tile_p, roughness: 0.25
+          
+        });
+        var CircleMaterial2 = new THREE.MeshStandardMaterial({
+          map:tile_g, //color green
+          normalMap: tile_g,
+          displacementMap: tile_g, displacementScale:0.5,
+          roughnessMap: tile_g, roughness: 0.25
+          
+        });
+        var CircleMaterial3 = new THREE.MeshStandardMaterial({
+          map:tile_w, //color white
+          normalMap: tile_w,
+          displacementMap: tile_w, displacementScale:0.5,
+          roughnessMap: tile_w, roughness: 0.25
+          
+        });
+        var circlePositions = [
+          [0.804, 0.003, 6.06],
+          [0.804, -0.001, 6.06],
+          [0.804, -0.005, 6.06],
+        ];
+        var circleMaterials = [CircleMaterial1, CircleMaterial2, CircleMaterial3];
+        var circleScales = [[2.8, 2.8, 1], [5, 5, 1], [7,7,1]];
+
+        for (let i = 0; i < circleMaterials.length; i++) {
+          var circle = createMesh(CircleGeometry, circleMaterials[i], circlePositions[i], [48.7, 0, 0]);
+          circle.scale.set(...circleScales[i]);
+          scene.add(circle);
+        }
+
+        var numPoints = 200;
+        var start1 = new THREE.Vector3(-5.4, 4.5, 8.3); // starting point1
+        var middle1 = new THREE.Vector3(-6.447, 4.5, 5.179); // control point1
+        var end1 = new THREE.Vector3(-4.447, 4.5, 2.179); // ending point1
+
+        var start2 = new THREE.Vector3(-4.447, 4.5, 2.179); // starting point2
+        var middle2 = new THREE.Vector3(-2.597, 4.5, 0.330); // control point2
+        var end2 = new THREE.Vector3(0.181, 4.5, -0.562); // ending point2
+
+        var start3 = new THREE.Vector3(0.181, 4.5, -0.562); // starting point3
+        var middle3 = new THREE.Vector3(2.545, 4.5, -0.295); // control point3
+        var end3 = new THREE.Vector3(4.727, 4.5, 0.767); // ending point3
+
+        var start4 = new THREE.Vector3(4.727, 4.5, 0.767); // starting point4
+        var middle4 = new THREE.Vector3(6.615, 4.5, 3.067); // control point4
+        var end4 = new THREE.Vector3(7.285, 4.5, 5.776); // ending point4
+
+        var start5 = new THREE.Vector3(0.181, 0.5, -0.562); // starting point5
+        var middle5 = new THREE.Vector3(2.545, 0.5, -0.295); // control point5
+        var end5 = new THREE.Vector3(4.727, 0.5, 0.767); // ending point5
+
+        var start6 = new THREE.Vector3(4.727, 0.5, 0.767); // starting point6
+        var middle6 = new THREE.Vector3(6.615, 0.5, 3.067); // control point6
+        var end6 = new THREE.Vector3(7.285, 0.5, 5.776); // ending point6
+
+        var curveQuad1 = new THREE.QuadraticBezierCurve3(start1, middle1, end1);
+        var curveQuad2 = new THREE.QuadraticBezierCurve3(start2, middle2, end2);
+        var curveQuad3 = new THREE.QuadraticBezierCurve3(start3, middle3, end3);
+        var curveQuad4 = new THREE.QuadraticBezierCurve3(start4, middle4, end4);
+        var curveQuad5 = new THREE.QuadraticBezierCurve3(start5, middle5, end5);
+        var curveQuad6 = new THREE.QuadraticBezierCurve3(start6, middle6, end6);
+        var tube1 = new THREE.TubeGeometry(curveQuad1, numPoints, 0.4, 15, false);
+        var curve1 = new THREE.Mesh(tube1, boxMaterial);
+        var tube2 = new THREE.TubeGeometry(curveQuad2, numPoints, 0.4, 15, false);
+        var curve2 = new THREE.Mesh(tube2, boxMaterial);
+        var tube3 = new THREE.TubeGeometry(curveQuad3, numPoints, 0.4, 15, false);
+        var curve3 = new THREE.Mesh(tube3, boxMaterial);
+        var tube4 = new THREE.TubeGeometry(curveQuad4, numPoints, 0.4, 15, false);
+        var curve4 = new THREE.Mesh(tube4, boxMaterial);
+        var tube5 = new THREE.TubeGeometry(curveQuad5, numPoints, 0.4, 15, false);
+        var curve5 = new THREE.Mesh(tube5, boxMaterial);
+        var tube6 = new THREE.TubeGeometry(curveQuad6, numPoints, 0.4, 15, false);
+        var curve6 = new THREE.Mesh(tube6, boxMaterial);
+        curve1.castShadow = true;
+        curve1.receiveShadow = true;
+        curve2.castShadow = true;
+        curve2.receiveShadow = true;
+        curve3.castShadow = true;
+        curve3.receiveShadow = true;
+        curve4.castShadow = true;
+        curve4.receiveShadow = true;
+        curve5.castShadow = true;
+        curve5.receiveShadow = true;
+        curve6.castShadow = true;
+        curve6.receiveShadow = true;
+        scene.add(curve1);
+        scene.add(curve2);
+        scene.add(curve3);
+        scene.add(curve4);
+        scene.add(curve5);
+        scene.add(curve6);
+
+        
+        
+        // position and point the camera to the center of the scene
+        camera.position.set(0.20, 45, -32.52);
+        camera.position.set(0.20, 45,-60);
+        camera.lookAt(scene.position);
+
+        // add the output of the renderer to the html element
+        document.getElementById("webgl-output").appendChild(renderer.domElement);
+        
+        // render the scene
+	var w=0;
+        function renderScene() {
+          requestAnimationFrame(renderScene);
+          renderer.render(scene, camera);
+          controls.update(); // update the controls
+          w++;
+          if(w==40){document.getElementById("code").style.color="#f00";}
+          if(w==80){document.getElementById("code").style.color="#fff";w=0;}
+          scene.rotation.y +=0.01;
+        }
+        renderScene();
+      }
+init();
+//renderScene();
+    </script>
+  </body>
+</html>
+

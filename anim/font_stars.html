@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>font_stars.html</title>
+
+<link rel="shortcut icon" href="https://threejs.org/files/favicon.ico"/>
+
+<style>
+body{margin:0px;font-family:Monospace;background-color:#000;overflow:hidden;}
+span{position:absolute;font-size:9pt;}
+</style>
+
+</head>
+
+<body>
+
+<span style="left:10px;top:5px;color:#c90;cursor:pointer;">right click &rarr; inspect &rarr; source code</span>
+<span id="spA" style="left:10px;top:25px;color:#c90;"></span>
+<center>
+<img id="star" src="images/starflower.jpg" height="45%" width="45%" style="opacity:1.0;"></img>
+</center>
+
+<script type="module">
+
+import * as THREE from '../js/three.module_res_res.js';
+import { FontLoader} from '../js/FontLoader_res_res.js';
+import { TextGeometry } from '../js/TextGeometry_res_res.js';
+
+var container,camera,scene,ambient,renderer,loader,textmat,controls;
+var p=Math.PI;
+var light=[];
+var w=0;
+var str=[];
+var star="";
+var vi;
+let wW=window.innerWidth,wH=window.innerHeight;
+var text="?";
+var font=undefined;
+
+str[1]="        Silent night, holy night!";
+str[2]="        All is calm, All is bright";
+str[3]="Round yon Virgin, Mother and Child";
+str[4]="Holy Infant so Tender and mild,";
+str[5]="        Sleep in heavenly peace,";
+
+str[6]="      Silent night, holy night!";
+str[7]="Shepherds quake at the sight!";
+str[8]="Glories stream from heaven afar;";
+str[9]="  Heavenly hosts sing Al-le-lu-ia!";
+str[10]="      Christ the Saviour is born!";
+
+str[11]="      Silent night, holy night!";
+str[12]="Wondrous star, lend thy light!";
+str[13]="    With the angels let us sing";
+str[14]="         Alleluia to our King!";
+str[15]="    Christ the Saviour is here,";
+str[16]="       Jesus the Saviour is here!";
+
+str[17]="      Silent night, Holy night!";
+str[18]="Son of God, love's pure light";
+str[19]="Radiant beams from Thy holy face,";
+str[20]="With the dawn of redeeming grace,";
+str[21]="       Jesus Lord at thy birth!";
+
+str[23]="          ...   T h r e e . j s   ...";
+
+function init(){
+
+	scene=new THREE.Scene();
+	camera=new THREE.PerspectiveCamera(45,wW/wH,0.1,1000);
+	camera.position.set(0,0,10);
+	scene.rotation.set(0.3,0,0);
+
+	renderer=new THREE.WebGLRenderer({antialias:false});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setClearColor('#000',1.0);
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	document.body.appendChild(renderer.domElement);
+
+	light[4]=new THREE.AmbientLight('#c90',1);
+	scene.add(light[4]);
+
+	for(var m=1;m<6;m++){star=star+str[m]+"\n\n\n";}
+	star=star+"\n\n\n";
+	for(var m=6;m<11;m++){star=star+str[m]+"\n\n\n";}
+	star=star+"\n\n\n";
+	for(var m=11;m<17;m++){star=star+str[m]+"\n\n\n";}
+	star=star+"\n\n\n";
+	for(var m=17;m<22;m++){star=star+str[m]+"\n\n\n";}
+	star=star+"\n\n\n"+str[23];
+
+
+	textmat=[new THREE.MeshPhongMaterial({color:'#c90'}),new THREE.MeshPhongMaterial({color:'#c90'})];// front,side
+	loader=new FontLoader();
+	loader.load('fonte/helvetiker_bold.typeface.json',function(response){font=response;
+	vi=new THREE.Mesh(new TextGeometry("",{
+		font:font,size:2,height:0.1,curveSegments:3,
+		bevelThickness:1,bevelSize:1,bevelEnabled:false}),textmat);
+		vi.rotation.set(0,-0.5,0);
+	})
+}
+
+function render(){
+	renderer.render(scene,camera);
+	w++;
+	if(w>300 && w<400){
+		document.getElementById("star").style.opacity -=0.01;
+	}
+	if(w==400){
+		document.getElementById("star").width=0;
+		vi=new THREE.Mesh(new TextGeometry(star,{font:font,size:0.4,height:0.01,curveSegments:3}),textmat);vi.position.set(-4,0,9);vi.rotation.set(-1.5,0,0);scene.add(vi);
+	}
+	if(w>400){vi.position.z -=0.02;}
+
+	if(w==3400){vi.position.set(-4,0,9);w=400;}
+	// document.getElementById("spA").innerText=w;
+	requestAnimationFrame(render);
+}
+
+init();
+
+render();
+
+
+/*
+
+Scrolling words of Silent Night inspired in Star Wars oppening
+
+Hi Three.js followers,
+
+the link:
+
+http://jrlazz.eu5.org/anim/font_stars.html
+
+Again, Thanks for the great Three.js Team!
+
+Jose Roberto Lazzareschi
+
+*/
+
+
+</script>
+
+</body>
+</html>

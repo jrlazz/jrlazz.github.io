@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>ent_sai.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="ok.ico"/>
+<style>
+body{overflow:hidden;margin:0px;font-family:Arial;background-color:#048;}
+button {position:absolute;left:20px;top:40px;width:30px;font-family:Arial;font-size:18pt;font-weight:bold;color:red;border-radius:2%;cursor:pointer}
+</style>
+
+</head>
+
+<script type="importmap">
+	{
+		"imports":{
+			"three":"https://unpkg.com/three@0.164.0/build/three.module.min.js",
+			"three/addons/":"https://unpkg.com/three@0.164.0/examples/jsm/"
+		}
+	}
+</script>
+
+<body>
+
+<span id="spa" style="position:absolute;left:40%;top:35%;font-size:82pt;color:#069;display:''"></span>
+<span id="spb" style="position:absolute;left:33%;top:3%;width:33%;font-size:20.5pt;color:#c90;text-align:center;display:''">... our tireless Steve</span>
+
+<button style="left:84%;top:3%;width:120px;background-color:#ccc;text-align:center;"><a id="code" href="ent_sai.txt" target="_blank" style="color:#f00;text-decoration:none;font-size:16pt;">The Code</a></button>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+
+var geo=[];
+var mat=[];
+
+var path=[];
+
+var box=[];
+var esf=[];
+var cir=[];
+var cur=[];
+var cyl=[];
+var tub=[];
+var luz=[];
+var tex=[];
+
+var tx,ty,tz;
+
+var ent=new THREE.Group();
+var sai=new THREE.Group();
+var entsai=new THREE.Group();
+
+var onoff=new THREE.Group();
+
+var sim=0;
+var w=0;
+var w1=0;
+
+var p=Math.PI;
+
+var vai=0;
+var volta=0;
+
+var part=[];
+var passo=0.1;
+var ango=0;
+var rot=0;
+let BD,BE,PD,PE,CA,TR;
+var group=new THREE.Group();
+var groupCATR=new THREE.Group();
+
+var garm=new THREE.Group();
+var gcyl=new THREE.Group();
+var gesf=new THREE.Group();
+
+var va,vb,arm,lookAt,dist;
+
+var BDx;
+var box8pz=0;
+
+
+var camera, scene, renderer, loader, controls, text, font;
+
+function init(){
+
+	camera=new THREE.PerspectiveCamera(50,window.innerWidth/window.innerHeight,1,1000);
+	camera.position.set(100,80,80);
+	scene=new THREE.Scene();
+	scene.rotation.y=-1;
+
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	document.body.appendChild(renderer.domElement);
+	renderer.setClearColor('#048',1.0);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+
+	window.addEventListener('resize',onWindowResize,false);
+
+	var onProgress=function(xhr){
+		if(xhr.lengthComputable){
+			var percentComplete=xhr.loaded/xhr.total* 100;
+			console.log(Math.round(percentComplete,2)+'% downloaded');
+		}
+	};
+
+	// Steve
+
+	new MTLLoader().load('models/steve/partesfoscas.mtl',function(mat){mat.preload();new OBJLoader().setMaterials(mat).load('models/steve/separa9.obj',function(object){
+		for(let k=0;k<6;k++){
+			if(object.children[k]){part[k]=object.children[k];}
+		}
+	},onProgress);});
+
+	//light
+
+	luz[1]=new THREE.AmbientLight("#fff",5);
+	scene.add(luz[1]);
+		luz[2]=new THREE.PointLight("#fc9",4000);
+		luz[2].position.set(-30,10,20);
+		scene.add(luz[2]);
+	luz[3]=new THREE.PointLight("#fc9",4000);
+	luz[3].position.set(30,20,20);
+	scene.add(luz[3]);
+
+	// tube \x61=a
+
+	loader=new FontLoader();
+	loader.load('../fonte/Acta_circles.json',function(response){font=response;createText();});
+	function createText(){
+		geo[1]=new TextGeometry("\x61",{font:font,size:4.5,depth:7,curveSegments:12,bevelThickness:0.1,bevelSize:0.1,bevelEnabled:false});
+		mat[1]=[new THREE.MeshStandardMaterial({color:'#ff0',metalness:0.5,roughness:0.1}),new THREE.MeshStandardMaterial({color:'#ccc',transparent:true,opacity:0.5,metalness:0.7,roughness:0.2})];
+		tub[0]=new THREE.Mesh(geo[1],mat[1]);
+		tub[0].position.set(-9,-4.25,4.5);
+		tub[0].rotation.set(0,p/2,0);
+
+		geo[2]=new TextGeometry("\x63",{font:font,size:4,depth:0.5,curveSegments:12,bevelEnabled:false});
+		mat[2]=[new THREE.MeshStandardMaterial({color:'#090'}),new THREE.MeshStandardMaterial({color:'#009'})];
+
+		tub[1]=new THREE.Mesh(geo[2],mat[2]);
+		tub[1].position.set(-7,-4,4.21);
+		tub[1].rotation.set(0,p/2,0);
+
+		geo[3]=new TextGeometry("\x61",{font:font,size:5,depth:3,curveSegments:12,bevelEnabled:false});
+		mat[3]=[new THREE.MeshStandardMaterial({color:'#fff',metalness:0.7,roughness:0.1}),new THREE.MeshStandardMaterial({color:'#ccc',transparent:true,opacity:0.5,metalness:0.7,roughness:0.2})];
+		tub[2]=new THREE.Mesh(geo[3],mat[3]);
+		tub[2].position.set(-3.5,-4.5,4.7);
+		tub[2].rotation.set(0,p/2,0);
+
+		tub[3]=tub[2].clone();
+		tub[3].position.set(-10.5,-4.5,4.7);
+
+		tub[4]=tub[2].clone();
+		tub[4].position.set(4.5,3.6,-0.75);
+		tub[4].rotation.set(p/2,0,p/2);
+
+		tub[6]=tub[0].clone();
+		tub[6].scale.set(1,1,0.4);
+		tub[6].position.set(11.5,-4.3,-9.5);//7.5
+		tub[6].rotation.set(0,0,0);
+
+		tub[7]=tub[0].clone();
+		tub[7].scale.set(1,1,0.3);
+		tub[7].position.set(2.7,-4.6,-4.2);
+		tub[7].rotation.set(0,p/2,p/2);
+
+		tub[8]=tub[2].clone();
+		tub[8].position.set(-8,-4.4,15.9);
+
+		tub[9]=tub[0].clone();
+		tub[9].scale.set(1,1,3);
+		tub[9].position.set(-27.5,-4.2,15.5);
+
+		tub[10]=tub[0].clone();
+		tub[10].scale.set(1,1,4);
+		tub[10].rotation.set(p/2,0,p/2);
+		tub[10].position.set(16.2,37,-16.7);
+
+		tub[11]=tub[2].clone();
+		tub[11].rotation.set(p/2,0,p/2);
+		tub[11].position.set(16.4,38.5,-17);
+
+		tub[12]=tub[0].clone();
+		tub[12].rotation.set(0,0,p/2);
+		tub[12].position.set(16,38.6,-25.5);
+
+		tub[13]=tub[2].clone();
+		tub[13].rotation.set(0,0,p/2);
+		tub[13].position.set(16.3,38.3,-20.5);
+
+		geo[4]=new TextGeometry("\x61",{font:font,size:20,depth:38,curveSegments:12,bevelThickness:0.1,bevelSize:0.1,bevelEnabled:false});
+		tub[5]=new THREE.Mesh(geo[4],mat[3]);
+		tub[5].position.set(3,-12,-7);
+
+	}
+
+	// curve
+
+	class CustomSinCurve1 extends THREE.Curve{
+		constructor(scale=1){super();this.scale=scale;}
+		getPoint(t,optionalTarget=new THREE.Vector3()){
+			tx=t*3-1.5;ty=Math.sin(Math.PI*t);tz=1;
+			return optionalTarget.set(tx,ty,tz).multiplyScalar(this.scale);
+		}
+	}
+	path[1]=new CustomSinCurve1(10);
+	geo[5]=new THREE.TubeGeometry(path[1],32,11,32,false);
+	mat[5]=new THREE.MeshStandardMaterial({color:'#444',emissive:'#f00',emissiveIntensity:0.5,metalness:0.7,roughness:0.2,side:THREE.DoubleSide})
+	cur[1]=new THREE.Mesh(geo[5],mat[5]);
+	cur[1].scale.set(0.2,0.2,0.2);
+	cur[1].rotation.set(0,0,p+p/4);
+
+		cur[2]=cur[1].clone();
+		cur[2].material=cur[1].material.clone();
+		cur[2].material=new THREE.MeshStandardMaterial({color:'#0f0',metalness:0.5,roughness:0.2,side:THREE.DoubleSide})
+		cur[2].scale.set(0.18,0.18,0.18);
+		cur[2].position.set(0.2,-0.2,0.2);
+
+	cur[3]=cur[1].clone();
+	cur[3].rotation.set(p/2,p,p/4);
+	cur[3].position.set(-4.2,-4,11);
+
+		cur[4]=cur[1].clone();
+		cur[4].rotation.set(0,p/2,p/4);
+		cur[4].position.set(12,39,-16.3);
+
+	// cyl
+
+	geo[6]=new THREE.CylinderGeometry(0.5,0.5,12,32);
+	mat[6]=new THREE.MeshStandardMaterial({color:'#ccc'})
+
+	cyl[1]=new THREE.Mesh(geo[6],mat[6]);
+	cyl[1].rotation.set(0,0,p/2);
+	cyl[1].position.set(0,-2.1,2);
+
+		cyl[2]=cyl[1].clone();
+		cyl[2].material=cyl[1].material.clone();
+		cyl[2].material=new THREE.MeshStandardMaterial({color:'#900'})
+		cyl[2].scale.set(2,0.2,2);
+		cyl[2].position.set(3.5,-2.1,2);
+
+	cyl[3]=cyl[2].clone();
+	cyl[3].scale.set(3,0.025,3);
+	cyl[3].position.set(-5,-2.1,2);
+
+		cyl[31]=cyl[1].clone();
+		cyl[32]=cyl[2].clone();
+		cyl[33]=cyl[3].clone();
+
+	cyl[4]=cyl[1].clone();
+	cyl[4].material=cyl[1].material.clone();
+	cyl[4].material=new THREE.MeshStandardMaterial({color:'#c90'})
+	cyl[4].scale.set(3,4.5,3);
+	cyl[4].rotation.set(p/2,0,0);
+	cyl[4].position.set(14,-2.5,35);// eixo embolo
+
+	cyl[5]=cyl[4].clone();
+	cyl[5].scale.set(16,0.2,16);
+	cyl[5].rotation.set(p/2,0,0);
+	cyl[5].position.set(14,-2.5,35);// embolo
+
+	cyl[51]=cyl[4].clone();
+	cyl[51].material=cyl[1].material.clone();
+	cyl[51].material=new THREE.MeshStandardMaterial({color:'#999',transparent:true,opacity:0.5})
+	cyl[51].scale.set(17.2,0.1,17.2);
+	cyl[51].position.set(14,-2.5,-6.4);// tampos do cilindro
+	cyl[52]=cyl[51].clone();
+	cyl[52].position.set(14,-2.5,30.4);
+
+
+	cyl[6]=cyl[1].clone();
+	cyl[6].material=cyl[1].material.clone();
+	cyl[6].material=new THREE.MeshStandardMaterial({color:'#c90'})
+	cyl[6].scale.set(2,0.2,2);
+	cyl[6].position.set(14,7,100);
+
+	cyl[7]=cyl[1].clone();
+	cyl[7].scale.set(1,0.5,1);
+	cyl[7].rotation.set(0,0,p/2);
+	gcyl.add(cyl[7]);
+	gcyl.position.set(13,47,100);
+	gcyl.rotation.set(p/2,0,0);
+
+	// box
+
+	geo[7]=new THREE.BoxGeometry(5,7,5);
+	mat[7]=new THREE.MeshBasicMaterial({color:'#333',transparent:true,opacity:0.9});
+	box[1]=new THREE.Mesh(geo[7],mat[7]);
+	box[1].position.set(14,-9,-14);
+
+		box[2]=box[1].clone();
+		box[2].scale.set(1,1.7,1);
+		box[2].position.set(-2,-6.5,-8);
+
+	box[3]=box[1].clone();
+	box[3].scale.set(0.25,0.1,15);
+	box[3].position.set(-2,-12.5,24);
+
+		box[4]=box[1].clone();
+		box[4].scale.set(0.25,0.1,2.9);
+		box[4].position.set(4.62,-12.5,-14);
+		box[4].rotation.set(0,p/2,0);
+
+	box[5]=box[1].clone();
+	box[5].material=box[1].material.clone();
+	box[5].material=new THREE.MeshStandardMaterial({color:'#468'}); 
+	box[5].scale.set(1,6,1);
+	box[5].position.set(13,8.6,-37.5);
+
+		box[6]=box[5].clone();
+		box[6].scale.set(1,1.2,1);
+		box[6].position.set(-30,-8,13);
+
+	box[7]=box[1].clone();
+	box[7].material=box[1].material.clone();
+	box[7].material=new THREE.MeshStandardMaterial({color:'#642',metalness:0.5,roughness:0.5}); 
+	box[7].scale.set(15,0.4,40);
+	box[7].position.set(0,-14,30);
+
+		box[8]=box[5].clone();
+		box[8].material=box[1].material.clone();
+		box[8].material=new THREE.MeshNormalMaterial();
+		box[8].scale.set(0.2,0.4,4);
+		box[8].rotation.set(p/2,0,0);
+		box[8].position.set(14,-1,35);// faca
+
+	box[9]=box[1].clone();
+	box[9].scale.set(0.25,0.1,7);
+	box[9].position.set(14,-12.5,61);
+
+		box[10]=box[4].clone();
+		box[10].scale.set(0.25,0.1,6);
+		box[10].position.set(-0.9,-12.5,62);
+
+	box[11]=box[4].clone();
+	box[11].scale.set(8,0.6,4);
+	box[11].position.set(-20,-11,45);
+		
+	// tank
+
+	geo[8]=new THREE.SphereGeometry(16,32,32,0,p*2,0,p/2); 
+	mat[8]=new THREE.MeshStandardMaterial({color:'#468',side:THREE.DoubleSide}); 
+	esf[1]=new THREE.Mesh(geo[8],mat[8]);
+	esf[1].rotation.z=p;
+	esf[1].position.set(13,44,-38);
+
+		geo[9]=new THREE.CircleGeometry(14,32); 
+		mat[9]=new THREE.MeshStandardMaterial({color:'#258'}); 
+		cir[1]=new THREE.Mesh(geo[9],mat[9]);
+		cir[1].rotation.x=-p/2;
+		cir[1].position.set(13,39,-38);
+
+	esf[2]=esf[1].clone();
+	esf[2].scale.set(0.5,0.5,0.5);
+	esf[2].position.set(-30,3,13);
+
+		cir[2]=cir[1].clone();
+		cir[2].material=cir[1].material.clone();
+		cir[2].material=new THREE.MeshStandardMaterial({color:'#147'}); 
+		cir[2].scale.set(0.5,0.5,0.5);
+		cir[2].position.set(-30,2,13);
+
+	// arm
+		va=new THREE.Vector3(0,0,0);
+		vb=new THREE.Vector3(0,0,0);
+		lookAt=new THREE.Vector3();
+		dist=va.distanceTo(vb);
+		geo[10]=new THREE.CylinderGeometry(0.4,0.4,dist).translate(0,dist*0.5,0).rotateX(p/2);
+		mat[10]=new THREE.MeshStandardMaterial({color:'#c90'});
+		arm=new THREE.Mesh(geo[10],mat[10]);
+		arm.position.copy(va);
+		arm.lookAt(vb);
+		garm.add(arm);
+		garm.rotation.x=p/2;
+		garm.position.set(14,47,101);
+
+	// contact
+
+	geo[11]=new THREE.CylinderGeometry(0.6,0.8,4,16);
+	mat[11]=new THREE.MeshNormalMaterial();
+	cyl[8]=new THREE.Mesh(geo[11],mat[11]);
+	cyl[8].position.set(15,-11,78);
+	cyl[9]=cyl[8].clone();
+	cyl[9].position.set(13,-11,78);
+	cyl[10]=cyl[8].clone();
+	cyl[10].position.set(15,-11,44);
+	cyl[11]=cyl[8].clone();
+	cyl[11].position.set(13,-11,44);
+	for(let z=8;z<12;z++){onoff.add(cyl[z]);}
+
+
+	geo[12]=new THREE.SphereGeometry(1,16,15); 
+	mat[12]=new THREE.MeshNormalMaterial();
+	esf[3]=new THREE.Mesh(geo[12],mat[12]);
+	esf[3].position.set(14,11,-14.3);
+
+	esf[4]=esf[3].clone();esf[4].position.set(-22,-2,13);
+	esf[5]=esf[3].clone();esf[5].position.set(14,-2.5,13);
+	esf[6]=esf[3].clone();esf[6].position.set(14,-3,4);
+	gesf.add(esf[6]);
+	gesf.position.set(0,37,-25);
+
+	// text
+
+	tex[1]=new THREE.TextureLoader().load("img/bat3404p2.png");
+	geo[14]=new THREE.PlaneGeometry(40,10);
+	mat[14]=new THREE.MeshStandardMaterial({map:tex[1],color:'#999',transparent:true}); 
+	tub[14]=new THREE.Mesh(geo[14],mat[14]);
+	tub[14].rotation.set(-p/2,0,p/2);
+	tub[14].position.set(-20,-8.5,42);
+
+}
+
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function animate() {
+	requestAnimationFrame(animate);
+
+	w++;
+
+	if(w<100){document.getElementById("spa").innerText=w+" %";}
+
+	w1++;
+
+	if(tub[13] && cur[4] && part[5] && sim==0){
+
+
+		part[3].geometry.translate(0.5,0,0);
+
+		CA=part[0];TR=part[2];CA.scale.set(0.8,1.1,0.8);CA.position.set(0,3.1,0);
+		BD=part[3];BE=part[1];
+		PD=part[5];PE=part[4];
+		TR.position.set(0,2,0);
+		groupCATR.add(CA);groupCATR.add(TR);
+		PD.scale.set(4.65,4,4);PD.position.set(-2,0,0);PD.rotation.x=-p/2;
+		PE.scale.set(4.65,4,4);PE.position.set( 2.5,0,0);PE.rotation.x=-p/2;
+		BD.scale.set(4.65,4,4);BD.position.set(-7.2,9.8,0);BD.rotation.z=p/2;
+		BE.scale.set(4.65,4,4);BE.position.set( 7.2,11.9,0);BE.rotation.z=-p/2;
+		groupCATR.scale.set(4,4,4);groupCATR.position.set(0,4,0);
+		group.add(groupCATR);group.add(PD);group.add(PE);group.add(BD);group.add(BE);
+		group.position.set(-2.7,-9,100);
+		group.rotation.y=p;
+		group.scale.setScalar(1.6);
+
+		for(let z=1;z<3;z++){ent.add(cur[z]);}
+		for(let z=0;z<5;z++){ent.add(tub[z]);}
+		ent.rotation.set(p/2,0,-p/2);
+		ent.position.y -=0.1;
+
+		sai=ent.clone();
+
+		for(let z=1;z<4;z++){ent.add(cyl[z]);sai.add(cyl[z+30]);}
+
+		sai.position.set(16,0,-12);
+		sai.rotation.set(p/2,-p/2,0);
+
+		sim=1;
+	}
+
+	if(sim==1){
+		document.getElementById("spa").style.display="none";
+
+		entsai.add(ent);
+		entsai.add(sai);
+		for(let z=5;z<15;z++){entsai.add(tub[z]);}
+		for(let z=1;z<12;z++){entsai.add(box[z]);}
+		entsai.add(cyl[51]);entsai.add(cyl[52]);
+		scene.add(entsai);
+		scene.add(group);
+		scene.add(garm);
+		scene.add(onoff);
+		for(let z=1;z<3;z++){scene.add(esf[z]);scene.add(cir[z]);}
+		for(let z=3;z<5;z++){scene.add(cur[z]);}
+		for(let z=4;z<7;z++){scene.add(cyl[z]);} 
+		scene.add(gcyl);
+		sim=2;
+	}
+
+	if(sim==2){
+		BD.rotation.x +=passo/2;
+		if(ango>0.6){rot=1;}
+		if(ango<-0.6){rot=0;}
+		if(rot==0){
+			ango +=0.01;CA.rotation.y -=passo/4;
+		}else{
+			ango -=0.01;CA.rotation.y +=passo/4;
+		}
+
+		garm.remove(arm);
+		BDx=17*Math.sin(BD.rotation.x);
+		va=new THREE.Vector3(0,-40+BDx,+40);
+		vb=new THREE.Vector3(0,BDx,17*Math.cos(BD.rotation.x)+40);
+cyl[4].position.z=38+BDx;
+cyl[5].position.z=12+BDx;
+box[8].position.z=61+BDx;box8pz=61+BDx;
+cyl[7].position.copy(vb);
+cyl[6].position.z=61+BDx;
+esf[5].position.z=8+BDx;
+		lookAt=new THREE.Vector3();
+		dist=va.distanceTo(vb);
+		geo[10]=new THREE.CylinderGeometry(1.5,1.5,dist).translate(0,dist*0.5,0).rotateX(p/2);
+		arm=new THREE.Mesh(geo[10],mat[10]);
+		arm.position.copy(va);
+		arm.lookAt(vb);
+		garm.add(arm);
+
+scene.add(esf[3]);
+scene.add(esf[4]);
+scene.add(esf[5]);
+scene.add(gesf);
+
+	}
+
+
+
+	if(box8pz>77){
+		cyl[1].position.x=-passo/2;cyl[3].position.x=cyl[1].position.x-6;
+		cyl[31].position.x=2;cyl[33].position.x=cyl[31].position.x-6;
+		vai=0;volta=1;
+	}
+	if(box8pz<45){
+		cyl[1].position.x=2;cyl[3].position.x=cyl[1].position.x-6;
+		cyl[31].position.x=-passo/2;cyl[33].position.x=cyl[31].position.x-6;
+		vai=1;volta=0;
+	}
+
+
+	if(w1>0){
+		if(vai==0){
+			esf[3].position.y +=passo*10;esf[3].position.x=14;
+			esf[4].position.x=-25;
+		}
+		if(vai==1){esf[3].position.x=-1000;}
+		gesf.rotation.x -=passo/2;
+	}
+	if(w1>20){
+		esf[3].position.y=13;
+		if(vai==0){gesf.rotation.x=-p/1.2;gesf.position.x=0;}
+		if(vai==1){gesf.rotation.x=-p/1.2;gesf.position.x=-1000;}
+		w1=0;
+	}
+
+
+	if(box8pz>50 && box8pz<70){
+		esf[5].position.x=12;
+		esf[4].position.x +=passo*6;
+	} else {
+		esf[5].position.x=-1000;
+	}
+	
+
+
+
+	renderer.render(scene, camera);
+}
+
+init();
+animate();
+
+/*
+
+Steve pumping water
+
+the link:
+
+https://jrlazz.eu5.org/anim/ent_sai.html
+
+
+*/
+
+</script>
+</body>
+</html>

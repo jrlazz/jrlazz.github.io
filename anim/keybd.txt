@@ -1,0 +1,554 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>keybd.html</title>
+<link rel="shortcut icon" href="ok.ico">
+
+<style>
+body{margin:0px;font-family:Lucida Console;font-size:11pt;background-color:#033;color:#ff0;overflow:hidden;}
+button{font-family:Lucida Console;font-size:11pt;font-weight:bold;width:100px;cursor:pointer;border:2px outset #0c0;}
+button:active{border-style:inset;}
+span{color:#ff0;font-size:11pt;}
+input{position:absolute;left:0px;accent-color:#0c0;background-color:#900;}
+input[type=range][orient=vertical]{-webkit-appearance:slider-vertical;width:16px;height:100px;padding:0 6px;top:360px;accent-color:#0c0;}
+code{position:absolute;left:0px;top:200px;font-size:11pt;font-weight:normal;}
+table,tr,td{padding:0px;}
+#spanvol,#spanvibfre,#spanvibgain,#spandet{position:relative;top:2px;}
+#vol,#gai,#vibfre,#vibgai,#det,#delayval,#feedbackval,#impulseval,#decayval{position:relative;top:8px;}
+.bu {background-color:#066;color:#fff;width:45px;font-weight:bold;font-size:10pt;border:2px outset #0c0;}
+.bu:hover{border-style:inset;}
+.buc{background-color:#ccc;color:#030;font-weight:bold;width:50px;font-size:10pt;border:2px outset #0c0;}
+.buc:hover{border-style:inset;}
+img{position:absolute;left:620px;width:64px;height:22px;cursor:pointer;opacity:0.3;}
+.fa{filter:hue-rotate(180deg) saturate(16) contrast(100%) brightness(200%);}
+.fb{filter:hue-rotate(60deg) saturate(16) contrast(100%) brightness(200%);}
+.hz{width:100px;}
+a{position:absolute;left:90%;top:80%;width:100px;background-color:#060;color:#fff;text-align:center;text-decoration:none;border:2px outset #0f0;z-index:2;}
+a:hover{border-style:inset;}
+</style>
+
+</head>
+
+<body>
+
+<hr id="cor" style="position:absolute;top:-20px;left:0px;width:20px;height:10px;background-color:#033;border:none;z-index:1;"></hr>
+
+<iframe id="ifra" name="ifra" src="keybd_sen.html" onload="frameLoaded();" style="position:absolute;left:10px;top:5px;width:580px;height:153px;border:none;display:"></iframe>
+<img id="sen" src="img\si.png" class="fa" style="top: 15px;opacity:9.9;"></img>
+<img id="qua" src="img\sq.png" class="fa" style="top: 50px;"></img>
+<img id="tri" src="img\tr.png" class="fa" style="top: 85px;"></img>
+<img id="rra" src="img\st.png" class="fa" style="top:120px;"></img>
+<hr style="position:absolute;left:0px;top:-8px;height:12px;width:100%;border:none;background-image:linear-gradient(#0cc,#033);background-repeat:no-repeat;"></hr>
+
+<table style="position:absolute;left:700px;top:5px;">
+<tr><td colspan="3">volume: <input id="vol" type="range" value="2" min="0.0" max="50" step="0.5" onchange="volval();" autocomplete="off" style="width:210px;"></input> <span id="spanvol">2</span></td></tr>
+<tr><td colspan="3">vib fre.: <input id="vibfre" type="range" value="4.5" min="4.0" max="6" step="0.1" onchange="vibfreq();" autocomplete="off" class="hz"></input><span id="spanvibfre">4.5</span> gain: <input id="vibgai" type="range" value="0" min="0" max="5" step="0.2" onchange="vibgain();" autocomplete="off" class="hz"></input>&nbsp;<span id="spanvibgai">0</span></td></tr>
+<tr><td colspan="3">detune: <span onclick="fdetzero();" style="color:#0f0;cursor:pointer;" title="reset">0</span>&nbsp;<input id="det" type="range" value="0" min="-1200" max="1200" step="0.1" onchange="fdet();" autocomplete="off" style="width:200px;"></input> <span id="spandet">0</span></td></tr>
+<tr><td>delay: <input id="delayval" type="range" value="0.3" min="0.0" max="1" step="0.1" onchange="delayval()" autocomplete="off" class="hz"></input> <span id="spandelay">??</span></td><td>&nbsp;feedback: <input id="feedbackval" type="range" value="0.6" min="0.0" max="1" step="0.1" onchange="feedbackval()" autocomplete="off" class="hz"></input><span id="spanfeedback">??</span></td></tr>
+<tr><td>impulse <input id="impulseval" type="range" value="1.3" min="0.1" max="4" step="0.1" onchange="impulseval()" autocomplete="off" class="hz"></input> <span id="spanimpulse">spanimpulse</span></td><td>&nbsp;decay: <input id="decayval" type="range" value="1.5" min="0.1" max="4" step="0.1" onchange="decayval()" autocomplete="off" class="hz"></input> <span id="spandecay">spandecay</span></td></tr>
+<tr><td colspan="3" style="height:30px;"><button class="bu" id="octme" onclick="foct(1);">oct1</button> <button class="bu" onclick="foct(2);">oct2</button> <button class="bu" onclick="foct(3);">oct3</button> <button class="buc" onclick="naco();">mute</button>
+ <select id="selc" autocomplete="off" style="width:100px;" class="bu" onchange="trocac();">
+<option value="0,0">Sound</option>
+<option value="restart">Restart</option>
+<option value="40000C4,40000E4,40000G4";>good</option>
+<option value="20000C4,40000G4,40000C5,30000E5,20000c6,10000E6">bassoon</option>
+<option value="40000A4,40000A5,40000E5,30000A6,25000C#6,20000E6,15-15G6,10000A7">trombone</option>
+<option value="40000D5,40000A6,40-25F#6,40000A7">Sax</option>
+<option value="40000A4,20-30G4,20-30G5,40000A6,40000E6,40000A7,20-30G7">Organ</option>
+<option value="40000E4,40000B5,40000E5,40000F#5,40000G#5,40000B6,40000E6,40000F#6,40000B7,40000F#7">Bagpipe</option>
+<option value="40000C4,40000G4,40000E5,50000C5,40000G5,40000C6">Satisf. 1</option>
+<option value="40000B4,50000F#4,53000D#5,80000F#5,45000B6,50000C#6,40000F#6,30000C#7">Satisf. 2</option>
+<option value="30000B5,55000C5,55000D5,37000F5">Train</option>
+</select> <span id="sound"></span>
+</td>
+</tr>
+</table>
+
+<table style="position:absolute;left:1200px;top:15px;">
+<tr><td colspan="3" style="height:30px;text-align:center;"><button id="restart" onclick="restart();" style="width:200px;background-color:#900;color:#fff;display:;">Restart</button></td></tr>
+<tr><td colspan="3" style="height:30px;text-align:center;"></td></tr>
+<tr>
+<td colspan="3"  style="height:30px;text-align:center;">
+<button id="ever" class="bu" style="opacity:1;">ever</button>&nbsp;&nbsp;
+<button id="some" class="bu" style="opacity:0.5;">adsr</button>&nbsp;&nbsp;
+<button id="play" class="bu" style="visibility:hidden;">play</button></td>
+</tr>
+<tr>
+<td colspan="3" style="height:30px;text-align:center;">
+<button id="sav" onclick="fsav();" class="bu" style="color:#fff;" class="bu">save</button>&nbsp;&nbsp;&nbsp;&nbsp;
+<button id="psav" onclick="fpsav();" class="bu" style="width:100px;color:#fff" class="bu">play save</button></td>
+</tr>
+</table>
+
+<a href="keybd.txt" target="_blank" style="">View code</a>
+
+<canvas id="harfre" width="1480" height="30" style="position:absolute;left:17px;top:200px;border:1px solid transparent;display:"></canvas>
+
+<div id="ke" style="position:absolute;left:0%;top:360px;width:99%;display:none;text-align:center;">
+<div id="teclado" style="position:relative;left:50px;top:4px;"></div>
+<img src="models/extras/bojomad2.jpg" style="position:relative;left:-5px;width:1070px;height:172px;border-width:3px;border-style:outset;border-color: #fc0 #000 #000 #fc0;opacity:1;"></img>
+</div>
+
+<span id="spr" style="font-size:7pt;position:absolute;left:1100px;top:100px;color:#ff0;display:none;">SPReal</span>
+<span id="spi" style="font-size:7pt;position:absolute;left:1100px;top:115px;color:#ff0;display:none;;">SPImag</span>
+
+<script>
+
+var fre=[];for(let z=0;z<109;z++){fre[z+1]=(27.5*Math.pow(2, z*1/12)).toFixed(3);}
+var ya=[];var nota=[];var k=0;
+var xa=[];xa=[" ","A","A#","B","C","C#","D","D#","E","F","F#","G","G#"];
+for(let u=1;u<13;u++){for(let z=(u*12-11);z<((u*12-11)+12);z++){k++;nota[z]=xa[k]+u;};k=0;}
+
+var lfo;var lfoGain;
+var det=0;
+var envo=1;
+var numosc=97;
+var tec=49;
+var convolver,delayNode,feedbackGain;
+var sampleRate,lngth,impulse;
+var channelData=[];
+
+var dela=0.3;// 0.3
+var feed=0.6;// 0.6
+
+var impu=0.3;
+var deca=0.6;
+
+var bId=function(id){return document.getElementById(id);}
+var audio=bId("audio");
+var dvol=bId("vol");			var dspanvol=bId("spanvol");
+var dvibfre=bId("vibfre");		var dspanvibfre=bId("spanvibfre");
+var dvibgai=bId("vibgai");		var dspanvibgai=bId("spanvibgai");
+
+var ddelayval=bId("delayval");		var dspandelay=bId("spandelay");
+var dfeedbackval=bId("feedbackval");	var dspanfeedback=bId("spanfeedback");
+
+var dimpulseval=bId("impulseval");	var dspanimpulse=bId("spanimpulse")
+var ddecayval=bId("decayval");		var dspandecay=bId("spandecay");
+var drestart=bId("restart");
+var ddet=bId("det");	var dspandet=bId("spandet");
+var dever=bId("ever");	var dsome=bId("some");	var dplay=bId("play");
+var dteclado=bId("teclado");
+var dke=bId("ke");
+var dqua=bId("qua");	var dsen=bId("sen");	var dtri=bId("tri");	var drra=bId("rra");
+var difra=bId("ifra");
+var dspr=bId("spr");
+var dspi=bId("spi");
+
+var arrayreal=[];	var arrayimag=[];
+var customWave;
+
+var tipo;
+var topi="sine";
+
+var detalt=0;
+var lasth=0;
+var octa,octb,octc;
+var timeout;
+var gNode;
+var MNode;
+
+osctype="sine";
+
+var envelope,now;
+var attack=0.05;
+var decay=0.07;
+var sustain=0.9
+var release=5.0;
+var isPlaying=false;
+var savf=[];
+var savh=[];
+var savd=[];
+
+var ga=[];
+var da=[];
+
+	dever.onclick=function EVER(){fenvo();fenvoplay();}
+	dsome.onclick=function SOME(){fenvo();fenvostop();}
+	dqua.onclick=function QUA(){tipqua("qua","square");}
+	dsen.onclick=function SEN(){tipsen("sen","sine");}
+	dtri.onclick=function TRI(){tiptri("tri","triangle");}
+	drra.onclick=function RRA(){tiprra("rra","sawtooth");}
+
+for(let z=1;z<101;z++){document.write("<input type='range' id='"+z+"' onchange='fhar(id)' value=0 orient='vertical' style='top:230px;height:100px;display:none;'>");}
+for(let z=101;z<150;z++){document.write("<code id='"+z+"' style='left:"+(6+30*(z-100))+"px;display:;'>a</code>");}
+
+var a=[];
+
+var posx=0;
+var har=[];for(let z=1;z<101;z++){har[z]=bId(z);}
+for(let z=(tec-12);z<(tec+37);z++){posx++;har[z].style.left=0+posx*30+"px";har[z].style.display="";}
+var cod=[];for(let z=101;z<201;z++){cod[z]=bId(z);}
+
+for(let z=149;z>100;z--){cod[z].innerHTML=nota[tec-13+(z-100)];}
+sufix(0);
+function sufix(s){
+	for(let z=125;z>100;z--){
+		if(s==1){cod[z].innerHTML=nota[(aux-12+12)-(125-z)];}
+		if(cod[z].innerHTML.length<3){
+			cod[z].innerHTML=cod[z].innerHTML.substring(0,1)+"<fonte style='color:#0ff;font-size:9pt;'>"+cod[z].innerHTML.substring(2,1)+"</font>";
+		}else{
+			cod[z].innerHTML=cod[z].innerHTML.substring(0,2)+"<fonte style='color:#0ff;font-size:9pt;'>"+cod[z].innerHTML.substring(2)+"</font>";
+		}
+	}
+}
+
+var aCtx=null;var osc=[];var oscGain=[];var oscb=[];var oscGainb=[];var oscc=[];var oscGainc=[];
+
+var myOscillo=null;var scopeCan=null;var freqCan=null;
+
+var gainMP3,spacing,barwidth,canvasWidth,canvasHeight,numBars,freqByteData,multiplier;
+var magnitude,offset,magnitude2,buffer,data,bufferSource,source;
+var data,quarterHeight,scaling,zeroCross;
+var mval=134;//128==zero minimum detected signal level.
+
+var canhar=document.getElementById("harfre");
+var VL=canhar.getContext("2d");
+VL.font="italic 14px monospace";
+VL.fillStyle="transparent";	VL.fillRect(0,0,1200,30);
+VL.fillStyle="#ff0";
+let e=-20;
+for(let z=-12;z<37;z++){
+	e=e+30;
+	if(z<0){VL.fillText(z,e,25);}
+	if(z>0){VL.fillText(" "+z,e,25);}
+}
+
+// ******** ********
+
+function restart(){location.href="keybd.html";}
+
+function init(){
+	setupAudio(scopeCan);dke.style.display="";
+}
+
+function setupAudio(obj){
+
+	window.AudioContext=window.AudioContext || window.webkitAudioContext;
+	aCtx=new AudioContext();
+
+	lfo=aCtx.createOscillator();
+	lfo.frequency.value=4.5;
+	lfo.start(0);
+	lfoGain=aCtx.createGain();
+	lfoGain.gain.value=0;
+	lfo.connect(lfoGain);
+
+	gNode=aCtx.createGain();
+	MNode=aCtx.createGain();
+
+	convolver=aCtx.createConvolver();
+	convolver.buffer=createReverbImpulse(impu,deca);
+	delayNode=aCtx.createDelay();
+	delayNode.delayTime.value=dela;
+	feedbackGain=aCtx.createGain();
+	feedbackGain.gain.value=feed;
+	delayNode.connect(feedbackGain);
+	feedbackGain.connect(delayNode);
+
+	for(let z=1;z<numosc;z++){
+		oscGain[z]=aCtx.createGain();
+		osc[z]=aCtx.createOscillator();
+		osc[z].type=osctype;//sine square triangle sawtooth
+		osc[z].start(aCtx.currentTime);
+		osc[z].connect(oscGain[z]);
+	}
+
+	for(let z=(tec-12);z<(tec+37);z++){
+		har[z].value=0;
+		osc[z].frequency.value=fre[z];
+		osc[z].detune.value=det;
+		lfoGain.connect(osc[z].frequency);
+		oscGain[z].gain.value=(har[z].value)/1000;
+		oscGain[z].connect(gNode);
+	}
+
+	gNode.connect(MNode);
+	MNode.connect(convolver);
+	convolver.connect(delayNode);
+	delayNode.connect(aCtx.destination);
+
+	envelope=createADSR(aCtx,attack,decay,sustain,release);
+	envelope.startEnvelope();isPlaying=true;
+
+	if(dspr.innerText.length>8){arrayreal=dspr.innerText.split(",");arrayimag=dspi.innerText.split(",");}
+	if(arrayreal[1]==arrayimag[1]){
+		for(let z=1;z<numosc;z++){osc[z].type=topi;}
+	}else{
+		customWave=aCtx.createPeriodicWave(arrayreal,arrayimag);
+		for(let z=1;z<numosc;z++){osc[z].setPeriodicWave(customWave);}
+	}
+	delayNode.delayTime.value=ddelayval.value;
+	feedbackGain.gain.value=dfeedbackval.value;;
+	convolver.buffer=createReverbImpulse(dimpulseval.value,ddecayval.value);
+}
+
+function createADSR(aCtx,attack,decay,sustain,release){
+	gNode.gain.setValueAtTime(0,aCtx.currentTime);
+	function startEnvelope() {
+		now=aCtx.currentTime;
+		gNode.gain.cancelScheduledValues(now);
+		gNode.gain.setValueAtTime(0,now);
+		gNode.gain.exponentialRampToValueAtTime(1,now+attack);
+		gNode.gain.exponentialRampToValueAtTime(sustain,now+attack+decay);
+	}
+	function stopEnvelope() {
+		now=aCtx.currentTime;
+		gNode.gain.cancelScheduledValues(now);
+		gNode.gain.setValueAtTime(gNode.gain.value, now);
+		gNode.gain.exponentialRampToValueAtTime(0.001,now+release);
+	}
+	return{gNode,startEnvelope,stopEnvelope}
+}
+
+dplay.addEventListener('mousedown',()=>{dplay.style.backgroundColor="#0c0";dplay.style.color="#f00";envelope.startEnvelope();isPlaying=true;})
+dplay.addEventListener('mouseup',()=>{if(envo==0){if(isPlaying){dplay.style.backgroundColor="#016";dplay.style.color="#0ff";envelope.stopEnvelope();isPlaying=false;}}})
+
+function fenvo(){
+	envo=1-envo;
+	if(envo==1){
+		dever.style.opacity=1;dsome.style.opacity=0.5;
+	}else{
+		dever.style.opacity=0.5;dsome.style.opacity=1;
+	}
+}
+
+function fenvoplay(){envelope.startEnvelope();isPlaying=true;dplay.style.visibility="hidden";}
+function fenvostop(){envelope.stopEnvelope();isPlaying=false;dplay.style.visibility="visible";}
+
+function aco(b){
+	a=b.split(",");;
+	for(let z=1;z<numosc;z++){har[z].value=0;oscGain[z].gain.value=0;}
+	for(let z=0;z<10;z++){
+		if(a[z]){
+			ga[z]=Number(a[z].substring(0,2));
+			da[z]=Number(a[z].substring(2,5));
+			a[z]=a[z].substring(5);
+			for(let r=1;r<numosc;r++){
+				if(nota[r]==a[z]){
+					osc[r].frequency.value=fre[r];
+					osc[r].detune.value=da[z];
+					har[r].value=ga[z];
+					oscGain[r].gain.value=ga[z]/1000;
+				}
+			}	
+		}
+	}
+}
+
+function naco(){for(let z=1;z<numosc;z++){har[z].value=0;osc[z].frequency.value=fre[z];osc[z].detune.value=0;oscGain[z].gain.value=0;}}
+
+function volval(){dspanvol.innerText=dvol.value;MNode.gain.value=dvol.value;}//alert(MNode.gain.value);}
+function delayval(){dspandelay.innerText=ddelayval.value;}
+function feedbackval(){dspanfeedback.innerText=dfeedbackval.value;}
+function impulseval(){dspanimpulse.innerText=dimpulseval.value;}
+function decayval(){dspandecay.innerText=ddecayval.value;}
+
+function vibfreq(){if(lfo){dspanvibfre.innerText=vibfre.value;lfo.frequency.value=vibfre.value;}}
+function vibgain(){if(lfoGain){dspanvibgai.innerText=dvibgai.value;lfoGain.gain.value=dvibgai.value;}}
+function fmval(){mval=didval.value;}
+
+function fdet(){
+	detalt=ddet.value;
+	dspandet.innerText=detalt;
+	for(let z=1;z<100;z++){if(osc[z]){osc[z].detune.value=detalt;}}
+}
+
+function fdetzero(){
+	//document.getElementsByClassName("fa")[0].className="fb";
+	//dsen.className="fb";
+	dsen.style.filter="hue-rotate(270deg) saturate(32) contrast(100%) brightness(200%)";
+	ddet.value=0;detalt=ddet.value;dspandet.innerText=0;
+	for(let z=1;z<100;z++){if(osc[z]){osc[z].detune.value=0;osc[z].frequency.value=fre[z];}}
+}
+
+function foct(u){
+	if(u==1){octa=6.875;octb=0;octc=37;foctchange();}
+	if(u==2){octa=13.75;octb=12;octc=25;foctchange();}
+	if(u==3){octa=27.5;octb=24;octc=13;foctchange();}
+}
+
+function foctchange(){
+	for(let z=0;z<109;z++){fre[z+1]=(octa*Math.pow(2,z*1/12)).toFixed(3);}
+	for(let u=1;u<13;u++){for(let z=(u*12-11);z<((u*12-11)+octb);z++){k++;nota[z]=xa[k]+u;};k=0;}
+	for(let z=1;z<numosc;z++){osc[z].frequency.value=fre[z];}
+	for(let z=149;z>100;z--){cod[z].innerHTML=nota[tec-octc+(z-100)];}
+	sufix(0);
+	if(lasth){fhar(lasth);}
+}
+
+function fhar(h){
+	lasth=h;
+	oscGain[h].gain.value=(har[h].value)/1000;//osc[h].detune.value=0;
+}
+
+function fkey(h){
+	for(let z=1;z<numosc;z++){osc[z].detune.value=(h-49)*100;}
+	if(dspr.innerText.length>8){arrayreal=dspr.innerText.split(",");arrayimag=dspi.innerText.split(",");}
+	if(arrayreal[1]==arrayimag[1]){
+		for(let z=1;z<numosc;z++){osc[z].type=topi;}
+	}else{
+		customWave=aCtx.createPeriodicWave(arrayreal,arrayimag);
+		for(let z=1;z<numosc;z++){osc[z].setPeriodicWave(customWave);}
+	}
+	delayNode.delayTime.value=ddelayval.value;
+	feedbackGain.gain.value=dfeedbackval.value;;
+	convolver.buffer=createReverbImpulse(dimpulseval.value,ddecayval.value);
+	dteclado.addEventListener('mousedown',()=>{dplay.style.backgroundColor="#0c0";dplay.style.color="#f00";envelope.startEnvelope();isPlaying=true;})
+	dteclado.addEventListener('mouseup',()=>{if(envo==0){if(isPlaying){dplay.style.backgroundColor="#016";dplay.style.color="#0ff";envelope.stopEnvelope();isPlaying=false;}}})
+}
+
+function createReverbImpulse(duration,decay){
+	sampleRate=aCtx.sampleRate;
+	length=sampleRate*duration			// Reverb length
+	impulse=aCtx.createBuffer(2,length,sampleRate);
+	for(let channel=0;channel<impulse.numberOfChannels;channel++){
+       		channelData=impulse.getChannelData(channel);
+       		for(let i=0;i<length;i++){		// Create exponential decay to simulate reverb tail
+ 			channelData[i]=(Math.random()*2-1)*Math.pow(1-i/length,decay);
+       		}
+	}
+	return impulse;
+}
+
+function fsav(){
+	for(let z=1;z<100;z++){
+		if(osc[z]){
+			savf[z]=osc[z].frequency.value;
+			savh[z]=har[z].value;
+			savd[z]=osc[z].detune.value;
+		}
+	}
+}
+
+function fpsav(){
+	if(savf[1]){
+		for(let z=1;z<numosc;z++){
+			osc[z].frequency.value=savf[z];
+			har[z].value=savh[z];
+			oscGain[z].gain.value=(har[z].value)/1000;
+			osc[z].detune.value=savd[z];
+		}
+	}
+}
+
+dspanvol.innerText=dvol.value;
+dspandelay.innerText=ddelayval.value;
+dspanfeedback.innerText=dfeedbackval.value;
+dspanimpulse.innerText=dimpulseval.value;
+dspandecay.innerText=ddecayval.value;
+
+// ivory
+var kn=["A","B","C","D","E","F","G"];
+var a1,a2,a3,a4,a5,a6,a7,a8;
+a1=80;a2=30;a3=10;a4=30;a5=150;a6="#fffff0";a7=3;a8=0;
+for(let z=0;z<35;z++){
+	if(z==7||z==14||z==21||z==28){a7=a7+1;a8=a8+7}
+	a6="#fffff0";
+	if(z==7||z==14||z==21||z==28){a6="#ffefcf"}
+	mak(a1+z*a2,a3,a4,a5,a6,kn[z-a8],a7);
+}
+// ebony
+kn=["A#","C#","D#","F#","G#"];
+var dist=[100,160,190,250,280,310,370,400,460,490,520,580,610,670,700,730,790,820,880,910,940,1000,1030,1090];
+a1=10;a2=20;a3=80;a7=3;a8=0;
+a6="#525b4e";
+a6="#220";
+var to;
+for(let z=0;z<24;z++){
+	if(z==5||z==10||z==15||z==20){a7=a7+1;a8=a8+5;}
+	mak(dist[z],a1,a2,a3,a6,kn[z-a8],a7);
+}
+
+function mak(x,y,width,height,color,xnote,oct){
+	var cla=document.createElement("div");
+	cla.style.zIndex=2;
+	cla.style.width=width+"px";
+	cla.style.height=height+"px";
+	cla.style.position="absolute";
+	cla.style.left=100+x+"px";
+	cla.style.top=y+"px";
+	cla.style.backgroundColor=color;
+	cla.style.border="solid 2px black";
+	cla.title=(xnote+oct);// alert(xnote+" "+oct);
+	for(let z=1;z<numosc;z++){if(nota[z]==cla.title){cla.title=cla.title+" "+z;cla.id=200+z;}}
+	//cla.addEventListener("mousedown",function(event){har[(cla.id-200)].value=70;fhar((cla.id-200));});
+	cla.addEventListener("mousedown",function(event){fkey((cla.id-200));});
+//	cla.addEventListener("mouseup",function(event){har[(cla.id-200)].value=0;fhar((cla.id-200));});
+//	cla.addEventListener("mouseup",function(event){to=(cla.id-200);setTimeout(timeout(),20);});
+	dteclado.appendChild(cla);
+
+
+	var sInterval;
+	var inta=70;
+	function timeout(){
+	//	inta=70;
+	//	xInterval=setInterval(mus,20);
+	}
+
+	function mus(){
+		inta=inta-5;
+		inta=0;
+		har[to].value=inta;fhar(to);
+		if(inta<5){clearInterval(xInterval);}
+	}
+}
+
+function tipqua(ti,to){opa();tipo=ti;topi=to;dqua.style.opacity=9.9;difra.src="keybd_qua.html";}
+function tipsen(ti,to){opa();tipo=ti;topi=to;dsen.style.opacity=9.9;difra.src="keybd_sen.html";}
+function tiptri(ti,to){opa();tipo=ti;topi=to;dtri.style.opacity=9.9;difra.src="keybd_tri.html";}
+function tiprra(ti,to){opa();tipo=ti;topi=to;drra.style.opacity=9.9;difra.src="keybd_rra.html";}
+function opa(){
+	arrayreal=new Float32Array([0,0,0,0]);
+	arrayimag=new Float32Array([0,0,0,0]);
+	dqua.style.opacity=0.3;dsen.style.opacity=0.3;dtri.style.opacity=0.3;drra.style.opacity=0.3;
+}
+
+function trocac(){
+	sc=document.getElementById('selc');
+	value=sc.options[sc.selectedIndex].value;
+	if(value=="restart"){
+		location.href="keybd.html";
+	}else{
+		document.getElementById("sound").innerText=sc.options[sc.selectedIndex].text;
+		aco(value);
+		sc.selectedIndex="Sound";
+	}
+}
+
+//console.clear();
+
+let firstClick=()=>{
+	init();
+	document.removeEventListener('pointerdown',firstClick)
+	}
+document.addEventListener('pointerdown',firstClick)
+
+</script>
+
+<script>
+function frameLoaded() {
+	document.getElementById("spr").innerText=window.ifra.document.getElementById("spb").value;
+	document.getElementById("spi").innerText=window.ifra.document.getElementById("spb").value;
+}
+</script>
+
+<script>
+/*
+
+I got the bagpipe sound in Internet and using synth_inst.html, I got for my ears (I hear less then 1.2 KHz):
+"40000E4,40000B5,40000E5,40000F#5,40000G#5,40000B6,40000E6,40000F#6,40000B7,40000F#7",
+that represent the 10 sound componets, intensity (2 strings), detune (3 strings) and the notes that syntesize the one key sounds.
+Then I would like to make a keyboard based on it, dettuning this sound for all keys.
+The result was keybd.html, the link:
+
+https://jrlazz.eu5.org/anim/keybd.html
+
+You can choose Bagpipe in "Sound" to hear the result...
+
+*/
+</script>
+
+</body>
+</html>

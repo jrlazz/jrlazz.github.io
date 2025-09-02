@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>audio3d_r1.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="../three.js.ico">
+
+<style>
+body{margin:0px;border:0px;background-color:#048;font-family:Monospace;overflow:hidden;}
+//span,button,input{position:absolute;}
+</style>
+
+</head>
+
+<body onclick="javascript:document.getElementById('bo').focus();">
+
+<table style="left:0px;top:8px;width:99%;color:#fc0;z-index:2;">
+<tr>
+<td style="width:20%;">
+<span style="color:#fc0;font-size:8pt;cursor:pointer;">click right to inspect / see code</span>
+</td><td style="width:20%;">
+<button id="bo" style="display:none;font-size:10pt;height:24px;background-color:#fc0;color:#00c;font-weight:bold;cursor:pointer;"> Play/Pause </button>
+</td><td style="width:30%;">
+<span style="color:#cc0;font-size:12pt;">audio&nbsp;<select id="sel" autocomplete="off" style="background-color:#630;color:#ff0;font-size:12pt;border:1px inset #999;cursor:pointer;" onchange="troca();">
+<option value="1248.mp3">1 2 4 8 kHz</option>
+<option value="unstress_you_red.mp3">Unstress You</option>
+<option value="TwoofUs.mp3">Two of Us</option>
+<option value="satisfaction.mp3">Satisfaction</option>
+<option value="ICallYourName.mp3">I Call Your Name</option>
+<option value="WeCanWorkItOut.mp3">We Can Work It Out</option>
+</select>
+</span>
+</td><td style="width:10%;">
+<input id="volin" type="range" style="width:100px;cursor:pointer;" value="0.4" min="0" max="1" step="0.02" onchange="mudavol();" autocomplete="off"></input>
+</td><td style="width:10%;">
+<span id="spanB" style="color:#fc0;font-size:9pt;"></span>
+</td></tr></table>
+
+<script>
+/*
+import * as THREE from '../js/three.module_res_res.js';
+import { OrbitControls } from '../js/OrbitControls_res_res.js';
+
+var camera, scene, renderer, controls;
+var box=[];
+var geo=[];
+var mat=[];
+var w=0;
+var currentTime;
+var volval=document.getElementById("volin");
+
+	var inpA=document.getElementById('volin');inpA.onchange=function StartAnimation(){mudavol();}
+	var sela=document.getElementById('sel');sela.onchange=function StartAnimation(){troca();}
+	camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,1,1000);
+	camera.position.set(0,0,400);
+
+	scene=new THREE.Scene();
+
+	renderer=new THREE.WebGLRenderer();
+
+	renderer.setClearColor('#048',1.0);
+
+	renderer.setSize(window.innerWidth, window.innerHeight);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	controls.minDistance=120;
+	controls.maxDistance=1200;
+	controls.enablePan=true;
+	controls.enableZoom=true;
+	controls.enableRotate=true;
+
+	document.body.appendChild(renderer.domElement);
+
+	window.addEventListener('resize', onWindowResize);
+
+
+	const esq=new THREE.DirectionalLight('#ccc',1);
+	esq.position.set(-30,30,60).normalize();
+	scene.add(esq);
+	const dir=new THREE.DirectionalLight('#ccc',1);
+	dir.position.set(30,-30,-60).normalize();
+	scene.add(dir);
+
+
+	var tex1=new THREE.TextureLoader().load('img/1kHz.png');
+	var tex2=new THREE.TextureLoader().load('img/2kHz.png');
+	var tex4=new THREE.TextureLoader().load('img/4kHz.png');
+	var tex8=new THREE.TextureLoader().load('img/8kHz.png');
+
+	var marca1=new THREE.MeshStandardMaterial({map:tex1,transparent:true});
+	var marca2=new THREE.MeshStandardMaterial({map:tex2,transparent:true});
+	var marca4=new THREE.MeshStandardMaterial({map:tex4,transparent:true});
+	var marca8=new THREE.MeshStandardMaterial({map:tex8,transparent:true});
+
+	geo[0]=new THREE.BoxGeometry(2,0.5,5);
+	mat[0]=new THREE.MeshStandardMaterial({color:0xffffff});
+	box[0]=new THREE.Mesh(geo[0],mat[0]);
+	
+	box[601]=new THREE.Mesh(geo[0],marca1);
+	box[602]=new THREE.Mesh(geo[0],marca2);
+	box[604]=new THREE.Mesh(geo[0],marca4);
+	box[608]=new THREE.Mesh(geo[0],marca8);
+
+	// -360 -320 -230 -60
+
+	box[601].position.set(-334,25,1);box[601].scale.set(1,500,10);
+	box[602].position.set(-274,25,1);box[602].scale.set(1,500,10);
+	box[604].position.set(-144,25,1);box[604].scale.set(1,500,10);
+	box[608].position.set( 114,25,1);box[608].scale.set(1,500,10);
+
+	scene.add(box[601]);scene.add(box[602]);scene.add(box[604]);scene.add(box[608]);
+
+	for(let z=1;z<129;z++){
+		geo[z]=geo[0].clone();
+		mat[z]=new THREE.MeshStandardMaterial({color:'hsl('+z*2+',50%,50%)',metalness:0.5,roughness:0.5});
+		box[z]=new THREE.Mesh(geo[z],mat[z]);
+		box[z].scale.set(2,1,10);
+		box[z].position.x=-400+z*6;
+		scene.add(box[z]);
+	}
+*/
+	var audio=new Audio();
+
+	audio.src="1248.mp3";
+
+	audio.load();
+
+	var duration=0;
+	window.AudioContext=window.AudioContext||window.webkitAudioContext; // old safari trick
+	var audioContext=new AudioContext();
+	var analyser=audioContext.createAnalyser();
+
+	var masterGain=audioContext.createGain();
+	masterGain.connect(audioContext.destination);
+	var gainNode=audioContext.createGain();
+	gainNode.connect(masterGain);
+	gainNode.connect(audioContext.destination);
+
+	var source=audioContext.createMediaElementSource(audio);
+	source.connect(analyser);
+	source.connect(gainNode);
+	document.getElementById("bo").style.display="block";
+	duration=audio.duration;
+//
+	document.getElementById("bo").addEventListener("click",function(){
+		audio.volume=0.2;
+		if(audio.paused){
+			audio.play();
+		}else{
+			audio.pause();
+		}
+	})
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function mudavol(){
+	gainNode.gain.value=volval.value;
+	document.getElementById("spanB").innerText="gain= "+volval.value;
+}
+
+function troca(){
+	var select=document.getElementById('sel');
+	var value=select.options[select.selectedIndex].value;
+	alert(audio.src);
+	audio.src="TwoofUs.mp3";
+	audio.play();
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+
+	function getDataFromAudio(){
+		analyser.fftSize=512;
+		var freqByteData=new Uint8Array(analyser.fftSize/2);
+		var timeByteData=new Uint8Array(analyser.fftSize/2);
+		analyser.getByteFrequencyData(freqByteData);
+		analyser.getByteTimeDomainData(timeByteData);
+		return {f:freqByteData, t:timeByteData}; // array of all 1024 levels
+	}
+
+	var data=[];
+	data=getDataFromAudio();
+	var ff=[];ff=data.f;var tt=[];tt=data.t;
+ 	for (let j=1;j<129;j++){
+		box[j].scale.y=ff[j]*2;
+		box[j].position.y=-100+(ff[j]/2);
+	}
+
+	renderer.render(scene,camera);
+}
+
+//animate();
+
+gainNode.gain.value=volval.value;
+document.getElementById("spanB").innerText="gain= "+volval.value;
+
+
+
+</script>
+</body>
+</html>

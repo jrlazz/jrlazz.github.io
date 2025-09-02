@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>font_scroll.html</title>
+
+<link rel="shortcut icon" href="https://threejs.org/files/favicon.ico"/>
+
+<style>
+body{margin:0px;font-family:Monospace;background-color:#000;overflow:hidden;}
+span{position:absolute;font-size:9pt;}
+</style>
+
+</head>
+
+<body>
+
+<span style="left:10px;top:5px;color:#c90;cursor:pointer;">right click &rarr; inspect &rarr; source code</span>
+<span id="spA" style="left:10px;top:25px;color:#c90;"></span>
+
+<script type="module">
+
+import * as THREE from '../js/three.module_res_res.js';
+import { FontLoader} from '../js/FontLoader_res_res.js';
+import { TextGeometry } from '../js/TextGeometry_res_res.js';
+
+var container,camera,scene,ambient,renderer,loader,textmat,controls;
+var p=Math.PI;
+var light=[];
+var tex,planeGeo,planeMat;
+var plane;
+var w=0;
+var str=[];
+var star="";
+var vi;
+let wW=window.innerWidth,wH=window.innerHeight;
+var text="?";
+var font=undefined;
+
+str[1] ="        1";
+str[2] ="        2";
+str[3] ="        3";
+str[4] ="        4";
+str[5] ="        5";
+str[6] ="        6";
+str[7] ="        7";
+str[8] ="All Good Children";
+str[9] ="      Go to";
+str[10]="       The";
+str[11]="     Heaven!";
+str[12]="... Three.js ...";
+
+function init(){
+
+	scene=new THREE.Scene();
+	camera=new THREE.PerspectiveCamera(45,wW/wH,0.1,1000);
+	camera.position.set(0,0,10);
+	scene.rotation.set(0.3,0,0);
+
+	renderer=new THREE.WebGLRenderer({antialias:false});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setClearColor('#000',1.0);
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	document.body.appendChild(renderer.domElement);
+
+	light[4]=new THREE.AmbientLight('#ccc',1);
+	scene.add(light[4]);
+
+	for(var m=1;m<12;m++){star=star+str[m]+"\n";}
+	star=star+"\n\n"+str[12];
+
+
+	textmat=[new THREE.MeshPhongMaterial({color:'#c90'}),new THREE.MeshPhongMaterial({color:'#c90'})];// front,side
+	loader=new FontLoader();
+	loader.load('fonte/Courier.json',function(response){font=response;
+	vi=new THREE.Mesh(new TextGeometry("",{
+		font:font,size:1,height:0.1,curveSegments:3,
+		bevelThickness:1,bevelSize:1,bevelEnabled:false}),textmat);
+		vi.rotation.set(0,-0.5,0);
+	})
+
+	tex=new THREE.TextureLoader().load('images/children.png');
+	tex.wrapS=THREE.RepeatWrapping;tex.wrapT=THREE.RepeatWrapping;
+	tex.repeat.set(1,1);
+	planeGeo=new THREE.PlaneGeometry(44,44);
+	planeMat=new THREE.MeshStandardMaterial({map:tex,color:'#fff'}); 
+	plane=new THREE.Mesh(planeGeo,planeMat);
+	plane.rotation.set(-0.3,0,0);
+	plane.position.set(0,-17,-50);
+	scene.add(plane);
+
+}
+
+function render(){
+	renderer.render(scene,camera);
+	w++;
+	if(w>100 && w<150){
+		plane.scale.x -=0.02;
+		plane.scale.y -=0.02;
+		plane.scale.z -=0.02;
+		plane.rotation.z -=0.2;
+	}
+	if(w==150){
+		plane.scale.set(0,0,0);
+		plane.rotation.z=0;
+		vi=new THREE.Mesh(new TextGeometry(star,{font:font,size:1,height:0.01,curveSegments:3}),textmat);vi.position.set(-7,0,9);vi.rotation.set(-1.5,0,0);scene.add(vi);
+	}
+	if(w>150){vi.position.z -=0.05;}
+
+	if(w>800 && w<851){
+		plane.scale.x +=0.02;
+		plane.scale.y +=0.02;
+		plane.scale.z +=0.02;
+		plane.rotation.z +=p/50;
+	}
+	if(w==850){
+		vi.position.set(-3,0,9);
+		w=0;
+	}
+
+
+	//document.getElementById("spA").innerText=w;
+	requestAnimationFrame(render);
+}
+
+init();
+
+render();
+
+
+/*
+
+Scrolling words for Children in Heaven
+
+Hi Three.js followers,
+
+the link:
+
+http://jrlazz.eu5.org/anim/font_stars.html
+
+Again, Thanks for the great Three.js Team!
+
+Jose Roberto Lazzareschi
+
+*/
+
+
+</script>
+
+</body>
+</html>

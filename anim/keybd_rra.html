@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>frame_rra.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="ok.ico"/>
+
+<style>
+body{font-family:monospace;font-size:12pt;font-weight:bold;background-color:transparent;color:#fff;overflow:hidden;}
+button{font-family:monospace;font-size:12pt;font-weight:bold;background-color:#09c;color:#fff;}
+#scope,#freqbars{border:0px solid gray;}
+</style>
+
+</head>
+
+<body>
+
+<canvas id="canv" style="position:absolute;left:-10px;top:0px;width:600px;height:150px;background-color:#666;border:none;"></canvas>
+<input id="spb" type="text" onchange="alter();" style="position:absolute;left:20px;top:160px;width:100px;z-index:2;" value="rra"></input>
+<div id="original" style="position:absolute;left:12px;top:285px;width:256px;height:230px;"></div>
+<div id="fft"></div>
+<div id="consoreal" style="position:absolute;left: 800px;top:200px;width:150px;height:200px;overflow:auto;">real</div>
+<div id="consoimag" style="position:absolute;left:1000px;top:200px;width:150px;height:200px;overflow:auto;">imag</div>
+<button onclick="click1();" style="position:absolute;left:1200px;top:280px;width:60px;cursor:pointer;">disp</button>
+<button onclick="click2();" style="position:absolute;left:1200px;top:320px;width:60px;cursor:pointer;">clear</button>
+
+<script>
+
+var foi=0;
+window.requestAnimationFrame=window.requestAnimationFrame || window.webkitRequestAnimationFrame;
+var myOscilloscope=null;
+var cope=null;
+var aCx=null;
+var osc=null;
+var tipo="rra";
+var freqval=20;
+var draw_plot=null;
+var pianono=null;
+var dreal=document.getElementById("consoreal");
+var dimag=document.getElementById("consoimag");
+var quant=256;
+clickou=1;
+arrayreal=[];
+arrayimag=[];
+var key=document.createElement("div");
+key.style="position:absolute;left:286px;top:200px;width:20px;height:20px;background-color:#fff;";
+key.note="c";
+key.title="c4 4";
+key.addEventListener("mousedown",function(event){tones.play(event.target.note,3);});
+document.body.appendChild(key);
+dreal.innerText="real\n";
+dimag.innerText="imag\n";
+
+document.getElementById("canv").style.backgroundColor=window.parent.document.getElementById("cor").style.backgroundColor;
+
+</script>
+<script src="keybd.js"></script>
+</body>
+</html>

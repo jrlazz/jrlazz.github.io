@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>draw2.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="ok.ico" />
+<style>
+body{overflow:hidden;margin:0px;background-color:#024;font-family:Monospace;font-size:14pt;}
+</style>
+
+<script type="importmap">
+	{
+		"imports":{
+	"three":"https://unpkg.com/three@0.171.0/build/three.module.js",
+	"three/addons/":"https://unpkg.com/three@0.171.0/examples/jsm/"
+		}
+	}
+</script>
+
+</head>
+
+<body>
+
+<span id="spa" style="position:absolute;left:30%;top:2%;color:#0f9;">
+Test2 Wookier<br>
+Included spotLight.decay=0 ... the trick to use small intensity values<br>
+Altered spotLight ... THREE.SpotLight('#f00',30 , 200, Math.PI/12);<br>
+Included renderer.shadowMap.enabled<br>
+Included animate() and spotLightHelper.update() in animate()<br>
+Included a mesh (not necessary)
+</span>
+
+<a href="draw2.txt" target="_blank" style="position:absolute;left:10px;top:10px;width:120px;border:2px outset #ff0;background-color:#009;color:#ff0;text-decoration:none;text-align:center;">The Code</a>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+	var renderer, scene, camera, loader, controls ;
+	var w=0;
+
+	camera=new THREE.PerspectiveCamera(70,window.innerWidth/window.innerHeight,1,1000,1);
+	camera.position.set(40,-40,200);
+	scene=new THREE.Scene();
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.colorSpace=THREE.SRGBColorSpace;
+
+renderer.shadowMap.enabled=true;
+
+	document.body.appendChild(renderer.domElement);
+	controls=new OrbitControls(camera,renderer.domElement);
+
+
+var geo=new THREE.BoxGeometry(10,10,10);
+var mat=new THREE.MeshStandardMaterial({color:'#09c'});
+var mesh=new THREE.Mesh(geo,mat);
+mesh.position.set(0,-5,-100);
+mesh.castShadow=true;
+scene.add(mesh);
+
+
+// **************** Your code ****************
+
+	// Define colours
+const [color1, color2, color3] = [
+  '#111B27',
+  '#757E83',
+  '#42687c',
+]
+
+const sceneColor1 = new THREE.Color(color1)
+const sceneColor2 = new THREE.Color(color2)
+const sceneColor3 = new THREE.Color(color3)
+
+// Change background color
+scene.background = sceneColor1
+
+// Create wall function
+const createWall = (width, height, color) => {
+  const geometry = new THREE.PlaneGeometry(width, height)
+  const material = new THREE.MeshStandardMaterial({color: color, side: THREE.DoubleSide})
+  const wall = new THREE.Mesh(geometry, material)
+  wall.receiveShadow = true
+
+  return wall;
+}
+
+// Add walls
+const backWall = createWall(500, 200, sceneColor1);
+scene.add(backWall)
+
+// Add floor
+const floor = createWall(200, 200, sceneColor1);
+floor.receiveShadow=true;
+scene.add(floor);
+
+// Position walls
+floor.rotation.x = Math.PI / 2;
+floor.position.y = -25;
+floor.position.z = -100;
+
+// Lights
+const spotLight = new THREE.SpotLight('#f00',30 , 200, Math.PI/12);
+spotLight.target = floor
+spotLight.castShadow = true;
+spotLight.position.set(0, 70, -100);
+
+spotLight.decay=0;
+
+const ambLight = new THREE.AmbientLight('#fff', 8);
+
+const spotLightHelper = new THREE.SpotLightHelper(spotLight);
+
+scene.add(ambLight, spotLight, spotLightHelper);
+
+// Camera settings
+camera.position.y = 0;
+camera.position.z = -320;
+scene.rotateY(0.202)
+scene.rotateX(-0.202)
+camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+// Draw canvas
+const drawCanvas = () => {
+  // scene.rotateY(0.002);
+  renderer.render(scene, camera);
+  // renderer.setAnimationLoop(drawCanvas)
+};
+
+drawCanvas();
+
+
+
+
+// **************** End of Your code ****************
+
+function animate(){
+	requestAnimationFrame(animate);
+	spotLightHelper.update();
+	w++;mesh.material.color=new THREE.Color("hsl("+w+", 50%, 25%)");if(w>359){w=0;}
+	mesh.rotation.y +=0.05;
+	renderer.render(scene,camera);
+}
+
+animate();
+
+</script>
+</body>
+</html>
+

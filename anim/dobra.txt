@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>dobra.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="ok.ico" />
+<style>
+@font-face {font-family:myq;src:url('../fonte/MysteryQuest-Regular.ttf');}
+body{overflow:hidden;margin:0px;background-color:#048;font-family:Monospace;}
+span{position:absolute;font-size:41px;font-family:myq;text-align:center;}
+a{font-size:16pt;font-family:myq;}
+</style>
+
+<!--
+<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+-->
+<script type="importmap">
+	{
+		"imports":{
+	"three":"https://unpkg.com/three@0.164.0/build/three.module.js",
+	"three/addons/":"https://unpkg.com/three@0.164.0/examples/jsm/"
+		}
+	}
+</script>
+
+</head>
+
+<body>
+<span style="left:84%;top:3%;width:120px;text-align:center;color:#fc0;">The Hinge</span>
+<span id="spa" style="left:20%;width:60%;top:35%;font-size:82pt;color:#069;display:''"></span>
+<button style="position:absolute;left:84%;top:33%;width:120px;height:30px;background-color:#c90;text-align:center;"><a id="code" href="dobra.txt" target="_blank" style="color:#024;font-weight:bold;text-decoration:none;">The Code</a></button>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
+import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+
+var renderer, scene, camera, loader, geometry, controls;
+var steps, depth, bevelEnabled, bevelThickness, bevelSize, bevelOffset, bevelSegments;
+var font, texto, measure, bbox, helper, size, grid;;
+
+var iW=window.innerWidth;
+var iH=window.innerHeight;
+
+var geo=[];
+var luz=[];
+var mat=[];
+var tex=[];
+var mesh=[];
+var obj=[];
+var par=[];
+var gar=[];
+var paths=[];
+var shapes=[];
+
+var di=0;;
+var mt=0;
+var sim=0;
+var tr=1;
+var w=0;
+var w1=0;
+var w2=0;
+
+var p=Math.PI;
+
+var st="                 ";
+
+var gra=new THREE.Group();
+var gre=new THREE.Group();
+var group=new THREE.Group();
+
+function init(){
+	camera=new THREE.PerspectiveCamera(50,iW/iH,1,1000,1);
+	camera.position.set(0,60,70);
+	scene=new THREE.Scene();
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(iW,iH);
+	//renderer.setClearColor('#600',1);
+	renderer.colorSpace=THREE.SRGBColorSpace;
+
+	document.body.appendChild(renderer.domElement);
+	window.addEventListener('resize', onWindowResize);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+
+		luz[1]=new THREE.AmbientLight("#fff",2);scene.add(luz[1]);
+		luz[2]=new THREE.PointLight('#00f',3000);luz[2].position.set(-50,  0,   0);scene.add(luz[2]);
+		luz[3]=new THREE.PointLight('#0f0',3000);luz[3].position.set( 50,  0,   0);scene.add(luz[3]);
+		luz[4]=new THREE.PointLight('#ff0',3000);luz[4].position.set(  0,-50,   0);scene.add(luz[4]);
+		luz[5]=new THREE.PointLight('#f0f',3000);luz[5].position.set(  0, 50,   0);scene.add(luz[5]);
+		luz[6]=new THREE.PointLight('#fff',3000);luz[6].position.set(  0,  0,-100);scene.add(luz[6]);
+		luz[7]=new THREE.PointLight('#0ff',3000);luz[7].position.set(  0,  0, 100);scene.add(luz[7]);
+
+	grid=new THREE.GridHelper(90,90,"#666",'#666');
+	grid.position.z=-10;
+
+		texto=st.substring(0,4)+"My\n";
+		texto+=st.substring(0,1)+"precious\n";
+		texto+=st.substring(0,2)+"Hinge !\n";
+		loader=new FontLoader();
+		loader.load('../fonte/mystery_quest_regular.json',function(response){font=response;createText();});
+		function createText(){
+			geo[91]=new TextGeometry(texto,{font:font,size:30,depth:1,curveSegments:12,bevelThickness:0.1,bevelSize:0.1,bevelEnabled:false});
+			mat[91]=[new THREE.MeshStandardMaterial({color:'#009'}),new THREE.MeshStandardMaterial({color:'#fc0'})];
+			tex[91]=new THREE.Mesh(geo[91],mat[91]);
+		}
+
+	tex[1]=new THREE.TextureLoader().load("images/made1.jpg");
+	tex[1].wrapS=THREE.RepeatWrapping;
+	tex[1].wrapT=THREE.RepeatWrapping;
+	tex[1].repeat.set(0.01,0.01);
+	tex[1].colorSpace=THREE.SRGBColorSpace;
+
+		mat[5]=new THREE.MeshStandardMaterial({color:'#fc0',metalness:0.5,roughness:0.2,transparent:true,opacity:1,wireframe:false});
+		mat[20]=new THREE.MeshStandardMaterial({color:'#666',metalness:0.5,roughness:0.3,side:THREE.DoubleSide});
+		mat[85]=new THREE.MeshStandardMaterial({map:tex[1],color:'#fc0',metalness:0.5,roughness:0.3});
+		mat[90]=new THREE.MeshStandardMaterial({color:'#fcc',transparent:true,opacity:0.5});
+		mat[99]=new THREE.MeshNormalMaterial({side:THREE.DoubleSide});
+		mat[7]=new THREE.MeshStandardMaterial({color:'#0cf',metalness:0.5,roughness:0.2,transparent:true,opacity:1});
+
+	new MTLLoader().load('models/steve/char56.mtl',function(mat){mat.preload();new OBJLoader().setMaterials(mat).load('models/steve/char56.obj',function(object){
+	gar[1]=object;gar[1].scale.setScalar(2);gar[1].position.set(-20,-1,-10);});});
+
+		new MTLLoader().load('models/steve/par01.mtl',function(mat){mat.preload();new OBJLoader().setMaterials(mat).load('models/steve/par01.obj',function(object){
+		par[1]=object;par[1].scale.setScalar(0.05);par[1].position.set(-9,9,-9.7);par[1].rotation.set(p/2,0,p/2);
+		for(let z=2;z<7;z++){par[z]=par[1].clone();}});});
+
+	geometry=new THREE.CylinderGeometry(2.5,2.5,40.5,32,1);
+	mesh[20]=new THREE.Mesh(geometry,mat[20]);
+	mesh[20].rotation.set(p/2,0,0);
+	mesh[20].position.set(0,0,-10.0);
+		geometry=new THREE.CylinderGeometry(3,3,0.1,32,1);
+		mesh[22]=new THREE.Mesh(geometry,mat[20]);
+		mesh[22].rotation.set(0,0,p);
+		mesh[22].position.set(0,-20.5,0);
+	geometry=new THREE.SphereGeometry(3,32,32,0,2*p,0,p/2);
+	mesh[23]=new THREE.Mesh(geometry,mat[20]);
+	mesh[23].rotation.set(0,0,p);
+	mesh[23].position.set(0,-20.6,0);
+		mesh[20].add(mesh[22]);
+		mesh[20].add(mesh[23]);
+
+	geometry=new THREE.CylinderGeometry(1,2,0.5,32,1,true);
+	mesh[24]=new THREE.Mesh(geometry,mat[20]);
+		geometry=new THREE.CylinderGeometry(1,2,0.1,32,1,true);
+		mesh[25]=new THREE.Mesh(geometry,mat[20]);
+
+	geometry=new THREE.CylinderGeometry(1,2,0.5,32,1,true);
+	mesh[74]=new THREE.Mesh(geometry,mat[99]);
+		geometry=new THREE.CylinderGeometry(1,2,0.1,32,1,true);
+		mesh[75]=new THREE.Mesh(geometry,mat[99]);
+
+// _______________________________________________
+	loadSVGindB(  5,'img/dobra02.svg',    10,   20, 0);
+	loadSVGindB( 15,'img/dobra03.svg',     2.35,20,10);
+	loadSVGindB( 85,'img/madocorte.svg',   1,    2, 0);
+	loadSVGindB( 86,'img/madobase.svg',   25,    2, 0);
+	loadSVGindB( 90,'img/bubble01.svg',    1,   20, 0);
+// _______________________________________________
+
+// init Fim
+
+}
+
+function loadSVGindB(ind,url,d,c,t){
+	loader=new SVGLoader();
+	loader.load(url,function(data){
+		paths=data.paths;
+		shapes=SVGLoader.createShapes(paths[0]);
+		geometry=new THREE.ExtrudeGeometry(shapes[0],{depth:d,curveSegments:c});
+		geometry.translate(t,0,0);
+		mesh[ind]=new THREE.Mesh(geometry,mat[99]);
+		if(ind==5){
+			mesh[ind]=new THREE.Mesh(geometry,mat[7]);
+			mesh[ind+2]=new THREE.Mesh(geometry,mat[5]);
+		}
+		if(ind==85 || ind== 86){mesh[ind]=new THREE.Mesh(geometry,mat[85]);}
+		if(ind==90){mesh[ind]=new THREE.Mesh(geometry,mat[90]);}
+		if(ind==15){
+			mesh[ind]=new THREE.Mesh(geometry,mat[7]);
+			mesh[ind+1]=new THREE.Mesh(geometry,mat[5]);
+		}
+		mesh[ind].scale.set(0.1,0.1,1);
+	});
+}
+
+function onWindowResize(){
+	iW=window.innerWidth;iH=window.innerHeight;
+	camera.aspect=iW/iH;
+	camera.updateProjectionMatrix();
+	renderer.setSize(iW,iH);
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+
+	w2=w2+0.1;
+
+	if(w2<=100){document.getElementById("spa").innerText=w2.toFixed(1)+" %";}
+	
+	if(mesh[5] && sim==0){
+//alert("1");
+		sim=1;
+	}
+
+	if(mesh[15] && mesh[25] && mesh[85] && mesh[86] && mesh[90] && mesh[7] && tex[91] && par[6] && gar[1] && sim==1){
+//alert("2");
+		// maddobcorte
+		mesh[85].scale.set(1,1,1);
+		mesh[85].position.set(0,0,-0.3);
+
+		// maddobbase
+		mesh[86].rotation.set(p/2,p/2,0);
+		mesh[86].scale.set(0.2,0.2,0.5);
+		mesh[86].position.set(2.8,3.2,-50);
+		mesh[86].add(mesh[85]);
+
+		// cones de furos da gira
+		mesh[24].rotation.set(p/2,0,0);
+		mesh[24].position.set(10,30,1.04);
+		mesh[24].scale.setScalar(5);
+		mesh[25].position.set(0,0.35,0);
+		mesh[24].add(mesh[25]);
+		mesh[125]=mesh[24].clone();mesh[125].position.set(10,100,1.04);
+		mesh[126]=mesh[24].clone();mesh[126].position.set(10,170,1.04);
+
+		// cones de furos da fixa
+		mesh[74].rotation.set(p/2,0,0);
+		mesh[74].position.set(10,30,1.04);
+		mesh[74].scale.setScalar(5);
+		mesh[75].position.set(0,0.35,0);
+		mesh[74].add(mesh[75]);
+		mesh[175]=mesh[74].clone();mesh[175].position.set(10,100,1.04);
+		mesh[176]=mesh[74].clone();mesh[176].position.set(10,170,1.04);
+
+
+		// 15 aba gira
+		mesh[15].scale.setScalar(0.2);
+		mesh[15].rotation.set(p/2,p/2,0);
+		mesh[15].position.set(2.5,7,-29.82);
+		mesh[24].position.set(10,30,1.04);
+		mesh[15].add(mesh[24]);
+		mesh[15].add(mesh[125]);
+		mesh[15].add(mesh[126]);
+
+		for(let z=1;z<4;z++){par[z].scale.setScalar(0.2);par[z].rotation.set(-p/2,0,0);par[z].position.set(10,30,27);}
+		par[1].position.y=30;
+		par[2].position.y=100;
+		par[3].position.y=170;
+		for(let z=1;z<4;z++){mesh[15].add(par[z]);}
+
+
+
+		// 16 aba fixa
+		mesh[16].scale.setScalar(0.2);
+		mesh[16].rotation.set(p/2,p/2,0);
+		mesh[16].rotation.set(p/2,-p/2,0);
+		mesh[16].position.set(-2.52,11,-30);
+		mesh[16].add(mesh[74]);
+		mesh[16].add(mesh[175]);
+		mesh[16].add(mesh[176]);
+
+		for(let z=4;z<7;z++){par[z].scale.setScalar(0.2);par[z].rotation.set(-p/2,0,0);par[z].position.set(10,30,7);}
+		par[4].position.y=30;
+		par[5].position.y=100;
+		par[6].position.y=170;
+		for(let z=4;z<7;z++){mesh[16].add(par[z]);}
+		scene.add(mesh[16]);
+
+		// dobra02 (5 e 6 pontas e 7 central)
+		mesh[6]=mesh[5].clone();
+		mesh[6].position.set(0,0,-30);
+		scene.add(mesh[6]);
+
+		gra.add(mesh[5]);gra.add(mesh[6]);
+
+		mesh[7].position.set(0,0,-0.65);
+		mesh[7].rotation.set(p,0,p);
+		mesh[7].scale.set(0.1,0.1,1.86);
+
+		// cilindro central e porta
+		gre.add(mesh[7]);
+		gre.add(mesh[16]);
+
+		// porta e aba fixa
+		gra.add(mesh[86]);
+		gra.add(mesh[15]);
+
+		scene.add(gra);
+		scene.add(gre);
+		scene.add(grid);
+
+		// bolha e texto
+		mesh[90].rotation.set(0,p,p);mesh[90].position.set(-35,23,-5);
+		tex[91].rotation.set(p,0,0);
+		tex[91].position.set(-90,-60,0.5);
+		mesh[90].add(tex[91]);
+		scene.add(mesh[90]);
+
+		scene.add(gar[1]);
+
+		scene.add(mesh[20]);
+
+		sim=2;
+	}
+
+	if(sim==2){
+
+		document.getElementById("spa").style.display="none";
+
+		w1++;
+
+		if(w1<=150){
+			w++;
+			if(w<=150){
+				gre.rotation.z +=0.005;
+				gra.rotation.z -=0.01;par[4].rotation.y -=0.1;par[5].rotation.y -=0.1;par[6].rotation.y -=0.1;
+			}
+			if(w>150){
+				gre.rotation.z -=0.005;
+				gra.rotation.z +=0.01;par[4].rotation.y +=0.1;par[5].rotation.y +=0.1;par[6].rotation.y +=0.1;
+			}
+			if(w==300){w=0;}
+		}
+		if(w1==300){w1=0;}
+	}
+
+	renderer.render(scene,camera);
+}
+
+init();
+
+animate();
+
+
+/*
+Hinge made with Three.js
+
+the link:
+
+https://jrlazz.eu5.org/anim/dobra.html
+
+Although there is no date for the invention of the hinge,
+ the earliest pivot hinge discovered dates as far back as 1600 B.C.
+ Some say a hinge's "importance to everyday life is right up there with the wheel"
+ and with good reason.
+ The hinge is an incredibly simple concept, but a crucial invention.
+https://www.signetlocks.co.uk/news/the-history-of-hinges/
+
+Thanks for the Three.js Team
+
+Jose Roberto Lazzareschi
+
+*/
+
+
+
+</script>
+</body>
+</html>
+

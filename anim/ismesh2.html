@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>ismesh2.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="ok.ico"/>
+
+<style>
+body{margin:0px;border:0px;background-color:#024;font-family:Monospace;overflow:hidden;}
+</style>
+
+<script type="importmap">
+	{
+		"imports":{
+			"three":"https://unpkg.com/three@0.171.0/build/three.module.js",
+			"three/addons/":"https://unpkg.com/three@0.171.0/examples/jsm/"
+		}
+	}
+</script>
+
+</head>
+
+<body>
+
+<button style="position:absolute;left:10%;top:2%;background-color:#c90;text-align:center;"><a id="code" href="ismesh2.txt" target="_blank" style="color:#024;font-weight:bold;text-decoration:none;">The Code for ismesh2.html</a></button>
+<span id="sp1" style="position:absolute;width:100%;top:45%;font-size:41px;color:#248;text-align:center;display:none;"></span>
+
+<script type="module">
+
+import * as THREE from "three";
+import {OrbitControls} from "three/addons/controls/OrbitControls.js";
+import {FBXLoader} from "three/addons/loaders/FBXLoader.js";
+import Stats from "three/addons/libs/stats.module.js";
+
+var camera, scene, renderer, loader, controls, stats, mesh, poly, ambLight, dirLight, tex;
+var objects=[];
+var conta=0;
+var w0=0;
+var w1=0;
+var em=0;
+var te=0;
+var sim=0;
+var dis=document.getElementById("sp1");
+dis.style.display="";
+
+function init(){
+
+	camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,1,1000);
+	camera.position.set(0,25,50);
+
+	scene=new THREE.Scene();
+	scene.background=new THREE.Color(0x112244);
+
+	loader=new FBXLoader();
+	loader.load('models/extras/blember.fbx',function(object){
+		object.traverse(function(child){
+			if (child.isMesh){
+				objects.push( child );
+				conta++;
+			}
+		});
+		//for(let z=0;z<conta;z++){console.log(objects[z]);}
+		objects[0].material=new THREE.MeshStandardMaterial({emissive:'#f00',emissiveIntensity:0.8});
+		objects[1].material=new THREE.MeshStandardMaterial({emissive:'#fc9',emissiveIntensity:0.5});
+		objects[2].material=new THREE.MeshStandardMaterial({emissive:'#09c',emissiveIntensity:0.2});
+		objects[3].material=new THREE.MeshStandardMaterial({emissive:'#00f',emissiveIntensity:0.3});
+		objects[4].material=new THREE.MeshStandardMaterial({emissive:'#fff',emissiveIntensity:0.2});
+		objects[5].material=new THREE.MeshStandardMaterial({emissive:'#0f0',emissiveIntensity:0.1});
+		poly=object;
+		poly.position.set(0,-10,0);
+		poly.scale.set(0.1,0.1,0.1);
+		poly.rotation.y=Math.PI;
+		scene.add(poly);
+	});
+
+	renderer=new THREE.WebGLRenderer({antialias: true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	document.body.appendChild(renderer.domElement);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+}
+
+function animate() {
+	requestAnimationFrame(animate);
+	if(sim==0){w0=w0+0.1;dis.innerText="... loading "+w0.toFixed(2)+"%";}
+	w1++;
+	if(w1>100 && poly){
+		sim=1;dis.style.display="none";
+		w1=0;
+		for(let z=0;z<6;z++){
+			em=parseInt(Math.random()*360);
+			te=Math.random();
+			objects[z].material=new THREE.MeshStandardMaterial({emissive:new THREE.Color("hsl("+em+",100%,50%)"),emissiveIntensity:te});
+			}
+	}
+	controls.update();
+	renderer.render(scene,camera);
+}
+
+init();
+
+animate();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>name_id.html</title>
+<link rel="shortcut icon" href="https://threejs.org/files/favicon.ico"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/90/three.min.js"></script>
+</head>
+<body style="margin:0px;width:90%;height:90%;">
+<span id="spanA" style="position:absolute;left:5px;top:  5px;color:#cc0;font-size:12pt;cursor:pointer;">right click &rarr; inspect &rarr; source code</span>
+<button          style="position:absolute;left:5px;top: 50px;color:#000;font-size:12pt;cursor:pointer;" onclick="javascript:location.reload();">restart</button>
+<span id="spanB" style="position:absolute;left:5px;top:90px;color:#0ff;font-size:16pt;">Only necessary four OK큦 OK?</span>
+<span id="spanC" style="position:absolute;left:5px;top:130px;color:#f0f;font-size:16pt;">
+With this page, I found 3 id큦 and respective names.<br>
+id 3 ... name scene_name<br>
+id 8 ... name cubeA<br>
+id 9 ... name cubeB<br>
+Please, help me to find what are the 1,2,5,6,7 others id큦.
+</span>
+<script>
+	var w=0;
+	var ww=0;
+	var scene=new THREE.Scene();
+	scene.name="scene_name";
+	var camera=new THREE.PerspectiveCamera(50,window.innerWidth/window.innerHeight,0.1,1000);
+	camera.position.z=100;
+	var renderer=new THREE.WebGLRenderer();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	document.body.appendChild(renderer.domElement);
+
+	var geo=new THREE.BoxGeometry(4,8,4);
+	var mat=new THREE.MeshBasicMaterial({color:0x00ff00});
+	var matB=new THREE.MeshBasicMaterial({color:0xffff00});
+
+	var cubeA=new THREE.Mesh(geo,mat);
+	cubeA.name="cubeA";
+	cubeA.position.x=-90;
+	scene.add(cubeA);
+
+	var cubeB=new THREE.Mesh(geo,matB);
+	cubeB.name="cubeB";
+	cubeB.position.x=90;
+	scene.add(cubeB);
+
+function animate(){
+	requestAnimationFrame(animate);
+	renderer.render(scene,camera);
+	w++;
+	if(ww==1){w=200; document.getElementById("spanB").innerText="";}
+	if(w<11){scene.getObjectByName("cubeA",true).position.x +=3;}
+	if(w==10){alert("cubeA position=" + scene.getObjectByName("cubeA",true).position.x);w=0;ww++;}
+	alert("id= " + scene.getObjectById(w).id + " ... name is: " +scene.getObjectById(w).name);
+
+
+}
+animate();
+
+/*
+Hi Three.js followers,
+
+Looking for id큦 and names of meshes
+
+With this page, I found 3 id큦 and respective names.
+id 3 ... name scene_name
+id 8 ... name cubeA
+id 9 ... name cubeB
+
+Please, help me to find what are the 1,2,5,6,7 others id큦.
+
+the link:
+
+http://jrlazz.eu5.org/anim/id_name.html
+
+Again, Thanks for the great Three.js Team!
+
+Jose Roberto Lazzareschi
+
+*/
+
+</script>
+</body>
+</html>

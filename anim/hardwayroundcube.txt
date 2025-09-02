@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>hardwayroundcube.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="ok.ico"/>
+
+<style>
+body{margin:0px;background-color:#024;font-family:Monospace;overflow:hidden;}
+</style>
+
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+	{
+		"imports":{
+			"three":"https://unpkg.com/three@0.160.0/build/three.module.js",
+			"three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"
+		}
+	}
+</script>
+
+</head>
+
+<body>
+
+<span style="position:absolute;left:10px;top:10px;color:#fc0;font-size:20.5px;">Hard Way Round Cube
+<br><br>round: 
+<input id="round" style="width:60px;color:#009;font-size:10.25pt;font-weight:bold;text-align:right;" type="number"autocomplete="on" min=2 max=32 step=2 value=4></input>
+<br>size:&nbsp;
+<input id="size"  style="width:60px;color:#090;font-size:10.25pt;font-weight:bold;text-align:right;" type="number"autocomplete="on" min=0.1 max=1 step=0.1 value=1></input>
+<br><br>&nbsp;<span id="reset" style="color:#f00;background-color:#ccc;cursor:pointer;border:2px outset #fc0;">&nbsp;&nbsp;&nbsp;reset&nbsp;&nbsp;&nbsp;</span></span>
+<button style="position:absolute;left:84%;top:84%;background-color:transparent;border-color:#fc0;text-align:center;"><a id="code" href="hardwayroundcube.txt" target="_blank" style="color:#fc0;text-decoration:none;font-size:20.5pt;">The Code</a></button>
+
+<script type="module">
+
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { Reflector } from 'three/addons/objects/Reflector.js';
+
+var scene,camera,renderer,controls;
+var clock=new THREE.Clock();
+var dt=0;
+var amb,point;
+var p=Math.PI;
+
+var geo=[];
+var mat=[];
+var mesh=[];
+var ax;
+var gT=new THREE.Group();
+var gD=new THREE.Group();
+var gL=new THREE.Group();
+var gR=new THREE.Group();
+var gF=new THREE.Group();
+var gB=new THREE.Group();
+var gX=new THREE.Group();
+var gAll=new THREE.Group();
+
+var cor='#f90';
+
+var bId=function(id){return document.getElementById(id);}
+	var dround=bId("round");
+	var dsize=bId("size");
+	var dreset=bId("reset");
+
+var ro=dround.value;
+var roAll=dsize.value;
+
+	dround.onchange=function FROUND(){location.reload();}
+	dsize.onchange=function FSIZE(){location.reload();}
+	dreset.onclick=function FRESET(){dround.value=4;dsize.value=1;location.reload();}
+
+	scene=new THREE.Scene();
+	camera=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,1,1000);
+	camera.position.set(20,20,50);
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.setClearColor('#068',1);
+	renderer.outputColorSpace=THREE.LinearSRGBColorSpace;
+	document.body.appendChild(renderer.domElement);
+
+	window.addEventListener('resize',onResize,false);
+
+	controls = new OrbitControls(camera,renderer.domElement);
+
+	amb=new THREE.AmbientLight('#fff',4);
+	scene.add(amb);
+
+	ax=new THREE.AxesHelper(1);
+
+	point=new THREE.PointLight('#fff',2000);
+	point.position.set(20,20,0);
+
+	gX.add(point);
+	gX.position.set(0,0,0);
+	scene.add(gX);
+
+	mesh[1]=new THREE.Mesh(new THREE.BoxGeometry(10,ro*2,10).translate(0,0,0),new THREE.MeshStandardMaterial({color:cor,metalness:0.6,roughness:0.2}));
+	mesh[1].position.set(0,0,0);
+
+	mesh[11]=new THREE.Mesh(new THREE.CylinderGeometry(ro,ro,10,32).translate(0,0,0),new THREE.MeshStandardMaterial({color:cor,metalness:0.6,roughness:0.2}));
+	mesh[11].position.set(-5,0,0);
+	mesh[11].rotation.set(p/2,0,0);
+		mesh[12]=mesh[11].clone();
+		mesh[12].position.set(5,0,0);
+	mesh[13]=mesh[11].clone();
+	mesh[13].position.set(0,0,-5);
+	mesh[13].rotation.set(0,0,p/2);
+		mesh[14]=mesh[11].clone();
+		mesh[14].position.set(0,0,5);
+		mesh[14].rotation.set(0,0,p/2);
+
+	mesh[21]=new THREE.Mesh(new THREE.SphereGeometry(ro,16,16).translate(0,0,0),new THREE.MeshStandardMaterial({color:cor,metalness:0.6,roughness:0.2}));
+	mesh[21].position.set(5,0,5);
+		mesh[22]=mesh[21].clone();
+		mesh[22].position.set(5,0,-5);
+	mesh[23]=mesh[21].clone();
+	mesh[23].position.set(-5,0,5);
+		mesh[24]=mesh[21].clone();
+		mesh[24].position.set(-5,0,-5);
+
+	for(let z=1;z<100;z++){if(mesh[z]){gT.add(mesh[z]);}}
+
+	gD=gT.clone();
+	gD.position.y=-10;
+		gL=gT.clone();
+		gL.position.set(-5,-5,0);
+		gL.rotation.z=p/2;
+	gR=gT.clone();
+	gR.position.set(5,-5,0);
+	gR.rotation.z=p/2;
+		gF=gT.clone();
+		gF.position.set(0,-5,5);
+		gF.rotation.x=p/2;
+	gB=gT.clone();
+	gB.position.set(0,-5,-5);
+	gB.rotation.x=p/2;
+
+	gAll.add(gT);
+	gAll.add(gD);
+	gAll.add(gL);
+	gAll.add(gR);
+	gAll.add(gF);
+	gAll.add(gB);
+
+	gAll.scale.multiplyScalar(roAll);
+
+	scene.add(gAll);
+
+renderer.setAnimationLoop(() => {
+  	dt=clock.getDelta();
+	gX.rotation.y +=dt*2;
+	renderer.render(scene,camera);
+})
+
+function onResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+/*
+
+The hard way a round cube is made
+
+the link:
+
+https://jrlazz.eu5.org/anim/hardwayroundcube.html
+
+Thanks to Three.js Team!!!
+
+*/
+
+</script>
+
+</body>
+
+</html>
