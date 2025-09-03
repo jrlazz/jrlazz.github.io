@@ -1,0 +1,27 @@
+# Created with Anim8or 1.00
+# Object "gkk3404":
+
+newmtl carro
+Ka 1 0 0
+Kd 1 0 0
+Ks 1 1 1
+Ns 752.6
+
+newmtl cock
+Ka 0.773 0.573 0.051
+Kd 0.773 0.573 0.051
+Ks 1 1 1
+Ns 752.6
+
+newmtl rodas
+Ka 0.251 0 0
+Kd 0.251 0 0
+Ks 1 1 1
+Ns 903.1
+
+newmtl gray
+Ka 0.875 0.875 0.875
+Kd 0.875 0.875 0.875
+Ks 1 1 1
+Ns 752.6
+

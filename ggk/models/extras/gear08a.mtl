@@ -1,0 +1,20 @@
+# Created with Anim8or 1.00
+# Object "gear08":
+
+newmtl material01
+Ka 0.25 0.25 0.25
+Kd 0.25 0.25 0.25
+Ks 1 1 1
+Ns 300
+
+newmtl material02
+Ka 0 0.1 0.7
+Kd 0 0.1 0.7
+Ks 1 1 1
+Ns 150
+
+newmtl material03
+Ka 0 0.8 0
+Kd 0 0.8 0
+Ks 1 1 1
+Ns 150

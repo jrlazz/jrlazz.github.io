@@ -1,0 +1,21 @@
+# Created with Anim8or 1.00
+# Object "gear32":
+
+newmtl material01
+Ka 0.25 0.25 0.25
+Kd 0.25 0.25 0.25
+Ks 1 1 1
+Ns 300
+
+newmtl material02
+Ka 0.4 0 0.8
+Kd 0.4 0 0.8
+Ks 1 1 1
+Ns 150
+
+newmtl material03
+Ka 0.8 0.4 0
+Kd 0.8 0.4 0
+Ks 1 1 1
+Ns 150
+

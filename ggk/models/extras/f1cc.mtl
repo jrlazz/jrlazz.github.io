@@ -1,0 +1,15 @@
+# Created with Anim8or 1.00
+# Object "f1bb":
+
+newmtl rodas
+Ka 0.00392 0.00392 0.00392
+Kd 0.00392 0.00392 0.00392
+Ks 1 1 1
+Ns 1000.0
+
+newmtl material01
+Ka 0.227 0.227 0.227
+Kd 0.227 0.227 0.227
+Ks 1 1 1
+Ns 1000.0
+

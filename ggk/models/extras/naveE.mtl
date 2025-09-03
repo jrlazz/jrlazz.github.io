@@ -1,0 +1,30 @@
+# Created with Anim8or 1.00
+# Object "object01":
+
+newmtl Steve
+Ka 0.878 0.878 0.878
+Kd 0.878 0.878 0.878
+Ks 1 1 1
+Ns 752.6
+# map_Kd orig_Steve.png
+# map_Kd ../steve/Steve.png
+map_Kd Steve_1024.png
+
+newmtl material02
+Ka 0.153 0.478 0.741
+Kd 0.153 0.478 0.741
+Ks 1 1 1
+Ns 752.6
+
+newmtl material01
+Ka 0.224 0.69 0.173
+Kd 0.224 0.69 0.173
+Ks 1 1 1
+Ns 752.6
+
+newmtl material04
+Ka 0.333 0.988 0.349
+Kd 0.333 0.988 0.349
+Ks 1 1 1
+Ns 752.6
+
