@@ -1,0 +1,15 @@
+# Created with Anim8or 1.00
+# Object "toiletOBJ":
+
+newmtl board_plastic
+Ka 0.914 0.914 0.914
+Kd 0.914 0.914 0.914
+Ks 0.898 0.898 0.898
+Ns 50.0
+
+newmtl toilet_ceramics
+Ka 0.884 0.884 0.584
+Kd 0.884 0.884 0.584
+Ks 0 0 0
+Ns 10.0
+

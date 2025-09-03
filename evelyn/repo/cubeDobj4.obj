@@ -1,0 +1,86 @@
+# Created with Anim8or 1.00
+# Object "cubeDobj2":
+
+mtllib cubeDobj4.mtl
+
+# Shape "mesh02":
+g mesh02
+# No. points 8:
+v -1 -0.50000 -0.50000
+v -1 -0.50000 0.50000
+v -1 0.50000 -0.50000
+v -1 0.50000 0.50000
+v 0 -0.50000 -0.50000
+v 0 -0.50000 0.50000
+v 0 0.50000 -0.50000
+v 0 0.50000 0.50000
+
+# No. normals 30:
+vn 0 0 -1
+vn -1 0 0
+vn 0 1 0
+vn 0 -1 0
+vn 0 0 1
+vn 1 0 0
+vn 0 0 -1
+vn 0 -1 0
+vn -1 0 0
+vn -1 0 0
+vn 0 0 1
+vn 0 -1 0
+vn 0 0 -1
+vn 0 1 0
+vn -1 0 0
+vn -1 0 0
+vn 0 0 1
+vn 0 1 0
+vn 0 0 -1
+vn 1 0 0
+vn 0 -1 0
+vn 0 -1 0
+vn 1 0 0
+vn 0 0 1
+vn 0 0 -1
+vn 1 0 0
+vn 0 1 0
+vn 0 1 0
+vn 1 0 0
+vn 0 0 1
+
+# No. texture coordinates 8:
+vt 0 0
+vt 0 0
+vt 0 1
+vt 0 1
+vt 1 0
+vt 1 0
+vt 1 1
+vt 1 1
+
+# No. faces 6:
+
+usemtl m_1
+
+f 4/4/18 8/8/28 7/7/27 3/3/14
+
+usemtl material01
+
+f 6/6/24 8/8/30 4/4/17 2/2/11
+
+usemtl material02
+
+f 7/7/26 8/8/29 6/6/23 5/5/20
+
+usemtl material03
+
+f 2/2/10 4/4/16 3/3/15 1/1/9
+
+usemtl material04
+
+f 5/5/21 6/6/22 2/2/12 1/1/8
+
+usemtl material05
+
+f 3/3/13 7/7/25 5/5/19 1/1/7
+
+# End of Object "cubeDobj2"

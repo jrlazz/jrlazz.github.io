@@ -1,0 +1,6 @@
+﻿linha 1 ... não entra ...
+'jpg0.jpg*jpg1.jpg*jpg2.jpg*jpg3.jpg*jpg4.jpg*jpg5.jpg'
+'Vivi_self_001.jpg*Vivi_self_001.jpg*Vivi_self_001.jpg*Vivi_self_001.jpg*ValedoSol1.jpg*ValedoSol1.jpg'
+'fl1.jpg*fl2.jpg*fl3.jpg*fl4.jpg*fl5.jpg*fl6.jpg'
+'ValedoSol1.jpg*ValedoSol2.jpg*ValedoSol1.jpg*ValedoSol2.jpg*ValedoSol1.jpg*ValedoSol2.jpg'
+
