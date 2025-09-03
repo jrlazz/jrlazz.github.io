@@ -1,0 +1,160 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+<meta charset="UTF-8">
+
+<title>4_audios.html</title>
+
+<style>
+@font-face {font-family:tipo;src:url('../fonte/MysteryQuest-Regular.ttf');}
+body { margin:0px; margin-top:0px; background-color:#bcc;font-family:tipo; font-size:20pt; font-weight:bold; color:#008;}
+img { position:relative; width:60px;}
+h3 {color:#c00; }
+p {color:#090; }
+audio {filter: invert(0%) sepia(100%) saturate(581%) hue-rotate(335deg) brightness(92%) contrast(105%);}
+
+.button{
+  position:relative;
+  display:inline-block;
+  margin:20px;
+}
+
+.button b{
+  color:white;
+  font-family:Helvetica, sans-serif;
+  font-weight:bold;
+  font-size:16px;
+  text-align: center;
+  text-decoration:none;
+  background-color:#FFA12B;
+  display:block;
+  position:relative;
+  padding:10px 20px;
+  
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  text-shadow: 0px 1px 0px #000;
+  filter: dropshadow(color=#000, offx=0px, offy=1px);
+  
+  -webkit-box-shadow:inset 0 1px 0 #FFE5C4, 0 10px 0 #915100;
+  -moz-box-shadow:inset 0 1px 0 #FFE5C4, 0 10px 0 #915100;
+  box-shadow:inset 0 1px 0 #FFE5C4, 0 10px 0 #915100;
+  
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+
+.button b:active{
+  top:10px;
+  background-color:#F78900;
+  
+  -webkit-box-shadow:inset 0 1px 0 #FFE5C4, inset 0 -3px 0 #915100;
+  -moz-box-shadow:inset 0 1px 0 #FFE5C4, inset 0 -3pxpx 0 #915100;
+  box-shadow:inset 0 1px 0 #FFE5C4, inset 0 -3px 0 #915100;
+}
+
+.button:after{
+  content:"";
+  height:100%;
+  width:100%;
+  padding:4px;
+  position: absolute;
+  bottom:-15px;
+  left:-4px;
+  z-index:-1;
+  background-color:#2B1800;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+
+
+</style>
+</head>
+
+<body>
+<center>
+<h3>Sons de Animais</h3>
+
+<p>Clique nos players para ouví-los:</p>
+<table>
+
+<tr><td>
+<audio id="horse" controls poster="horseZ.png">
+<source src="horse.mp3" type="audio/mpeg">
+</audio></td><td onclick="playhorse();">cavalo</td></tr>
+<tr><td>
+<audio id="dog" controls>
+<source src="dog-2.mp3" type="audio/mpeg">
+</audio></td><td onclick="playdog();">cachorrão</td></tr>
+<tr><td>
+<audio id="pig" controls>
+<source src="big_pig_snort.mp3" type="audio/mpeg">
+</audio></td><td onclick="playpig();">porco</td></tr>
+<tr><td>
+<audio id="elefante" controls>
+<source src="elephant9.mp3" type="audio/mpeg">
+</audio></td><td onclick="playelefante();">elefante</td></tr>
+</table>
+
+<table>
+<tr><td>
+<div class="button">
+<b><img src="horseZ.png" onclick="playhorse();"></img></b>
+</div>
+</td><td>
+<div class="button">
+<b><img src="dogZ.png" onclick="playdog();"></img></b>
+</div>
+</td><td>
+<div class="button">
+<b><img src="pigZ.png" onclick="playpig();"></img></b>
+</div>
+</td><td>
+<div class="button">
+<b><img src="elefanteZ.png" onclick="playelefante();"></img></b>
+</div>
+</td></tr>
+</table>
+
+</center>
+
+<script>
+
+document.getElementById("horse").volume=.5;
+document.getElementById("dog").volume=.5;
+document.getElementById("pig").volume=.5;
+document.getElementById("elefante").volume=.5;
+
+function playhorse(){document.getElementById("horse").play();}
+function playdog(){document.getElementById("dog").play();}
+function playpig(){document.getElementById("pig").play();}
+function playelefante(){document.getElementById("elefante").play();}
+
+</script>
+<!--
+<div ontouchstart=""><div class="button">
+<a href="#"><img src="dogZ.png" onclick="playdog();"></img></a>
+</div></div>
+-->
+<!--
+<a href="#INSERT_YOUR_OBJECT_NAME_HERE">Click here to see the content below.</a>
+<br>
+<a href="#facebook_ads_example">Click here to see an example of how a company uses Facebook ads.</a>
+<br><br><br><br><br><br>
+<br><br><br><br><br><br>
+<br><br><br><br><br><br>
+<br><br><br><br><br><br>
+<a id="INSERT_YOUR_OBJECT_NAME_HERE">The object you want to link to.</a>
+<br><br><br><br><br><br>
+<br><br><br><br><br><br>
+<br><br><br><br><br><br>
+<br><br><br><br><br><br>
+<a id="facebook_ads_example">This is the Facebook ad example I want to link to.</a>
+-->
+</body>
+</html>
