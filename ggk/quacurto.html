@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>quacurto.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="https://threejs.org/files/favicon.ico"/>
+<style>
+input{font-size:12px;border:3px inset #ff0000;width:20px;text-align:right;step:0.01;autocomplete:"off";z-index:2;}
+span{position:absolute;z-index:2;}
+.siz{width:22px;height:22px;}
+.rig{text-align:right;}
+</style>
+</head>
+
+<body style="overflow:hidden;margin:0px;background-color:#06a;font-family:Monospace;">
+
+<span style="left:10px;top:5px;color:#ff0;">right click &rarr; inspect</span>
+
+<span id="tit" style="left:100px;top:10px;width:640px;text-align:center;color:#ff0;font-size:18pt;display:none;">quadraticCurveTo
+<br><img id="clo" src="img/clock.png" style="width:30px;height:30px;z-index:2;display:;"></img>
+<button id="res" style="font-weight:bold;color:red;display:none;" onclick="limpa()">RESET</button>
+</span>
+
+<label style="position:absolute;left:940px;top:275px;color:#ff0;">Color
+<input type="color" id="myColor" autocomplete="off" style="background-color:transparent;width:42px;height:25px;border-width:2px;border-color:transparent;" value=#10a080></input>
+</label>
+
+<button id="butA" style="position:absolute;left:940px;top:300px;font-weight:bold;color:red;display:;">Example 1</button>
+<button id="butB" style="position:absolute;left:940px;top:330px;font-weight:bold;color:red;display:;">Example 2</button>
+<button id="butC" style="position:absolute;left:940px;top:360px;font-weight:bold;color:red;display:;">Example 3</button>
+
+<table style="position:absolute;left:36px;top:97px;background-color:#ccc;">
+<tr>
+<td colspan="9"><br></td>
+</tr><tr>
+<td class="rig">mT[11]</td><td><input id="mT11" value=0 autocomplete="off" style="border-color:#ff0000;"></input></td>
+<td class="rig">mT[12]</td><td><input id="mT12" value=0 autocomplete="off" style="border-color:#ff0000;"></input></td>
+<td colspan="5" style="color:red;">&rarr; initial values</td>
+</tr><tr>
+<td>qCT[11]</td><td><input id="inp11" value=5 autocomplete="off" style="border-color:#00ff00;"></input></td>
+<td>qCT[12]</td><td><input id="inp12" value=5 autocomplete="off" style="border-color:#00ff00;"></input></td>
+<td>qCT[21]</td><td><input id="inp21" value=0 autocomplete="off" style="border-color:#00ff00;"></input></td>
+<td>qCT[22]</td><td><input id="inp22" value=3 autocomplete="off" style="border-color:#00ff00;"></input></td>
+<td></td>
+</tr><tr>
+<td class="rig">lT[11]</td><td><input id="lT11" value=0 autocomplete="off" style="border-color:#ff3333;"></input></td>
+<td class="rig">lT[12]</td><td><input id="lT12" value=8 autocomplete="off" style="border-color:#ff3333;"></input></td>
+<td><input class="siz" type="checkbox" id="lTcheck1" autocomplete="off"></input></td>
+<td colspan="6"></td>
+</tr><tr>
+<td class="rig">lT[21]</td><td><input id="lT21" value=-2 autocomplete="off" style="border-color:#ff5555;"></input></td>
+<td class="rig">lT[22]</td><td><input id="lT22" value=8 autocomplete="off" style="border-color:#ff5555;"></input></td>
+<td><input class="siz" type="checkbox" id="lTcheck2" autocomplete="off"></input></td>
+<td colspan="6"></td>
+</tr><tr>
+<td>qCT[31]</td><td><input id="inp31" value=-5 autocomplete="off" style="border-color:#cc9900;"></input></td>
+<td>qCT[32]</td><td><input id="inp32" value=5 autocomplete="off" style="border-color:#cc9900;"></input></td>
+<td>qCT[41]</td><td><input id="inp41" value=0 autocomplete="off" style="border-color:#cc9900;"></input></td>
+<td>qCT[42]</td><td><input id="inp42" value=0 autocomplete="off" style="border-color:#cc9900;"></input></td>
+<td><input class="siz" type="checkbox" id="check34" autocomplete="off"></input></td>
+</tr><tr>
+<td class="rig">lT[31]</td><td><input id="lT31" value=0 autocomplete="off" style="border-color:#ff7777;"></input></td>
+<td class="rig">lT[32]</td><td><input id="lT32" value=0 autocomplete="off" style="border-color:#ff7777;"></input></td>
+<td><input class="siz" type="checkbox" id="lTcheck3" autocomplete="off"></input></td>
+<td colspan="6"></td>
+</tr><tr>
+<td class="rig">lT[41]</td><td><input id="lT41" value=-4 autocomplete="off" style="border-color:#ff9999;"></input></td>
+<td class="rig">lT[42]</td><td><input id="lT42" value=-4 autocomplete="off" style="border-color:#ff9999;"></input></td>
+<td><input class="siz" type="checkbox" id="lTcheck4" autocomplete="off"></input></td>
+<td colspan="6"></td>
+</tr><tr>
+<td>qCT[51]</td><td><input id="inp51" value=-5 autocomplete="off" style="border-color:#ff88ff;"></input></td>
+<td>qCT[52]</td><td><input id="inp52" value=-5 autocomplete="off" style="border-color:#ff88ff;"></input></td>
+<td>qCT[61]</td><td><input id="inp61" value=0 autocomplete="off" style="border-color:#ff88ff;"></input></td>
+<td>qCT[62]</td><td><input id="inp62" value=-3 autocomplete="off" style="border-color:#ff88ff;"></input></td>
+<td><input class="siz" type="checkbox" id="check56" autocomplete="off"></input></td>
+</tr><tr>
+<td class="rig">lT[51]</td><td><input id="lT51" value=-5 autocomplete="off" style="border-color:#ffbbbb;"></input></td>
+<td class="rig">lT[52]</td><td><input id="lT52" value=-5 autocomplete="off" style="border-color:#ffbbbb;"></input></td>
+<td><input class="siz" type="checkbox" id="lTcheck5" autocomplete="off"></input></td>
+<td colspan="6"></td>
+</tr><tr>
+<td class="rig">lT[61]</td><td><input id="lT61" value=-6 autocomplete="off" style="border-color:#ffdddd;"></input></td>
+<td class="rig">lT[62]</td><td><input id="lT62" value=-6 autocomplete="off" style="border-color:#ffdddd;"></input></td>
+<td><input class="siz" type="checkbox" id="lTcheck6" autocomplete="off"></input></td>
+<td colspan="6"></td>
+</tr><tr>
+<td>qCT[71]</td><td><input id="inp71" value=5 autocomplete="off" style="border-color:#0099ff;"></input></td>
+<td>qCT[72]</td><td><input id="inp72" value=-5 autocomplete="off" style="border-color:#0099ff;"></input></td>
+<td>qCT[81]</td><td><input id="inp81" value=0 autocomplete="off" style="border-color:#0099ff;"></input></td>
+<td>qCT[82]</td><td><input id="inp82" value=0 autocomplete="off" style="border-color:#0099ff;"></input></td>
+<td><input class="siz" type="checkbox" id="check78" autocomplete="off"></input></td>
+</tr><tr>
+<td colspan="9" style="text-align:center;"><br><button style="font-weight:bold;color:green;width:240px;">OK</button></td>
+</tr><tr>
+<td colspan="9">&nbsp;</td>
+</tr>
+</table>
+
+
+<span style="left:940px;top:97px;color:#ff0;z-index:2;">
+	shape=new THREE.Shape();<br>
+	shape.moveTo(mT[11],mT[12]); ... initial values<br>
+	shape.quadraticCurveTo(qCT[11],qCT[12],qCT[21],qCT[22]);<br>
+	shape.lineTo(lT[11],lT[12]);<br>
+	shape.lineTo(lT[21],lT[22]);<br>
+	shape.quadraticCurveTo(qCT[31],qCT[32],qCT[41],qCT[42]);<br>
+	shape.lineTo(lT[31],lT[32]);<br>
+	shape.lineTo(lT[41],lT[42]);<br>
+	shape.quadraticCurveTo(qCT[51],qCT[52],qCT[61],qCT[62]);<br>
+	shape.lineTo(lT[51],lT[52]);<br>
+	shape.lineTo(lT[61],lT[62]);<br>
+	shape.quadraticCurveTo(qCT[71],qCT[72],qCT[81],qCT[82]);<br>
+</span>
+
+<script type="module">
+
+import * as THREE from '../js/three.module_res_res.js';
+import { OrbitControls } from '../js/OrbitControls_res_res.js';
+
+var container, camera, scene, ambient, renderer, controls, grid;
+var wW=window.innerWidth, wH=window.innerHeight;
+
+var cor=[];
+var lT=[];
+var mesh=[];
+var mT=[];
+var qCT=[];
+var sph=[];
+
+var clique=0;
+var fui=0;
+var w=0;
+var coralt=0x10a080;
+var BA, BB, BC, CO;
+
+var shape=new THREE.Shape();
+var path=new THREE.Path();
+var points, geoL, matL, line, movetox, movetoy, linetox, linetoy;
+var extrudeSettings, geo, mat, geoC, geoB;
+
+function init(){
+
+	CO=document.getElementById('myColor');CO.onchange=function StartAnimation(){cor1();}
+	BA=document.getElementById('butA');BA.onclick=function StartAnimation(){ex1();}
+	BB=document.getElementById('butB');BB.onclick=function StartAnimation(){ex2();}
+	BC=document.getElementById('butC');BC.onclick=function StartAnimation(){ex3();}
+
+	container=document.createElement('div');
+	document.body.appendChild(container);
+
+	camera=new THREE.PerspectiveCamera(40,wW/wH,1,1000);
+	camera.position.set(0,0,40);
+
+	scene=new THREE.Scene();
+	scene.rotation.set(0,0,0);
+
+	ambient=new THREE.AmbientLight("#fff",1);
+	scene.add(ambient);
+
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(wW,wH);
+	renderer.setClearColor('#06a',1.0);
+
+
+	container.appendChild(renderer.domElement);
+
+        document.addEventListener('pointerup',onDocumentMouseUp,false);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	controls.minDistance=20;
+	controls.maxDistance=400;
+	controls.enablePan=true;
+	controls.enableDamping=true;
+
+	mT[11]=document.getElementById("mT11").value;
+	mT[12]=document.getElementById("mT12").value;
+	lT[11]=document.getElementById("lT11").value;
+	lT[12]=document.getElementById("lT12").value;
+	lT[21]=document.getElementById("lT21").value;
+	lT[22]=document.getElementById("lT22").value;
+	lT[31]=document.getElementById("lT31").value;
+	lT[32]=document.getElementById("lT32").value;
+	lT[41]=document.getElementById("lT41").value;
+	lT[42]=document.getElementById("lT42").value;
+	lT[51]=document.getElementById("lT51").value;
+	lT[52]=document.getElementById("lT52").value;
+	lT[61]=document.getElementById("lT61").value;
+	lT[62]=document.getElementById("lT62").value;
+
+	qCT[11]=document.getElementById("inp11").value;
+	qCT[12]=document.getElementById("inp12").value;
+	qCT[21]=document.getElementById("inp21").value;
+	qCT[22]=document.getElementById("inp22").value;
+	qCT[31]=document.getElementById("inp31").value;
+	qCT[32]=document.getElementById("inp32").value;
+	qCT[41]=document.getElementById("inp41").value;
+	qCT[42]=document.getElementById("inp42").value;
+	qCT[51]=document.getElementById("inp51").value;
+	qCT[52]=document.getElementById("inp52").value;
+	qCT[61]=document.getElementById("inp61").value;
+	qCT[62]=document.getElementById("inp62").value;
+	qCT[71]=document.getElementById("inp71").value;
+	qCT[72]=document.getElementById("inp72").value;
+	qCT[81]=document.getElementById("inp81").value;
+	qCT[82]=document.getElementById("inp82").value;
+
+	grid=new THREE.GridHelper(20,20,'#09d','#048');
+	grid.rotation.set(1.57,0,0);
+	grid.position.set(0,0,0);
+	scene.add(grid);
+
+	geoC=new THREE.SphereGeometry(0.25,8,8);
+	geoB=new THREE.BoxGeometry(0.4,0.4,0.4);
+	cor[0]=new THREE.MeshBasicMaterial({color:0xff0000});sph[0]=new THREE.Mesh(geoC,cor[0]);
+	cor[1]=new THREE.MeshBasicMaterial({color:0x00ff00});sph[1]=new THREE.Mesh(geoB,cor[1]);
+	cor[2]=new THREE.MeshBasicMaterial({color:0x00ff00});sph[2]=new THREE.Mesh(geoC,cor[2]);
+	cor[3]=new THREE.MeshBasicMaterial({color:0xcc9900});sph[3]=new THREE.Mesh(geoB,cor[3]);
+	cor[4]=new THREE.MeshBasicMaterial({color:0xcc9900});sph[4]=new THREE.Mesh(geoC,cor[4]);
+	cor[5]=new THREE.MeshBasicMaterial({color:0xff88ff});sph[5]=new THREE.Mesh(geoB,cor[5]);
+	cor[6]=new THREE.MeshBasicMaterial({color:0xff88ff});sph[6]=new THREE.Mesh(geoC,cor[6]);
+	cor[7]=new THREE.MeshBasicMaterial({color:0x0099ff});sph[7]=new THREE.Mesh(geoB,cor[7]);
+	cor[8]=new THREE.MeshBasicMaterial({color:0x0099ff});sph[8]=new THREE.Mesh(geoC,cor[8]);
+	cor[11]=new THREE.MeshBasicMaterial({color:0xff3333});sph[11]=new THREE.Mesh(geoC,cor[11]);
+	cor[21]=new THREE.MeshBasicMaterial({color:0xff5555});sph[21]=new THREE.Mesh(geoC,cor[21]);
+	cor[31]=new THREE.MeshBasicMaterial({color:0xff7777});sph[31]=new THREE.Mesh(geoC,cor[31]);
+	cor[41]=new THREE.MeshBasicMaterial({color:0xff9999});sph[41]=new THREE.Mesh(geoC,cor[41]);
+	cor[51]=new THREE.MeshBasicMaterial({color:0xffbbbb});sph[51]=new THREE.Mesh(geoC,cor[51]);
+	cor[61]=new THREE.MeshBasicMaterial({color:0xffdddd});sph[61]=new THREE.Mesh(geoC,cor[61]);
+
+	sph[0].position.set(mT[11],mT[12],0);
+	sph[1].position.set(qCT[11],qCT[12],0);
+	sph[2].position.set(qCT[21],qCT[22],0);
+	sph[3].position.set(qCT[31],qCT[32],0);
+	sph[4].position.set(qCT[41],qCT[42],0);
+	sph[5].position.set(qCT[51],qCT[52],0);
+	sph[6].position.set(qCT[61],qCT[62],0);
+	sph[7].position.set(qCT[71],qCT[72],0);
+	sph[8].position.set(qCT[81],qCT[82],0);
+	sph[11].position.set(lT[11],lT[12],0);
+	sph[21].position.set(lT[21],lT[22],0);
+	sph[31].position.set(lT[31],lT[32],0);
+	sph[41].position.set(lT[41],lT[42],0);
+	sph[51].position.set(lT[51],lT[52],0);
+	sph[61].position.set(lT[61],lT[62],0);
+	for(let m=0;m<62;m++){
+		if(sph[m]){scene.add(sph[m]);}
+	}
+
+	function ex1(){
+		coralt=0xff0044;
+		document.getElementById("mT11").value=0;
+		document.getElementById("mT12").value=-5;
+		document.getElementById("inp11").value=3;
+		document.getElementById("inp12").value=10;
+		document.getElementById("inp21").value=0;
+		document.getElementById("inp22").value=-3;
+		document.getElementById("inp31").value=-3;
+		document.getElementById("inp32").value=10;
+		document.getElementById("inp41").value=0;
+		document.getElementById("inp42").value=-5;
+		document.getElementById("lT31").value=0;
+		document.getElementById("lTcheck1").checked=false;
+		document.getElementById("lTcheck2").checked=false;
+		document.getElementById("lTcheck3").checked=false;
+		document.getElementById("lTcheck4").checked=false;
+		document.getElementById("lTcheck5").checked=false;
+		document.getElementById("lTcheck6").checked=false;
+		document.getElementById("check34").checked=true;
+		document.getElementById("check56").checked=false;
+		document.getElementById("check78").checked=false;
+		camera.position.set(20,0,40);
+		clique=1;
+	}
+
+	function ex2(){
+		coralt=0xff0000;
+		document.getElementById("mT11").value=0;
+		document.getElementById("mT12").value=0;
+		document.getElementById("inp11").value=5;
+		document.getElementById("inp12").value=6;
+		document.getElementById("inp21").value=0;
+		document.getElementById("inp22").value=4;
+		document.getElementById("inp31").value=-5;
+		document.getElementById("inp32").value=6;
+		document.getElementById("inp41").value=0;
+		document.getElementById("inp42").value=0;
+		document.getElementById("lT31").value=0;
+		document.getElementById("lT32").value=0;
+		document.getElementById("inp51").value=0;
+		document.getElementById("inp52").value=10;
+		document.getElementById("inp61").value=0;
+		document.getElementById("inp62").value=7;
+		document.getElementById("lTcheck1").checked=false;
+		document.getElementById("lTcheck2").checked=false;
+		document.getElementById("lTcheck3").checked=false;
+		document.getElementById("lTcheck4").checked=false;
+		document.getElementById("lTcheck5").checked=false;
+		document.getElementById("lTcheck6").checked=false;
+		document.getElementById("check34").checked=true;
+		document.getElementById("check56").checked=false;
+		document.getElementById("check78").checked=false;
+		camera.position.set(20,10,40);
+		clique=1;
+	}
+
+	function ex3(){
+		coralt=0xcc6600;
+		document.getElementById("mT11").value=0;
+		document.getElementById("mT12").value=-5;
+		document.getElementById("inp11").value=-3;
+		document.getElementById("inp12").value=0;
+		document.getElementById("inp21").value=0;
+		document.getElementById("inp22").value=5;
+		document.getElementById("lT21").value=-5;
+		document.getElementById("lT22").value=5;
+		document.getElementById("inp31").value=-8;
+		document.getElementById("inp32").value=0;
+		document.getElementById("inp41").value=-5;
+		document.getElementById("inp42").value=-5;
+		document.getElementById("lTcheck1").checked=false;
+		document.getElementById("lTcheck2").checked=true;
+		document.getElementById("lTcheck3").checked=false;
+		document.getElementById("lTcheck4").checked=false;
+		document.getElementById("lTcheck5").checked=false;
+		document.getElementById("lTcheck6").checked=false;
+		document.getElementById("check34").checked=true;
+		document.getElementById("check56").checked=false;
+		document.getElementById("check78").checked=false;
+		camera.position.set(-20,0,40);
+		clique=1;
+	}
+
+	function cor1(){coralt=CO.value;clique=1;}
+}
+
+function onDocumentMouseUp(event){clique=1;}
+
+function animate(){requestAnimationFrame(animate);render();}
+
+function render(){
+	if(clique==1 && w>20 && fui==1){vai();}
+
+	if(fui==0 && w>100){fui=1;vai();}
+
+function vai(){
+	mT[11] =document.getElementById("mT11").value;mT[12]=document.getElementById("mT12").value;
+	lT[11] =document.getElementById("lT11").value;lT[12]=document.getElementById("lT12").value;
+	lT[21] =document.getElementById("lT21").value;lT[22]=document.getElementById("lT22").value;
+	lT[31] =document.getElementById("lT31").value;lT[32]=document.getElementById("lT32").value;
+	lT[41] =document.getElementById("lT41").value;lT[42]=document.getElementById("lT42").value;
+	lT[51] =document.getElementById("lT51").value;lT[52]=document.getElementById("lT52").value;
+	lT[61] =document.getElementById("lT61").value;lT[62]=document.getElementById("lT62").value;
+
+	qCT[11]=document.getElementById("inp11").value;qCT[12]=document.getElementById("inp12").value;
+	qCT[21]=document.getElementById("inp21").value;qCT[22]=document.getElementById("inp22").value;
+	qCT[31]=document.getElementById("inp31").value;qCT[32]=document.getElementById("inp32").value;
+	qCT[41]=document.getElementById("inp41").value;qCT[42]=document.getElementById("inp42").value;
+	qCT[51]=document.getElementById("inp51").value;qCT[52]=document.getElementById("inp52").value;
+	qCT[61]=document.getElementById("inp61").value;qCT[62]=document.getElementById("inp62").value;
+	qCT[71]=document.getElementById("inp71").value;qCT[72]=document.getElementById("inp72").value;
+	qCT[81]=document.getElementById("inp81").value;qCT[82]=document.getElementById("inp82").value;
+
+	sph[0].position.set(mT[11],mT[12],0);
+	sph[1].position.set(qCT[11],qCT[12],0);sph[2].position.set(qCT[21],qCT[22],0);
+
+	for(let m=3;m<62;m++){if(sph[m]){scene.remove(sph[m]);}}
+	if(document.getElementById("check34").checked==true){sph[3].position.set(qCT[31],qCT[32],0);scene.add(sph[3]);sph[4].position.set(qCT[41],qCT[42],0);scene.add(sph[4]);}
+	if(document.getElementById("check56").checked==true){sph[5].position.set(qCT[51],qCT[52],0);scene.add(sph[5]);sph[6].position.set(qCT[61],qCT[62],0);scene.add(sph[6]);}
+	if(document.getElementById("check78").checked==true){sph[7].position.set(qCT[71],qCT[72],0);scene.add(sph[7]);sph[8].position.set(qCT[81],qCT[82],0);scene.add(sph[8]);}
+
+	if(document.getElementById("lTcheck1").checked==true){sph[11].position.set(lT[11],lT[12],0);scene.add(sph[11]);}
+	if(document.getElementById("lTcheck2").checked==true){sph[21].position.set(lT[21],lT[22],0);scene.add(sph[21]);}
+	if(document.getElementById("lTcheck3").checked==true){sph[31].position.set(lT[31],lT[32],0);scene.add(sph[31]);}
+	if(document.getElementById("lTcheck4").checked==true){sph[41].position.set(lT[41],lT[42],0);scene.add(sph[41]);}
+	if(document.getElementById("lTcheck5").checked==true){sph[51].position.set(lT[51],lT[52],0);scene.add(sph[51]);}
+	if(document.getElementById("lTcheck6").checked==true){sph[61].position.set(lT[61],lT[62],0);scene.add(sph[61]);}
+
+	scene.remove(mesh[1]);
+	shape=null;
+	shape=new THREE.Shape();
+	shape.moveTo(mT[11],mT[12]);
+	shape.quadraticCurveTo(qCT[11],qCT[12],qCT[21],qCT[22]);
+	if(document.getElementById("lTcheck1").checked==true){shape.lineTo(lT[11],lT[12]);}
+	if(document.getElementById("lTcheck2").checked==true){shape.lineTo(lT[21],lT[22]);}
+	if(document.getElementById("check34").checked==true){shape.quadraticCurveTo(qCT[31],qCT[32],qCT[41],qCT[42]);}
+	if(document.getElementById("lTcheck3").checked==true){shape.lineTo(lT[31],lT[32]);}
+	if(document.getElementById("lTcheck4").checked==true){shape.lineTo(lT[41],lT[42]);}
+	if(document.getElementById("check56").checked==true){shape.quadraticCurveTo(qCT[51],qCT[52],qCT[61],qCT[62]);}
+	if(document.getElementById("lTcheck5").checked==true){shape.lineTo(lT[51],lT[52]);}
+	if(document.getElementById("lTcheck6").checked==true){shape.lineTo(lT[61],lT[62]);}
+	if(document.getElementById("check78").checked==true){shape.quadraticCurveTo(qCT[71],qCT[72],qCT[81],qCT[82]);}
+
+	extrudeSettings={depth:2,bevelEnabled:false,bevelSegments:1,steps:1,bevelSize:1,bevelThickness:1};
+	geo=new THREE.ExtrudeGeometry(shape,extrudeSettings);
+	mat=new THREE.MeshStandardMaterial({color:coralt,side:THREE.DoubleSide});
+	mesh[1]=new THREE.Mesh(geo,mat);
+	mesh[1].position.set(0,0,-2);
+	scene.add(mesh[1]);
+
+	scene.remove(line);
+	path=null;
+	path=new THREE.Path();
+	path.moveTo(mT[11],mT[12]);
+	path.quadraticCurveTo(qCT[11],qCT[12],qCT[21],qCT[22]);
+	if(document.getElementById("lTcheck1").checked==true){path.lineTo(lT[11],lT[12]);}
+	if(document.getElementById("lTcheck2").checked==true){path.lineTo(lT[21],lT[22]);}
+
+	if(document.getElementById("check34").checked==true){path.quadraticCurveTo(qCT[31],qCT[32],qCT[41],qCT[42]);}
+	if(document.getElementById("lTcheck3").checked==true){path.lineTo(lT[31],lT[32]);}
+	if(document.getElementById("lTcheck4").checked==true){path.lineTo(lT[41],lT[42]);}
+
+	if(document.getElementById("check56").checked==true){path.quadraticCurveTo(qCT[51],qCT[52],qCT[61],qCT[62]);}
+	if(document.getElementById("lTcheck5").checked==true){path.lineTo(lT[51],lT[52]);}
+	if(document.getElementById("lTcheck6").checked==true){path.lineTo(lT[61],lT[62]);}
+
+	if(document.getElementById("check78").checked==true){path.quadraticCurveTo(qCT[71],qCT[72],qCT[81],qCT[82]);}
+	points=path.getPoints();
+	geoL=new THREE.BufferGeometry().setFromPoints(points);
+	matL=new THREE.LineBasicMaterial({color:0xffffff});
+	line=new THREE.Line(geoL,matL);
+	line.position.set(0,0,0);
+	scene.add(line);
+
+	w=0;
+	clique=0;
+	document.getElementById("clo").style.display="none";
+	document.getElementById("res").style.display="";
+}
+
+	w++;
+	controls.update();
+	renderer.render(scene,camera);
+}
+
+init();
+
+animate();
+
+document.getElementById("tit").style.width=wW-200+"px";
+document.getElementById("tit").style.display="";
+
+</script>
+
+<script>
+
+function limpa(){window.location.replace(window.location.href);}
+
+document.getElementById("lTcheck1").checked=false;
+document.getElementById("lTcheck2").checked=false;
+document.getElementById("lTcheck3").checked=true;
+document.getElementById("lTcheck4").checked=false;
+document.getElementById("lTcheck5").checked=false;
+document.getElementById("lTcheck6").checked=false;
+document.getElementById("check34").checked=true;
+document.getElementById("check56").checked=true;
+document.getElementById("check78").checked=true;
+
+
+
+/*
+
+Simple quadraticCurveTo Shape maker tool
+
+Hi showcase visitors,
+
+I did it to feel quadratic curves interactions
+ and create shapes for extruded meshes.
+
+the link:
+
+http://jrlazz.eu5.org/ggk/quacurto.html
+
+Again, Thanks for the great Three.js Team!
+
+Jose Roberto Lazzareschi
+
+
+*/
+</script>
+
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>tubes.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="../three.js.ico">
+</head>
+<body style="overflow:hidden;margin:0px;background-color:#000;">
+
+<span style="position:absolute;left:10px;top:10px;color:#09f;">... click right to inspect ...</span>
+
+<script type="module">
+
+import * as THREE from '../js/three.module_res_res.js';
+import { FontLoader} from '../js/FontLoader_res_res.js';
+import { TextGeometry } from '../js/TextGeometry_res_res.js';
+import { OrbitControls } from '../js/OrbitControls_res_res.js';
+
+let container,manager,objLoader,hex;
+
+let camera, cameraTarget, scene, renderer, controls;
+
+var textMesh1, textMesh2, textGeo, materials;
+
+var altera=0;
+
+let text="\x53\x54\x55\x56\x57\x58",bevelEnabled=true,font=undefined;// S
+
+const height=100,size=50,hover=30,curveSegments=12,bevelThickness=2,bevelSize=1.5;
+
+let windowHalfX=window.innerWidth/2;
+
+	container=document.createElement('div');
+	document.body.appendChild(container);
+
+	// CAMERA
+	camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1500 );
+	camera.position.set( 0, 40,60 );
+	cameraTarget = new THREE.Vector3(0,0,0);
+
+	// SCENE
+	scene = new THREE.Scene();
+
+	// RENDERER
+	renderer = new THREE.WebGLRenderer( { antialias: true } );
+	renderer.setPixelRatio( window.devicePixelRatio );
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	container.appendChild( renderer.domElement );
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	controls.minDistance=50;
+	controls.maxDistance=600;
+	controls.enablePan=false;
+	controls.enableZoom=true;
+	controls.enableRotate=true;
+	controls.enableDamping=true;
+
+	// LIGHTS
+	const ambientLight=new THREE.AmbientLight("#fc9",1);
+	ambientLight.position.set(0,60,0);
+	scene.add(ambientLight);
+
+	const dirLight=new THREE.DirectionalLight('#fc0',1);
+	dirLight.position.set(55,30,20).normalize();
+	scene.add(dirLight);
+
+	const pointLight=new THREE.PointLight('#fc9',1);
+	pointLight.position.set(-40,50,40 );
+	scene.add(pointLight);
+
+	materials=[
+		new THREE.MeshStandardMaterial({color:'#ff0',flatShading:true,metalness:0.5,roughness:0.3}), // front
+		new THREE.MeshStandardMaterial({color:'#242',flatShading:true,metalness:0.5,roughness:0.3}) // side
+	];
+
+	const loader=new FontLoader();
+	loader.load('../fonte/tubes.json',function(response){
+	font=response;
+	createText();
+	});
+
+function createText() {
+	textGeo=new TextGeometry(text,{font:font,size:size,
+	height:height,
+	curveSegments:curveSegments,bevelThickness:bevelThickness,
+	bevelSize:bevelSize,
+	bevelEnabled:bevelEnabled});
+        textGeo.center();
+	textMesh1=new THREE.Mesh(textGeo,materials);
+	textMesh1.position.set(0,0,0);
+	textMesh1.scale.set(0.25,0.25,0.25);
+	scene.add(textMesh1);
+}
+
+function animate() {
+	requestAnimationFrame(animate);
+	controls.update();
+	render();
+}
+function render() {
+	renderer.render(scene,camera);
+	if(altera==0){alterando();}
+}
+
+function alterando(){
+
+//alert("... just click !!! ...\n ... I have always to put this ALERT for things work!!! ...");
+
+const myTimeout=setTimeout(segue,500);
+
+function segue(){
+}
+	altera++;
+}
+
+animate();
+
+/*
+Making tubes/pipes with FontLoader
+
+It was difficult to find a way to make the tube I wanted.
+The satisfactory idea was to use Acta Symbols W95 Circles.ttf from http://www.onlinewebfonts.com/, converted to json with
+https://gero3.github.io/facetype.js/
+The page is here:
+http://jrlazz.eu5.org/ggk/tubes.html
+*/
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>text3d.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="https://threejs.org/files/favicon.ico"/>
+</head>
+
+<body style="overflow:hidden;margin:0px;background-color:#000;">
+
+<span style="color:#09f;">... click right to inspect ...</span>
+
+<script type="module">
+
+import * as THREE from 'https://threejs.org/build/three.module.js';
+import { FontLoader} from 'https://threejs.org/examples/jsm/loaders/FontLoader.js';
+import { TextGeometry } from 'https://threejs.org/examples/jsm/geometries/TextGeometry.js';
+
+let container,camera,scene,ambient,renderer,loader,Mesh,Geo,Mat;
+let text="FontLoader",bevelEnabled=true,font=undefined;
+let wW=window.innerWidth,wH=window.innerHeight;
+const height=30,size=70,hover=30,curveS=4,bevT=2,bevS=1.5;
+
+function init() {
+	container=document.createElement('div');
+	document.body.appendChild(container);
+
+	camera=new THREE.PerspectiveCamera(30,wW/wH,1,1500);
+	camera.position.set(0,10,200);
+
+	scene=new THREE.Scene();
+
+	ambient=new THREE.AmbientLight("#cff",1);
+	scene.add(ambient);
+
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(wW,wH);
+	container.appendChild(renderer.domElement);
+}
+
+loader=new FontLoader();
+//loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json',function(response){font=response;createText();});
+loader.load('../js/roboto_italic.typeface.json',function(response){font=response;createText();});
+
+//https://gero3.github.io/facetype.js/... to convert to json
+
+Mat=[new THREE.MeshPhongMaterial({color:'#f03',flatShading:true}),new THREE.MeshPhongMaterial({color:'#09f'})];// front,side
+
+function createText() {
+	Geo=new TextGeometry(text,{
+	font:font,size:size,height:height,
+	curveSegments:curveS,
+	bevelThickness:bevT,bevelSize:bevS,bevelEnabled:bevelEnabled});
+	Geo.computeBoundingBox();
+	Mesh=new THREE.Mesh(Geo,Mat);
+	Mesh.position.set(-50,5,0);
+	Mesh.scale.set(0.2,0.2,0.2);
+	scene.add(Mesh);
+}
+
+function animate() {
+	requestAnimationFrame(animate);
+	renderer.render(scene,camera);
+}
+
+init();
+
+animate();
+
+</script>
+</body>
+</html>

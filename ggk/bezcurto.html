@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>bezcurto.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="https://threejs.org/files/favicon.ico"/>
+<style>
+input{font-size:12px;border:3px solid #ff0000;width:25px;text-align:right;step:0.01;autocomplete:"off";z-index:2;}
+span{position:absolute;z-index:2;}
+td{width:44px;text-align:center;font-size:16px;font-weight:bold;}
+.bu{font-family:Monospace;width:100px;font-size:12pt;font-weight:bold;color:#06a;}
+.siz{width:22px;height:22px;}
+</style>
+</head>
+
+<body style="overflow:hidden;margin:0px;background-color:#06a;font-family:Monospace;">
+
+<span style="left:10px;top:5px;color:#ff0;cursor:pointer;">right click &rarr; inspect &rarr; page source</span>
+
+<span id="tit" style="left:300px;top:10px;width:640px;text-align:center;color:#ff0;font-size:18pt;line-height:35px;display:none;z-index:2;">bezierCurveTo (Pierre B&eacute;zier)
+<br>
+<svg id="clo" width="40" height="40" style="z-index:2;display:;">
+<circle style="stroke:#ff0;stroke-width:2px;fill:#06a" cx="20" cy="20" r="15"></circle>
+<line x1="20" y1="20" x2="20" y2="5" style="stroke-width:2px;stroke:#ff0;">
+<animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0,20,20" to="360,20,20" dur="2s" repeatCount="indefinite" />
+</line>
+</svg>
+<button id="res" style="font-size:12px;font-weight:bold;color:red;display:none;" onclick="limpa()">RESTART</button>
+</span>
+
+
+<table id="tabex" style="position:absolute;left:960px;top:100px;z-index:2;">
+<tr>
+<td colspan="2"><label class="bu" style="top:100px;font-size:12pt;color:#fff;">COLOR
+<input type="color" id="myColor" autocomplete="off" style="background-color:transparent;width:140px;height:22px;border-width:0px;" value=#10a080></input>
+</label></td>
+</tr><tr>
+<td><button id="butA" class="bu">Example 1</button></td>
+<td><button id="butB" class="bu" style="left:1040px;">Example 2</button></td>
+</tr><tr>
+<td><button id="butC" class="bu" style="top:160px;">Example 3</button></td>
+<td><button id="butD" class="bu" style="top:160px;left:1040px;color:red;">C L E A N</button></td>
+</tr>
+</table>
+
+<span id="spanA" style="font-size:8pt;left:960px;top:200px;color:#ff0;z-index:2;"></span>
+
+<table style="position:absolute;left:30px;top:100px;background-color:#ccc;">
+<tr>
+<td colspan="8" style="line-height:4px;">&nbsp;</td>
+</tr><tr>
+<td style="width:30px;"></td><td>x1</td><td>y1</td><td>x2</td><td>y2</td><td>x3</td><td>y3</td><td style="color:#900;">Y/N</td>
+</tr><tr>
+<td colspan="8" style="line-height:4px;">&nbsp;</td>
+</tr><tr>
+<td>M</td>
+<td><input id="Mx1" value=0 autocomplete="off" style="border-color:#ff0000;"></input></td>
+<td><input id="My1" value=0 autocomplete="off" style="border-color:#ff0000;"></input></td>
+<td colspan="5" style="color:red;text-align:left;">&rarr; initial values</td>
+</tr><tr>
+<td>B1</td>
+<td><input id="B1x1" value=-5 autocomplete="off" style="border-color:#00ff00;"></input></td>
+<td><input id="B1y1" value=5 autocomplete="off" style="border-color:#00ff00;"></input></td>
+<td><input id="B1x2" value=5 autocomplete="off" style="border-color:#00ff00;"></input></td>
+<td><input id="B1y2" value=5 autocomplete="off" style="border-color:#00ff00;"></input></td>
+<td><input id="B1x3" value=0 autocomplete="off" style="border-color:#00ff00;"></input></td>
+<td><input id="B1y3" value=0 autocomplete="off" style="border-color:#00ff00;"></input></td>
+<td><input class="siz" type="checkbox" id="checkB1" autocomplete="off"></input></td>
+</tr><tr>
+
+<td>L1</td>
+<td><input id="L1x1" value=0 autocomplete="off" style="border-color:#ff3333;"></input></td>
+<td><input id="L1y1" value=0 autocomplete="off" style="border-color:#ff3333;"></input></td>
+<td colspan="4"></td>
+<td><input class="siz" type="checkbox" id="checkL1" autocomplete="off"></input></td>
+</tr><tr>
+
+<td>B2</td>
+<td><input id="B2x1" value=0 autocomplete="off" style="border-color:#cc9900;"></input></td>
+<td><input id="B2y1" value=0 autocomplete="off" style="border-color:#cc9900;"></input></td>
+<td><input id="B2x2" value=0 autocomplete="off" style="border-color:#cc9900;"></input></td>
+<td><input id="B2y2" value=0 autocomplete="off" style="border-color:#cc9900;"></input></td>
+<td><input id="B2x3" value=0 autocomplete="off" style="border-color:#cc9900;"></input></td>
+<td><input id="B2y3" value=0 autocomplete="off" style="border-color:#cc9900;"></input></td>
+<td><input class="siz" type="checkbox" id="checkB2" autocomplete="off"></input></td>
+</tr><tr>
+
+<td>L2</td>
+<td><input id="L2x1" value=0 autocomplete="off" style="border-color:#ff6666;"></input></td>
+<td><input id="L2y1" value=0 autocomplete="off" style="border-color:#ff6666;"></input></td>
+<td colspan="4"></td>
+<td><input class="siz" type="checkbox" id="checkL2" autocomplete="off"></input></td>
+</tr><tr>
+
+<td>B3</td>
+<td><input id="B3x1" value=0 autocomplete="off" style="border-color:#ff88ff;"></input></td>
+<td><input id="B3y1" value=0 autocomplete="off" style="border-color:#ff88ff;"></input></td>
+<td><input id="B3x2" value=0 autocomplete="off" style="border-color:#ff88ff;"></input></td>
+<td><input id="B3y2" value=0 autocomplete="off" style="border-color:#ff88ff;"></input></td>
+<td><input id="B3x3" value=0 autocomplete="off" style="border-color:#ff88ff;"></input></td>
+<td><input id="B3y3" value=0 autocomplete="off" style="border-color:#ff88ff;"></input></td>
+<td><input class="siz" type="checkbox" id="checkB3" autocomplete="off"></input></td>
+</tr><tr>
+
+<td>L3</td>
+<td><input id="L3x1" value=0 autocomplete="off" style="border-color:#ff9999;"></input></td>
+<td><input id="L3y1" value=0 autocomplete="off" style="border-color:#ff9999;"></input></td>
+<td colspan="4"></td>
+<td><input class="siz" type="checkbox" id="checkL3" autocomplete="off"></input></td>
+</tr><tr>
+
+<td>B4</td>
+<td><input id="B4x1" value=0 autocomplete="off" style="border-color:#0099ff;"></input></td>
+<td><input id="B4y1" value=0 autocomplete="off" style="border-color:#0099ff;"></input></td>
+<td><input id="B4x2" value=0 autocomplete="off" style="border-color:#0099ff;"></input></td>
+<td><input id="B4y2" value=0 autocomplete="off" style="border-color:#0099ff;"></input></td>
+<td><input id="B4x3" value=0 autocomplete="off" style="border-color:#0099ff;"></input></td>
+<td><input id="B4y3" value=0 autocomplete="off" style="border-color:#0099ff;"></input></td>
+<td><input class="siz" type="checkbox" id="checkB4" autocomplete="off"></input></td>
+</tr><tr>
+
+<td>L4</td>
+<td><input id="L4x1" value=0 autocomplete="off" style="border-color:#ffcccc;"></input></td>
+<td><input id="L4y1" value=0 autocomplete="off" style="border-color:#ffcccc;"></input></td>
+<td colspan="4"></td>
+<td><input class="siz" type="checkbox" id="checkL4" autocomplete="off"></input></td>
+</tr><tr>
+
+<td colspan="8" style="line-height:4px;">&nbsp;</td>
+</tr><tr>
+<td colspan="8"><button style="font-size:16px;font-weight:bold;color:green;width:240px;">OK</button></td>
+</tr><tr>
+<td colspan="8" style="line-height:8px;">&nbsp;</td>
+</tr><tr>
+<td colspan="4">View Lines<input class="siz" type="checkbox" checked=true id="viewL" autocomplete="off"></input></td>
+<td colspan="4">View Tangents<input class="siz" type="checkbox" checked=true id="viewT" autocomplete="off"></input></td>
+</tr><tr>
+<td colspan="8" style="line-height:8px;">&nbsp;</td></tr>
+</table>
+
+<script type="module">
+
+import * as THREE from '../js/three.module_res_res.js';
+import { OrbitControls } from '../js/OrbitControls_res_res.js';
+
+//https://javascript.info/bezier-curve
+
+var container, camera, scene, ambient, renderer, controls, grid;
+var wW=window.innerWidth, wH=window.innerHeight;
+
+var B1=[];
+var B2=[];
+var B3=[];
+var B4=[];
+
+var cor=[];
+var L=[];
+var M=[];
+var S=[];
+
+var mesh;
+var clique=0;
+var fui=0;
+var w=0;
+var coralt=0x10a080;
+var BA, BB, BC, BD, CO;
+
+var shape=new THREE.Shape();
+
+var extrudeSettings, geoC, geoB, geoT, geoL, matL, line;
+
+var B1d, B2d, B3d, B4d, L1d, L2d, L3d, L4d;
+
+var points=[];
+var path=[];
+var geo=[];
+var mat=[];
+var T=[];
+var p;
+var str="";
+var viewLd, viewTd;
+var viewlines=0;
+var viewtangents=0;
+
+function init(){
+
+	CO=document.getElementById('myColor');CO.onchange=function StartAnimation(){cor1();}
+	BA=document.getElementById('butA');BA.onclick=function StartAnimation(){ex1();}
+	BB=document.getElementById('butB');BB.onclick=function StartAnimation(){ex2();}
+	BC=document.getElementById('butC');BC.onclick=function StartAnimation(){ex3();}
+	BD=document.getElementById('butD');BD.onclick=function StartAnimation(){ex4();}
+
+	container=document.createElement('div');
+	document.body.appendChild(container);
+
+	camera=new THREE.PerspectiveCamera(40,wW/wH,1,1000);
+	camera.position.set(0,0,40);
+
+	scene=new THREE.Scene();
+	scene.rotation.set(0,0,0);
+
+	ambient=new THREE.AmbientLight("#fff",1);
+	scene.add(ambient);
+
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(wW,wH);
+	renderer.setClearColor('#06a',1.0);
+
+
+	container.appendChild(renderer.domElement);
+
+        document.addEventListener('pointerup',onDocumentMouseUp,false);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	controls.minDistance=20;
+	controls.maxDistance=400;
+	controls.enablePan=true;
+	controls.enableDamping=true;
+
+	M[1] =Number(document.getElementById("Mx1").value);
+	M[2] =Number(document.getElementById("My1").value);
+	L[11]=Number(document.getElementById("L1x1").value);
+	L[12]=Number(document.getElementById("L1y1").value);
+	L[21]=Number(document.getElementById("L2x1").value);
+	L[22]=Number(document.getElementById("L2y1").value);
+	L[31]=Number(document.getElementById("L3x1").value);
+	L[32]=Number(document.getElementById("L3y1").value);
+	L[41]=Number(document.getElementById("L4x1").value);
+	L[42]=Number(document.getElementById("L4y1").value);
+	L1d=document.getElementById("checkL1");
+	L2d=document.getElementById("checkL2");
+	L3d=document.getElementById("checkL3");
+	L4d=document.getElementById("checkL4");
+
+	B1[11]=Number(document.getElementById("B1x1").value);B1[12]=Number(document.getElementById("B1y1").value);
+	B1[21]=Number(document.getElementById("B1x2").value);B1[22]=Number(document.getElementById("B1y2").value);
+	B1[31]=Number(document.getElementById("B1x3").value);B1[32]=Number(document.getElementById("B1y3").value);
+
+	B2[11]=Number(document.getElementById("B2x1").value);B2[12]=Number(document.getElementById("B2y1").value);
+	B2[21]=Number(document.getElementById("B2x2").value);B2[22]=Number(document.getElementById("B2y2").value);
+	B2[31]=Number(document.getElementById("B2x3").value);B2[32]=Number(document.getElementById("B2y3").value);
+
+	B3[11]=Number(document.getElementById("B3x1").value);B3[12]=Number(document.getElementById("B3y1").value);
+	B3[21]=Number(document.getElementById("B3x2").value);B3[22]=Number(document.getElementById("B3y2").value);
+	B3[31]=Number(document.getElementById("B3x3").value);B3[32]=Number(document.getElementById("B3y3").value);
+
+	B4[11]=Number(document.getElementById("B4x1").value);B4[12]=Number(document.getElementById("B4y1").value);
+	B4[21]=Number(document.getElementById("B4x2").value);B4[22]=Number(document.getElementById("B4y2").value);
+	B4[31]=Number(document.getElementById("B4x3").value);B4[32]=Number(document.getElementById("B4y3").value);
+
+	B1d=document.getElementById("checkB1");
+	B2d=document.getElementById("checkB2");
+	B3d=document.getElementById("checkB3");
+	B4d=document.getElementById("checkB4");
+
+	viewLd=document.getElementById("viewL");
+	viewTd=document.getElementById("viewT");
+
+	grid=new THREE.GridHelper(20,20,'#09d','#048');
+	grid.rotation.set(1.57,0,0);
+	grid.position.set(0,0,-0.05);
+	scene.add(grid);
+
+	geoC=new THREE.SphereGeometry(0.25,8,8);
+	geoB=new THREE.BoxGeometry(0.4,0.4,0.4);
+	geoT=new THREE.TetrahedronGeometry(0.4,0);
+
+	cor[0]=new THREE.MeshBasicMaterial({color:0xff0000});S[0]=new THREE.Mesh(geoC,cor[0]);
+
+//#00ff00 #cc9900 #ff88ff #0099ff
+
+	cor[1]=new THREE.MeshBasicMaterial({color:0x00ff00});S[11]=new THREE.Mesh(geoB,cor[1]);
+	cor[2]=new THREE.MeshBasicMaterial({color:0x00ff00});S[12]=new THREE.Mesh(geoT,cor[2]);S[12].rotation.y=Math.PI/4.5;
+	cor[3]=new THREE.MeshBasicMaterial({color:0x00ff00});S[13]=new THREE.Mesh(geoC,cor[3]);
+
+	cor[4]=new THREE.MeshBasicMaterial({color:0xcc9900});S[21]=new THREE.Mesh(geoB,cor[4]);
+	cor[5]=new THREE.MeshBasicMaterial({color:0xcc9900});S[22]=new THREE.Mesh(geoT,cor[5]);S[22].rotation.y=Math.PI/4.5;
+	cor[6]=new THREE.MeshBasicMaterial({color:0xcc9900});S[23]=new THREE.Mesh(geoC,cor[6]);
+
+	cor[7]=new THREE.MeshBasicMaterial({color:0xff88ff});S[31]=new THREE.Mesh(geoB,cor[7]);
+	cor[8]=new THREE.MeshBasicMaterial({color:0xff88ff});S[32]=new THREE.Mesh(geoT,cor[8]);S[32].rotation.y=Math.PI/4.5;
+	cor[9]=new THREE.MeshBasicMaterial({color:0xff88ff});S[33]=new THREE.Mesh(geoC,cor[9]);
+
+	cor[10]=new THREE.MeshBasicMaterial({color:0x0099ff});S[41]=new THREE.Mesh(geoB,cor[10]);
+	cor[11]=new THREE.MeshBasicMaterial({color:0x0099ff});S[42]=new THREE.Mesh(geoT,cor[11]);S[42].rotation.y=Math.PI/4.5;
+	cor[12]=new THREE.MeshBasicMaterial({color:0x0099ff});S[43]=new THREE.Mesh(geoC,cor[12]);
+
+//#ff3333 #ff5555 #ff7777 #ff9999
+
+	cor[13]=new THREE.MeshBasicMaterial({color:0xff3333});S[111]=new THREE.Mesh(geoC,cor[13]);
+	cor[14]=new THREE.MeshBasicMaterial({color:0xff5555});S[121]=new THREE.Mesh(geoC,cor[14]);
+	cor[15]=new THREE.MeshBasicMaterial({color:0xff7777});S[131]=new THREE.Mesh(geoC,cor[15]);
+	cor[16]=new THREE.MeshBasicMaterial({color:0xff9999});S[141]=new THREE.Mesh(geoC,cor[16]);
+
+	S[0].position.set(M[11],M[12],0);
+
+	S[11].position.set(B1[11],B1[12],0);
+	S[12].position.set(B1[21],B1[22],0);
+	S[13].position.set(B1[31],B1[32],0);
+
+	S[21].position.set(B2[11],B2[12],0);
+	S[22].position.set(B2[21],B2[22],0);
+	S[23].position.set(B2[31],B2[32],0);
+
+	S[31].position.set(B3[11],B3[12],0);
+	S[32].position.set(B3[21],B3[22],0);
+	S[33].position.set(B3[31],B3[32],0);
+
+	S[41].position.set(B4[11],B4[12],0);
+	S[42].position.set(B4[21],B4[22],0);
+	S[43].position.set(B4[31],B4[32],0);
+
+	S[111].position.set(L[11],L[12],0);
+	S[121].position.set(L[21],L[22],0);
+	S[131].position.set(L[31],L[32],0);
+	S[141].position.set(L[41],L[42],0);
+
+	function ex1(){
+		coralt=0xff0044;
+
+		document.getElementById("Mx1").value=0;
+		document.getElementById("My1").value=0;
+
+		document.getElementById("B1x1").value=-5;document.getElementById("B1y1").value=5;
+		document.getElementById("B1x2").value=5;document.getElementById("B1y2").value=5;
+		document.getElementById("B1x3").value=0;document.getElementById("B1y3").value=0;
+
+		document.getElementById("L1x1").value=0;document.getElementById("L1y1").value=0;
+
+		document.getElementById("B2x1").value=0;document.getElementById("B2y1").value=0;
+		document.getElementById("B2x2").value=0;document.getElementById("B2y2").value=0;
+		document.getElementById("B2x3").value=0;document.getElementById("B2y3").value=0;
+
+		document.getElementById("L2x1").value=0;document.getElementById("L2y1").value=0;
+
+		document.getElementById("B3x1").value=0;document.getElementById("B3y1").value=0;
+		document.getElementById("B3x2").value=0;document.getElementById("B3y2").value=0;
+		document.getElementById("B3x3").value=0;document.getElementById("B3y3").value=0;
+
+		document.getElementById("L3x1").value=0;document.getElementById("L3y1").value=0;
+
+		document.getElementById("B4x1").value=0;document.getElementById("B4y1").value=0;
+		document.getElementById("B4x2").value=0;document.getElementById("B4y2").value=0;
+		document.getElementById("B4x3").value=0;document.getElementById("B4y3").value=0;
+
+		document.getElementById("L4x1").value=0;document.getElementById("L4y1").value=0;
+
+		L1d.checked=false;
+		L2d.checked=false;
+		L3d.checked=false;
+		L4d.checked=false;
+
+		B1d.checked=true;
+		B2d.checked=false;
+		B3d.checked=false;
+		B4d.checked=false;
+
+		viewLd.checked=true;
+		viewTd.checked=true;
+
+		camera.position.set(20,0,40);
+		clique=1;
+	}
+
+	function ex2(){
+		coralt=0x6666cc;
+		document.getElementById("Mx1").value=0;
+		document.getElementById("My1").value=0;
+
+		document.getElementById("B1x1").value=-7;document.getElementById("B1y1").value=5;
+		document.getElementById("B1x2").value=7;document.getElementById("B1y2").value=5;
+		document.getElementById("B1x3").value=0;document.getElementById("B1y3").value=10;
+
+		document.getElementById("L1x1").value=0;document.getElementById("L1y1").value=0;
+
+		document.getElementById("B2x1").value=7;document.getElementById("B2y1").value=5;
+		document.getElementById("B2x2").value=-7;document.getElementById("B2y2").value=5;
+		document.getElementById("B2x3").value=0;document.getElementById("B2y3").value=0;
+
+		document.getElementById("L2x1").value=0;document.getElementById("L2y1").value=0;
+
+		document.getElementById("B3x1").value=7;document.getElementById("B3y1").value=-5;
+		document.getElementById("B3x2").value=-7;document.getElementById("B3y2").value=-5;
+		document.getElementById("B3x3").value=0;document.getElementById("B3y3").value=-10;
+
+		document.getElementById("L3x1").value=0;document.getElementById("L3y1").value=0;
+
+		document.getElementById("B4x1").value=-7;document.getElementById("B4y1").value=-5;
+		document.getElementById("B4x2").value=7;document.getElementById("B4y2").value=-5;
+		document.getElementById("B4x3").value=0;document.getElementById("B4y3").value=0;
+
+		document.getElementById("L4x1").value=0;document.getElementById("L4y1").value=0;
+
+		L1d.checked=false;
+		L2d.checked=false;
+		L3d.checked=false;
+		L4d.checked=false;
+
+		B1d.checked=true;
+		B2d.checked=true;
+		B3d.checked=true;
+		B4d.checked=true;
+
+		viewLd.checked=true;
+		viewTd.checked=true;
+		camera.position.set(-20,0,40);
+		clique=1;
+	}
+
+	function ex3(){
+		coralt=0xcc6600;
+		document.getElementById("Mx1").value=0;
+		document.getElementById("My1").value=0;
+
+		document.getElementById("B1x1").value=-5;document.getElementById("B1y1").value=5;
+		document.getElementById("B1x2").value=5;document.getElementById("B1y2").value=5;
+		document.getElementById("B1x3").value=0;document.getElementById("B1y3").value=10;
+
+		document.getElementById("L1x1").value=3;document.getElementById("L1y1").value=10;
+
+		document.getElementById("B2x1").value=0;document.getElementById("B2y1").value=0;
+		document.getElementById("B2x2").value=0;document.getElementById("B2y2").value=0;
+		document.getElementById("B2x3").value=0;document.getElementById("B2y3").value=0;
+
+		document.getElementById("L2x1").value=3;document.getElementById("L2y1").value=0;
+
+		document.getElementById("B3x1").value=0;document.getElementById("B3y1").value=0;
+		document.getElementById("B3x2").value=0;document.getElementById("B3y2").value=0;
+		document.getElementById("B3x3").value=0;document.getElementById("B3y3").value=0;
+
+		document.getElementById("L3x1").value=0;document.getElementById("L3y1").value=0;
+
+		document.getElementById("B4x1").value=0;document.getElementById("B4y1").value=0;
+		document.getElementById("B4x2").value=0;document.getElementById("B4y2").value=0;
+		document.getElementById("B4x3").value=0;document.getElementById("B4y3").value=0;
+
+		document.getElementById("L4x1").value=0;document.getElementById("L4y1").value=0;
+
+		L1d.checked=true;
+		L2d.checked=true;
+		L3d.checked=false;
+		L4d.checked=false;
+
+		B1d.checked=true;
+		B2d.checked=false;
+		B3d.checked=false;
+		B4d.checked=false;
+
+		viewLd.checked=true;
+		viewTd.checked=true;
+
+		camera.position.set(-20,30,30);
+		clique=1;
+	}
+
+	function ex4(){
+		coralt=0x10a080;
+		coralt=CO.value;
+		document.getElementById("Mx1").value=0;
+		document.getElementById("My1").value=0;
+
+		document.getElementById("B1x1").value=0;document.getElementById("B1y1").value=0;
+		document.getElementById("B1x2").value=0;document.getElementById("B1y2").value=0;
+		document.getElementById("B1x3").value=0;document.getElementById("B1y3").value=0;
+
+		document.getElementById("L1x1").value=0;document.getElementById("L1y1").value=0;
+
+		document.getElementById("B2x1").value=0;document.getElementById("B2y1").value=0;
+		document.getElementById("B2x2").value=0;document.getElementById("B2y2").value=0;
+		document.getElementById("B2x3").value=0;document.getElementById("B2y3").value=0;
+
+		document.getElementById("L2x1").value=0;document.getElementById("L2y1").value=0;
+
+		document.getElementById("B3x1").value=0;document.getElementById("B3y1").value=0;
+		document.getElementById("B3x2").value=0;document.getElementById("B3y2").value=0;
+		document.getElementById("B3x3").value=0;document.getElementById("B3y3").value=0;
+
+		document.getElementById("L3x1").value=0;document.getElementById("L3y1").value=0;
+
+		document.getElementById("B4x1").value=0;document.getElementById("B4y1").value=0;
+		document.getElementById("B4x2").value=0;document.getElementById("B4y2").value=0;
+		document.getElementById("B4x3").value=0;document.getElementById("B4y3").value=0;
+
+		document.getElementById("L4x1").value=0;document.getElementById("L4y1").value=0;
+
+		L1d.checked=false;
+		L2d.checked=false;
+		L3d.checked=false;
+		L4d.checked=false;
+
+		B1d.checked=false;
+		B2d.checked=false;
+		B3d.checked=false;
+		B4d.checked=false;
+
+		viewLd.checked=false;
+		viewTd.checked=false;
+
+		camera.position.set(0,0,40);
+		clique=1;
+	}
+
+	function cor1(){coralt=CO.value;clique=1;}
+
+}
+
+function onDocumentMouseUp(event){clique=1;}
+
+function animate(){requestAnimationFrame(animate);render();}
+
+function render(){
+	if(clique==1 && w>20 && fui==1){vai();}
+
+	if(fui==0 && w>120){
+		B1d.checked=true;
+		fui=1;vai();
+	}
+
+function vai(){
+
+	str="";
+	M[1] =Number(document.getElementById("Mx1").value); M[2] =Number(document.getElementById("My1").value);
+	L[11]=Number(document.getElementById("L1x1").value);L[12]=Number(document.getElementById("L1y1").value);
+	L[21]=Number(document.getElementById("L2x1").value);L[22]=Number(document.getElementById("L2y1").value);
+	L[31]=Number(document.getElementById("L3x1").value);L[32]=Number(document.getElementById("L3y1").value);
+	L[41]=Number(document.getElementById("L4x1").value);L[42]=Number(document.getElementById("L4y1").value);
+
+	B1[11]=Number(document.getElementById("B1x1").value);B1[12]=Number(document.getElementById("B1y1").value);
+	B1[21]=Number(document.getElementById("B1x2").value);B1[22]=Number(document.getElementById("B1y2").value);
+	B1[31]=Number(document.getElementById("B1x3").value);B1[32]=Number(document.getElementById("B1y3").value);
+
+	B2[11]=Number(document.getElementById("B2x1").value);B2[12]=Number(document.getElementById("B2y1").value);
+	B2[21]=Number(document.getElementById("B2x2").value);B2[22]=Number(document.getElementById("B2y2").value);
+	B2[31]=Number(document.getElementById("B2x3").value);B2[32]=Number(document.getElementById("B2y3").value);
+
+	B3[11]=Number(document.getElementById("B3x1").value);B3[12]=Number(document.getElementById("B3y1").value);
+	B3[21]=Number(document.getElementById("B3x2").value);B3[22]=Number(document.getElementById("B3y2").value);
+	B3[31]=Number(document.getElementById("B3x3").value);B3[32]=Number(document.getElementById("B3y3").value);
+
+	B4[11]=Number(document.getElementById("B4x1").value);B4[12]=Number(document.getElementById("B4y1").value);
+	B4[21]=Number(document.getElementById("B4x2").value);B4[22]=Number(document.getElementById("B4y2").value);
+	B4[31]=Number(document.getElementById("B4x3").value);B4[32]=Number(document.getElementById("B4y3").value);
+
+	S[0].position.set(M[1],M[2],0);scene.add(S[0]);
+//	S[11].position.set(B1[11],B1[12],0);
+//	S[12].position.set(B1[21],B1[22],0);
+
+	for(let m=1;m<162;m++){if(S[m]){scene.remove(S[m]);}}
+	if(B1d.checked==true){S[11].position.set(B1[11],B1[12],0);scene.add(S[11]);S[12].position.set(B1[21],B1[22],0);scene.add(S[12]);S[13].position.set(B1[31],B1[32],0);scene.add(S[13]);}
+	if(B2d.checked==true){S[21].position.set(B2[11],B2[12],0);scene.add(S[21]);S[22].position.set(B2[21],B2[22],0);scene.add(S[22]);S[23].position.set(B2[31],B2[32],0);scene.add(S[23]);}
+	if(B3d.checked==true){S[31].position.set(B3[11],B3[12],0);scene.add(S[31]);S[32].position.set(B3[21],B3[22],0);scene.add(S[32]);S[33].position.set(B3[31],B3[32],0);scene.add(S[33]);}
+	if(B4d.checked==true){S[41].position.set(B4[11],B4[12],0);scene.add(S[41]);S[42].position.set(B4[21],B4[22],0);scene.add(S[42]);S[43].position.set(B4[31],B4[32],0);scene.add(S[43]);}
+
+	scene.remove(mesh);
+	shape=null;
+	shape=new THREE.Shape();
+	shape.moveTo(M[1],M[2]);str=str+"shape=new THREE.Shape();\nshape.moveTo(M[1],M[2]);\n";
+	
+	if(B1d.checked==true){shape.bezierCurveTo(B1[11],B1[12],B1[21],B1[22],B1[31],B1[32]);str=str+"shape.bezierCurveTo(B1[11],B1[12],B1[21],B1[22],B1[31],B1[32]);\n";}
+
+	if(L[11]!=0 || L[12]!=0){L1d.checked=true;}//else{L1d.checked=false;}
+	if(L[21]!=0 || L[22]!=0){L2d.checked=true;}//else{L2d.checked=false;}
+	if(L[31]!=0 || L[32]!=0){L3d.checked=true;}//else{L3d.checked=false;}
+	if(L[41]!=0 || L[42]!=0){L4d.checked=true;}//else{L4d.checked=false;}
+
+	if(L1d.checked==true){shape.lineTo(L[11],L[12]);str=str+"shape.lineTo(L[11],L[12]);\n";}
+	if(B2d.checked==true){shape.bezierCurveTo(B2[11],B2[12],B2[21],B2[22],B2[31],B2[32]);str=str+"shape.bezierCurveTo(B2[11],B2[12],B2[21],B2[22],B2[31],B2[32]);\n";}
+
+	if(L2d.checked==true){shape.lineTo(L[21],L[22]);str=str+"shape.lineTo(L[21],L[22]);\n";}
+	if(B3d.checked==true){shape.bezierCurveTo(B3[11],B3[12],B3[21],B3[22],B3[31],B3[32]);str=str+"shape.bezierCurveTo(B3[11],B3[12],B3[21],B3[22],B3[31],B3[32]);\n";}
+
+	if(L3d.checked==true){shape.lineTo(L[31],L[32]);str=str+"shape.lineTo(L[31],L[32]);\n";}
+	if(B4d.checked==true){shape.bezierCurveTo(B4[11],B4[12],B4[21],B4[22],B4[31],B4[32]);str=str+"shape.bezierCurveTo(B4[11],B4[12],B4[21],B4[22],B4[31],B4[32]);\n";}
+
+	if(L4d.checked==true){shape.lineTo(L[41],L[42]);str=str+"shape.lineTo(L[41],L[42]);\n";}
+
+	if(L1d.checked==true){S[111].position.set(L[11],L[12],0);scene.add(S[111]);}
+	if(L2d.checked==true){S[121].position.set(L[21],L[22],0);scene.add(S[121]);}
+	if(L3d.checked==true){S[131].position.set(L[31],L[32],0);scene.add(S[131]);}
+	if(L4d.checked==true){S[141].position.set(L[41],L[42],0);scene.add(S[141]);}
+
+	extrudeSettings={depth:2,bevelEnabled:false,bevelSegments:1,steps:1,bevelSize:1,bevelThickness:1};
+	geo[0]=new THREE.ExtrudeGeometry(shape,extrudeSettings);
+	mat[0]=new THREE.MeshStandardMaterial({color:coralt,side:THREE.DoubleSide});
+	mesh=new THREE.Mesh(geo[0],mat[0]);
+	mesh.position.set(0,0,-2);
+	scene.add(mesh);
+	str=str+"extrudeSettings={depth:2...\n";
+	str=str+"geo[0]=new THREE.ExtrudeGeometry(shape,extrudeSettings);\n";
+	str=str+"mat[0]=new THREE.MeshStandardMaterial...\n";
+	str=str+"mesh=new THREE.Mesh(geo[0],mat[0]);\n";
+	str=str+"mesh.position.set(0,0,-2);\n";
+	str=str+"scene.add(mesh);\n";
+	document.getElementById("spanA").innerText=str;
+
+	// Lines
+	if(viewLd.checked==true){
+		scene.remove(line);
+		path[0]=null;
+		path[0]=new THREE.Path();
+		path[0].moveTo(M[1],M[2]);
+		if(document.getElementById("checkB1").checked==true){path[0].bezierCurveTo(B1[11],B1[12],B1[21],B1[22],B1[31],B1[32]);}
+			if(L1d.checked==true){path[0].lineTo(L[11],L[12]);}
+		if(document.getElementById("checkB2").checked==true){path[0].bezierCurveTo(B2[11],B2[12],B2[21],B2[22],B2[31],B2[32]);}
+			if(L2d.checked==true){path[0].lineTo(L[21],L[22]);}
+		if(document.getElementById("checkB3").checked==true){path[0].bezierCurveTo(B3[11],B3[12],B3[21],B3[22],B3[31],B3[32]);}
+			if(L3d.checked==true){path[0].lineTo(L[31],L[32]);}
+		if(document.getElementById("checkB4").checked==true){path[0].bezierCurveTo(B4[11],B4[12],B4[21],B4[22],B4[31],B4[32]);}
+			if(L4d.checked==true){path[0].lineTo(L[41],L[42]);}
+		points=path[0].getPoints();
+		geoL=new THREE.BufferGeometry().setFromPoints(points);
+		matL=new THREE.LineBasicMaterial({color:0xffffff});
+		line=new THREE.Line(geoL,matL);
+		line.position.set(0,0,0);
+		scene.add(line);
+	}
+	if(viewLd.checked==false){scene.remove(line);}
+
+	// Tangents
+	if(viewTd.checked==true){
+		p=11;
+		scene.remove(T[p]);
+		path[p]=null;
+		path[p]=new THREE.Path();
+		path[p].moveTo(M[1],M[2]);
+		if(B1d.checked==true){path[p].lineTo(B1[11],B1[12]);}
+		points[p]=path[p].getPoints();
+		geo[p]=new THREE.BufferGeometry().setFromPoints(points[p]);
+		mat[p]=new THREE.LineBasicMaterial({color:0x00ff00});
+		T[p]=new THREE.Line(geo[p],mat[p]);
+		T[p].position.set(0,0,0);
+		scene.add(T[p]);
+
+		p=12;
+		scene.remove(T[p]);
+		path[p]=null;
+		path[p]=new THREE.Path();
+		if(B1d.checked==true){path[p].moveTo(B1[21],B1[22]);path[p].lineTo(B1[31],B1[32]);}
+		points[p]=path[p].getPoints();
+		geo[p]=new THREE.BufferGeometry().setFromPoints(points[p]);
+		mat[p]=new THREE.LineBasicMaterial({color:0x00ff00});
+		T[p]=new THREE.Line(geo[p],mat[p]);
+		T[p].position.set(0,0,0);
+		scene.add(T[p]);
+		// ........
+		p=21;
+		scene.remove(T[p]);
+		path[p]=null;
+		path[p]=new THREE.Path();
+		if(L[11]==0 && L[12]==0 && B1d.checked==false){path[p].moveTo(M[1],M[2]);}
+		if(L[11]==0 && L[12]==0 && B1d.checked==true){path[p].moveTo(B1[31],B1[32]);}
+		if(L[11]!=0 || L[12]!=0){path[p].moveTo(L[11],L[12]);}
+		if(B2d.checked==true){path[p].lineTo(B2[11],B2[12]);}
+		points[p]=path[p].getPoints();
+		geo[p]=new THREE.BufferGeometry().setFromPoints(points[p]);
+		mat[p]=new THREE.LineBasicMaterial({color:0xcc9900});
+		T[p]=new THREE.Line(geo[p],mat[p]);
+		T[p].position.set(0,0,0);
+		scene.add(T[p]);
+
+		p=22;
+		scene.remove(T[p]);
+		path[p]=null;
+		path[p]=new THREE.Path();
+		if(B2d.checked==true){path[p].moveTo(B2[21],B2[22]);path[p].lineTo(B2[31],B2[32]);}
+		points[p]=path[p].getPoints();
+		geo[p]=new THREE.BufferGeometry().setFromPoints(points[p]);
+		mat[p]=new THREE.LineBasicMaterial({color:0xcc9900});
+		T[p]=new THREE.Line(geo[p],mat[p]);
+		T[p].position.set(0,0,0);
+		scene.add(T[p]);
+		// ........
+		p=31;
+		scene.remove(T[p]);
+		path[p]=null;
+		path[p]=new THREE.Path();
+			if(L[21]==0 && L[22]==0 && B2d.checked==false){
+				if(L[11]==0 && L[12]==0 && B1d.checked==false){path[p].moveTo(M[1],M[2]);}
+				if(L[11]==0 && L[12]==0 && B1d.checked==true){path[p].moveTo(B1[31],B1[32]);}
+				if(L[11]!=0 || L[12]!=0){path[p].moveTo(L[11],L[12]);}
+			}
+		if(L[21]==0 && L[22]==0 && B2d.checked==true){path[p].moveTo(B2[31],B2[32]);}
+		if(L[21]!=0 || L[22]!=0){path[p].moveTo(L[21],L[22]);}
+		if(B3d.checked==true){path[p].lineTo(B3[11],B3[12]);}
+		points[p]=path[p].getPoints();
+		geo[p]=new THREE.BufferGeometry().setFromPoints(points[p]);
+		mat[p]=new THREE.LineBasicMaterial({color:0xff88ff});
+		T[p]=new THREE.Line(geo[p],mat[p]);
+		T[p].position.set(0,0,0);
+		scene.add(T[p]);
+
+		p=32;
+		scene.remove(T[p]);
+		path[p]=null;
+		path[p]=new THREE.Path();
+		if(B3d.checked==true){path[p].moveTo(B3[21],B3[22]);path[p].lineTo(B3[31],B3[32]);}
+		points[p]=path[p].getPoints();
+		geo[p]=new THREE.BufferGeometry().setFromPoints(points[p]);
+		mat[p]=new THREE.LineBasicMaterial({color:0xff88ff});
+		T[p]=new THREE.Line(geo[p],mat[p]);
+		T[p].position.set(0,0,0);
+		scene.add(T[p]);
+		// ........
+		p=41;
+		scene.remove(T[p]);
+		path[p]=null;
+		path[p]=new THREE.Path();
+			if(L[31]==0 && L[32]==0 && B3d.checked==false){
+				if(L[21]==0 && L[22]==0 && B2d.checked==false){
+					if(L[11]==0 && L[12]==0 && B1d.checked==false){path[p].moveTo(M[1],M[2]);}
+					if(L[11]==0 && L[12]==0 && B1d.checked==true){path[p].moveTo(B1[31],B1[32]);}
+					if(L[11]!=0 || L[12]!=0){path[p].moveTo(L[11],L[12]);}
+				}
+				//if(L[21]==0 && L[22]==0 && B2d.checked==false){path[p].moveTo(L[11],L[12]);}
+				if(L[21]==0 && L[22]==0 && B2d.checked==true){path[p].moveTo(B2[31],B2[32]);}
+				if(L[21]!=0 || L[22]!=0){path[p].moveTo(L[21],L[22]);}
+			}
+		if(L[31]==0 && L[32]==0 && B3d.checked==true){path[p].moveTo(B3[31],B3[32]);}
+		if(L[31]!=0 || L[32]!=0){path[p].moveTo(L[31],L[32]);}
+		if(B4d.checked==true){path[p].lineTo(B4[11],B4[12]);}
+		points[p]=path[p].getPoints();
+		geo[p]=new THREE.BufferGeometry().setFromPoints(points[p]);
+		mat[p]=new THREE.LineBasicMaterial({color:0x0099ff});
+		T[p]=new THREE.Line(geo[p],mat[p]);
+		T[p].position.set(0,0,0);
+		scene.add(T[p]);
+
+		p=42;
+		scene.remove(T[p]);
+		path[p]=null;
+		path[p]=new THREE.Path();
+		if(B4d.checked==true){path[p].moveTo(B4[21],B4[22]);path[p].lineTo(B4[31],B4[32]);}
+		points[p]=path[p].getPoints();
+		geo[p]=new THREE.BufferGeometry().setFromPoints(points[p]);
+		mat[p]=new THREE.LineBasicMaterial({color:0x0099ff});
+		T[p]=new THREE.Line(geo[p],mat[p]);
+		T[p].position.set(0,0,0);
+		scene.add(T[p]);
+	}
+	if(viewTd.checked==false){
+		scene.remove(T[11]);scene.remove(T[12]);
+		scene.remove(T[21]);scene.remove(T[22]);
+		scene.remove(T[31]);scene.remove(T[32]);
+		scene.remove(T[41]);scene.remove(T[42]);
+	}
+
+	w=0;
+	clique=0;
+//	document.getElementById("clo").style.display="none";
+	document.getElementById("res").style.display="";
+	const element=document.getElementById("clo");
+	if(element){element.remove();}
+}
+
+	w++;
+	controls.update();
+	renderer.render(scene,camera);
+}
+
+init();
+
+animate();
+
+document.getElementById("tit").style.width=wW-600+"px";
+document.getElementById("tit").style.display="";
+document.getElementById("tabex").style.left=wW-420+"px";
+document.getElementById("spanA").style.left=wW-420+"px";
+
+</script>
+
+<script>
+
+function limpa(){window.location.replace(window.location.href);}
+
+/*
+
+Simple bezierCurveTo Shape maker tool
+
+Hi Three.js followers,
+
+As did with quadratic curves, now made to feel B&eacute;zier curves interactions
+ and create shapes for extruded meshes.
+
+the link:
+
+http://jrlazz.eu5.org/ggk/bezcurto.html
+
+Again, Thanks for the great Three.js Team!
+
+Jose Roberto Lazzareschi
+
+PS: Pierre Etienne Bezier, September 1, 1910 - November 25, 1999, was a French Engineer, creator of the Bezier curve.
+
+He was one of the founders of the field of solid, geometric and physical modeling, as well as the field of representative curves, especially in CAD/CAM systems.
+
+Working as an engineer at Renault, distinguished itself as a leader in the application of mathematics and computational tools in transforming design and manufacturing into computer-aided design and three dimensional modeling.
+
+*/
+
+</script>
+</body>
+</html>

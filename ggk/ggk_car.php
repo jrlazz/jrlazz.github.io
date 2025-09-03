@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>ggk_car.php</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="../three.js.ico">
+<link type="text/css" rel="stylesheet" href="main.css">
+
+<style>
+body{margin:0;background-color:#012;color:#ff0;font-family:Verdana;font-size:13px;overscroll-behavior:none;line-height:20px;overflow:hidden;}
+</style>
+
+<script src="../js/jquery-3.5.1.min.js"></script>
+
+<!--
+<script src="../js/jquery-ui.js"></script>
+-->
+
+</head>
+
+<body>
+
+<img src="img/cockpit2.jpg" width="150" style="position:absolute;left:5px;top:80px;border:2px inset;border-color: #000 #ff0 #ff0 #000;"></img>
+
+<span id="spanid"  style="position:absolute;left:5px;top:12px;font-family:Lucida Console;color:#006;font-size:12pt;"></span>
+<span id="spanidB" style="position:absolute;left:3px;top:3px;width:99%;font-family:Lucida Console;color:#ff0;font-size:9pt;text-align:center;"></span>
+<span id="spanidC" style="position:absolute;left:3px;top:16px;width:99%;font-family:Lucida Console;color:#ff0;font-size:9pt;text-align:center;"></span>
+<span style="position:absolute;left:5px;top:10px;width:150px;font-family:Lucida Console;color:#fc0;font-size:14pt;font-weight:bold;line-height:16px;z-index:2;">
+<center><img src="img/arrows.png" width="80"></img><br>W S L R
+</center>
+</span>
+<span style="position:absolute;left:6px;top:11px;width:150px;font-family:Lucida Console;color:#000;font-size:14pt;font-weight:bold;line-height:16px;z-index:2;">
+<center><img src="img/arrows.png" width="80"></img><br>W S L R
+</center>
+</span>
+
+<div id="container"></div>
+
+<span  id="spancompleto" style="position:absolute;left:200px;top:120px;font-size:16pt;color:#f0f;">... wait once... wait for the alert ...</span>
+
+<script type="module">
+
+//Access-Control-Allow-Origin;
+//curl -H "origin: example.com" -v "https://www.anything.net/video/call/System.generateId.dwr"
+
+
+import * as THREE from '../js/three.module_res_res.js';
+import { OrbitControls } from '../js/OrbitControls_res_res.js';
+import { DDSLoader } from '../js/DDSLoader_res_res.js';
+import { MTLLoader } from '../js/MTLLoader_res_res.js';
+import { OBJLoader } from '../js/OBJLoader_res_res.js';
+import { TDSLoader } from '../js/TDSLoader_res_res.js';
+import { FontLoader } from '../js/FontLoader_res_res.js';
+import { TextGeometry } from '../js/TextGeometry_res_res.js'
+
+
+/*
+import * as THREE from 'https://cdn.skypack.dev/three/build/three.module.js';
+import { OrbitControls } from 'https://cdn.skypack.dev/three/examples/jsm/controls/OrbitControls.js';
+import { DDSLoader } from 'https://cdn.skypack.dev/three/examples/jsm/loaders/DDSLoader.js';
+import { MTLLoader } from 'https://cdn.skypack.dev/three/examples/jsm/loaders/MTLLoader.js';
+import { OBJLoader } from 'https://cdn.skypack.dev/three/examples/jsm/loaders/OBJLoader.js';
+import { TDSLoader } from 'https://cdn.skypack.dev/three/examples/jsm/loaders/TDSLoader.js';
+*/
+/*
+import * as THREE from 'https://threejs.org/build/three.module.js';
+import { OrbitControls } from 'https://threejs.org/examples/jsm/controls/OrbitControls.js';
+import { DDSLoader } from 'https://threejs.org/examples/jsm/loaders/DDSLoader.js';
+import { MTLLoader } from 'https://threejs.org/examples/jsm/loaders/MTLLoader.js';
+import { OBJLoader } from 'https://threejs.org/examples/jsm/loaders/OBJLoader.js';
+import { TDSLoader } from 'https://threejs.org/examples/jsm/loaders/TDSLoader.js';
+import { FontLoader} from 'https://threejs.org/examples/jsm/loaders/FontLoader.js';
+import { TextGeometry } from 'https://threejs.org/examples/jsm/geometries/TextGeometry.js';
+*/
+const container = document.getElementById( 'container' );
+
+let renderer,scene,camera,material,geometry,objLoader;
+let ambient,ppotLight,qpotLight,spotLight;
+
+var altera=0;
+
+var mesh=null;
+var color=Math.random()*0xffffff;
+
+var k=0;
+var w=0;
+var bone=new Array();
+var arte=new Array();
+var oo=new Array();
+var f1=new Array();
+var pp=new Array();
+var jar=new Array();
+var geo=new Array();
+var mat=new Array();
+var mesh=new Array();
+var tex=new Array();
+var rot=new Array();rot[1]=0;
+var jrl=new Array();
+
+
+var loader=new Array();
+var loaderCount=0;
+
+var v=1;
+var j=0;
+
+var de2ra=function(degree){return degree*(Math.PI/180);};
+
+var passo=0.02;
+
+var w=0;
+var ww=0;
+var f1LP=5;
+
+var teclaA=0;var teclaD=0;
+var teclaW=0;var teclaS=0;
+var teclaG=0;var teclaH=0;
+var teclaC=0;var teclaB=0;
+var teclaV=0;
+var teclaL=0;var teclaP=0;
+var setaE=0;var setaD=0;
+var setaC=0;var setaB=0;
+var mov=0.2;
+var angfrente=0;
+var etapa=0;
+
+var Tgeometry;
+
+var target=new THREE.Vector3(); // create once an reuse it
+
+var querocontrols=0;// tirar controls de const controls e de animate
+
+let BDs,BDi,BEs,BEi,PDs,PDi,PEs,PEi,CA,TR;
+var group=new THREE.Group();
+var groupCATR=new THREE.Group();
+var groupPD=new THREE.Group();
+var groupPE=new THREE.Group();
+var groupBD=new THREE.Group();
+var groupBE=new THREE.Group();
+
+let pBDs,pBDi,pBEs,pBEi,pPDs,pPDi,pPEs,pPEi,pCA,pTR;
+var pgroup=new THREE.Group();
+var pgroupCATR=new THREE.Group();
+var pgroupPD=new THREE.Group();
+var pgroupPE=new THREE.Group();
+var pgroupBD=new THREE.Group();
+var pgroupBE=new THREE.Group();
+
+var malucar=0;
+var mika=0;
+var duration;
+var ur=window.location.href;
+var quando=200;
+var home=0;
+if(ur.includes("127")){quando=100;home=1;}
+
+var normal;
+
+
+
+
+
+
+
+
+
+
+
+
+// ***************************************************************
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	container.appendChild( renderer.domElement );
+
+
+	renderer.shadowMap.enabled=true;
+	renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+
+	//renderer.outputEncoding=THREE.sRGBEncoding;
+	
+	renderer.setClearColor(0x003344);
+
+	scene=new THREE.Scene();
+	scene.position.set(0,0,0);
+
+	camera=new THREE.PerspectiveCamera(70,window.innerWidth/window.innerHeight,1,1000);
+	camera.position.set(0,10,20);
+
+	window.addEventListener('resize',onResize,false);
+
+	const manager=new THREE.LoadingManager();
+	manager.onStart=function(url,itemsLoaded,itemsTotal){console.log('Started loading file:'+url+'.\nLoaded '+itemsLoaded+' of '+itemsTotal + ' files.' );};
+	manager.onLoad=function(){console.log('Loading complete!');};
+	manager.onProgress=function(url,itemsLoaded,itemsTotal){console.log('loading texture'+url+' '+(itemsLoaded/itemsTotal*100)+'%');};
+	manager.onError=function(url){console.log('Error loading texture:'+url);};
+	manager.addHandler(/\.dds$/i,new DDSLoader());
+
+	const axesHelper=new THREE.AxesHelper(0.5);
+	scene.add(axesHelper);
+
+	// MTL
+
+var moaa="models/extras/ggk.mtl";
+var f1aa="models/extras/ggk.obj";
+var mocc="models/extras/f1cc.mtl";
+var f1cc="models/extras/f1cc.obj";
+new MTLLoader(manager).load(moaa,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1aa,function(object){object.children[k].castShadow=true;f1[0]=object;scene.add(object);},manager.onProgress,manager.onError);});
+new MTLLoader(manager).load(mocc,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1cc,function(object){object.children[k].castShadow=true;f1[3]=object;scene.add(object);},manager.onProgress,manager.onError);});
+new MTLLoader(manager).load(mocc,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1cc,function(object){object.children[k].castShadow=true;f1[4]=object;scene.add(object);},manager.onProgress,manager.onError);});
+new MTLLoader(manager).load(mocc,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1cc,function(object){object.children[k].castShadow=true;f1[5]=object;scene.add(object);},manager.onProgress,manager.onError);});
+new MTLLoader(manager).load(mocc,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1cc,function(object){object.children[k].castShadow=true;f1[6]=object;scene.add(object);},manager.onProgress,manager.onError);});
+
+//... scene.add(object);});});
+
+var mo="models/steve/partes.mtl";
+var cox="models/steve/vivicox.obj";
+new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load('models/steve/steve_ca.obj',function(object){object.children[k].castShadow=true;CA=object;},manager.onProgress,manager.onError);});
+new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load('models/steve/steve_to.obj',function(object){object.children[k].castShadow=true;TR=object;},manager.onProgress,manager.onError);});
+new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(cox,function(object)                        {object.children[k].castShadow=true;BDs=object;},manager.onProgress,manager.onError);});
+
+var yemtl="models/extras/yellarrow.mtl";
+var yeobj="models/extras/yellarrow.obj";
+new MTLLoader(manager).load(yemtl,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(yeobj,function(object){f1[7]=object;},manager.onProgress,manager.onError);});
+
+
+//new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(cox, function(object){object.children[k].castShadow=true;BDi=object;});});
+//new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(cox, function(object){object.children[k].castShadow=true;BEs=object;});});
+//new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(cox, function(object){object.children[k].castShadow=true;BEi=object;});});
+//new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(cox, function(object){object.children[k].castShadow=true;PDs=object;});});
+//new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(cox, function(object){object.children[k].castShadow=true;PDi=object;});});
+//new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(cox, function(object){object.children[k].castShadow=true;PEs=object;});});
+//new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(cox, function(object){object.children[k].castShadow=true;PEi=object;});});
+
+
+
+mo="models/artes/Town.mtl";
+var arteA="models/artes/Town.obj";
+new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(arteA,function(object){object.children[k].castShadow=true;arte[1]=object;arte[1].position.set(9.5,-0.75,23);scene.add(arte[1]);},manager.onProgress,manager.onError);});
+
+
+j++;
+	//goldenrod
+	tex[j]=new THREE.TextureLoader(manager).load('img/fl4.jpg');
+	tex[j].wrapS=THREE.RepeatWrapping;tex[j].wrapT=THREE.RepeatWrapping;
+	tex[j].repeat.set(10,1);
+	geo[j]=new THREE.BoxGeometry(3,10,3);
+	mat[j]=new THREE.MeshBasicMaterial({map:tex[j]});
+	var ACube=new THREE.Mesh(geo[j],mat[j]);
+	ACube.position.set(-4,5,-9);
+	ACube.castShadow=true;
+	scene.add(ACube);
+j++;
+	tex[j]=new THREE.TextureLoader(manager).load('models/futebol.jpg');
+	tex[j].wrapS=THREE.RepeatWrapping;tex[j].wrapT=THREE.RepeatWrapping;
+	tex[j].repeat.set(1,1);
+	geo[j]=new THREE.BoxGeometry(12,0.01,8);
+	geo[j].computeVertexNormals();
+	//geo[j].computeFaceNormals();
+	mat[j]=new THREE.MeshPhongMaterial({map:tex[j]});
+	const futebol=new THREE.Mesh(geo[j],mat[j]);
+	futebol.receiveShadow=true;
+	//futebol.castShadow=true;
+	futebol.position.set(-15,0.015,-9);
+	scene.add(futebol);
+
+j++;
+	tex[j]=new THREE.TextureLoader(manager).load('models/lajinha_amarela-are-1.jpg');
+	tex[j].wrapS=THREE.RepeatWrapping;tex[j].wrapT=THREE.RepeatWrapping;
+	tex[j].repeat.set(12,6);
+	geo[j]=new THREE.BoxGeometry(22,0.01,9);
+	geo[j].computeVertexNormals();
+	//geo[j].computeFaceNormals();
+	mat[j]=new THREE.MeshPhongMaterial({map:tex[j]});
+	var goldenrodB=new THREE.Mesh(geo[j],mat[j]);
+	goldenrodB.receiveShadow=true;
+	goldenrodB.position.set(-13,0.01,-9);
+	scene.add(goldenrodB);
+
+
+j++;
+	tex[j]=new THREE.TextureLoader(manager).load('img/fl1.jpg');
+	tex[j].wrapS=THREE.RepeatWrapping;tex[j].wrapT=THREE.RepeatWrapping;
+	tex[j].repeat.set(6,1);
+	geo[j]=new THREE.BoxGeometry(1.5,4,1.5);
+	mat[j]=new THREE.MeshBasicMaterial({map:tex[j]});
+	mesh[j]=new THREE.Mesh(geo[j],mat[j]);
+	mesh[j].castShadow=true;
+	mesh[j].position.set(10,2,-5);
+	scene.add(mesh[j]);
+
+j++;
+	tex[j]=new THREE.TextureLoader(manager).load('img/fl5.jpg');
+	tex[j].wrapS=THREE.RepeatWrapping;tex[j].wrapT=THREE.RepeatWrapping;
+	tex[j].repeat.set(10,1);
+	geo[j]=new THREE.BoxGeometry(1.5,6,1.5);
+	mat[j]=new THREE.MeshBasicMaterial({map:tex[j]});
+	mesh[j]=new THREE.Mesh(geo[j],mat[j]);
+	mesh[j].castShadow=true;
+	mesh[j].position.set(15,3,-5);
+	scene.add(mesh[j]);
+
+j++;
+	geo[j]=new THREE.BoxGeometry(0.5,0.5,0.5);
+	mat[j]=new THREE.MeshBasicMaterial({color:0xff0000});
+	jar[1]=new THREE.Mesh(geo[j],mat[j]);
+	scene.add(jar[1]);
+j++;
+	geo[j]=new THREE.BoxGeometry(0.5,0.5,0.5);
+	mat[j]=new THREE.MeshBasicMaterial({color:0xffff00});
+	jar[2]=new THREE.Mesh(geo[j],mat[j]);
+	scene.add(jar[2]);
+
+
+
+j++;
+	tex[j]=new THREE.TextureLoader(manager).load('img/fl5.jpg');
+	tex[j].wrapS=THREE.RepeatWrapping;tex[j].wrapT=THREE.RepeatWrapping;
+	tex[j].repeat.set(10,1);
+	geo[j]=new THREE.BoxGeometry(1.5,3,1.5);
+	mat[j]=new THREE.MeshBasicMaterial({map:tex[j]});
+	var DCube=new THREE.Mesh(geo[j],mat[j]);
+	DCube.castShadow=true;
+	DCube.position.set(5,1.5,0);
+	scene.add(DCube);
+
+j++;
+	tex[j]=new THREE.TextureLoader(manager).load('img/fl4.jpg');
+	tex[j].wrapS=THREE.RepeatWrapping;tex[j].wrapT=THREE.RepeatWrapping;
+	tex[j].repeat.set(10,1);
+	geo[j]=new THREE.BoxGeometry(1.5,3,1.5);
+	mat[j]=new THREE.MeshBasicMaterial({map:tex[j]});
+	var ECube=new THREE.Mesh(geo[j],mat[j]);
+	ECube.castShadow=true;
+	ECube.position.set(10,1.5,0);
+	scene.add(ECube);
+
+j++;
+	tex[j]=new THREE.TextureLoader(manager).load('img/fl3.jpg');
+	tex[j].wrapS=THREE.RepeatWrapping;tex[j].wrapT=THREE.RepeatWrapping;
+	tex[j].repeat.set(10,1);
+	geo[j]=new THREE.BoxGeometry(1.5,3,1.5);
+	mat[j]=new THREE.MeshBasicMaterial({map:tex[j]});
+	var FCube=new THREE.Mesh(geo[j],mat[j]);
+	FCube.castShadow=true;
+	FCube.position.set(15,1.5,0);
+	scene.add(FCube);
+
+
+	var group1=new THREE.Group();
+	var group2=new THREE.Group();
+	var group3=new THREE.Group();
+	group1.add(DCube);
+	group1.add(ECube);
+	group1.add(FCube);scene.add(group1);
+	group2=group1.clone();group2.position.set(0,0,6);scene.add(group2);
+	group3=group1.clone();group3.position.set(0,0,12);scene.add(group3);
+
+//piso e grade
+
+j++;
+	geo[j]=new THREE.BoxGeometry(100,100,0.01);
+	mat[j]=new THREE.MeshPhongMaterial({color:0x333333,side:THREE.DoubleSide});
+	var piso=new THREE.Mesh(geo[j],mat[j]);
+	piso.position.set(0,0,0);piso.rotation.set(0,0,0);piso.rotation.x=de2ra(90);
+	piso.receiveShadow=true;
+	scene.add(piso);
+	var grid=new THREE.GridHelper(100,50);//size,divisions
+	grid.material.color.setHex(0xffffff);
+	grid.position.set(0,0.005,0);
+	scene.add(grid);
+
+//RUAS
+	var ruaGeo=new THREE.BoxGeometry(100,1.5,0.01);
+	var ruaMat=new THREE.MeshPhongMaterial({color:0x202020});
+	var AArua=new THREE.Mesh(ruaGeo,ruaMat);
+	AArua.position.set(-0.78,0.01,0);
+	AArua.rotation.set(de2ra(90),0,de2ra(90));
+	AArua.receiveShadow=true;
+	scene.add(AArua);
+
+	var ruaGeoB=new THREE.BoxGeometry(100,2,0.01);
+	var ruaMatB=new THREE.MeshPhongMaterial({color:0xffff00});
+	var ABrua=new THREE.Mesh(ruaGeoB,ruaMatB);
+	ABrua.position.set(0.5,0.0075,0);
+	ABrua.rotation.set(de2ra(90),0,de2ra(90));
+	ABrua.receiveShadow=true;
+	scene.add(ABrua);
+
+	var ACrua=new THREE.Mesh(ruaGeo,ruaMat);
+	ACrua.position.set(0.78,0.01,0);
+	ACrua.rotation.set(de2ra(90),0,de2ra(90));
+	ACrua.receiveShadow=true;
+	scene.add(ACrua);
+
+	ruaGeo=new THREE.BoxGeometry(100,3,0.01);
+	ruaMat=new THREE.MeshPhongMaterial({color:0x202020});
+	var Brua=new THREE.Mesh(ruaGeo,ruaMat);
+	Brua.position.set(0,0.005,-25);
+	Brua.rotation.set(de2ra(90),0,de2ra(0));
+	Brua.receiveShadow=true;
+	scene.add(Brua);
+
+	ruaGeo=new THREE.BoxGeometry(100,2,0.01);
+	ruaMat=new THREE.MeshPhongMaterial({color:0x202020});
+	var Drua=new THREE.Mesh(ruaGeo,ruaMat);
+	Drua.position.set(0,0.005,3);
+	Drua.rotation.set(de2ra(90),0,de2ra(0));
+	Drua.receiveShadow=true;
+	scene.add(Drua);
+
+	ruaGeo=new THREE.BoxGeometry(100,2,0.01);
+	ruaMat=new THREE.MeshPhongMaterial({color:0x202020});
+	var Erua=new THREE.Mesh(ruaGeo,ruaMat);
+	Erua.position.set(0,0.005,9);
+	Erua.rotation.set(de2ra(90),0,de2ra(0));
+	Erua.receiveShadow=true;
+	scene.add(Erua);
+
+	ruaGeo=new THREE.BoxGeometry(100,2,0.01);
+	ruaMat=new THREE.MeshPhongMaterial({color:0x202020});
+	var Frua=new THREE.Mesh(ruaGeo,ruaMat);
+	Frua.position.set(0,0.005,15);
+	Frua.rotation.set(de2ra(90),0,de2ra(0));
+	Frua.receiveShadow=true;
+	scene.add(Frua);
+
+// Text
+
+/*
+	let text="FontLoader",bevelEnabled=true,font=undefined;
+	loader=new FontLoader();
+	//loader.load("https://threejs.org/examples/fonts/helvetiker_regular.typeface.json",(response)=>{
+	//loader.load("../js/roboto_italic.typeface.json",(response)=>{
+	loader.load("../js/Roboto Lt_Regular.json",(response)=>{
+	font=response;
+        const textGeometry=new TextGeometry("GGK-3404",{font:font,size:0.2,height:0.02,curveSegments:4,bevelEnabled:true,bevelThickness:0.03,bevelSize:0.02,bevelOffset:0,bevelSegments:4});
+	textGeometry.computeBoundingBox();
+        const textMaterial=new THREE.MeshPhongMaterial({color:0xffff00});
+        const texto=new THREE.Mesh(textGeometry,textMaterial);
+	texto.position.set(2,0.01,3);
+	texto.rotation.set(-1.57,0,0);
+        scene.add(texto);
+    	})
+*/
+
+
+	let textMesh1, textMesh2, textGeo, materials;
+	let text="GGK-3404",bevelEnabled=true,font=undefined;
+	const height=20,size=170,hover=30,curveSegments=8,bevelThickness=3,bevelSize=2.5;
+
+
+	loader=new FontLoader();
+	//loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json',function(response){
+	//loader.load('../js/Roboto Lt_Regular.json',function(response){
+	loader.load('../js/roboto_italic.typeface.json',function(response){
+	//loader.load('../js/Roboto Lt_Italic.json',function(response){
+	font=response;
+	createText();
+	});
+
+function createText() {
+	textGeo=new TextGeometry(text,{font:font,size:size,height:height,curveSegments:curveSegments,bevelThickness:bevelThickness,bevelSize:bevelSize,bevelEnabled:bevelEnabled});
+        textGeo.center();
+//	textGeo.computeBoundingBox();
+//	const centerOffset=-0.5*(textGeo.boundingBox.max.x-textGeo.boundingBox.min.x);
+	materials=[
+		new THREE.MeshPhongMaterial({color:0xff0000,flatShading:true}),// front
+		new THREE.MeshPhongMaterial({color:0x0099ff})// side
+	];
+	textMesh1=new THREE.Mesh(textGeo,materials);
+	textMesh1.rotation.set(-0.4,0,0);//Math.PI*2
+	textMesh1.position.set(0,4,-50);
+	textMesh1.scale.set(0.05,0.05,0.05);
+//	textMesh1.castShadow=true;
+	scene.add(textMesh1);
+
+	var textGeo2=new TextGeometry(text,{font:font,size:size,height:height,curveSegments:curveSegments,bevelThickness:bevelThickness,bevelSize:bevelSize,bevelEnabled:bevelEnabled});
+        textGeo2.center();
+	textMesh2=new THREE.Mesh(textGeo2,materials);
+	textMesh2.position.set(-50,4,0);
+	textMesh2.rotation.set(0,1.5708,0);
+	textMesh2.scale.set(0.05,0.05,0.05);
+	scene.add(textMesh2);
+}
+
+
+
+
+
+
+/*
+var from=new THREE.Vector3(1,0,0);
+var to=new THREE.Vector3(1,5,0);
+var direction=to.clone().sub(from);
+var length=direction.length();
+console.log(direction.normalize());
+var arrowHelper=new THREE.ArrowHelper(direction.normalize(),from,1,0xff0000);
+arrowHelper.rotation.set(-1.54,0,0);
+arrowHelper.position.set(0,0.2,0);
+scene.add(arrowHelper);
+*/
+
+// 3DS
+
+//if (child.isMesh){child.material.specular.setScalar(0.1);child.material.normalMap=normal;}
+if(home==1){
+	loader=new TDSLoader();
+	loader.load('models/extras/palm.3ds',function(object){
+		object.traverse(function(child){
+		});
+		object.scale.set(0.04,0.04,0.04);
+		object.position.set(-6,0,6);
+		object.rotation.set(-1.54,0,0);
+		object.children[k].castShadow=true;
+		jrl[1]=object;
+	scene.add(jrl[1]);
+	});
+
+
+	loader=new TDSLoader();
+	loader.load('models/extras/conifera.3ds',function(object){
+		object.traverse(function(child){
+		});
+		object.scale.set(0.005,0.005,0.005);
+		object.position.set(-6,0,0);
+		object.rotation.set(-1.54,0,0);
+		object.children[k].castShadow=true;
+		jrl[2]=object;
+	scene.add(jrl[2]);
+	});
+
+}
+
+
+// Light
+
+	ambient=new THREE.AmbientLight("#cff",0.5);
+	scene.add(ambient);
+
+	var sun=new THREE.PointLight("#963",2);
+	sun.position.set(0,15,0);
+	sun.shadow.mapSize.width=1024;
+	sun.shadow.mapSize.height=1024;
+	sun.castShadow=true;
+	scene.add(sun);
+
+/*
+	spotLight=new THREE.SpotLight(0x996633,2);
+	spotLight.position.set(0,15,0);
+	spotLight.angle=Math.PI/3;
+	spotLight.castShadow=true;
+	spotLight.shadow.mapSize.width=2048;
+	spotLight.shadow.mapSize.height=2048;
+	scene.add(spotLight);
+*/
+
+
+	// Edificio Evelyn, Rua Girassol, 594 Apto. 502, CEP: 05433-001
+
+function onResize() {
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function animate() {
+	requestAnimationFrame(animate);
+
+	//controls.update();
+ww++;
+	if(altera==0 && ww==quando){alterando();}
+
+	if(altera>0){
+	document.getElementById("spancompleto").innerText="";
+
+	if(querocontrols==0){
+		scene.updateMatrixWorld(true);
+		target.setFromMatrixPosition(jar[2].matrixWorld);
+		camera.lookAt(target.x,target.y,target.z);
+		scene.updateMatrixWorld(true);
+		target.setFromMatrixPosition(jar[1].matrixWorld);
+		camera.position.set(target.x,target.y,target.z);
+	}
+
+	if(groupPD.rotation.x> 1.07){rot[1]=1;PEi.rotation.x=0;}//	document.getElementById("spanid").innerText="1";}
+	if(groupPD.rotation.x<-1.07){rot[1]=0;PDi.rotation.x=0;}//	document.getElementById("spanid").innerText="0";}
+
+	if(rot[1]==0){
+		group.rotation.z +=0.02;
+		groupPD.rotation.x +=0.2;
+		groupPE.rotation.x -=0.2;
+		groupBD.rotation.x -=0.2;
+		groupBE.rotation.x +=0.2;
+			CA.rotation.y -=0.05;
+			TR.rotation.x +=0.02;
+				BDi.rotation.x -=0.05;
+				BEi.rotation.x +=0.05;
+				PDi.rotation.x +=0.02;
+				PEi.rotation.x -=0.02;
+
+	}else{
+		group.rotation.z -=0.02;
+		groupPD.rotation.x -=0.2;
+		groupPE.rotation.x +=0.2;
+		groupBD.rotation.x +=0.2;
+		groupBE.rotation.x -=0.2;
+			CA.rotation.y +=0.05;
+			TR.rotation.x -=0.02;
+				BDi.rotation.x +=0.05;
+				BEi.rotation.x -=0.05;
+				PDi.rotation.x -=0.02;
+				PEi.rotation.x +=0.02;
+	}
+
+		w++;
+
+		if(w==1){group.position.set(-20,0.3,-5);}
+		if(etapa==0){group.position.x +=passo*5;}
+		if(group.position.x>-9.5){etapa=1;}
+		if(etapa==1){group.rotation.y=Math.PI;group.position.z -=passo*2;}
+		if(group.position.z<-12.5){etapa=2;}
+		if(etapa==2){group.rotation.y=-Math.PI/2;group.position.x -=passo*5;}
+		if(group.position.x<-20){etapa=3;}
+		if(etapa==3){group.rotation.y=0;group.position.z +=passo*2;}
+		if(group.position.z>-5.5){group.rotation.y=Math.PI/2;etapa=0;}
+
+
+//		nave[0].rotation.y +=0.01;
+
+
+		f1[3].rotation.y=1.57;
+		f1[4].rotation.y=1.57;
+		f1[5].rotation.y=1.57;
+		f1[6].rotation.y=1.57;
+
+		if(teclaW==1){
+			f1[3].rotation.x +=0.07;
+			f1[4].rotation.x +=0.07;
+			f1[5].rotation.z +=0.07;
+			f1[6].rotation.z +=0.07;
+		}
+		if(teclaV==1){
+			f1[3].rotation.x -=0.07;
+			f1[4].rotation.x -=0.07;
+			f1[5].rotation.z -=0.07;
+			f1[6].rotation.z -=0.07;
+		}
+
+		if(teclaL==1 && f1LP<20){f1LP +=0.1;jar[1].position.y=f1LP;}
+		if(teclaP==1 && f1LP>0){f1LP -=0.1;jar[1].position.y=f1LP;}
+
+		if(teclaW==1){f1[0].rotation.y=-3.14+ang;f1[0].position.z +=Math.cos(f1[0].rotation.y=-3.14+ang)*mov;	f1[0].position.x +=Math.sin(f1[0].rotation.y=-3.14+ang)*mov;		scene.position.z -=Math.cos(f1[0].rotation.y=-3.14+ang)*mov;	scene.position.x -=Math.sin(f1[0].rotation.y=+3.14+ang)*mov;angfrente=0; myFunction(   0);}//W
+		if(teclaV==1){f1[0].rotation.y=-3.14+ang;f1[0].position.z -=Math.cos(f1[0].rotation.y=-3.14+ang)*mov;	f1[0].position.x -=Math.sin(f1[0].rotation.y=-3.14+ang)*mov;		scene.position.z +=Math.cos(f1[0].rotation.y=-3.14+ang)*mov;	scene.position.x +=Math.sin(f1[0].rotation.y=+3.14+ang)*mov;angfrente=0; myFunction(3.14);}//V
+
+		if(teclaH==1){f1[0].rotation.y -=.05;ang-=.05;angfrente=-0.8;if(teclaV==1){angfrente=0.8;}f1[5].rotation.y=1.57+angfrente;f1[6].rotation.y=1.57+angfrente;}//G
+		if(teclaG==1){f1[0].rotation.y +=.05;ang+=.05;angfrente= 0.8;if(teclaV==1){angfrente=-0.8;}f1[5].rotation.y=1.57+angfrente;f1[6].rotation.y=1.57+angfrente;}//H
+
+		if(home==1){
+			if(Math.abs(f1[0].position.x)>40 || Math.abs(f1[0].position.z)>40){maluca();}
+		}
+	}
+
+	renderer.render(scene,camera);
+}
+
+function alterando(){
+
+	document.getElementById("spancompleto").innerText="... wait twice ...";
+
+	//alert("... Espere a mensagem 'Pode clicar'...\n... ent\xE3o clique...\n... Boa Sorte no Evelyn!");
+	alert("... Alert to make it possible ... Please Click OK!\n... Pode clicar ... Boa Sorte!");
+
+document.getElementById("spanidB").innerText="";
+document.getElementById("spanidC").innerText="";
+
+		f1[0].add(f1[3]);
+		f1[0].add(f1[4]);
+		f1[0].add(f1[5]);
+		f1[0].add(f1[6]);
+
+		f1[0].add(jar[1]);
+		f1[0].add(jar[2]);
+
+		f1[5].scale.set(1,1,1);
+		f1[5].position.set( 0.825,0.23,1.65);
+		f1[6].scale.set(1,1,1);
+		f1[6].position.set(-0.825,0.23,1.65);
+
+		f1[3].scale.set(1.5,1.5,1.5);
+
+		f1[3].position.set( 1,0.42 ,-2.35);
+		f1[4].scale.set(1.5,1.5,1.5);
+		f1[4].position.set(-1,0.42 ,-2.35);
+
+		f1[0].scale.set(0.3,0.3,0.3);
+		//f1[0].scale.set(1,1,1);
+		f1[0].rotation.set(0,3.14,0);
+		f1[0].position.set(0,0.02,0);
+
+		f1[7].scale.set(0.6,0.2,0.2);
+		f1[7].position.set(3,0.0,9);
+		f1[7].rotation.set(1.57,0,0);
+		//f1[7].rotation.set(1.57,0,3.14);
+		scene.add(f1[7]);
+
+		jar[1].position.set(0, f1LP,-8);
+		jar[2].position.set(0,-1, 6);
+
+		arte[1].scale.set(1,1,1);
+		arte[1].position.set(9.5,-0.75,23);
+		scene.add(arte[1]);
+
+/*
+if(child.isMesh)child.geometry.computeVertexNormals();
+if(child.isMesh)child.geometry.computeFaceNormals();
+
+	nave[0].position.set(-10,10,-12);
+	nave[0].rotation.set(0.25,0,0);
+	nave[0].scale.set(0.01,0.01,0.01);
+	scene.add(nave[0]);
+
+	arte[5].scale.set(15,15,15);
+	arte[5].position.set(0,1,0);
+	scene.add(arte[5]);
+	scene.add(pp);
+*/
+
+// sky
+	loader=new THREE.TextureLoader();
+	loader.load('models/sky_cores_3.jpg',function(texture){
+	texture.mapping=THREE.EquirectangularReflectionMapping;
+	scene.background=texture;  
+});
+
+// **************************** ainda alterando
+
+	CA.position.set( 0  ,2.1,0); // steve_ca
+	TR.position.set( 0  ,2  ,0); // steve_to
+
+	BDs.position.set(-1.75,   1,0); // vivicox
+BDi=BDs.clone();
+	BDi.position.set(-1.75,-0.5,0);
+BEs=BDs.clone();
+	BEs.position.set( 1.75,   1,0);
+BEi=BDs.clone();
+	BEi.position.set( 1.75,-0.5,0);
+PDs=BDs.clone();
+	PDs.position.set(0.025,   0,0);
+PDi=BDs.clone();
+	PDi.position.set(0.025,-1.5,0);
+PEs=BDs.clone();
+	PEs.position.set(0.56,    0,0);
+PEi=BDs.clone();
+	PEi.position.set(0.56, -1.5,0);
+
+	BDs.scale.y=0.5;
+	BEs.scale.y=0.5;
+	BDi.scale.set(0.75,0.75,0.75);
+	BEi.scale.set(0.75,0.75,0.75);
+
+	PDs.scale.y=0.5;
+	PEs.scale.y=0.5;
+	PDi.scale.set(0.85,0.85,0.85);
+	PEi.scale.set(0.85,0.85,0.85);
+
+	groupCATR.add(CA);groupCATR.add(TR);
+	groupPD.add(PDs);groupPD.add(PDi);
+	groupPE.add(PEs);groupPE.add(PEi);
+	groupBD.add(BDs);groupBD.add(BDi);
+	groupBE.add(BEs);groupBE.add(BEi);
+
+	groupCATR.scale.set(4,4,4);
+	groupPD.scale.set(4,4,4);
+	groupPE.scale.set(4,4,4);
+	groupBD.scale.set(4,4,4);
+	groupBE.scale.set(4,4,4);
+
+	group.add(groupCATR);
+	group.add(groupPD);
+	group.add(groupPE);
+	group.add(groupBD);
+	group.add(groupBE);
+
+	groupCATR.position.set(   0,4,0);
+	groupPD.position.set(-2.5,0,0);
+	groupPE.position.set( 0.0,0,0);
+	groupBD.position.set( 0.0,8,0);
+	groupBE.position.set( 0.0,8,0);
+
+	group.rotation.y=1.57;
+	group.position.y=1;
+	group.scale.set(0.02,0.02,0.02);
+
+	//group.rotation.y=1;
+	//group.position.set(0,2,-2);
+	//group.scale.set(0.1,0.1,0.1);
+
+	scene.add(group);
+
+
+
+	pCA=CA.clone();
+	pTR=TR.clone();
+	pBDs=BDs.clone();pBDi=BDi.clone();
+	pBEs=BEs.clone();pBEi=BEi.clone();
+	pPDs=PDs.clone();pPDi=PDi.clone();
+	pPEs=PEs.clone();pPEi=PEi.clone();
+
+
+		pBDs.scale.y=1;
+		pBDi.scale.y=1;
+		pBDi.position.y=-2;
+		pBDi.rotation.x=-0.5;
+		pBDi.rotation.z=0.2;
+
+		pBEs.scale.y=1;
+		pBEi.scale.y=1;
+		pBEi.position.y=-2;
+		pBEi.rotation.x=-0.5;
+		pBEi.rotation.z=-0.2;
+
+
+	pBDs.scale.y=1;
+	pBEs.scale.y=1;
+	pPDs.scale.y=1;
+	pPEs.scale.y=1;
+
+	pPDi.position.y=-3;
+	pPEi.position.y=-3;
+	pPDi.rotation.x=1.57;
+	pPEi.rotation.x=1.57;
+
+	pBDi.scale.set(0.85,0.85,0.85);
+	pBEi.scale.set(0.85,0.85,0.85);
+	pPDi.scale.set(0.85,0.85,0.85);
+	pPEi.scale.set(0.85,0.85,0.85);
+
+	pgroupCATR.add(pCA);pgroupCATR.add(pTR);
+	pgroupPD.add(pPDs);pgroupPD.add(pPDi);
+		pgroupPD.rotation.x=-1.57;
+	pgroupPE.add(pPEs);pgroupPE.add(pPEi);
+		pgroupPE.rotation.x=-1.57;
+	pgroupBD.add(pBDs);pgroupBD.add(pBDi);
+		pgroupBD.rotation.x=-1;
+	pgroupBE.add(pBEs);pgroupBE.add(pBEi);
+		pgroupBE.rotation.x=-1;
+
+	pgroupCATR.position.set( 0,4,0);
+	pgroupPD.position.set(-0.6,3,0);
+	pgroupPE.position.set( 0.0,3,0);
+	pgroupBD.position.set( 0.0,5,0);
+	pgroupBE.position.set( 0.0,5,0);
+
+	pgroup.add(pgroupCATR);
+	pgroup.add(pgroupPD);
+	pgroup.add(pgroupPE);
+	pgroup.add(pgroupBD);
+	pgroup.add(pgroupBE);
+
+	pgroup.scale.set(0.2,0.2,0.2);
+	pgroup.position.set(0,0,-10);
+	pgroup.position.set(0,0,-0.9);
+
+	f1[0].add(pgroup);
+
+if(home==1){
+	jrl[3]=jrl[1].clone();jrl[3].position.set(-10,0,6);scene.add(jrl[3]);
+	jrl[4]=jrl[2].clone();jrl[4].position.set(-10,0,0);scene.add(jrl[4]);
+	jrl[5]=jrl[1].clone();jrl[5].position.set(-14,0,6);scene.add(jrl[5]);
+	jrl[6]=jrl[2].clone();jrl[6].position.set(-14,0,0);scene.add(jrl[6]);
+	jrl[7]=jrl[1].clone();jrl[7].position.set(-18,0,6);scene.add(jrl[7]);
+	jrl[8]=jrl[2].clone();jrl[8].position.set(-18,0,0);scene.add(jrl[8]);
+}
+
+
+
+	altera++;
+
+}
+
+animate();
+
+var keys=[];
+
+var ang=0;
+
+window.addEventListener("keydown",function(e){
+        keys[e.keyCode]=e.keyCode;
+	//alert(e.keyCode);
+        var keysArray=getNumberArray(keys);
+	teclaA=0;teclaD=0;teclaW=0;teclaS=0;teclaG=0;teclaH=0;teclaC=0;teclaB=0;teclaV=0;setaE=0;setaD=0;setaC=0;setaB=0;teclaL=0;teclaP=0;
+	for(var i=0;i<keysArray.length;i++){
+	if(keysArray[i]==37 || keysArray[i]==76){teclaG=1;}//G Rot+
+	if(keysArray[i]==39 || keysArray[i]==82){teclaH=1;}//H Rot-
+	if(keysArray[i]==87){teclaW=1;}//W Frente
+	if(keysArray[i]==83){teclaV=1;}//V Pilot Tras
+	if(keysArray[i]==38){teclaW=1;}//W Frente
+	if(keysArray[i]==40){teclaV=1;}//V Pilot Tras
+	if(keysArray[i]==76){teclaL=1;}//L
+	if(keysArray[i]==80){teclaP=1;}//P
+	if(keysArray[i]==79){
+		if(querocontrols==0){
+			querocontrols=1;
+			const controls=new OrbitControls(camera,renderer.domElement);
+			controls.enablePan=true;
+			controls.enableDamping=true;// precisa de controls update em animate
+			controls.minDistance=1;
+			controls.maxDistance=200;
+		}
+	}//C
+	if(keysArray[i]==67){
+		//window.location.replace("http://jrlazz.eu5.org/anim/ggk_car.php");
+		window.location.replace(ur);
+		querocontrols=0;
+		OrbitControls.enabled=false;
+	}//B
+	}
+        //if(keysArray.toString()=="17,65"){document.getElementById("spanid").innerText +=" Select all!";}
+},false);
+
+window.addEventListener('keyup',function(e){
+        keys[e.keyCode]=false;
+	teclaA=0;teclaD=0;teclaW=0;teclaS=0;teclaG=0;teclaH=0;teclaC=0;teclaB=0;teclaV=0;setaE=0;setaD=0;setaC=0;setaB=0;teclaL=0;teclaP=0;
+	for(var i=0;i<getNumberArray(keys).length;i++){
+	if(getNumberArray(keys)[i]==37 || getNumberArray(keys)[i]==76){teclaG=1;}//G Rot+
+	if(getNumberArray(keys)[i]==39 || getNumberArray(keys)[i]==82){teclaH=1;}//H Rot-
+	if(getNumberArray(keys)[i]==87){teclaW=1;}//W Frente
+	if(getNumberArray(keys)[i]==83){teclaV=1;}//V Pilot Tras
+	if(getNumberArray(keys)[i]==38){teclaW=1;}//W Frente
+	if(getNumberArray(keys)[i]==40){teclaV=1;}//V Pilot Tras
+	if(getNumberArray(keys)[i]==76){teclaL=1;}//L
+	if(getNumberArray(keys)[i]==80){teclaP=1;}//P
+	if(getNumberArray(keys)[i]==79){
+		if(querocontrols==0){
+			querocontrols=1;
+			controls=new OrbitControls(camera,renderer.domElement);
+			controls.enablePan=true;
+			controls.enableDamping=true;// precisa de controls update em animate
+			controls.minDistance=1;
+			controls.maxDistance=200;
+		}
+	}//C
+	if(getNumberArray(keys)[i]==67){
+		//window.location.replace("http://jrlazz.eu5.org/anim/ggk_car.php");
+		window.location.replace(ur);
+		querocontrols=0;
+		OrbitControls.enabled=false;
+	}//B
+	}
+},false);
+
+function getNumberArray(arr){
+	var newArr = new Array();
+	for(var i=0;i<arr.length;i++){
+		if(typeof arr[i]=="number"){
+			newArr[newArr.length]=arr[i];
+		}
+	}
+	return newArr;
+}
+
+var sca=0;
+var scale=0;
+window.addEventListener('wheel',function(e){
+	scale += e.deltaY * -0.1;
+	if(scale>sca){teclaL=1;sca=scale;}
+	if(scale<sca){teclaP=1;sca=scale;}
+setTimeout(function(){teclaL=0;teclaP=0;},300);
+},false);
+
+
+var mika=0;
+
+function maluca(){
+	duration=200;
+	$({to:0}).animate({to:1}, duration, function() {
+	// do stuff after `duration` elapsed
+	if(mika==0){f1[0].rotation.z +=0.3;f1[0].position.y +=0.3;}
+	$("#spanidB").html("... Waw ! ...");mais();
+	})
+}
+
+function mais(){
+	duration=2000;
+	$({to:0}).animate({to:1},duration,function(){
+	$("#spanidB").html("... No ...");
+	//window.location.replace(ur);
+	mika=1;malucar=1;f1[0].rotation.set(0,3.14,0);f1[0].position.set(0,0.02,0);fim();
+	})
+}
+
+function fim(){
+	duration=200;
+	$({to:0}).animate({to:1},duration,function(){
+	$("#spanidB").html(" ... restarting ... reiniciando ... ");window.location.replace(ur);
+	})
+}
+
+
+</script>
+
+
+<script>
+
+function myFunction(cor){return;}
+myFunction(0);
+
+document.getElementById("spanidB").innerText="... Please do not run near borders! ... Favor n\xE3o correr perto das bordas!";
+document.getElementById("spanidC").innerText="... O for OrbitControls ... C cancel OrbitControls...";
+
+
+/*
+
+Here goes the page:
+
+http://jrlazz.eu5.org/ggk/ggk_car.php
+
+Hope You like,
+Jose Roberto Lazzareschi
+
+PS1: I am inserting the helicopter page here:
+
+http://jrlazz.eu5.org/ggk/heli_res_res.php
+
+It has an iframe showing the Steve position in the cockpit.
+This page is more simple and was done before the car version.
+
+PS2: The problem of relative module specifiers must start with "./", ".../" or "/",
+made me change js references, creating all modules in the site, with "_res_res.js".
+
+
+
+
+*/
+</script>
+
+</body>
+
+</html>

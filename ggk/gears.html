@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Gears_Lamp_Steve.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="https://threejs.org/files/favicon.ico"/>
+
+<style>
+body {margin:0;overflow:hidden;background-color:#024;}
+</style>
+
+</head>
+
+<body>
+
+<span id="spanA" style="position:absolute;left:5px;top:5px;color:#ff0;font-family:Monospace;cursor:pointer;">right click &rarr; inspect &rarr; source code</span>
+<svg id="clo" viewBox="0 0 50 50" style="position:absolute;left:25%;top:25%;width:50%;height:50%;z-index:2;display:;">
+<circle style="stroke:#fc0;stroke-width:0.5px;fill:#024" cx="20" cy="20" r="17"></circle>
+<line x1="20" y1="20" x2="20" y2="5" style="stroke-width:0.5px;stroke:#fc0;">
+<animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0,20,20" to="360,20,20" dur="5s" repeatCount="indefinite" />
+</line>
+</svg>
+
+<script type="module">
+
+	import * as THREE from '../js/three.module_res_res.js';
+	import { OrbitControls } from '../js/OrbitControls_res_res.js';
+	import { EffectComposer } from '../js/EffectComposer_res_res.js';
+	import { RenderPass } from '../js/RenderPass_res_res.js';
+	import { ShaderPass } from '../js/ShaderPass_res_res.js';
+	import { OutlinePass } from '../js/OutlinePass_res_res.js';
+	import { DDSLoader } from '../js/DDSLoader_res_res.js';
+	import { MTLLoader } from '../js/MTLLoader_res_res.js';
+	import { OBJLoader } from '../js/OBJLoader_res_res.js';
+	import { STLLoader } from '../js/STLLoader_res_res.js';
+
+var container,camera,scene,renderer,controls,Loader,textureLoader,stlLoader;
+var composer,renderPass,outlinePass;
+var manager,ambient;
+
+var w=0;
+var w1=0;
+var w2=0;
+var w3=0;
+var w4=0;
+var w5=0;
+var woo=[];
+var vel=0.01;
+
+var mouse=new THREE.Vector2();
+var raycaster=new THREE.Raycaster();
+
+var selectedObjects=[];
+var selectedObject;
+var selectedObject2=[];
+var intersects;
+
+var flame,flamebase,cup,base,matflame,matflamebase,matcup,matbase,light1,light2;
+var geoplane,texplaneA,texplaneB,matplaneA,matplaneB,planeA,planeB;
+
+var element;
+var para=0;
+var para1=0;
+var para2=0;
+
+var width=window.innerWidth;
+var height=window.innerHeight;
+
+var geotex,mattex;
+var box=[];
+var geobox=[];
+var matbox=[];
+var cyl=[];
+var geocyl,matcyl;
+var mesh=[];
+var wW=window.innerWidth;
+var wH=window.innerHeight;
+var geoger,gerA,gerB;
+var grid;
+var wmtl64,wobj64,wmtl32,wobj32,wmtl16,wobj16,wmtl08,wobj08;
+var shape,extrudeSettings,geoa,mata,center
+var altera=0;
+
+var BDs,BDi,BEs,BEi,PDs,PDi,PEs,PEi,CA,TR,mo,cox;
+var rot=[];
+var group=new THREE.Group();
+var groupCATR=new THREE.Group();
+var groupPD=new THREE.Group();
+var groupPE=new THREE.Group();
+var groupBD=new THREE.Group();
+var groupBE=new THREE.Group();
+
+var geofio,matLA,matLB,circlegeo,circle;
+
+function init(){
+
+	container=document.createElement('div');
+	document.body.appendChild(container);
+
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setSize(width,height );
+	renderer.setClearColor('#024',1);
+
+
+	document.body.appendChild(renderer.domElement);
+
+	scene=new THREE.Scene();
+
+	camera=new THREE.PerspectiveCamera(50,wW/wH,1,1000);
+	camera.position.set(0,30,160);
+
+	scene=new THREE.Scene();
+	scene.rotation.set(0,2.5,0);scene.position.set(0,5,0);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	controls.minDistance=10;
+	controls.maxDistance=300;
+	controls.enablePan=true;
+	controls.enableDamping=true;
+
+	manager=new THREE.LoadingManager();
+	manager.onStart=function(url,itemsLoaded,itemsTotal){console.log('Started loading file:'+url+'.\nLoaded '+itemsLoaded+' of '+itemsTotal + ' files.' );};
+	manager.onLoad=function(){console.log('Loading complete!');};
+	manager.onProgress=function(url,itemsLoaded,itemsTotal){console.log('loading texture'+url+' '+(itemsLoaded/itemsTotal*100)+'%');};
+	manager.onError=function(url){console.log('Error loading texture:'+url);};
+	manager.addHandler(/\.dds$/i,new DDSLoader());
+
+	ambient=new THREE.AmbientLight("#fff",0.7);
+	scene.add(ambient);
+
+	light1=new THREE.DirectionalLight(0xffffff,0.5);
+	light1.position.set(0,40,80);
+	scene.add(light1);
+
+	light2=new THREE.PointLight(0xffffff,0.2);
+	light2.position.set(0,40,-120);
+	scene.add(light2);
+
+//https://movies.stackexchange.com/questions/109569/why-is-there-a-head-of-a-native-american-man-on-the-early-test-screens
+
+	geoplane=new THREE.PlaneGeometry(80.4,60);
+	texplaneA=new THREE.TextureLoader().load('img/ushu01.jpg');
+	texplaneB=new THREE.TextureLoader().load('img/mgfzl.png');
+	matplaneA=new THREE.MeshStandardMaterial({map:texplaneA});
+	matplaneB=new THREE.MeshStandardMaterial({map:texplaneB,transparent:true,opacity:1});
+
+	planeA=new THREE.Mesh(geoplane,matplaneA);
+	planeA.position.set(0,5,75);
+	planeA.rotation.set(0,-3.14,0);
+
+	planeB=new THREE.Mesh(geoplane,matplaneB);
+	planeB.position.set(0,5,75);
+	planeB.rotation.set(0,-3.14,0);
+
+	stlLoader=new STLLoader(manager);
+
+	stlLoader.load('models/extras/filaAAAA.stl',function(geometrySTL){
+		matflame=new THREE.MeshStandardMaterial({color:0x993300,wireframe:false});
+		flame=new THREE.Mesh(geometrySTL,matflame);
+		flame.name="flame";
+	});
+
+	stlLoader.load('models/extras/lamp_cup.stl',function(geometrySTL){
+		matcup=new THREE.MeshLambertMaterial({color:0xffffff,transparent:true,opacity:0.3});
+		cup=new THREE.Mesh(geometrySTL,matcup);
+	});
+
+	stlLoader.load('models/extras/lamp_base.stl',function(geometrySTL){
+		matbase=new THREE.MeshStandardMaterial({color:0xcccccc,metalness:0.5,roughness:0.2});
+		base=new THREE.Mesh(geometrySTL,matbase);
+	});
+
+	stlLoader.load('models/extras/filaBB.stl',function(geometrySTL){
+		matflamebase=new THREE.MeshStandardMaterial({color:0x333333});
+		flamebase=new THREE.Mesh(geometrySTL,matflamebase);
+		flamebase.scale.set(0.5,0.4,0.5);
+		flamebase.position.set(0,7,0);
+	});
+
+	geobox[1]=new THREE.BoxGeometry(100,10,4);
+	matbox[1]=new THREE.MeshStandardMaterial({color:'#ccc',wireframe:false,transparent:true,opacity:0.5});
+	box[1]=new THREE.Mesh(geobox[1],matbox[1]);
+	box[1].rotation.set(0,0,0);
+	box[1].position.set(0,0,-10);
+
+	box[2]=box[1].clone();box[2].position.set(0,0,10);
+	box[21]=box[1].clone();box[21].position.set(0,0,-30);
+	box[22]=box[1].clone();box[22].position.set(0,0,-50);
+
+	geobox[2]=new THREE.BoxGeometry(50,10,4);
+	box[3]=new THREE.Mesh(geobox[2],matbox[1]);
+	box[3].scale.set(0.4,1,1);
+	box[3].rotation.set(0,0,1.57);
+	box[3].position.set(45,-15,-10);
+
+	box[31]=box[3].clone();box[31].position.set(45,-15,10);
+
+	box[32]=box[3].clone();box[32].position.set(-45,-15,-10);
+	box[33]=box[3].clone();box[33].position.set(-45,-15,10);
+
+	box[34]=box[3].clone();box[34].position.set(-45,-15,-30);
+	box[35]=box[3].clone();box[35].position.set(45,-15,-30);
+
+	box[36]=box[3].clone();box[36].position.set(-45,-15,-50);
+	box[37]=box[3].clone();box[37].position.set(45,-15,-50);
+
+	matbox[3]=new THREE.MeshStandardMaterial({color:'#936'});
+	geobox[4]=new THREE.BoxGeometry(16,16,1);
+	box[4]=new THREE.Mesh(geobox[4],matbox[3]);
+	box[4].rotation.set(1.57,0,1.57);box[4].position.set(-20,-4.5,-40);
+
+	matbox[5]=new THREE.MeshStandardMaterial({color:'#363'});
+	geobox[5]=new THREE.BoxGeometry(12,8,6);
+	box[5]=new THREE.Mesh(geobox[5],matbox[5]);
+	box[5].rotation.set(0,0,0);box[5].position.set(-20,0,-40);
+	geoger=new THREE.SphereGeometry(4,12,12);
+	gerA=new THREE.Mesh(geoger,matbox[5]);
+	gerA.position.set(-20,0,-42);
+	gerB=gerA.clone();
+	gerB.position.set(-20,0,-38);
+
+	geobox[6]=new THREE.BoxGeometry(16,16,1);
+	box[6]=new THREE.Mesh(geobox[6],matbox[3]);
+	box[6].rotation.set(1.57,0,1.57);box[6].position.set(0,4.5,-40);
+
+	geobox[7]=new THREE.BoxGeometry(10,9,0.5);
+	box[7]=new THREE.Mesh(geobox[7],matbox[1]);
+	box[7].rotation.set(0,1.57,1.57);box[7].position.set(-6,0,-23.5);
+
+	box[8]=box[7].clone();
+	box[8].position.set(-12,0,-23.5);
+
+	grid=new THREE.GridHelper(150,50,'#048','#048');
+	grid.position.set(0,-25,0);
+
+	wmtl64="models/extras/gear64a.mtl";
+	wobj64="models/extras/gear64a.obj";
+	new MTLLoader(manager).load(wmtl64,function(mat){mat.preload(manager);new OBJLoader(manager).setMaterials(mat).load(wobj64,function(object){woo[64]=object;},manager.onProgress,manager.onError);});
+	wmtl32="models/extras/gear32a.mtl";
+	wobj32="models/extras/gear32a.obj";
+	new MTLLoader(manager).load(wmtl32,function(mat){mat.preload(manager);new OBJLoader(manager).setMaterials(mat).load(wobj32,function(object){woo[32]=object;},manager.onProgress,manager.onError);});
+	wmtl16="models/extras/gear16a.mtl";
+	wobj16="models/extras/gear16a.obj";
+	new MTLLoader(manager).load(wmtl16,function(mat){mat.preload(manager);new OBJLoader(manager).setMaterials(mat).load(wobj16,function(object){woo[16]=object;},manager.onProgress,manager.onError);});
+	wmtl08="models/extras/gear08a.mtl";
+	wobj08="models/extras/gear08a.obj";
+	new MTLLoader(manager).load(wmtl08,function(mat){mat.preload(manager);new OBJLoader(manager).setMaterials(mat).load(wobj08,function(object){woo[8]=object;},manager.onProgress,manager.onError);});
+
+	mo="models/steve/partes.mtl";
+	cox="models/steve/vivicox.obj";
+	new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load('models/steve/steve_ca.obj',function(object){CA=object;},manager.onProgress,manager.onError);});
+	new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load('models/steve/steve_to.obj',function(object){TR=object;},manager.onProgress,manager.onError);});
+	new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(cox, function(object){BDs=object;},manager.onProgress,manager.onError);});
+	new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(cox, function(object){BDi=object;});});
+	new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(cox, function(object){BEs=object;});});
+	new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(cox, function(object){BEi=object;});});
+	new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(cox, function(object){PDs=object;});});
+	new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(cox, function(object){PDi=object;});});
+	new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(cox, function(object){PEs=object;});});
+	new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(cox, function(object){PEi=object;});});
+
+	geocyl=new THREE.CylinderGeometry(1,1,32,32);
+	matcyl=new THREE.MeshStandardMaterial({color:'#999',wireframe:false,metalness:0.5,roughness:0.2});
+	cyl[1]=new THREE.Mesh(geocyl,matcyl);
+	cyl[1].position.set(0,0,0);
+	cyl[1].rotation.set(1.57,0,0);
+
+	geocyl=new THREE.CylinderGeometry(5.5,5.5,1,32,32);
+	matcyl=new THREE.MeshStandardMaterial({color:'#999',wireframe:false,metalness:0.5,roughness:0.2});
+	cyl[5]=new THREE.Mesh(geocyl,matcyl);
+	cyl[5].position.set(0,0,0);
+	cyl[5].rotation.set(0,0,0);
+	cyl[2]=cyl[5].clone();
+
+	shape=new THREE.Shape();
+
+	shape.moveTo( 0.5,0);
+	shape.lineTo( 1,0.2);
+	shape.lineTo( 0.8,1.4);
+	shape.lineTo( 1.1,2.5);
+	shape.lineTo( 1.5,3.5);
+	shape.lineTo( 2.5,3.5);
+	shape.lineTo( 2.9,2.5);
+	shape.lineTo( 3.3,1.4);
+	shape.lineTo( 3,0.2);
+	shape.lineTo( 3.5,0);
+	shape.lineTo( 0.5,0);
+
+	matbox[2]=new THREE.MeshStandardMaterial({color:0xff0000,metalness:0.5,roughness:0.1});
+	geobox[3]=new THREE.BoxGeometry(10,10,2);
+	box[10]=new THREE.Mesh(geobox[3],matbox[2]);
+
+	extrudeSettings={steps:1,depth:4,bevelEnabled:false,bevelThickness:0,bevelSize:0,bevelOffset:0,bevelSegments:0};
+	geoa=new THREE.ExtrudeGeometry(shape,extrudeSettings);
+	mata=new THREE.MeshStandardMaterial({color:0xff0000,metalness:0.5,roughness:0.1});
+	mesh[1]=new THREE.Mesh(geoa,mata);
+	center=new THREE.Vector3();
+	mesh[1].geometry.computeBoundingBox();
+	mesh[1].geometry.boundingBox.getCenter(center);
+	mesh[1].geometry.center();
+	mesh[1].position.copy(center);
+	mesh[1].rotation.set(0,1.57,0);
+
+	mesh[1].scale.set(0.4,0.5,0.25);
+	mesh[1].position.set(5,1,0);
+	mesh[2]=mesh[1].clone();
+	mesh[2].position.set(-5,1,0);
+
+	cyl[5].add(mesh[1]);
+	cyl[5].add(mesh[2]);
+
+	cyl[6]=cyl[5].clone();
+	cyl[6].rotation.set(0,Math.PI/2,0);
+
+	cyl[7]=cyl[2].clone();
+	cyl[7].add(cyl[5]);
+	cyl[7].add(cyl[6]);
+
+	cyl[8]=cyl[7].clone();
+	cyl[8].rotation.set(0,Math.PI/4,0);
+
+	cyl[9]=cyl[2].clone();
+	cyl[9].add(cyl[7]);
+	cyl[9].add(cyl[8]);
+
+	cyl[10]=cyl[9].clone();
+	cyl[10].rotation.set(0,Math.PI/8,0);
+
+	cyl[11]=cyl[2].clone();
+	cyl[11].add(cyl[9]);
+	cyl[11].add(cyl[10]);
+
+	cyl[11].rotation.set(Math.PI/8,0,Math.PI/2);
+	cyl[11].position.set(-8.2,0,-21);
+
+	geofio=new THREE.CylinderGeometry(0.2,0.2,8,8);
+	matLA=new THREE.MeshBasicMaterial({color:0xcccccc});
+	matLB=new THREE.MeshBasicMaterial({color:0xff0000});
+
+	cyl[30]=new THREE.Mesh(geofio,matLA);
+	cyl[30].position.set(-17.5,3,-41);
+	cyl[31]=new THREE.Mesh(geofio,matLB);
+	cyl[31].position.set(-17.5,3,-39);
+
+	cyl[32]=cyl[30].clone();
+	cyl[32].scale.set(1,2.04,1);
+	cyl[32].rotation.set(0,0,1.57);
+	cyl[32].position.set(-9.5,7,-41);
+
+	cyl[33]=cyl[31].clone();
+	cyl[33].scale.set(1,2.04,1);
+	cyl[33].rotation.set(0,0,1.57);
+	cyl[33].position.set(-9.5,7,-39);
+
+	cyl[34]=new THREE.Mesh(geofio,matLA);
+	cyl[34].scale.set(1,4,1);
+	cyl[34].position.set(-11,-9.2,-41);
+
+	cyl[35]=new THREE.Mesh(geofio,matLB);
+	cyl[35].scale.set(1,4,1);
+	cyl[35].position.set(-9,-9.2,-39);
+
+	cyl[36]=cyl[30].clone();
+	cyl[36].scale.set(1,14.5,1);
+	cyl[36].rotation.set(1.57,0,0);
+	cyl[36].position.set(-11,-25,17);
+
+	cyl[37]=cyl[31].clone();
+	cyl[37].scale.set(1,14.2,1);
+	cyl[37].rotation.set(1.57,0,0);
+	cyl[37].position.set(-9,-25,18);
+
+	circlegeo=new THREE.CircleGeometry(2.6,32);
+	circle=new THREE.Mesh(circlegeo,matcyl);
+	circle.rotation.set(-1.57,0,0);
+
+	composer=new EffectComposer(renderer);
+	renderPass=new RenderPass(scene,camera );
+	composer.addPass(renderPass);
+	outlinePass=new OutlinePass(new THREE.Vector2(window.innerWidth,window.innerHeight),scene,camera);
+	composer.addPass(outlinePass);
+
+	window.addEventListener('resize',onWindowResize);
+
+// init() end
+}
+
+function onWindowResize(){
+	width=window.innerWidth;
+	height=window.innerHeight;
+	camera.aspect=width/height;
+	camera.updateProjectionMatrix();
+	renderer.setSize(width,height);
+	composer.setSize(width,height);
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	controls.update();
+	composer.render();
+
+// Lamp
+	w++;
+	if(w==200){
+		cup.scale.set(0.8,0.8,0.8);
+		cup.position.set(-11,5,4);
+			base.scale.set(0.8,0.8,0.8);
+			base.position.set(-11,0,4);
+			base.add(flamebase);
+		selectedObject2.push(flame);
+		outlinePass.selectedObjects=selectedObject2;
+	}
+
+	if(w>200 && para==0){
+		flame.scale.set(0.30,0.3,0.30);
+		cup.position.set(0,13,-40);
+		flame.position.set(cup.position.x,cup.position.y-1.2,cup.position.z+0.0);
+		base.position.set(cup.position.x,cup.position.y-6.5,cup.position.z);
+		circle.position.set(base.position.x,base.position.y+1,base.position.z);
+		scene.add(cup);scene.add(base);scene.add(flame);scene.add(circle);
+		scene.add(cyl[30]);scene.add(cyl[31]);
+		scene.add(cyl[32]);scene.add(cyl[33]);
+		scene.add(cyl[34]);scene.add(cyl[35]);
+		scene.add(cyl[36]);scene.add(cyl[37]);
+		para=1;
+	}
+	w1++;
+		if(w1>120 && w1<123){outlinePass.edgeStrength +=5.0;outlinePass.edgeGlow +=1.5;}
+		if(w1>123){outlinePass.edgeStrength -=5.0;outlinePass.edgeGlow -=1.5;}
+		if(w1>126){w1=120;outlinePass.edgeStrength=0;outlinePass.edgeGlow=0;}
+	w2++;
+		if(w2>120 && w2<160){outlinePass.visibleEdgeColor.set(0xff0000);}
+		if(w2>160){outlinePass.visibleEdgeColor.set(0xffcc00);}
+		if(w2>200){w2=121;}
+	w3++;
+		if(w3>800){
+			w3=0;light1.intensity=.1;
+			cup.position.set(0,13,-40);
+			flame.position.set(cup.position.x,cup.position.y-1.2,cup.position.z+0.0);
+			base.position.set(cup.position.x,cup.position.y-6.5,cup.position.z);
+			circle.position.set(base.position.x,base.position.y+1,base.position.z);
+		}
+
+// Gears
+	w4++;
+
+	if(w4>100 && para1==0){
+		vel=0.01;
+		woo[64].position.set(28.6,0,0);
+		woo[64].scale.set(2,2,2);
+		woo[64].rotation.z=0.05;
+
+		woo[32].position.set(-0.2,0,0);
+		woo[32].scale.set(2,2,2);
+		woo[32].rotation.z=0.2;
+
+		woo[16].position.set(-14,0,-16);
+		woo[16].scale.set(2,2,2);
+		woo[16].rotation.z=0.2;
+
+		woo[116]=woo[16].clone();
+		woo[116].position.set(-14,0,0);
+		woo[116].scale.set(2,2,2);
+		woo[116].rotation.z=0.2;
+
+		woo[8].position.set(-20.4,-0.2,0);
+		woo[8].scale.set(2,2,2);
+		woo[8].rotation.z=0.1;
+
+		cyl[2]=cyl[1].clone();
+		cyl[2].position.set(28.6,0,0);
+
+		cyl[3]=cyl[1].clone();//16
+			cyl[3].position.set(-14,0,-8);
+			cyl[3].scale.set(1,1.5,1);
+
+		cyl[4]=cyl[1].clone();
+		cyl[4].position.set(-20.4,-0.2,-18);
+		cyl[4].scale.set(1,2.14,1);
+
+		cyl[20]=cyl[1].clone();
+		cyl[20].material.color.set(0x999900);
+		cyl[20].scale.set(0.3,0.21,0.3);
+		cyl[20].rotation.set(0,0,Math.PI/2);
+		cyl[20].position.set(-9,0,-21);
+
+		para1=1;
+	}
+	if(w4>200){
+		if(woo[64] && woo[32] && woo[16] && woo[116] && woo[8] && cyl[11]){
+			scene.add(cyl[1]);
+			scene.add(box[2]);
+			scene.add(box[21]);
+			scene.add(box[22]);
+			scene.add(box[1]);
+			scene.add(box[3]);
+			scene.add(box[31]);
+			scene.add(box[32]);
+			scene.add(box[33]);
+			scene.add(box[34]);
+			scene.add(box[35]);
+			scene.add(box[36]);
+			scene.add(box[37]);
+			scene.add(box[4]);
+			scene.add(box[5]);
+			scene.add(gerA);
+			scene.add(gerB);
+			scene.add(box[6]);
+			scene.add(box[7]);
+			scene.add(box[8]);
+			scene.add(grid);
+
+			scene.add(woo[64]);
+			scene.add(woo[32]);
+			scene.add(woo[16]);
+			scene.add(woo[116]);
+			scene.add(woo[8]);
+			scene.add(cyl[2]);
+			scene.add(cyl[3]);
+			scene.add(cyl[4]);
+
+			scene.add(cyl[11]);
+			scene.add(cyl[20]);
+
+			woo[64].rotation.z -=vel;
+			woo[32].rotation.z +=vel*2;
+			woo[16].rotation.z -=vel*4;
+			woo[116].rotation.z -=vel*4;
+			woo[8].rotation.z +=vel*8;
+			cyl[11].rotation.x +=vel*4;
+
+			scene.add(planeA);scene.add(planeB);
+			scene.add(group);
+
+			element=document.getElementById("clo");
+			if(element){element.remove();}
+		}
+	}
+	w5++;
+
+	if(w5>300 && w5<500){planeB.material.opacity -=0.005;}
+
+	if(w5>1200 && w5<1400){planeB.material.opacity +=0.005;}
+
+	if(w5>1400){w5=0;}
+
+// Steve
+	if(altera==0){setTimeout(function(){alterando();},800);}
+	if(altera>0){
+		if(groupPD.rotation.x> 1.07){rot[1]=1;PEi.rotation.x=0;}
+		if(groupPD.rotation.x<-1.07){rot[1]=0;PDi.rotation.x=0;}
+		//if(CA && TR && BDi && BEi && PDi && PEi){
+			if(rot[1]==0){
+				group.rotation.z +=0.01;
+				groupPD.rotation.x +=0.1;
+				groupPE.rotation.x -=0.1;
+				groupBD.rotation.x -=0.1;
+				groupBE.rotation.x +=0.1;
+					CA.rotation.y -=0.025;
+					TR.rotation.x +=0.01;
+						BDi.rotation.x -=0.025;
+						BEi.rotation.x +=0.025;
+						PDi.rotation.x +=0.01;
+						PEi.rotation.x -=0.01;
+
+			}else{
+				group.rotation.z -=0.01;
+				groupPD.rotation.x -=0.1;
+				groupPE.rotation.x +=0.1;
+				groupBD.rotation.x +=0.1;
+				groupBE.rotation.x -=0.1;
+					CA.rotation.y +=0.025;
+					TR.rotation.x -=0.01;
+						BDi.rotation.x +=0.025;
+						BEi.rotation.x -=0.025;
+					PDi.rotation.x -=0.01;
+					PEi.rotation.x +=0.01;
+			}
+		//}
+	}
+}
+
+function alterando(){
+	CA.position.set(0,2.1,0); // steve_ca
+	TR.position.set(0,2  ,0); // steve_to
+	BDs.position.set(-1.75,1  ,0); // steve_bd
+	BDi.position.set(-1.75,-0.5,0); // steve_bd
+	BEs.position.set( 1.75,   1,0); // steve_be
+	BEi.position.set( 1.75,-0.5,0); // steve_be
+	PDs.position.set(0.025,   0,0); // vivicox
+	PDi.position.set(0.125,-1.5,0); // vivicox
+	PEs.position.set(0.56, 0,0); // vivicox
+	PEi.position.set(0.56,-1.5,0); // vivicox
+	BDs.scale.y=0.5;
+	BEs.scale.y=0.5;
+	BDi.scale.set(1,0.75,1);
+	BEi.scale.set(1,0.75,1);
+	PDs.scale.y=0.5;
+	PEs.scale.y=0.5;
+	PDi.scale.set(0.8,0.8,0.8);
+	PEi.scale.set(0.8,0.8,0.8);
+	groupCATR.add(CA);groupCATR.add(TR);
+	groupPD.add(PDs);groupPD.add(PDi);
+	groupPE.add(PEs);groupPE.add(PEi);
+	groupBD.add(BDs);groupBD.add(BDi);
+	groupBE.add(BEs);groupBE.add(BEi);
+	group.add(groupCATR);
+	group.add(groupPD);
+	group.add(groupPE);
+	group.add(groupBD);
+	group.add(groupBE);
+	group.scale.set(2,2,2);
+	groupCATR.position.set( 0,4,0);
+	groupPD.position.set(-0.6,3,0);
+	groupPE.position.set( 0.0,3,0);
+	groupBD.position.set( 0.0,5,0);
+	groupBE.position.set( 0.0,5,0);
+	group.rotation.y=4.74;
+	group.position.set(28,21,0);
+
+	altera++;
+}
+
+init();
+
+animate();
+
+
+/*
+
+View of Steve s electricity generation lab, or GEARSneration
+
+Hi Three.js followers,
+
+Postprocessing only the filament, without intersection.
+
+the link:
+
+http://jrlazz.eu5.org/ggk/gears.html
+
+Again, Thanks for the great Three.js Team!
+
+Jose Roberto Lazzareschi
+
+*/
+
+</script>
+
+</body>
+
+</html>

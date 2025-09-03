@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>woody.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="../three.js.ico">
+<style>
+@font-face {font-family:tipo;src:url('../fonte/MysteryQuest-Regular.ttf');}
+</style>
+</head>
+
+<body style="overflow:hidden;margin:0px;background-color:#04185f;">
+
+<span id="spanA" style="position:absolute;left:5px;top:5px;color:#fc3;display:none;">... click right to inspect ... </span>
+<div id="divC" style="position:absolute;left:-100px;top:20px;display:;">X</div>
+<div onclick="XparaY();" id="divA" style="position:absolute;left:45%;top:30%;width:100px;font-family:tipo;font-size:16pt;font-weight:bold;color:#f00;text-align:center;"></div>
+<div onclick="XparaY();" id="divB" style="position:absolute;left:45%;top:30%;width:100px;font-family:tipo;font-size:16pt;font-weight:bold;color:#0ff;text-align:center;"></div>
+
+<script type="module">
+
+import * as THREE from '../js/three.module_res_res.js';
+import { DDSLoader } from '../js/DDSLoader_res_res.js';
+import { MTLLoader } from '../js/MTLLoader_res_res.js';
+import { OBJLoader } from '../js/OBJLoader_res_res.js';
+import { STLLoader } from '../js/STLLoader_res_res.js';
+import { FontLoader} from '../js/FontLoader_res_res.js';
+import { TextGeometry } from '../js/TextGeometry_res_res.js';
+import { OrbitControls } from '../js/OrbitControls_res_res.js';
+
+THREE.Cache.enabled=true;
+
+var container,manager,objLoader,stlLoader,hex;
+
+var camera,scene,renderer,controls;
+
+var materialSTL,geometrySTL;
+
+var TM1,TM2,TM3;
+
+var altera=0;
+var woo;
+var k=0;
+var w=0;
+var cylinderG;
+
+var cube1,cube2,cube3,cube4,cube5;
+
+var cyli1,cyli2,cyli3,cyli4,cyli5;
+
+var groupW=new THREE.Group();
+var groupG=new THREE.Group();
+
+var TX1=new THREE.Group();
+var TX2=new THREE.Group();
+var TX3=new THREE.Group();
+
+var ES1=new THREE.Group();//ESFERA
+var ES2=new THREE.Group();
+var ES3=new THREE.Group();
+
+var BB1=new THREE.Group();//BALL BEARING
+var BB2=new THREE.Group();
+var BB3=new THREE.Group();
+
+var FRE=new THREE.Group();
+var TRA=new THREE.Group();
+
+var WO=new THREE.Group();
+
+var BDs,BDi,BEs,BEi,PDs,PDi,PEs,PEi,TR,TRC,CI,MA,MB;
+
+var groupTR=new THREE.Group();
+var groupCI=new THREE.Group();
+var groupPD=new THREE.Group();
+var groupPE=new THREE.Group();
+var groupBD=new THREE.Group();
+var groupBE=new THREE.Group();
+var group=new THREE.Group();
+var CA=new THREE.Group();
+
+
+var clock=new THREE.Clock();
+var speed=3; //units a second
+var delta=0;
+var passo=0.05;
+
+var larray=new Array();
+	larray[1]="D";
+	larray[2]="o";
+	larray[3]="w";
+	larray[4]="n";
+	larray[5]="l";
+	larray[6]="o";
+	larray[7]="a";
+	larray[8]="d";
+	larray[9]="i";
+	larray[10]="n";
+	larray[11]="g";
+
+let text="\x61",bevelEnabled=true,font=undefined;
+const height=10,size=50,hover=30,curveSegments=12,bevelThickness=2,bevelSize=1.5;
+
+	container=document.createElement('div');
+	document.body.appendChild(container);
+
+	// CAMERA
+	camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,1,1500);
+	camera.position.set(-60,20,160);
+
+	// SCENE
+	scene=new THREE.Scene();
+
+	var backLoader=new THREE.TextureLoader();
+	backLoader.load('models/sky_cores_5.jpg',function(textureZ){
+	textureZ.mapping=THREE.EquirectangularReflectionMapping;
+	scene.background=textureZ;  
+	});
+
+	// LIGHTS
+	const ambientLight=new THREE.AmbientLight("#fff",0.3);
+	ambientLight.position.set(30,30,30);
+	scene.add(ambientLight);
+
+	const dirLight=new THREE.DirectionalLight('#fcc',1);
+	dirLight.position.set(-30,60,120).normalize();
+	scene.add(dirLight);
+
+	const dirLight2=new THREE.DirectionalLight('#fcc',0.5);
+	dirLight2.position.set(0,0,-120).normalize();
+	scene.add(dirLight2);
+
+	// RENDERER
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	container.appendChild(renderer.domElement);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	controls.minDistance=10;
+	controls.maxDistance=600;
+	controls.enablePan=true;
+	controls.enableZoom=true;
+	controls.enableRotate=true;
+
+	manager=new THREE.LoadingManager();
+	manager.onStart=function(url,itemsLoaded,itemsTotal){console.log('Started loading file:'+url+'.\nLoaded '+itemsLoaded+' of '+itemsTotal + ' files.' );};
+	manager.onLoad=function(){console.log('Loading complete!');};
+	manager.onProgress=function(url,itemsLoaded,itemsTotal){console.log('loading texture'+url+' '+(itemsLoaded/itemsTotal*100)+'%');};
+	manager.onError=function(url){console.log('Error loading texture:'+url);};
+	manager.addHandler(/\.dds$/i,new DDSLoader());
+
+
+const geometry=new THREE.SphereGeometry(3.1,16,16);
+const material=new THREE.MeshStandardMaterial({color:0x999999,metalness:.5,roughness:0.2});
+const sphere=new THREE.Mesh(geometry,material);
+sphere.position.set(8,0,0);
+sphere.scale.set(1,1,1);
+scene.add(sphere);
+
+const sphereA=sphere.clone();sphereA.position.set(4,6.5,0);
+const sphereB=sphere.clone();sphereB.position.set(4,-6.5,0);
+const sphereC=sphere.clone();sphereC.position.set(-4,6.5,0);
+const sphereD=sphere.clone();sphereD.position.set(-4,-6.5,0);
+const sphereE=sphere.clone();sphereE.position.set(-8,0,0);
+
+ES1.add(sphere);
+ES1.add(sphereA);
+ES1.add(sphereB);
+ES1.add(sphereC);
+ES1.add(sphereD);
+ES1.add(sphereE);
+ES1.scale.set(0.5,0.5,0.5);
+ES1.rotation.set(0,-1.57,0);
+
+ES2=ES1.clone();
+ES2.scale.set(0.5,0.5,0.5);
+
+	var materials=[new THREE.MeshStandardMaterial({color:0x999999,flatShading:true,metalness:1,roughness:0}),new THREE.MeshStandardMaterial({color:0x666666,flatShading:true,metalness:0.5,roughness:0.3})];
+	var materials3=[new THREE.MeshStandardMaterial({color:0xff0000,flatShading:true}),new THREE.MeshStandardMaterial({color:0xffffff,flatShading:true})];
+	var fontLoader=new FontLoader();
+	fontLoader.load('../fonte/GGK3404.json',function(response){
+	font=response;
+	createText();
+	});
+
+function createText(){
+	var textGeo=new TextGeometry(text,{font:font,size:size,
+	height:height,
+	curveSegments:curveSegments,bevelThickness:bevelThickness,
+	bevelSize:bevelSize,
+	bevelEnabled:bevelEnabled});
+        textGeo.center();
+	TM1=new THREE.Mesh(textGeo,materials);
+	TM1.position.set(0,0,0);
+	TM1.rotation.set(0,1.57,0);
+	TM1.scale.set(0.25,0.25,0.25);
+
+	var textGeo2=new TextGeometry(text,{font:font,size:size,
+	height:20,
+	curveSegments:curveSegments,bevelThickness:bevelThickness,
+	bevelSize:4,
+	bevelEnabled:bevelEnabled});
+        textGeo2.center();
+	TM2=new THREE.Mesh(textGeo2,materials);
+	TM2.position.set(0,0,0);
+	TM2.rotation.set(0,1.57,0);
+	TM2.scale.set(0.1,0.1,0.1);
+
+	var textGeo3=new TextGeometry("GGK 3404",{font:font,size:size,
+	height:20,
+	curveSegments:curveSegments,bevelThickness:bevelThickness,
+	bevelSize:4,
+	bevelEnabled:bevelEnabled});
+        textGeo3.center();
+	TM3=new THREE.Mesh(textGeo3,materials3);
+	TM3.position.set(0,0,-64.5);
+	TM3.rotation.set(0,3.14,0);
+	TM3.scale.set(0.06,0.06,0.06);
+}
+
+	//MTL
+	var wmtl="models/extras/woody3.mtl";
+	var wobj="models/extras/woody3.obj";
+	new MTLLoader(manager).load(wmtl,function(mat){mat.preload(manager);new OBJLoader(manager).setMaterials(mat).load(wobj,function(object){woo=object;},manager.onProgress,manager.onError);});
+
+	//STL
+	stlLoader=new STLLoader(manager);
+	var cor='#09c';
+
+	stlLoader.load('models/extras/stl_ci.stl',function(geometrySTL){
+		materialSTL=new THREE.MeshLambertMaterial();
+		CI=new THREE.Mesh(geometrySTL,materialSTL);
+		CI.material.color.set(cor);
+		CI.rotation.set(-1.57,0,0);
+	});
+
+	stlLoader.load('models/extras/stl_trB.stl',function(geometrySTL){
+		TR=new THREE.Mesh(geometrySTL,materialSTL);
+		TR.material.color.set('#f00');
+		TR.rotation.set(-1.57,0,0);
+	});
+
+	stlLoader.load('models/extras/stl_bds.stl',function(geometrySTLds){
+		BDs=new THREE.Mesh(geometrySTLds,materialSTL);
+		BDs.material.color.set(cor);
+		BDs.rotation.set(-1.57,0,0);
+		BEs=BDs.clone();
+		PDs=BDs.clone();
+		PEs=BDs.clone();
+	});
+
+	stlLoader.load('models/extras/stl_bdi.stl',function(geometrySTLbdi){
+		var materialSTLbdi=new THREE.MeshPhongMaterial();
+		BDi=new THREE.Mesh(geometrySTLbdi,materialSTLbdi);
+		BDi.material.color.set('#f00');
+		BDi.rotation.set(-1.57,0,0);
+		BEi=BDi.clone();
+		PDi=BDi.clone();
+		PEi=BDi.clone();
+	});
+
+	stlLoader.load('models/extras/stl_ca3.stl',function(geometrySTLma){
+		var materialSTLma=new THREE.MeshLambertMaterial();
+		MA=new THREE.Mesh(geometrySTLma,materialSTLma);
+		MA.material.color.set(cor);
+		MA.rotation.set(-1.57,0,0);
+	});
+
+	stlLoader.load('models/extras/stl_ca2.stl',function(geometrySTLmb){
+		var materialSTLmb=new THREE.MeshPhongMaterial();
+		MB=new THREE.Mesh(geometrySTLmb,materialSTLmb);
+		MB.material.color.set('#aaa');
+		MB.rotation.set(-1.57,0,0);
+	});
+
+const texture=new THREE.TextureLoader().load('models/extras/woody3c.jpg');
+const geometryC=new THREE.CylinderGeometry(2,2,55,16,16);
+const materialC=new THREE.MeshStandardMaterial({color:'#feb',map:texture,metalness:0.4,roughness:0.4});
+cyli1=new THREE.Mesh(geometryC,materialC);
+cyli1.position.set(0,-0,0);
+cyli1.rotation.set(0,0,1.57);
+//scene.add( cylinder );
+
+const geometryC2=new THREE.CylinderGeometry(2,2,90,16,16);
+cyli2 = new THREE.Mesh( geometryC2,materialC);
+cyli2.position.set(0,0,0);
+cyli2.rotation.set(0,0,1.57);
+
+const geometryC3=new THREE.CylinderGeometry(2,2,20,16,16);
+cyli3=new THREE.Mesh( geometryC3,materialC);
+cyli3.position.set(0,-10,0);
+cyli3.rotation.set(0,0,1.57);
+
+const geometryC4=new THREE.CylinderGeometry(1,1,10,16,16);
+const materialC4=new THREE.MeshStandardMaterial({color:'#fff',metalness:0.5,roughness:0.1});
+cyli4=new THREE.Mesh(geometryC4,materialC4);
+cyli4.position.set(0,2.5,0);
+cyli4.rotation.set(0,1.57,0);
+
+const geometryC5=new THREE.CylinderGeometry(1,1,20,16,16);
+const materialC5=new THREE.MeshStandardMaterial({color:'#fff',metalness:0.7,roughness:0.1});
+cyli5=new THREE.Mesh(geometryC4,materialC4);
+cyli5.position.set(-22,0,40);
+cyli5.rotation.set(0,0,1.57);
+cyli5.scale.set(0.5,0.5,0.5);
+
+const geometryK=new THREE.BoxGeometry(1,1,1);
+const materialK=new THREE.MeshStandardMaterial({color:'#feb',map:texture,metalness:0.4,roughness:0.4});
+cube1=new THREE.Mesh(geometryK,materialK);
+cube1.position.set(0,0,0);
+
+const textureG=new THREE.TextureLoader().load('img/terraR.jpg');
+textureG.wrapS=THREE.RepeatWrapping;textureG.wrapT=THREE.RepeatWrapping;
+textureG.repeat.set(20,1);
+const geometryG=new THREE.CylinderGeometry(500,500,128,128,8,0);
+const materialG=new THREE.MeshStandardMaterial({color:'#666',map:textureG,roughness:1});
+cylinderG=new THREE.Mesh(geometryG,materialG);
+cylinderG.position.set(0,0,0);
+cylinderG.rotation.set(0,0,1.57);
+groupG.add(cylinderG);
+groupG.position.set(0,-510,0);
+
+function animate(){
+	requestAnimationFrame(animate);
+	delta=clock.getDelta();
+	passo=speed*delta;
+	//document.getElementById("spanA").innerText=passo;
+	render();
+}
+function render(){
+	renderer.render(scene,camera);
+	if(altera==0){alterando();}
+
+	ES1.rotation.z -=(passo*1.5);
+	ES2.rotation.z -=(passo*1.5);
+	ES3.rotation.z -=(passo*1.5);
+
+	groupG.rotation.x -=(passo/25);
+
+	w++;
+
+	if(w>150 && w<200){PDi.rotation.x +=passo;PDi.rotation.y -=(passo/4);}
+	if(w>180){MB.material.color.set('#f00');}
+	if(w>200){w=150;PDi.rotation.x=-3.7;PDi.rotation.y=0;MB.material.color.set('#aaa');}//STL
+
+}
+
+function alterando(){
+
+//alert("... just click !!! ...\n ... I have always to put this ALERT for things work!!! ...");
+
+const myTimeout=setTimeout(segue,6000);
+
+function segue(){
+
+	woo.rotation.set(1.57,0,-1.57);
+	woo.position.set(0,0,0);
+
+	TX1.add(TM1);
+	TX1.add(TM2);
+
+	TX2=TX1.clone();
+
+	scene.add(TX1);
+	scene.add(TX2);
+
+	// rolamento direito
+	BB1.add(TX1);
+	BB1.add(ES1);
+	BB1.position.set(25,-5,0);
+
+	BB2.add(TX2);
+	BB2.add(ES2);
+	BB2.position.set(0,-10,0);
+
+	ES3=ES1.clone();
+	ES3=ES1.clone();
+
+	TX3=TX1.clone();
+
+	// rolamento esquerdo
+	BB3.add(ES3);
+	BB3.add(TX3);
+	BB3.position.set(-25,-5,0);
+
+	cube1.scale.set(44,4,10);
+	cube1.position.set(0,-4,0);
+
+	cyli1.scale.set(1,1,1);
+	cyli1.position.set(0,-5,0);
+
+	TRA.add(BB1);
+	TRA.add(BB3);
+	TRA.add(cube1);
+	TRA.add(cyli1);
+	TRA.position.set(0,0,-50);
+
+	WO.add(woo);
+	WO.add(TRA);
+	WO.rotation.x=-0.06;
+	WO.position.y=2;
+	scene.add(WO);
+
+	scene.add(groupG);
+
+	cube2=cube1.clone();
+	cube3=cube1.clone();
+	cube4=cube1.clone();
+	cube5=cube1.clone();
+
+	cube2.position.set(0,0,0);
+	cube2.scale.set(60,4,10);
+
+	cube3.position.set(-10,-6,0);
+	cube3.scale.set(4,12,10);
+
+	cube4.position.set(10,-6,0);
+	cube4.scale.set(4,12,10);
+
+	cube5.position.set(-22,0,40);
+	cube5.scale.set(4,4,35);
+	cube5.rotation.set(-0.6,0,0);
+
+	FRE.add(BB2);
+	FRE.add(cube2);
+	FRE.add(cube3);
+	FRE.add(cube4);
+	FRE.add(cyli2);
+	FRE.add(cyli3);
+	FRE.add(cyli4);
+	FRE.rotation.set(-0.06,0,0);
+	FRE.position.set(0,-4.5,80);
+
+	WO.add(woo);
+	WO.add(TRA);
+	WO.add(FRE);
+	WO.add(cube5);
+	WO.add(cyli5);
+	WO.add(TM3);
+	WO.rotation.x=-0.04;
+	WO.position.y=1;
+	scene.add(WO);
+
+	scene.add(TR);
+
+// Squeleton
+
+	CA.add(MA);
+	CA.add(MB);
+	CA.position.set(0,-1,0);
+
+	TR.position.set(0,-1,0);
+
+	BDs.position.set(0, 0,0);
+
+	BDi.position.set(0,-4,0);
+	BEs.position.set(0,0,0);
+	BEi.position.set(0,-4,0);
+
+	PDs.position.set(0,0,0);
+	PDi.position.set(0,-4,0);
+	PEs.position.set(0,0,0);
+	PEi.position.set(0,-4,0);
+
+	PDi.rotation.x=-1.6;
+
+	PEi.rotation.z=-1.3;
+	PEi.rotation.x=-1;
+	PEi.rotation.y=1.5;
+
+	groupBD.add(BDs);groupBD.add(BDi);groupBD.position.set(-4,0,0);
+	groupBE.add(BEs);groupBE.add(BEi);groupBE.position.set(4,0,0);
+
+	groupPD.add(PDs);groupPD.add(PDi);groupPD.position.set(-3,-2,0);
+	groupPE.add(PEs);groupPE.add(PEi);groupPE.position.set(3,-2,0);
+
+	groupCI.add(CI);groupCI.add(groupPD);groupCI.add(groupPE);
+	groupCI.position.set(0,-8,0);
+
+	groupTR.add(TR);groupTR.add(CA);groupTR.add(groupBD);groupTR.add(groupBE);
+
+	group.add(groupTR);group.add(groupCI);
+	scene.add(group);
+	group.position.set(0,30,60);
+	group.rotation.set(1.2,0,0);
+	group.scale.set(5,5,5);
+
+	groupBD.rotation.set(-1.8,0,-0.5);
+	groupBE.rotation.set(-1.8,0,0.5);
+
+	groupPD.rotation.set(1.7,0,-0.7);
+	groupPE.rotation.set(1.3,0,0);
+
+	CA.rotation.set(-1.2,-0.5,0);
+
+	groupCI.rotation.set(-1,0,0);
+
+	PDi.rotation.x=-3.7;
+
+	document.getElementById("divC").innerHTML="Y";
+	document.getElementById("spanA").style.display="";
+
+}
+	altera++;
+}
+
+animate();
+
+/*
+
+Driving a Childhood car. Made with wood and ball bearings.
+Using FontLoader to make the bearings.
+Here is the page:
+
+José Roberto Lazzareschi
+
+PS: carrinho de rolimã infantil
+
+*/
+
+var posleft=window.innerWidth*0.45;
+var postop=window.innerHeight*0.30;
+
+var elementA=document.getElementById("divA");
+var elementB=document.getElementById("divB");
+
+elementA.style.left=2+posleft+"px";
+elementA.style.top=2+postop +"px";
+
+elementB.style.left=posleft+"px";
+elementB.style.top=postop +"px";
+
+var co=0;
+var str="";
+var myInterval=setInterval(pupa,100);
+
+function pupa(){
+	co++;
+	str=str+larray[co]+"<br>";
+	elementA.innerHTML=str;
+	elementB.innerHTML=str;
+	if(co>11){co=0;str="";elementA.innerHTML=str;elementB.innerHTML=str;}
+	if(document.getElementById("divC").innerHTML=="Y"){clearInterval(myInterval);elementA.style.display="none";elementB.style.display="none";}
+}
+
+</script>
+</body>
+</html>
