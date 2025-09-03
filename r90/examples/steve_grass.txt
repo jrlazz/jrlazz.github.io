@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>steve_grass_2.html</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<link rel="shortcut icon" href="ok.ico"/>
+<style>
+@font-face {font-family:tipo;src:url('fonts/MysteryQuest-Regular.ttf');}
+body {font-family:Monospace;background-color:#024;color:#fff;margin:0px;overflow:hidden;}
+#info {color:#fff;position:absolute;top:10px;width:100%;text-align:center;z-index:2;display:block;}
+#info a, .button {color:#0ff;font-size:12pt;font-weight:bold;text-decoration:underline;cursor: pointer}
+</style>
+
+<div id="info"><a href="steve_grass_2.txt" target="_blank" rel="noopener">The Code</a>&nbsp;... steve_grass_2.html</div>
+
+<script src="../build/three.min.js"></script>
+<script src="js/loaders/DDSLoader.js"></script>
+<script src="js/loaders/MTLLoader.js"></script>
+<script src="js/loaders/OBJLoader.js"></script>
+<script src="js/controls/OrbitControls.js"></script>
+
+</head>
+
+<body>
+
+<span id="wow" style="position:absolute;top:40px;left:20px;font-family:tipo;font-size:28pt;color:#ff0;"></span>
+<span id="show" style="position:absolute;top:300px;width:300px;left:5%;font-family:tipo;font-size:20pt;color:#fc0;text-align:center;">Hi, is this a walking on the grass scene, or a fashion show ?</span>
+
+<script>
+
+var camera,scene,renderer,controls,ax,bx,geo1,mat1,plane1,geo2,mat2,plane2,geo3,mat3,mtlLoader,objLoader,setpat,amb,point,textureLoader,texture1,texture2;
+var wi=window.innerWidth;
+var he=window.innerHeight;
+var k=0;
+var w=0;
+var rot=0;
+var ango=0;
+var grot=0.0001;
+var p=Math.PI;
+var sim1=0;
+var sim2=0;
+
+var st=[];
+var stall;
+var gra=[];
+var grag=[];for(let u=1;u<50;u++){grag[u]=new THREE.Group();}
+var gr=new THREE.Group();
+var grall=new THREE.Group();
+
+var dwow=document.getElementById("wow");
+var dshow=document.getElementById("show");
+
+var mc=[];
+mc[0]="mc00.png";
+mc[1]="mc01.png";
+mc[2]="mc02.png";
+mc[3]="mc03.png";
+mc[4]="mc04.png";
+mc[5]="mc05.png";
+mc[6]="mc06.png";
+mc[7]="mc07.png";
+mc[8]="mc08.png";
+mc[9]="mc09.png";
+var tex=[];
+
+function init(){
+
+	camera=new THREE.PerspectiveCamera(30,wi/he,1,1000);
+	camera.position.set(-30,15,50);
+
+	scene= new THREE.Scene();
+
+	renderer=new THREE.WebGLRenderer({alpha:true});
+	renderer.setPixelRatio( window.devicePixelRatio );
+	renderer.setSize(wi,he);
+	renderer.setClearColor(0x003344,0);
+
+	document.body.appendChild(renderer.domElement);
+
+	controls=new THREE.OrbitControls(camera,renderer.domElement);
+
+	window.addEventListener('resize',onWindowResize,false);
+
+	amb=new THREE.AmbientLight(0xcccccc,1.2);
+	scene.add(amb);
+
+	point=new THREE.SpotLight(0xffffff,0.5);
+	point.position.set(10,5,40);
+	scene.add(point);
+
+	var onProgress=function(xhr){
+		if(xhr.lengthComputable){
+			var percentComplete=xhr.loaded/xhr.total* 100;
+			console.log(Math.round(percentComplete,2)+'% downloaded');
+		}
+	};
+	var onError=function(xhr){};
+
+	THREE.Loader.Handlers.add(/\.dds$/i,new THREE.DDSLoader());
+
+	textureLoader=new THREE.TextureLoader();
+	texture1=textureLoader.load('models/steve/'+mc[Math.trunc(10*Math.random())]);
+	texture2=textureLoader.load('models/steve/Steve_1024x512.png');
+	for(let m=0;m<10;m++){
+		tex[m]=textureLoader.load('models/steve/'+mc[m]);
+		}
+	//texture1=textureLoader.load('models/steve/'+mc[Math.trunc(10*Math.random())]);
+
+	mtlLoader=new THREE.MTLLoader();
+	objLoader=new THREE.OBJLoader();
+	k=0;
+	setpat='models/steve/';
+
+	mtlLoader.setPath(setpat);
+	mtlLoader.load( 'partesfoscas.mtl',function( materials){
+		materials.preload();
+		var objLoader=new THREE.OBJLoader();
+		objLoader.setMaterials(materials);
+		objLoader.setPath(setpat);
+		objLoader.load('separa9.obj',function(object){
+			for(let k=0;k<6;k++){
+				if(object.children[k]){st[k]=object.children[k];}
+			}
+		},onProgress,onError);
+	});
+
+	geo1=new THREE.BoxGeometry(10,10,1);
+	mat1=new THREE.MeshStandardMaterial({color:'#640',transparent:true,opacity:0.5});
+	plane1=new THREE.Mesh(geo1,mat1);
+	plane1.position.set(0,1.5,-19);
+	plane1.receiveShadow=true;
+	scene.add(plane1);
+
+	geo2=new THREE.BoxGeometry(10,38,1);
+	mat2=new THREE.MeshStandardMaterial({color:'#320'});
+	plane2=new THREE.Mesh(geo2,mat2);
+	plane2.rotation.set(-1.57,0,0);
+	plane2.position.set(0,-3,0.5);
+	plane2.receiveShadow=true;
+	scene.add(plane2);
+
+	bx=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.05,0.05),new THREE.MeshBasicMaterial({color:'#630'}));
+
+	geo3=new THREE.SphereGeometry(15,24,24,-0.2,0.2,p/2,p/2);
+	mat3=new THREE.MeshStandardMaterial({color:'#0c0',side:THREE.DoubleSide}); 
+	gra[40]=new THREE.Mesh(geo3,mat3);
+	gra[40].scale.set(0.05,0.1,0.04);
+	gra[40].rotation.set(p,p,0);
+	gra[40].position.set(0,-3,0);
+	gra[40].position.set(-0.7,0,0);
+
+	bx.add(gra[40]);
+	gra[0]=bx.clone();
+
+	gra[1]=gra[0].clone();gra[1].rotation.set(0,p,0);
+
+	for(let g=3;g<40;g++) {gra[0].scale.y=(1+Math.random());gra[0].rotation.y=Math.random()*1.6;gra[g]=gra[0].clone();gra[g].position.z=g;grag[1].add(gra[g]);}
+	for(let g=43;g<80;g++){gra[1].scale.y=(1+Math.random());gra[0].rotation.y=Math.random()*1.6;gra[g]=gra[1].clone();gra[g].position.z=g-39.9;gra[g].position.x=0.0;grag[1].add(gra[g]);}
+
+	for(let g=3;g<40;g++) {gra[0].scale.y=(1+Math.random());gra[0].rotation.y=Math.random()*1.6;gra[g]=gra[0].clone();gra[g].position.z=g;grag[2].add(gra[g]);}
+	for(let g=43;g<80;g++){gra[1].scale.y=(1+Math.random());gra[0].rotation.y=Math.random()*1.6;gra[g]=gra[1].clone();gra[g].position.z=g-39.9;gra[g].position.x=0.0;grag[2].add(gra[g]);}
+
+	for(let g=3;g<40;g++) {gra[0].scale.y=(1+Math.random());gra[0].rotation.y=Math.random()*1.6;gra[g]=gra[0].clone();gra[g].position.z=g;grag[3].add(gra[g]);}
+	for(let g=43;g<80;g++){gra[1].scale.y=(1+Math.random());gra[0].rotation.y=Math.random()*1.6;gra[g]=gra[1].clone();gra[g].position.z=g-39.9;gra[g].position.x=0.0;grag[3].add(gra[g]);}
+
+	for(let g=3;g<40;g++) {gra[0].scale.y=(1+Math.random());gra[0].rotation.y=Math.random()*1.6;gra[g]=gra[0].clone();gra[g].position.z=g;grag[3].add(gra[g]);}
+	for(let g=43;g<80;g++){gra[1].scale.y=(1+Math.random());gra[0].rotation.y=Math.random()*1.6;gra[g]=gra[1].clone();gra[g].position.z=g-39.9;gra[g].position.x=0.0;grag[4].add(gra[g]);}
+
+	for(let g=3;g<40;g++) {gra[0].scale.y=(1+Math.random());gra[0].rotation.y=Math.random()*1.6;gra[g]=gra[0].clone();gra[g].position.z=g;grag[3].add(gra[g]);}
+	for(let g=43;g<80;g++){gra[1].scale.y=(1+Math.random());gra[0].rotation.y=Math.random()*1.6;gra[g]=gra[1].clone();gra[g].position.z=g-39.9;gra[g].position.x=0.0;grag[5].add(gra[g]);}
+
+	var dist=-6;
+	for(let o=10;o<40;o++){
+		dist=dist+0.3;
+		if(o==10 || o==15 || o==20 || o==25 || o==30 || o==35){grag[o]=grag[1].clone();}
+		if(o==11 || o==16 || o==21 || o==26 || o==31 || o==36){grag[o]=grag[2].clone();}
+		if(o==12 || o==17 || o==22 || o==27 || o==32 || o==37){grag[o]=grag[3].clone();}
+		if(o==13 || o==18 || o==23 || o==28 || o==33 || o==38){grag[o]=grag[4].clone();}
+		if(o==14 || o==19 || o==24 || o==29 || o==34 || o==39){grag[o]=grag[5].clone();}
+		grag[o].position.set(dist,0,-20-Math.random());
+		grall.add(grag[o]);
+	}
+
+	ax=new THREE.AxesHelper(1);
+	ax.add(grall);
+	grall.position.set(0,0,18);
+	ax.position.set(1.5,-3,-18);
+	scene.add(ax);
+
+}
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+
+	w++;
+
+	if(w==240){dshow.innerText="";}
+
+	if(st[0] && st[1] && st[2] && st[3] && st[4] && st[5] && sim1==0){
+
+		st[3].rotation.set(0,1.57,0)
+		st[1].rotation.set(0,1.57,0)
+		st[5].scale.set(4,6,4);
+		st[4].scale.set(4,6,4);
+		st[3].scale.set(5,4,4);
+		st[1].scale.set(5,4,4);
+			st[5].position.set(-2,0,0);
+			st[4].position.set( 2.5,0,0);
+			st[3].position.set(-6.5,12.5,0);
+			st[1].position.set( 6.5,12.5,0);
+		st[0].scale.set(4,4,4);
+		st[2].scale.set(4,4,4);
+			st[0].position.set(0,16,0);
+			st[2].position.set(0,12,0);
+		for(let f=0;f<6;f++){gr.add(st[f]);}
+		gr.position.set(0,1,-20);
+		gr.scale.set(0.2,0.2,0.2);
+		sim1=1;
+	}
+
+	if(sim1==1){scene.add(gr);sim2=1;}
+
+	if(sim2==1){
+
+		gr.position.z +=0.2;
+
+		if(gr.position.z>22){gr.position.z=-24;gr.position.y=1;dwow.innerText="Did I change ?";dwow.style.color="#0ff";texture1=tex[Math.trunc(10*Math.random())];}
+		if(gr.position.z>-20 && gr.position.z<-19){dwow.innerText="";}
+
+		if(gr.position.z>19.5){gr.position.y -=0.5;st[0].material.map=texture1;dwow.innerText="What is happening ?";dwow.style.color="#f0f";}
+
+		for(let j=10;j<40;j++){
+			if(grag[j]){grag[j].rotation.z +=(grot*100);grag[j].rotation.x +=(grot);}
+		}
+		if(grag[10].rotation.z>0.2){grot=-grot};
+		if(grag[10].rotation.z<-0.2){grot=-grot};
+
+		if(ango>0.6){rot=1; st[4].rotation.x=-0.7;st[3].rotation.x=1.57;}
+		if(ango<-0.6){rot=0;st[5].rotation.x=-0.7;st[1].rotation.x=-1.57;}
+		if(rot==0){
+			ango +=0.1;
+			gr.rotation.z +=0.01;
+			st[0].rotation.y -=0.03;
+			st[2].rotation.y +=0.03;
+			st[3].rotation.z -=0.1;
+			st[1].rotation.z +=0.1;
+			st[5].rotation.x +=0.1;
+			st[4].rotation.x -=0.1;
+		}else{
+			ango -=0.1;
+			gr.rotation.z -=0.01;
+			st[0].rotation.y +=0.03;
+			st[2].rotation.y -=0.03;
+			st[3].rotation.z +=0.1;
+			st[1].rotation.z -=0.1;
+			st[5].rotation.x -=0.1;
+			st[4].rotation.x +=0.1;
+		}
+	}
+
+	renderer.render(scene,camera);
+}
+
+init();
+animate();
+
+
+/*
+Grass... oh my cheaper grass.
+
+the link:
+
+http://jrlazz.eu5.org/r90/examples/steve_grass.html
+
+
+Thanks for the Tree.Js Team!
+
+*/
+
+
+</script>
+
+</body>
+</html>
