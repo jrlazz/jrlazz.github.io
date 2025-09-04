@@ -1,0 +1,22 @@
+# Created with Anim8or 1.00
+# Object "collada":
+
+newmtl Material.002
+Ka 1 1 1
+Kd 0.875 0.741 0.388
+Ks 1 1 1
+Ns 752.6
+
+newmtl Material.001
+Ka 1 1 1
+Kd 1 1 1
+Ks 1 1 1
+Ns 752.6
+map_Kd blender_cor_03.jpg
+
+newmtl None
+Ka 0 0 0
+Kd 0.8 0.8 0.8
+Ks 1 1 1
+Ns 752.6
+

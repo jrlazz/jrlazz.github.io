@@ -1,0 +1,25 @@
+# Created with Anim8or 1.00
+# Object "shower":
+
+newmtl material01
+Ka 0.471 0.824 0.863
+Kd 0.471 0.824 0.863
+d 0.600000
+Tr 0.400000
+Ks 1 1 1
+Ns 400
+
+newmtl material02
+Ka 0.804 0.804 0.804
+Kd 0.804 0.804 0.804
+Ks 1 1 1
+Ns 800
+
+newmtl material03
+Ka 0.471 0.824 0.863
+Kd 0.471 0.824 0.863
+d 0.600000
+Tr 0.400000
+Ks 1 1 1
+Ns 400
+

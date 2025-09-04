@@ -1,0 +1,15 @@
+# Created with Anim8or 1.00
+# Object "tr_to_220":
+
+newmtl metal
+Ka 0.3 0.3 0.3
+Kd 0.3 0.3 0.3
+Ks 0 0 0
+Ns 0
+
+newmtl plastico
+Ka 0.1 0.1 0.1
+Kd 0.1 0.1 0.1
+Ks 0 0 0
+Ns 0
+

@@ -1,0 +1,28 @@
+# Created with Anim8or 1.00
+# Object "3ds_pers2":
+
+newmtl material02
+Ka 0.878 0.878 0.878
+Kd 0.878 0.878 0.878
+Ks 1 1 1
+Ns 752.6
+map_Kd blender_cor_02.png
+
+newmtl Material.001
+Ka 0.8 0.8 0.8
+Kd 1 1 1
+Ks 1 1 1
+Ns 742.5
+
+newmtl Material.002
+Ka 1 0.541 0.722
+Kd 0.929 0.259 0.31
+Ks 1 1 1
+Ns 742.5
+
+newmtl material03
+Ka 0 0 0
+Kd 0 0 0
+Ks 1 1 1
+Ns 752.6
+
