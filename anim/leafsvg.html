@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>leafsvg.html</title>
+<meta charset="utf-8" />
+<link rel="shortcut icon" href="../ok.ico">
+
+<script type="importmap">
+{"imports": {"three": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.module.min.js",
+"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.172.0/examples/jsm/"}}
+</script>
+
+<style>
+body{margin:0;background-color:#024;font-family:Lucida Console;font-size:9pt;color:#0ff;overflow:hidden;}
+td,span{font-family:Lucida Console;font-size:16pt;color:#0ff;}
+</style>
+
+</head>
+
+<body>
+
+<span id="sp" style="position:absolute;left:20%;right:20%;top:10px;color:#0ff;text-align:center;">
+Leaf experience
+</span>
+
+<script type="module">
+
+import * as THREE from "three"
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import Stats from "three/addons/libs/stats.module.js";
+import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
+
+var scene,camera,renderer,controls,loader,stats;
+var g=[],gg=[],l=[],m=[],mm=[],s=[],ss=[],paths=[],shapes=[];
+var gr=[];for(let z=1;z<10;z++){gr[z]=new THREE.Group();}
+var p=Math.PI;
+var ax=new THREE.AxesHelper(0.001);
+
+function init() {
+
+	scene=new THREE.Scene()
+	camera=new THREE.PerspectiveCamera(30,window.innerWidth/window.innerHeight,1,1000,)
+	camera.position.set(3,2,-3)
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setClearColor(0x222222,0);
+	renderer.setPixelRatio(window.devicePixelRatio)
+	renderer.setClearColor("#FF796c",0)
+	renderer.setSize(window.innerWidth, window.innerHeight)
+
+	document.body.appendChild(renderer.domElement)
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	
+	l[1]=new THREE.AmbientLight('#fff',5);scene.add(l[1]);
+	l[2]= new THREE.DirectionalLight('#fff',2);l[2].position.set(-10,10,10);scene.add(l[2]);
+	l[3]= new THREE.DirectionalLight('#fff',2);l[3].position.set(-10,-10,10);scene.add(l[3]);
+
+	stats=new Stats();document.body.appendChild(stats.dom);
+
+	window.addEventListener("resize",onWindowResize);
+
+	gg[1]=new THREE.TorusGeometry(1,0.01, 16, 100,0.6);
+	mm[1]=new THREE.MeshStandardMaterial({color:'#660',metalness:0.7,roughness:0.2,side:THREE.DoubleSide});
+	ss[1]=new THREE.Mesh(gg[1],mm[1]);
+	ss[1].rotation.set(1,p/2,0);
+	ss[1].position.set(0,-1,0);
+	ax.add(ss[1]);
+	scene.add(ax);
+
+	loader=new SVGLoader();
+	m[1]=new THREE.MeshStandardMaterial({color:'#030',metalness:0.3,roughness:0.6});
+	m[2]=new THREE.MeshStandardMaterial({color:'#090',metalness:0.7,roughness:0.2});
+
+	loader.load('img/leaf_0.svg',function(data){
+		paths=data.paths;
+		shapes=SVGLoader.createShapes(paths[0]);
+		g[1]=new THREE.ExtrudeGeometry(shapes[0],{depth:2,curveSegments:20});
+		s[1]=new THREE.Mesh(g[1],m[1]);
+		s[1].position.set(0,0,0);
+
+		g[2]=new THREE.ExtrudeGeometry(shapes[0],{depth:2,curveSegments:20});
+		s[2]=new THREE.Mesh(g[2],m[2]);
+		s[2].position.set(0,0,0);
+		
+		let a=0;
+		for(let z=1;z<315;z++){
+			a=a+0.01;
+			s[z]=s[1].clone();
+			s[z].position.set(0,0,z/20);
+			s[z].scale.set(Math.sin(a)/5,Math.sin(a)/6,0.03);
+			gr[1].add(s[z]);
+		}
+
+		a=0;
+		for(let z=1000;z<1315;z++){
+			a=a+0.01;
+			s[z]=s[2].clone();
+			s[z].position.set(0,0,(z-1000)/20);
+			s[z].scale.set(Math.sin(a)/5,Math.sin(a)/6,0.03);
+			gr[2].add(s[z]);
+		}
+
+		gr[1].scale.setScalar(0.1);
+
+		gr[2].scale.setScalar(0.1);
+		gr[2].position.y=-0.01;
+
+		gr[3].add(ax);
+		gr[3].add(gr[1]);
+		gr[3].add(gr[2]);
+		scene.add(gr[3]);
+	})
+
+}
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	if(gr[3]){gr[3].rotation.y -=0.01;}
+	stats.update();
+	renderer.render(scene, camera);
+}
+
+init();
+animate();
+
+</script>
+</body>
+</html>

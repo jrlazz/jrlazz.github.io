@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>dunes.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="../ok.ico">
+<style>
+body{margin:0;background-color:#036;overflow:hidden;background-image: linear-gradient(#07d,#07d,#d70,#846508,#846508);}
+span{position:absolute;left:20px;top:10px;color:#ff0;font-family:Lucida Console;font-size:16pt;}
+</style>
+
+<script type="importmap">
+{"imports": {"three": "https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.module.min.js",
+"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.174.0/examples/jsm/"}}
+</script>
+
+</head>
+
+<body>
+
+<span id="spana"></span>
+<span id="spanb" style="position:absolute;top:50px;"></span>
+<span style="width:99%;text-align:center;">Children playing in the dunes... (with GPT help for terrain)</span>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+
+var t=1200,t1=0,t2=0,sim=0,dir=1;
+var vector=new THREE.Vector3();
+var v=[],ter=[],ste=[],tex=[];
+for(let z=0;z<12000;z++){v[z]=new THREE.Vector3();}
+var vi=new THREE.Group();
+var textex;
+
+	const scene=new THREE.Scene();
+	const camera=new THREE.PerspectiveCamera(80,window.innerWidth/window.innerHeight,0.1,1000);
+
+	const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setClearColor(0x004477,0);
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	document.body.appendChild(renderer.domElement);
+
+	const controls=new OrbitControls(camera,renderer.domElement);
+	controls.enableZoom=false;
+	controls.minPolarAngle=Math.PI/2.2;
+	controls.maxPolarAngle=Math.PI/2.2;
+
+	const geometry=new THREE.PlaneGeometry(400,400,100,100);
+	geometry.rotateX(-Math.PI/2);
+	const mk=new THREE.MeshNormalMaterial();
+	const ob=new THREE.Mesh(geometry,mk);
+
+	const position=ob.geometry.attributes.position;
+	for(let i=0;i<position.count;i++){
+		vector=new THREE.Vector3();
+ 		vector.fromBufferAttribute(position,i);
+		vector.applyMatrix4(ob.matrixWorld);
+		v[i]=vector.clone();
+		let y=Math.sin(i/2)*8;
+		position.setY(i,y);
+		v[i].y=y;
+	}
+
+	//document.getElementById("spanb").innerText="Positions: "+position.count;
+
+	geometry.computeVertexNormals();
+
+	// lig
+	const geofix=new THREE.TorusGeometry(3.5,0.1,16,16,2);
+	const matfix=new THREE.MeshStandardMaterial({color:'#660',metalness:0.7,roughness:0.2,side:THREE.DoubleSide});
+	const fix=new THREE.Mesh(geofix,matfix);
+	fix.rotation.set(0,Math.PI/2,0);
+	fix.position.set(0,1.8,3.6);
+	const geolig=new THREE.SphereGeometry(0.2,8,8);
+	const matlig=new THREE.MeshBasicMaterial({color:'#fff'});
+	const lig=new THREE.Mesh(geolig, matlig);
+	lig.position.set(0,5,5);
+
+	// Children
+	for(let z=1;z<63;z++){tex[z]=new THREE.TextureLoader().load('models/skins/ski'+z+'.png');}//tex[z].colorSpace=THREE.SRGBColorSpace;tex[z].minFilter=THREE.NearestFilter;tex[z].magFilter=THREE.NearestFilter;}
+	textex=tex[49];
+	new MTLLoader().load('models/steve/partesfoscas.mtl',function(mat){mat.preload();new OBJLoader().setMaterials(mat).load('models/steve/separa9.obj',function(object){
+	for(let k=0;k<6;k++){if(object.children[k]){ste[k]=object.children[k];ste[k].material=new THREE.MeshStandardMaterial({map:textex});}}});});
+
+	// Terrain
+	const material=new THREE.MeshStandardMaterial({color:'#da0',side:THREE.DoubleSide});
+	const terrain=new THREE.Mesh(geometry,material);
+	scene.add(terrain);
+
+	const lig1=new THREE.DirectionalLight(0xffffff,0.5);lig1.position.set(10,20,10);scene.add(lig1);
+	const lig2=new THREE.PointLight(0xffffff,500);
+	const lig3=new THREE.AmbientLight(0xffffff,0.5);scene.add(lig3);
+	
+	camera.position.set(0,25,-210);
+	camera.lookAt(terrain.position);
+
+function animate(){
+	requestAnimationFrame(animate);
+
+	t1++;if(t1==5){t++;t1=0;}
+	t2++;if(t2==30){dir=-dir;t2=0;}
+
+	//t=1250;
+
+	if(v[t] && ste[2]){
+		vi.position.set(v[t].x,12+v[t].y,v[t].z);
+	}
+	if(t>7300){t=1200;conta=0;}
+
+	for(let o=1300;o<7300;o=o+100){
+		if(t==o){textex=tex[(o/100)-12];for(let r=0;r<6;r++){ste[r].material=new THREE.MeshStandardMaterial({map:textex});}}
+	}
+
+	if(ste[5] && sim==0){
+		ste[0].position.set(0,0.95,0);//CA
+		ste[3].position.set(-1.1,-0.5,0);//BD
+		ste[1].position.set(1.1,-0.5,0.1);//BE
+		ste[5].position.set(0.55,-3,0);//PE
+		ste[4].position.set(-0.575,-3,0);//PD
+		vi.rotateY(Math.PI/2);
+		for(let q=0;q<6;q++){vi.add(ste[q]);}
+		vi.scale.set(2,2,2);
+		lig2.position.copy(lig.position);
+		vi.add(lig);vi.add(lig2);
+		vi.add(fix);
+		vi.position.set(0,60,0);
+		scene.add(vi);
+		sim=1;
+	}
+
+	renderer.render(scene, camera);
+}
+	
+animate();
+
+</script>
+</body>
+</html>

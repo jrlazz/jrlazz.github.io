@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>csgwin.html</title>
+<meta charset="utf-8">
+<link rel="icon" type="image/png" href="img/grad.png">
+<meta name="description" content="Creating windows with CSG">
+
+<!--
+<meta data-rh="true" name="twitter:image" content="img/ag_baboy_r.png"/>
+<meta name="twitter:image" content="<generated>" />
+<meta name="twitter:image:type" content="<generated>" />
+<meta name="twitter:image:width" content="<generated>" />
+<meta name="twitter:image:height" content="<generated>" />
+
+<meta property="og:image" content="img/ag_baboy_r.png">
+<meta property="og:image:width" content="19" />
+<meta property="og:image:height" content="47" />
+-->
+
+
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="37" />
+
+
+
+<style>
+body{margin:0;background-color:#05b;overflow:hidden;background-image: linear-gradient(#05b,#05b,#c60,#000,#000);}
+span{position:absolute;left:0%;top:10px;color:#ff0;font-family:Lucida Console;font-size:16pt;}
+</style>
+
+<script type="importmap">
+	{
+		"imports": {
+			"three": "https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.module.min.js",
+			"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.174.0/examples/jsm/",
+			"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.7.3/build/index.module.js",
+			"three-bvh-csg": "https://cdn.jsdelivr.net/npm/three-bvh-csg@0.0.16/build/index.module.js"
+		}
+	}
+</script>
+
+</head>
+
+<body>
+
+<span id="sp" style="width:99%;text-align:center;">... waiting for shadows in the scene ...</span>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { SUBTRACTION, Brush, Evaluator } from 'three-bvh-csg';
+var t=0,foi=0,sim=0,result,result2;
+var g=[];
+var gru=new THREE.Group();
+var dsp=document.getElementById("sp");
+
+	const camera=new THREE.PerspectiveCamera(40,window.innerWidth/window.innerHeight,1,1000);
+	camera.position.set(5,2,12);
+	const scene=new THREE.Scene();
+	scene.position.set(1.5,0,0);
+
+	const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setClearColor('#505',0);
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize( window.innerWidth,window.innerHeight);
+	renderer.shadowMap.enabled=true;
+
+	document.body.appendChild(renderer.domElement);
+
+	const controls=new OrbitControls(camera,renderer.domElement);
+	controls.enableZoom=false;
+	controls.minPolarAngle=Math.PI/2.2;
+	controls.maxPolarAngle=Math.PI/2.2;
+
+	const pointroom=new THREE.PointLight('#fff',5);
+	pointroom.position.set(-1.5,0,0);
+
+	const geofix=new THREE.TorusGeometry(1.5,0.02,16,16,3);
+	const matfix=new THREE.MeshNormalMaterial();
+	const fix=new THREE.Mesh(geofix,matfix);
+	fix.rotation.set(0,Math.PI/2,0);
+	fix.position.set(0,0,1.5);
+
+	const geolig=new THREE.SphereGeometry(0.05,8,8);
+	const matlig=new THREE.MeshBasicMaterial({color:'#fff'});
+	const lig=new THREE.Mesh(geolig, matlig);
+	lig.position.set(0,0.2,3);
+
+	const point=new THREE.PointLight('#fff',300);point.castShadow=true;point.shadow.mapSize.setScalar(512);point.position.set(0,1.7,3);
+	lig.add(point);
+
+	const ax=new THREE.AxesHelper(0.1);
+
+	ax.position.set(-1.5,1.5,0);
+	ax.add(fix);
+	ax.add(lig);
+
+	const ground=new THREE.Mesh(new THREE.CircleGeometry(10,64),new THREE.MeshStandardMaterial({color:'#666',side:THREE.DoubleSide}));
+	ground.position.set(-1.5,-1.51,0);
+	ground.rotation.x=Math.PI/2;
+	ground.receiveShadow=true;
+	scene.add(ground) ;
+
+	const backwall=new THREE.Mesh(new THREE.BoxGeometry(0.2,2.8,2.8),new THREE.MeshStandardMaterial({color:'#060'}));
+	backwall.position.set(-1.5,-0.1,-1.4);
+	backwall.rotation.y=Math.PI/2;
+	backwall.castShadow=true;backwall.receiveShadow=true;
+
+	const roof=new THREE.Mesh(new THREE.BoxGeometry(0.2,2.8,3),new THREE.MeshStandardMaterial({color:'#999'}));
+	roof.position.set(-1.5,1.4,0);
+	roof.rotation.z=Math.PI/2;
+	roof.castShadow=true;
+
+	g[1]=new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.02,1.2),new THREE.MeshStandardMaterial({color:'#999'}));
+	g[1].position.set(0,0,0);
+	g[1].castShadow=true;
+	let h=-0.6;
+	for(let z=2;z<7;z++){h=h+0.2;g[z]=g[1].clone();g[z].position.set(0,0,h);}
+	g[7]=g[1].clone();g[7].rotation.set(Math.PI/2,0,0);g[7].position.set(0,0,0);
+	h=-0.6;for(let z=8;z<13;z++){h=h+0.2;g[z]=g[7].clone();g[z].position.set(0,h,0);}
+
+	const evaluator=new Evaluator();
+
+	const a1=new Brush(new THREE.BoxGeometry(0.2,3,3),new THREE.MeshStandardMaterial({flatShading:true,color:'#900'}));
+	const a2=new Brush(new THREE.BoxGeometry(0.2,1,1),new THREE.MeshStandardMaterial({color:'#900'}));
+
+	const b1=new Brush(new THREE.BoxGeometry(0.2,3,3),new THREE.MeshStandardMaterial({flatShading:true,color:'#960'}));
+	const b2=new Brush(new THREE.SphereGeometry(0.6,16,16),new THREE.MeshStandardMaterial({color:'#960'}));
+
+	const jan=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshStandardMaterial({color:'#066',side:THREE.DoubleSide,transparent:true,opacity:0.7}));
+	jan.rotation.set(0,1.57,1.57);
+	jan.castShadow=true;
+
+function updateCSG(){result=  evaluator.evaluate(a1,a2,SUBTRACTION,result);result.castShadow=true;result.receiveShadow=true;scene.add(result);}
+function updateCSG2(){result2=evaluator.evaluate(b1,b2,SUBTRACTION,result2);result2.position.x=-3;result2.castShadow=true;result2.receiveShadow=true;scene.add(result2);}
+
+function animate(){
+	requestAnimationFrame(animate);
+
+	if(a1 && a2 && b1 && b2 && sim==0){updateCSG();updateCSG2();sim=1}
+
+	if(result && result2 && foi==0){
+		for(let z=2;z<15;z++){if(g[z]){gru.add(g[z]);}}
+		gru.position.x=-3;
+		scene.add(gru);
+		scene.add(roof);
+		scene.add(backwall);
+		scene.add(ax);
+		scene.add(jan);	
+		scene.add(pointroom);
+		dsp.innerText="Creating windows with CSG";
+		foi=1;
+	}
+	if(foi==1){
+		t++;
+		if(t<40){jan.position.z -=0.025;gru.position.y -=0.035;}
+		if(t>40 && t<80){jan.position.z +=0.025;gru.position.y +=0.035;}
+		if(t==120){t=0;jan.position.z=0;gru.position.y=0;}
+		ax.rotation.y -=0.01;
+	}
+
+	renderer.render(scene,camera);
+}
+animate();
+</script>
+</body>
+</html>

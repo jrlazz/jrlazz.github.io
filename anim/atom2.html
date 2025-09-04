@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>atom2.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="ok.ico"/>
+<style>
+@font-face {font-family:myq;src:url('../fonte/MysteryQuest-Regular.ttf');}
+body{margin:0;background-color:#000;font-family:myq;color:#09c;overflow:hidden;}
+span{position:absolute;left:0px;}
+</style>
+
+<script type="importmap">
+	{
+	  "imports": {
+		"three": "https://unpkg.com/three@0.173.0/build/three.module.min.js",
+		"three/addons/": "https://unpkg.com/three@0.173.0/examples/jsm/"
+	  }
+	}
+</script>
+
+</head>
+
+<body>
+
+<span id="sp2" style="top:10px;color:#096;font-size:16pt;width:99%;text-align:center;">... another vision of an atom ...</span>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+var scene,camera,camera2,renderer,controls,wand1,wand2, kcode;
+var position;
+var vector=new THREE.Vector3();
+
+var avec=[];
+for(let z=0;z<1000;z++){avec[z]=new THREE.Vector3();}
+
+var g=[],m=[],s=[],e=[],ax=[],l=[];
+for(let z=0;z<100;z++){ax[z]=new THREE.AxesHelper(0.01);}
+
+var num=0;
+var t=0;
+var p=Math.PI;
+var letters,color,co;
+
+function init(){
+
+	scene=new THREE.Scene();
+
+	camera=new THREE.PerspectiveCamera(50,window.innerWidth/window.innerHeight,0.1,1000);
+	scene.add(camera);
+	camera.position.set(10,15,20);
+	
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setClearColor(0x000000,0);
+	renderer.setSize(window.innerWidth, window.innerHeight);
+
+	document.body.appendChild(renderer.domElement);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+
+	window.addEventListener("resize",onWindowResize);
+
+	function rdColor(){
+  		letters='0123456789ABCDEF';color='#';
+  		for(let i=0;i<6;i++){color +=letters[Math.floor(Math.random()*16)];}
+  		return color;
+	}
+
+	g[11]=new THREE.SphereGeometry(0.1,32,32);
+
+	co=rdColor();
+	co='#ff0';
+	m[11]=new THREE.MeshStandardMaterial({color:co});
+	e[11]=new THREE.Mesh(g[11],m[11]);
+	e[11].position.set(3,0,0);
+	l[11]=new THREE.PointLight(co,2);
+	l[11].position.set(3,0,0);
+ax[11].add(e[11]);
+ax[11].add(l[11]);
+ax[11].rotation.set(0,0,0);
+scene.add(ax[11]);
+	g[1]=new THREE.RingGeometry(3,3.1,64,64);
+	m[1]=new THREE.MeshStandardMaterial({color:co,side:THREE.DoubleSide,metalness:0.5,roughness:0.3});
+	e[1]=new THREE.Mesh(g[1],m[1]);
+	e[1].rotation.set(p/2,0,0);
+	scene.add(e[1]);
+
+
+	co=rdColor();
+	co='#f0f';
+	m[12]=new THREE.MeshStandardMaterial({color:co});
+	e[12]=new THREE.Mesh(g[11],m[12]);
+	e[12].position.set(4,0,0);
+	l[12]=new THREE.PointLight(co,3);
+	l[12].position.set(4,0,0);
+ax[12].add(e[12]);
+ax[12].add(l[12]);
+ax[12].rotation.set(p/2,0,0);
+scene.add(ax[12]);
+	g[2]=new THREE.RingGeometry(4,4.1,64,64);
+	m[2]=new THREE.MeshStandardMaterial({color:co,side:THREE.DoubleSide,metalness:0.5,roughness:0.3});
+	e[2]=new THREE.Mesh(g[2],m[2]);
+	e[2].rotation.set(0,0,0);
+	scene.add(e[2]);
+
+
+	co=rdColor();
+	co='#0ff';
+	m[13]=new THREE.MeshStandardMaterial({color:co});
+	e[13]=new THREE.Mesh(g[11],m[13]);
+	e[13].position.set(5,0,0);
+	l[13]=new THREE.PointLight(co,4);
+	l[13].position.set(5,0,0);
+ax[13].add(e[13]);
+ax[13].add(l[13]);
+ax[13].rotation.set(0,0,p/2);
+scene.add(ax[13]);
+	g[3]=new THREE.RingGeometry(5,5.1,64,64);
+	m[3]=new THREE.MeshStandardMaterial({color:co,side:THREE.DoubleSide,metalness:0.5,roughness:0.3});
+	e[3]=new THREE.Mesh(g[3],m[3]);
+	e[3].rotation.set(0,p/2,0);
+	scene.add(e[3]);
+
+
+	co=rdColor();
+	co='#0f0';
+	m[14]=new THREE.MeshStandardMaterial({color:co});
+	e[14]=new THREE.Mesh(g[11],m[14]);
+	e[14].position.set(6,0,0);
+	l[14]=new THREE.PointLight(co,5);
+	l[14].position.set(6,0,0);
+ax[14].add(e[14]);
+ax[14].add(l[14]);
+ax[14].rotation.set(p/2+p/3,0,0);
+scene.add(ax[14]);
+	g[4]=new THREE.RingGeometry(6,6.1,64,64);
+	m[4]=new THREE.MeshStandardMaterial({color:co,side:THREE.DoubleSide,metalness:0.5,roughness:0.3});
+	e[4]=new THREE.Mesh(g[4],m[4]);
+	e[4].rotation.set(p/3,0,0);
+	scene.add(e[4]);
+
+
+	co=rdColor();
+	co='#f00';
+	m[15]=new THREE.MeshStandardMaterial({color:co});
+	e[15]=new THREE.Mesh(g[11],m[15]);
+	e[15].position.set(7,0,0);
+	l[15]=new THREE.PointLight(co,6);
+	l[15].position.set(7,0,0);
+ax[15].add(e[15]);
+ax[15].add(l[15]);
+ax[15].rotation.set(p/4,0,0);
+scene.add(ax[15]);
+	g[5]=new THREE.RingGeometry(7,7.1,64,64);
+	m[5]=new THREE.MeshStandardMaterial({color:co,side:THREE.DoubleSide,metalness:0.5,roughness:0.3});
+	e[5]=new THREE.Mesh(g[5],m[5]);
+	e[5].rotation.set(p/2+p/4,0,0);
+	scene.add(e[5]);
+
+
+	co='#fff';
+	m[16]=new THREE.MeshStandardMaterial({color:co});
+	e[16]=new THREE.Mesh(g[11],m[16]);
+	e[16].position.set(8,0,0);
+	l[16]=new THREE.PointLight(co,10);
+	l[16].position.set(8,0,0);
+ax[16].add(e[16]);
+ax[16].add(l[16]);
+ax[16].rotation.set(-p/3,0,0);
+scene.add(ax[16]);
+	g[6]=new THREE.RingGeometry(8,8.1,64,64);
+	m[6]=new THREE.MeshStandardMaterial({color:co,side:THREE.DoubleSide,metalness:0.5,roughness:0.3});
+	e[6]=new THREE.Mesh(g[6],m[6]);
+	e[6].rotation.set(p/2-p/3,0,0);
+	scene.add(e[6]);
+
+
+	co='#99f';
+	m[17]=new THREE.MeshStandardMaterial({color:co});
+	e[17]=new THREE.Mesh(g[11],m[17]);
+	e[17].position.set(9,0,0);
+	l[17]=new THREE.PointLight(co,14);
+	l[17].position.set(9,0,0);
+ax[17].add(e[17]);
+ax[17].add(l[17]);
+ax[17].rotation.set(p/2,0,0);
+scene.add(ax[17]);
+	g[7]=new THREE.RingGeometry(9,9.1,64,64);
+	m[7]=new THREE.MeshStandardMaterial({color:co,side:THREE.DoubleSide,metalness:0.3,roughness:0.3});
+	e[7]=new THREE.Mesh(g[7],m[7]);
+	e[7].rotation.set(p/2+p/2,0,0);
+	scene.add(e[7]);
+
+
+	co='#6cf';
+	m[18]=new THREE.MeshStandardMaterial({color:co});
+	e[18]=new THREE.Mesh(g[11],m[18]);
+	e[18].position.set(10,0,0);
+	l[18]=new THREE.PointLight(co,20);
+	l[18].position.set(10,0,0);
+ax[18].add(e[18]);
+ax[18].add(l[18]);
+ax[18].rotation.set(p/4,0,0);
+scene.add(ax[18]);
+	g[8]=new THREE.RingGeometry(10,10.1,64,64);
+	m[8]=new THREE.MeshStandardMaterial({color:co,side:THREE.DoubleSide,metalness:0.3,roughness:0.3});
+	e[8]=new THREE.Mesh(g[8],m[8]);
+	e[8].rotation.set(p/2+p/4,0,0);
+	scene.add(e[8]);
+
+
+/*
+newModel.position.copy(oldModel.position);
+newModel.rotation.copy(oldModel.rotation);
+newModel.scale.copy(oldModel.scale);
+ground.remove(oldModel);
+ground.add(newModel);
+*/
+
+// ********	
+
+	g[2]=new THREE.SphereGeometry(2,128,128);
+	m[2]=new THREE.MeshStandardMaterial({color:'#ccc',metalness:0.9,roughness:0.1});
+	s[2]=new THREE.Mesh(g[2],m[2]);
+	s[2].position.set(0,0,0);
+	s[2].name="Atenciosamente";
+	scene.add(s[2]); 
+
+	l[20]=new THREE.AmbientLight('#fff',1);scene.add(l[20]);
+
+}
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function animate(){
+	requestAnimationFrame( animate );
+
+	ax[11].rotation.y -=0.02;
+	ax[12].rotation.y -=0.04;
+	ax[13].rotation.x -=0.03;
+	ax[14].rotation.y -=0.02;
+	ax[15].rotation.y -=0.02;
+	ax[16].rotation.y -=0.02;
+	ax[17].rotation.y -=0.02;
+	ax[18].rotation.y -=0.03;
+
+	renderer.render(scene,camera);	
+}
+
+init();
+animate();
+
+</script>
+</body>
+</html>

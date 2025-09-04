@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>tsl_a2.html</title>
+<meta charset="utf-8" />
+<link rel="icon" type="image/png" href="img/grad.png">
+<meta name="description" content="TSL Visual Node Editor result on a page">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+<style>
+body {overflow:hidden;margin:0;background-color:#036;}	
+</style>
+
+<script type="importmap">
+	  {
+		"imports": {
+			"three": "https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.webgpu.min.js",
+			"three/webgpu": "https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.webgpu.min.js",
+			"three/tsl": "https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.tsl.min.js",
+			"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.174.0/examples/jsm/",
+			"tsl-textures/": "https://cdn.jsdelivr.net/npm/tsl-textures@1.11.0/src/"
+		}
+	  }
+</script>
+
+</head>
+
+<body>
+
+<span style="font-family:Lucida Console;font-size:10pt;font-weight:bold;position:absolute;left:10px;top:10px;color:#0ff;">
+<big style="color:#ff0;">TSL page tsl_a2.html from TSL Visual Node Editor</big>
+<br> ... https://discourse.threejs.org/t/tsl-visual-node-editor-alpha-release/80387
+<br> ... https://bandinopla.github.io/three.js-visual-node-editor/
+</span>
+
+<script type="module">
+	
+	import * as THREE from 'three';
+	import {texture,uv,color} from 'three/tsl';
+	import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+	const scene=new THREE.Scene();
+
+	const camera=new THREE.PerspectiveCamera(30,innerWidth/innerHeight,1,1000);
+	camera.position.set(-10,10,40 );
+	camera.lookAt( scene.position );
+
+	const renderer=new THREE.WebGPURenderer({antialias:true,alpha:true});
+	renderer.setClearColor('#049',1);
+	renderer.setSize( innerWidth,innerHeight);
+	renderer.outputColorSpace=THREE.LinearSRGBColorSpace;
+	document.body.appendChild(renderer.domElement);
+		
+	window.addEventListener("resize", (event) =>{
+		camera.aspect=innerWidth/innerHeight;
+		camera.updateProjectionMatrix();
+		renderer.setSize(innerWidth,innerHeight);
+	});
+
+	const controls=new OrbitControls(camera,renderer.domElement);
+	controls.enableDamping=true;
+	controls.autoRotate=true;
+	controls.autoRotateSpeed =2.5;
+
+	var light=new THREE.AmbientLight('#fff',4) ;
+	scene.add(light);
+
+	//   ThreeJs TSL Visual Node Editor v0.0.3
+
+	/**LAYOUT** {"layout":[{"type":"default","x":608,"y":203.50000000000006,"ambientLight":0.1,"rotationSpeed":1,"objType":0},{"type":"mesh-standard-shader","x":303,"y":96,"baseColor":"#e7c800"},{"type":"uv","x":117,"y":242,"channel":0}],"zOrder":[0,1,2],"canvasMatrix":{"a":1,"b":0,"c":0,"d":1,"e":0,"f":0},"connections":[[1,0,0,0],[2,0,1,1]],"format":"0.0.3","date":"2025-04-01T04:10:48.102Z"} **LAYOUT**/ 
+    
+	export const $uniforms={}
+	const attribute=uv(0);
+	const meshstandardmaterial_in_4=color(0xe7c800).mul(attribute);
+	const meshstandardmaterial=()=>{
+		const material=new THREE.MeshStandardNodeMaterial();
+		material.colorNode=meshstandardmaterial_in_4;
+		return material;
+	};
+
+	//export const materials=[meshstandardmaterial()];
+	const materials=meshstandardmaterial();
+
+	const geolig=new THREE.BoxGeometry(8,8,8);
+	const lig=new THREE.Mesh(geolig,materials);
+	lig.position.set(0,0,);
+	scene.add(lig);
+
+function animate(){
+	requestAnimationFrame(animate);
+	controls.update();
+	renderer.renderAsync(scene,camera);
+}
+
+animate();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>molder.html</title>
+<meta charset="utf-8" />
+<link rel="shortcut icon" href="../ok.ico">
+
+<style>
+body{margin:0;background-color:#025;font-family:Lucida Console;font-size:12pt;color:#cff;overflow:hidden;}
+span,button,img{position:absolute;left:10px;font-family:Lucida Console;font-size:11pt;font-weight:bold;color:#ff0;}
+button{border:3px outset #900;border-radius:7px;width:120px;}
+button:hover{border:3px inset #0c0;}
+</style>
+
+<script type="importmap">
+{"imports": {"three": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.module.min.js",
+"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.172.0/examples/jsm/"}}
+</script>
+
+</head>
+
+<body>
+<img src="img\molder.png" style="top:80%;left:10px;width:160px;"></img>
+<span style="left:5px;top:10px;">Vertices:</span><span id="sp2" style="left:100px;top:10px;">0</span>
+<span style="left:5px;top:40px;">vertex #:</span><span id="spv" style="left:100px;top:40px;">?</span>
+<button id="meshy"	style="left: 5px;top: 80px;color:#060;">Mesh Yes</button>
+<button id="meshn"	style="left:125px;top: 80px;color:#900;">Mesh No</button>
+<button id="verty"	style="left: 5px;top:120px;color:#060;">Vert Yes</button>
+<button id="vertn"	style="left:125px;top:120px;color:#900;">Vert No</button>
+<button id="grow"	style="left: 5px;top:160px;color:#060;">Grow Yes</button>
+<button id="remgrow"	style="left:125px;top:160px;color:#900;">Grow No</button>
+<button id="shrink"	style="left: 5px;top:200px;color:#060;">Shrink Yes</button>
+<button id="remshrink"	style="left:125px;top:200px;color:#900;">Shrink No</button>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { STLExporter } from 'three/addons/exporters/STLExporter.js';
+import { OBJExporter } from 'three/addons/exporters/OBJExporter.js';
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+var scene,camera,renderer,loader,controls,ob,obclone,position,link,exporter,result;
+
+var vector=new THREE.Vector3();
+var g=[],m=[],s=[],c=[],v=[];
+for(let z=0;z<2000;z++){c[z]=0;v[z]=new THREE.Vector3();}
+
+var iw=window.innerWidth,ih=window.innerHeight;
+var raycaster=new THREE.Raycaster();
+var mouse=new THREE.Vector2();
+var selected,intersects=[],alvos=[];
+var vx=0,numver=0,p=Math.PI,meshsim=1,vertsim=1;
+var gs=0;
+
+var dmeshy=document.getElementById("meshy");
+var dmeshn=document.getElementById("meshn");
+var dverty=document.getElementById("verty");
+var dvertn=document.getElementById("vertn");
+var dgrow=document.getElementById("grow");
+var dremgrow=document.getElementById("remgrow");
+var dshrink=document.getElementById("shrink");
+var dremshrink=document.getElementById("remshrink");
+
+
+
+const params={exportBinary:exportBinary,exportToObj:exportToObj};
+
+	dmeshy.onclick=function(){scene.add(ob);}
+	dmeshn.onclick=function(){scene.remove(ob);}
+	dverty.onclick=function(){for(let z=0;z<=numver;z++){if(s[z]){   scene.add(s[z]);};scene.add(ob);}}
+	dvertn.onclick=function(){for(let z=0;z<=numver;z++){if(s[z]){scene.remove(s[z]);}}}
+	dgrow.onclick=function(){gs=1;grow();}
+	dremgrow.onclick=function(){remgrow();}
+	dshrink.onclick=function(){gs=-1;grow();}
+	dremshrink.onclick=function(){remgrow();}
+
+	scene=new THREE.Scene();
+
+	camera=new THREE.PerspectiveCamera(20,iw/ih,0.1,1000);
+	scene.add(camera);
+	camera.position.set(100,20,50);
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setClearColor('#025',1);
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(iw,ih);
+
+	document.body.appendChild(renderer.domElement);
+
+	window.addEventListener("mousedown",onClick);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	
+	for(let z=0;z<2000;z++){
+		g[z]=new THREE.BoxGeometry(0.1,0.7,0.7);
+		m[z]=new THREE.MeshStandardMaterial({color:'#f0f'});
+		s[z]=new THREE.Mesh(g[z],m[z]); 
+	}
+
+	var geom=new THREE.BoxGeometry(10,32,32,1,28,28);
+	ob=new THREE.Mesh(geom,new THREE.MeshStandardMaterial({color:'#447',metalness:0.7,roughness:0.2}));
+	ob.position.set(0,0,0);
+	scene.add(ob);
+
+ 	console.log(ob.geometry.isBufferGeometry);
+	console.log(ob.isMesh );
+	if(ob.isMesh ){
+		position=ob.geometry.attributes.position;
+		vector=new THREE.Vector3();
+		for(let i=0;i<position.count;i++){
+			if(i){
+				document.getElementById("sp2").innerText=i;
+ 				vector.fromBufferAttribute(position,i);
+				vector.applyMatrix4(ob.matrixWorld);
+				v[i]=vector.clone();
+				numver=i;
+				//s[i]=new THREE.Mesh(g[i],m[i]);s[i].position.set(v[i].x,v[i].y,v[i].z);scene.add(s[i]);s[i].name="s"+i;alvos.push(s[i]);
+			}
+		}
+		for(let w=0;w<17;w++){
+			for(let z=w;z<841;z=z+17){
+				s[z]=new THREE.Mesh(g[z],m[z]);s[z].position.set(v[z].x,v[z].y,v[z].z);scene.add(s[z]);s[z].name="s"+z;alvos.push(s[z]);
+			}
+		}
+		let q=1739;
+		s[q]=new THREE.Mesh(g[q],m[q]);s[q].position.set(v[q].x,v[q].y,v[q].z);scene.add(s[q]);s[q].name="s"+q;alvos.push(s[q]);
+		scene.remove(s[0]);//alvos.pop(s[0]);
+
+	}
+
+	link=document.createElement('a');
+	link.style.display='none';
+	document.body.appendChild(link);
+
+	const gui=new GUI();
+	gui.add(params,'exportBinary').name('Export STL Binary');
+	gui.add(params,'exportToObj').name('Export OBJ');
+	gui.open();
+
+	var lig1=new THREE.AmbientLight('#fff',15);scene.add(lig1);
+	var lig2=new THREE.PointLight('#fff',700);lig2.position.set(100,30,-60);scene.add(lig2);
+	var lig3=new THREE.PointLight('#fff',700);lig3.position.set(-100,0,60);scene.add(lig3);
+
+function exportBinary(){
+	const exporter=new STLExporter();
+	obclone=ob.clone();obclone.rotation.x=p/2;obclone.updateMatrixWorld();
+	result=exporter.parse(obclone,{binary:true});
+	saveArrayBuffer(result,'mold.stl');
+	}
+function save(blob,filename){link.href=URL.createObjectURL(blob);link.download=filename;link.click();}
+function saveString(text,filename){save(new Blob([text],{type:'text/plain'}),filename);}
+function saveArrayBuffer(buffer,filename){save(new Blob([buffer],{type:'application/octet-stream'}),filename);}
+function exportToObj(){const exporter=new OBJExporter();result=exporter.parse(scene);saveString(result,'mold.obj');}
+
+function onClick(event){
+	mouse.x=event.clientX/iw*2-1;
+	mouse.y=-(event.clientY/ih)*2+1;
+	raycaster.setFromCamera(mouse,camera);
+	intersects=raycaster.intersectObjects(alvos,true);
+	if(intersects.length>0){
+		selected=intersects[0].object;
+		vx=Number(selected.name.substring(1));
+		if(c[vx]==1){
+			s[vx].material.color.set('#f0f');c[vx]=0;
+		}else{
+			s[vx].material.color.set('#ff0');c[vx]=1;
+		}
+		document.getElementById("spv").innerText=vx;
+	}
+}
+
+function grow(){
+	position =ob.geometry.attributes.position;
+	for(let i=0;i<position.count;i++){
+		if(i){
+			if(c[i]==1){
+				position.setX(i,s[i].position.x+gs);s[i].position.x=s[i].position.x+gs;
+				position.needsUpdate=true;
+			}
+		}
+	}
+}
+
+function remgrow(){
+	position =ob.geometry.attributes.position;
+	for(let i=0;i<position.count;i++){
+		if(i){
+			if(c[i]==1){
+				position.setX(i,v[i].x);s[i].position.x=v[i].x;
+				position.needsUpdate=true;
+			}
+		}
+	}
+}
+
+function animate(){requestAnimationFrame(animate);renderer.render(scene,camera);}
+
+animate();
+
+/*
+An idea for mold making
+
+choose the points...
+grow the points...
+clear the vertices...
+ecport it
+*/
+
+</script>
+
+</body>
+</html>

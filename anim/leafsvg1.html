@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>leafsvg1.html</title>
+<meta name="description" content="SvG and ExtrudeGeometry">
+<meta charset="utf-8" />
+<link rel="shortcut icon" href="../ok.ico">
+
+<script type="importmap">
+{"imports": {"three": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.module.min.js",
+"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.172.0/examples/jsm/"}}
+</script>
+
+<style>
+body{margin:0;background-color:#024;overflow:hidden;}
+span{font-family:Lucida Console;font-size:16pt;color:#0ff;}
+</style>
+
+</head>
+
+<body>
+
+<span id="sp" style="position:absolute;width:99%;top:10px;color:#0c0;text-align:center;">
+SVG and ExtrudeGeometry ... Leaf Experience N&#176;1
+</span>
+
+<script type="module">
+
+import * as THREE from "three"
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
+
+var scene,camera,renderer,controls,loader;
+var paths=[],shapes=[];
+var ax=[],gr=[],j=[],l=[];
+for(let z=1;z<20;z++){gr[z]=new THREE.Group();ax[z]=new THREE.AxesHelper(0.001);}
+var sim=0,a=0,p=Math.PI;
+
+function init(){
+
+	scene=new THREE.Scene()
+	camera=new THREE.PerspectiveCamera(30,window.innerWidth/window.innerHeight,1,1000,)
+	camera.position.set(3,4,8)
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setClearColor(0x222222,0);
+	renderer.setPixelRatio(window.devicePixelRatio)
+	renderer.setSize(window.innerWidth, window.innerHeight)
+	document.body.appendChild(renderer.domElement)
+	window.addEventListener("resize",onWindowResize);
+	controls=new OrbitControls(camera,renderer.domElement);
+	
+	l[1]=new THREE.AmbientLight('#fc9',5);scene.add(l[1]);
+	l[2]= new THREE.DirectionalLight('#fff',3);l[2].position.set(-10,10,-10);scene.add(l[2]);
+
+	const g=new THREE.TorusGeometry(1,0.005,8,8,0.32);
+	const m=new THREE.MeshStandardMaterial({color:'#330'});
+	for(let z=1;z<12;z++){
+		j[z]=new THREE.Mesh(g,m);
+		j[z].rotation.set(1,p/2,0);
+		j[z].position.set(0,-0.965,0.45);
+	}
+
+	loader=new SVGLoader();
+	const mm=new THREE.MeshStandardMaterial({color:'#060',metalness:0.7,roughness:0.1});
+	loader.load('img/leaf_1.svg',function(data){
+		paths=data.paths;
+		shapes=SVGLoader.createShapes(paths[0]);
+		const gg=new THREE.ExtrudeGeometry(shapes[0],{depth:1,curveSegments:20});
+		const mesh=new THREE.Mesh(gg,mm);
+		mesh.position.set(0,0,0);
+
+		fj(3,1);ax[4].rotation.y=p*2/5;
+		fj(5,2);ax[6].rotation.y=p*4/5;
+		fj(7,3);ax[8].rotation.y=p*6/5;
+		fj(9,4);ax[10].rotation.y=p*8/5;
+		fj(11,5);ax[11].rotation.y=p*10/5;
+
+		function fj(r1,r2){
+			a=0;
+			gr[r2]=new THREE.Group();
+			for(let z=0;z<315;z++){
+				a=a+0.01;
+				const j=mesh.clone();
+				j.position.set(0,2*Math.sin(a),2+z/10);
+				j.scale.set(Math.sin(a)/18,0.01,1);
+				gr[r2].add(j);
+			}
+			gr[r2].scale.setScalar(0.1);
+			gr[r1].add(j[r2]);
+			gr[r1].add(gr[r2]);
+			gr[r1].position.set(0,0.13,0.1);
+			ax[r1+1].add(gr[r1]);
+		}
+	})
+}
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	if(sim==0 && ax[11]){
+		for(let z=4;z<20;z++){
+			if(ax[z]){gr[19].add(ax[z]);}
+		}
+		scene.add(gr[19]);
+		sim=1;
+	}
+	if(sim==1){
+		gr[19].rotation.y -=0.01;
+	}
+	renderer.render(scene, camera);
+}
+
+init();
+animate();
+
+</script>
+</body>
+</html>

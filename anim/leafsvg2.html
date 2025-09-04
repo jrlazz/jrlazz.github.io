@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>leafsvg2.html</title>
+<meta charset="utf-8" />
+<link rel="icon" type="image/png" href="img/grad.png">
+<meta name="description" content="SvG and ExtrudeGeometry - Ixora">
+<meta data-rh="true" name="twitter:image" content="img/ag_baboy_r.png"/>
+
+<script type="importmap">
+{"imports": {"three": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.module.min.js",
+"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.172.0/examples/jsm/"}}
+</script>
+
+<style>
+body{margin:0;background-color:#024;overflow:hidden;}
+span{position:absolute;left:10px;font-family:Lucida Console;font-size:11pt;font-weight:bold;color:#f03;}
+</style>
+
+</head>
+
+<body>
+
+<span id="sp" style="position:absolute;width:99%;top:10px;text-align:center;">
+SVG and ExtrudeGeometry ... Leaf Experience N&#176;2 ... observing Bougainvillea<br>
+Bougainvillea (Ixora) is a genus of flowering plants native to South America
+</span>
+
+<script type="module">
+
+import * as THREE from "three"
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
+
+var scene,camera,renderer,controls,loader;
+var paths=[],shapes=[];
+var bx=[],cx=[],fx={},gr=[],j=[],l=[],k=[];
+
+for(let z=1;z<50;z++){
+	gr[z]=new THREE.Group();bx[z]=new THREE.AxesHelper(0.001);cx[z]=new THREE.AxesHelper(0.001);fx[z]=new THREE.AxesHelper(0.001);
+	bx[z].setColors('#024','#024','#024');cx[z].setColors('#024','#024','#024');fx[z].setColors('#024','#024','#024');
+}
+
+var sim=0,a=0,p=Math.PI;
+
+var vector=new THREE.Vector3();
+var g=[],m=[],s=[],c=[],v=[];
+for(let z=0;z<2000;z++){c[z]=0;v[z]=new THREE.Vector3();}
+
+var iw=window.innerWidth,ih=window.innerHeight;
+
+function init(){
+
+	scene=new THREE.Scene()
+	camera=new THREE.PerspectiveCamera(25,window.innerWidth/window.innerHeight,1,1000,)
+	camera.position.set(-16,-8,-2)
+	scene.position.y=1;
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setClearColor(0x222222,0);
+	renderer.setPixelRatio(window.devicePixelRatio)
+	renderer.setSize(window.innerWidth, window.innerHeight)
+	document.body.appendChild(renderer.domElement)
+	window.addEventListener("resize",onWindowResize);
+	controls=new OrbitControls(camera,renderer.domElement);
+	
+	l[1]=new THREE.AmbientLight('#fc9',6);scene.add(l[1]);
+	l[2]= new THREE.DirectionalLight('#fff',6);l[2].position.set(-10,10,-10);scene.add(l[2]);
+
+	const g=new THREE.TorusGeometry(1,0.005,8,8,0.8);
+	const m=new THREE.MeshStandardMaterial({color:'#fc0'});
+	for(let z=1;z<3;z++){
+		k[z]=new THREE.Mesh(g,m);k[z].rotation.set(p/2.6,p/2,0);
+		bx[z].add(k[z]);
+		bx[z].rotation.set(0,p/4+p/2*(z+1),p);bx[z].position.set(0,0.57,0);bx[z].scale.set(1,0.5,1);
+		bx[18].add(bx[z]);
+	}
+
+	for(let z=4;z<7;z++){
+		k[z]=new THREE.Mesh(g,m);k[z].rotation.set(p/2.6,p/2,0);
+		bx[z].add(k[z]);
+		bx[z].rotation.set(0,p/4+p/2*(z+1),p);bx[z].position.set(0,0.57,0);bx[z].scale.set(1,0.5,1);
+		bx[19].add(bx[z]);
+	}
+
+	for(let z=9;z<11;z++){
+		k[z]=new THREE.Mesh(g,m);k[z].rotation.set(p/2.6,p/2,0);
+		bx[z].add(k[z]);
+		bx[z].rotation.set(0,p/4+p/2*(z+1),p);bx[z].position.set(0,0.57,0);bx[z].scale.set(1,0.5,1);
+		bx[20].add(bx[z]);
+	}
+
+	const gc=new THREE.CylinderGeometry(0.005,0.03,3,8,8);
+	gc.translate(0,-1.3,0);
+	const mc=new THREE.MeshStandardMaterial({color:'#903',metalness:0.7,roughness:0.1});
+	s[998]=new THREE.Mesh(gc,mc);bx[18].add(s[998]);
+	s[997]=new THREE.Mesh(gc,mc);bx[19].add(s[997]);
+	s[996]=new THREE.Mesh(gc,mc);bx[20].add(s[996]);
+
+	const gs=new THREE.SphereGeometry(0.01,8,8);
+	const ms=new THREE.MeshStandardMaterial({color:'#fc0'});
+	s[991]=new THREE.Mesh(gs,ms);s[991].position.set(0,0.2,0);bx[18].add(s[991]);
+	s[992]=new THREE.Mesh(gs,ms);s[992].position.set(0,0.2,0);bx[19].add(s[992]);
+	s[993]=new THREE.Mesh(gs,ms);s[993].position.set(0,0.2,0);bx[20].add(s[993]);
+	
+	const gss=new THREE.SphereGeometry(0.05,8,8);
+	const mss=new THREE.MeshStandardMaterial({color:'#903'});
+	s[995]=new THREE.Mesh(gss,mss);
+	s[995].position.set(3.1,0,0);
+	scene.add(s[995]);
+
+	loader=new SVGLoader();
+	const mm=new THREE.MeshStandardMaterial({color:'#903',metalness:0.7,roughness:0.1});
+	loader.load('img/leaf_2.svg',function(data){
+		paths=data.paths;
+		shapes=SVGLoader.createShapes(paths[0]);
+		const gg=new THREE.ExtrudeGeometry(shapes[0],{depth:1,curveSegments:20});
+		const mesh=new THREE.Mesh(gg,mm);
+		mesh.position.set(0,0,0);
+
+		fj(3,1);cx[4].rotation.y=0;
+		fj(5,2);cx[6].rotation.y=-p/2;
+		fj(7,3);cx[8].rotation.y=p/2;
+		fj(9,4);cx[10].rotation.y=p;
+
+		let h=11;fj(h,h-1);cx[h+1].rotation.y=0;
+		h=13;fj(h,h-1);cx[h+1].rotation.y=-p/2;
+		h=15;fj(h,h-1);cx[h+1].rotation.y=p/2;
+		h=17;fj(h,h-1);cx[h+1].rotation.y=p;
+
+		h=19;fj(h,h-1);cx[h+1].rotation.y=0;
+		h=21;fj(h,h-1);cx[h+1].rotation.y=-p/2;
+		h=23;fj(h,h-1);cx[h+1].rotation.y=p/2;
+		h=25;fj(h,h-1);cx[h+1].rotation.y=p;
+
+		function fj(r1,r2){
+			a=0;
+			gr[r2]=new THREE.Group();
+			for(let z=0;z<315;z++){
+				a=a+0.01;
+				const j=mesh.clone();
+				j.position.set(0,2*Math.sin(a),z/20);
+				j.scale.set(Math.sin(a)/6.5,0.05,0.2);
+				gr[r2].add(j);
+			}
+			gr[r2].scale.setScalar(0.1);
+			gr[r1].add(gr[r2]);
+			gr[r1].position.set(0,0,-0.05);
+			cx[r1+1].add(gr[r1]);
+		}
+	})
+
+}
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	if(sim==0 && cx[28]){
+
+		for(let z=4;z<12;z++){if(cx[z]){gr[22].add(cx[z]);}}
+		bx[18].add(gr[22]);bx[18].position.x=1.7;bx[18].position.y=0.2;
+		fx[18].add(bx[18]);
+		fx[18].rotation.z=1;fx[18].rotation.x=1.75;
+
+		for(let z=11;z<19;z++){if(cx[z]){gr[31].add(cx[z]);}}
+		bx[19].add(gr[31]);bx[19].position.x=1.7;bx[19].position.y=0.2;
+		fx[19].add(bx[19]);
+		fx[19].rotation.z=1;fx[19].rotation.x=-1.75;
+
+		for(let z=20;z<28;z++){if(cx[z]){gr[39].add(cx[z]);}}
+		bx[20].add(gr[39]);bx[20].position.x=1.7;bx[20].position.y=0.2;
+		fx[20].add(bx[20]);
+		fx[20].rotation.z=1;fx[20].rotation.x=0;
+
+		fx[30].add(fx[18]);
+		fx[30].add(fx[19]);
+		fx[30].add(fx[20]);
+		scene.add(fx[30]);
+
+		sim=1;
+	}
+	if(sim==1){
+		fx[30].rotation.x +=0.01;
+	}
+	renderer.render(scene, camera);
+}
+
+init();
+animate();
+
+</script>
+</body>
+</html>

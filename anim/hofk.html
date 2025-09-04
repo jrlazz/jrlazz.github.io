@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>collision4_hofk.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="ok.ico"/>
+<style>
+body{margin:0;background-color:#000;font-family:Monospace;font-size:12pt;color:#cff;overflow:hidden;}
+</style>
+<script type="importmap">
+	{
+	  "imports": {
+		"three": "https://unpkg.com/three@0.171.0/build/three.module.min.js",
+		"three/addons/": "https://unpkg.com/three@0.171.0/examples/jsm/"
+	  }
+	}
+  </script>
+</head>
+
+<body>
+
+<div style="position:absolute;top:10px;left:25px;">
+https://discourse.threejs.org/t/collisions-two-objects/4125/2
+<br/>
+https://hofk.de/main/threejs/kollision/02_kollision.html
+<br/>
+https://discourse.threejs.org/t/solved-geometry-vertices-is-undefined/3133
+<br>
+"l" turn left ... "r" turn right ... "w" ahead ... "a" left ... "d" right ... "s" back ... "h" higher ... "t" lower
+<br>
+<input type="text" size="10" id="anzeige" >
+<br>
+<span id="sp"></span> 
+</div>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
+
+var scene,camera,renderer,container,ASPECT,NEAR,FAR,controls,objMaterial,obj,wandGeometrie,wandMaterial,wand1,wand2, kcode;
+var objGeometrie=[];
+var position;
+var vector=new THREE.Vector3();
+var vec=[];for(let z=0;z<1000;z++){vec[z]=new THREE.Vector3();}
+var vertexIndex=0;
+var originPoint=new THREE.Vector3();
+anzeige = document.getElementById("anzeige"); 
+var collidableMeshes = [];
+var localVertex,globalVertex,directionVector,ray,collisionResults;
+
+init();
+animate();
+
+function init(){
+
+	scene = new THREE.Scene();
+
+	camera = new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,0.1,2000);
+	scene.add(camera);
+	camera.position.set(50,350,800);
+	
+	renderer = new THREE.WebGLRenderer( {antialias:true} );
+	renderer.setSize(window.innerWidth, window.innerHeight);	
+
+	document.body.appendChild(renderer.domElement); 
+
+	document.addEventListener('keydown', function(event) {	   // Objekt mit Tasten bewegen
+		kcode = event.keyCode;	                               	 
+		if (kcode == 76) { obj.rotation.y = obj.rotation.y + 0.1 } //l
+		if (kcode == 82) { obj.rotation.y = obj.rotation.y - 0.1 } //r
+		if (kcode == 65) { obj.position.x = obj.position.x - 10 }  //a
+		if (kcode == 68) { obj.position.x = obj.position.x + 10 }  //d
+		if (kcode == 87) { obj.position.z = obj.position.z - 10 }  //w
+		if (kcode == 83) { obj.position.z = obj.position.z + 10 }  //s
+		if (kcode == 72) { obj.position.y = obj.position.y + 10 }  //h
+		if (kcode == 84) { obj.position.y = obj.position.y - 10 }  //t			
+	}); 
+
+	controls = new OrbitControls( camera, renderer.domElement );	
+
+	objGeometrie = new THREE.BoxGeometry(64, 64, 64, 8, 8, 8);
+	objMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe:true} );
+	obj = new THREE.Mesh( objGeometrie, objMaterial );              
+
+/* @Mugen87
+console.log( obj.geometry.isBufferGeometry );
+if ( child.isMesh ) {
+	const position = child.geometry.attributes.position;
+	const vector = new THREE.Vector3();
+	for ( let i = 0, l = position.count; i < l; i ++ )
+		vector.fromBufferAttribute( position, i );
+		vector.applyMatrix4( child.matrixWorld );
+		console.log(vector);
+	}
+}
+*/
+
+	console.log( objGeometrie.isBufferGeometry );
+	if ( obj.isMesh ) {
+		position = obj.geometry.attributes.position;
+		vector = new THREE.Vector3();
+		for ( let i = 0, l = position.count; i < l; i ++ )
+			if(i){
+				document.getElementById("sp").innerText=i;
+				vector.fromBufferAttribute( position, i );
+				vector.applyMatrix4( obj.matrixWorld );
+				//console.log(vector);
+				vec[i]=vector.clone();
+			}
+//objGeometrie.vertices.push(vector)
+
+//obj.vertices.push(vector)
+		}
+
+	}
+
+alert(vec[1].x);
+
+//alert(obj.geometry.vertices);
+//alert(objGeometrie.vertices);
+
+//	objGeometrie.vertices[95].x = objGeometrie.vertices[95].x - 20 ; //  Knoten links rausziehen (Nase)
+
+	//vec[95].x=vec[95].x-20
+
+	//vector.x = vector.x - 20 ; //  Knoten links rausziehen (Nase)
+
+	obj.position.set(0, 32, 200);
+	scene.add( obj );	
+
+	wandGeometrie = new THREE.BoxGeometry( 400, 100, 8, 4, 4, 2 );
+	wandMaterial = new THREE.MeshBasicMaterial( {color: 0x99ffff, wireframe:true} );	
+	wand1 = new THREE.Mesh(wandGeometrie, wandMaterial);
+	wand1.position.y = 50;
+	scene.add(wand1);
+	collidableMeshes.push(wand1);  // zum Datenfeld der Kollisionsobjekte hinzufuegen		
+	wand2 = new THREE.Mesh(wandGeometrie, wandMaterial);
+	wand2.position.set(-200, 50, 200);
+	wand2.rotation.y = 1.57;
+	scene.add(wand2);
+	collidableMeshes.push(wand2); // zum Datenfeld der Kollisionsobjekte hinzufuegen	
+
+function collision(origin){
+	anzeige.value = " ";
+
+//	for (vertexIndex = 0; vertexIndex < obj.geometry.vertices.length; vertexIndex++) { // fuer alle Knoten: 	
+//	for (vertexIndex = 0; vertexIndex < 10; vertexIndex++) { // fuer alle Knoten: 	
+//	for (vertexIndex = 0; vertexIndex < vector.length; vertexIndex++) { // fuer alle Knoten: 	
+
+	for (vertexIndex = 0; vertexIndex < vec.length; vertexIndex++) { // fuer alle Knoten: 	
+		//localVertex = obj.geometry.vertices[vertexIndex].clone(); // Knoten kopieren
+		//globalVertex = localVertex.applyMatrix4( obj.matrix ); // Projektion
+
+		localVertex = vec[vertexIndex];
+		globalVertex = localVertex.applyMatrix4( obj.matrix ); // Projektion
+//originPoint.position.set(vec[vertexIndex].x,vec[vertexIndex].y,vec[vertexIndex].z);
+originPoint=vec[vertexIndex].clone();
+		directionVector = globalVertex.sub(obj.position ); // Richtung (Subtraktion)
+		ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() ); // Strahl ...
+		collisionResults = ray.intersectObjects( collidableMeshes ); // ... schneidet Kollisionsobjekte
+		if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {	
+			anzeige.value = "Kollision";	  	
+			wandMaterial.color.set(0xff0000);			
+		}
+	}
+}
+
+
+function animate(){
+	requestAnimationFrame( animate );  // rekursiver Aufruf der Animation
+	//wandMaterial.color.set(0xffffff);
+	objMaterial.color.set(0x00ff00);
+	//originPoint = obj.position.clone();    // Mittelpunkt des Objekts
+
+	collision(originPoint)                 // Kollision ermitteln, Reaktion 
+	renderer.render( scene, camera );	
+}
+
+</script>
+</html>
