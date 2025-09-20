@@ -9,45 +9,19 @@
 @font-face {font-family:lucida;src:url(lucida_console.ttf);}
 span{position:absolute;font-family:lucida;font-size:9pt;width:40px;font-style:italic;text-align:center;z-index:1;}
 img:hover{cursor:pointer;}
-body {margin:8px; background-color:#899;font-family:lucida;}
+body {margin:0px;background-color:#001144;overflow:hidden;font-family:lucida;}
 td{font-family:lucida;font-size:9pt;color:#001122;font-style:italic;text-align:center;}
-.red{filter: invert(17%) sepia(79%) saturate(4241%) hue-rotate(339deg) brightness(87%) contrast(99%);}
-.gre{filter: invert(26%) sepia(48%) saturate(3609%) hue-rotate(99deg) brightness(87%) contrast(104%);}
 .blu{filter: invert(41%) sepia(86%) saturate(2434%) hue-rotate(195deg) brightness(104%) contrast(101%);}
-.slider{-webkit-appearance:none; width:50px; height:2px; background:#006699; opacity:0.5; -webkit-transition:.2s; transition:opacity.2s;}
-.slider:hover{opacity:1;}
-.slider::-webkit-slider-thumb{-webkit-appearance: none; appearance: none; width:8px; height:8px; border-radius:50px; background:#006699; cursor:pointer;}
-.slider::-moz-range-thumb{width:8px; height:8px; border-radius:50px; background:#006699; cursor:pointer;}
 </style>
 
 </head>
 
-<body style="margin:0px;background-color:#001144;overflow:hidden;">
-
-<span style="left:10px;top:40px;color:#006699;">
-If a 3Dreamer can code it...<br>
-Mother Nature had created before...<br><br>
-Do not loose Your mind...<br>
-You are what You remember...<br><br>
-I wish VV is there...<br>
-but accept God alternatives...
-</span>
-
-<span id="spanB" style="left:90%;top:40px;color:#006699;font-size:9pt;font-style:italic;z-index:2;">
-Sweet dreams VV Piruba...<br><br>
-good dreams go with You tonight...<br><br>
-Love came all around around...<br><br>
-looking for a dream around around...<br><br>
-then VV went!
-</span>
+<body>
 
 <script type="module">
 
 import * as THREE from '../js/three.module_res_res.js';
 import { OrbitControls } from '../js/OrbitControls_res_res.js';
-
-//import * as THREE from 'https://threejs.org/build/three.module.js';
-//import { OrbitControls } from 'https://threejs.org/examples/jsm/controls/OrbitControls.js';
 
 var renderer,scene,camera,geometry,material,controls;
 var altera=0;
@@ -87,9 +61,7 @@ function init(){
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth,window.innerHeight);
 	document.body.appendChild(renderer.domElement);
-	//	renderer.outputEncoding=THREE.sRGBEncoding;
 	renderer.shadowMap.enabled=true;
-	//	renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 	renderer.setClearColor(0x001144);
 
 	scene=new THREE.Scene();
@@ -219,8 +191,6 @@ function render() {
 
 function alterando(){
 
-//	alert("... just click !!! ...\n ... I have always to put this ALERT for things work!!! ...");
-
 const myTimeout=setTimeout(segue, 400);
 
 function segue(){
@@ -238,64 +208,11 @@ function segue(){
 
 init();
 
-
-</script>
-
-<script src="../js/wavesurfer.min.js"></script>
-
-<script>
-
-var wavesurfer;
-	document.addEventListener('DOMContentLoaded',function(){
-		wavesurfer=WaveSurfer.create({
-		container:'#waveform',
-		waveColor:'#006699',
-		cursorColor:'#00112200',
-		progressColor:'#0099cc',
-		splitChannels:false,
-		height:40,
-		barWidth:0.5
-		});
-	});
-	document.addEventListener('DOMContentLoaded',function(){
-	var playPause=document.querySelector('#playPause');
-	playPause.addEventListener('click',function(){wavesurfer.playPause();});
-	wavesurfer.on('play',function(){document.querySelector('#play').style.display='none';document.querySelector('#pause').style.display='';});
-	wavesurfer.on('pause',function(){document.querySelector('#play').style.display='';document.querySelector('#pause').style.display='none';});
-	var links=document.querySelectorAll('#playlist a');
-	var currentTrack=0;
-	var setCurrentSong=function(index){links[currentTrack].classList.remove('active');currentTrack=index;links[currentTrack].classList.add('active');wavesurfer.load(links[currentTrack].href);};
-	Array.prototype.forEach.call(links,function(link,index){
-        	link.addEventListener('click',function(e){e.preventDefault();setCurrentSong(index);});
-	});
-	wavesurfer.on('ready',function(){wavesurfer.play();});
-	wavesurfer.on('error',function(e){console.warn(e);});
-	wavesurfer.on('finish',function(){setCurrentSong((currentTrack + 1) % links.length);});
-	setCurrentSong(currentTrack);
-});
-
 </script>
 
 <table style="position:absolute;left:33%;width:33%;top:0px;z-index:1;"><tr>
-<td>
-<img onmouseover="info();" onmouseout="infoout();" src="../img/inf.png" class="blu" style="width:16px;;"></img>
-</td>
-<td>
-<div onmouseover="info();" onmouseout="infoout();" id="waveform" style="position:relative;left:0px;top:-130px;width:300px;height:40px;"></div>
-<script>
-var wavesurfer=WaveSurfer.create({container:'#waveform'});
-</script>
-</td>
-<td style="width:10px;">
-<input onmouseover="info();" onmouseout="infoout();" class="slider" id="inpa" onchange="vol();" type="range" min="0" max="1" value="0" step="0.01" style="position:relative;top:-2px;">
-</td>
-<td >
-<span id="playlist" style="width:5px;"><a href="wandering_44100.mp3"></a></span>
-</td>
-<td  id="playPause" style="width:100px;">
-<img id="play" src="../img/aud.png" class="gre" style="width:16px;"></img>
-<img id="pause" src="../img/aud.png" class="red" style="width:16px;"></img>
-</td>
+<td><img onmouseover="info();" onmouseout="infoout();" src="../img/inf.png" class="blu" style="width:16px;;"></img></td>
+<td><div onmouseover="info();" onmouseout="infoout();" id="waveform" style="position:relative;left:0px;top:-130px;width:300px;height:40px;"></div></td>
 </tr>
 </table>
 
@@ -303,11 +220,6 @@ var wavesurfer=WaveSurfer.create({container:'#waveform'});
 <tr><td>
 <br>
 ... wandering<br>
-have You wander through the fields...<br>
-in the night...<br>
-between giant trees...<br>
-and thinking about Your Love...<br>
-Oh I&#39;ve done!<br><br>
 I did Wandering in the 60&#39;s (I was 17),<br>
 coded it in AdLib Visual Composer in the 80&#39;s,<br>
 mp3ed it in Audacity,<br>
@@ -318,21 +230,9 @@ and run Three.js with QuickPHP.<br><br>
 Jos&eacute; Roberto Lazzareschi, a 3Dreamer...
 <br>
 <br>
-<!--
-wandering... a 3Dreamer page
-http://jrlazz.eu5.org/wandering/wandering_freewha.html
-I had to do it.
-Jos&eacute; Roberto Lazzareschi
--->
-
 </td></tr></table>
 
 <script>
-
-document.getElementById("inpa").value=0.5;
-wavesurfer.setVolume(.5);
-
-function vol(){wavesurfer.setVolume(document.getElementById("inpa").value);}
 
 function info(){document.getElementById("info").style.display="";}
 function infoout(){document.getElementById("info").style.display="none";}
