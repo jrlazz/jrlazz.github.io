@@ -9,6 +9,7 @@
 <meta name="twitter:image:type" content="png" />
 <meta name="twitter:image:width" content="19" />
 <meta name="twitter:image:height" content="47" />
+
 <style>
 @font-face {font-family:lucida;src:url(lucida_console.ttf);}
 span{position:absolute;font-family:lucida;font-size:9pt;width:40px;font-style:italic;text-align:center;z-index:1;}
@@ -166,7 +167,7 @@ function onResize() {
 	camera.aspect=window.innerWidth/window.innerHeight;
 	camera.updateProjectionMatrix();
 	renderer.setSize(window.innerWidth,window.innerHeight);
-	document.getElementById("spanB").style.left=window.innerWidth-80+"px";
+//	document.getElementById("spanB").style.left=window.innerWidth-80+"px";
 }
 function animate() {
 	requestAnimationFrame(animate);
@@ -241,7 +242,7 @@ Jos&eacute; Roberto Lazzareschi, a 3Dreamer...
 function info(){document.getElementById("info").style.display="";}
 function infoout(){document.getElementById("info").style.display="none";}
 
-document.getElementById("spanB").style.left=window.innerWidth-80+"px";
+//document.getElementById("spanB").style.left=window.innerWidth-80+"px";
 
 </script>
 
