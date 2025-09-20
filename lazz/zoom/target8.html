@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>target8</title>
+
+<style>
+body { margin:0px; padding:0px; background-color:#bcc;}
+span { font-family: Arial, Helvetica, sans-serif; position:absolute; left:400px; top:90px; background-color:#9aa; color:#ff0; font-size:12pt; padding:4px; border:1px solid #ff0; width:120px;} 
+img { position:absolute; left:0px; top:0px;}
+div { position:absolute; width:0px; height:0px; overflow:none; display:inline-block;}
+</style>
+
+</head>
+
+<body >
+
+<div onmousemove="showCoords(event);" style="left:0px;top:0px;width:100%;height:100%;">
+
+<img id="ima" style="left:  0px;top:  0px;width:200px;height:200px;" src='flor_Vivi_1000.jpg'></img>
+<div id="diva" style="background-size:1000px;background-image:url('flor_Vivi_1000.jpg');left:  0px;top:  0px;width:200px;height:200px;cursor:pointer; display:none;"></div>
+
+<img id="imb" style="left:200px;top:200px;width:200px;height:200px;" src='paisa_2.jpg'></img>
+<div id="divb" style="background-size:500px;background-image:url('paisa_2.jpg');left:200px;top:200px;width:200px;height:200px;cursor:pointer; display:none;"></div>
+
+<span id="spana" style="left:201px;"> ... </span>
+<span id="spanb" style="top:300px;"> ... </span>
+</div>
+
+<img style="left:70px;top:270px;cursor:pointer;" onclick="window.history.back();" onmouseover="this.src='../get_back_home_invert.png';" onmouseout="this.src='../get_back_home.png';" src="../get_back_home.png" title="get back home"></img>
+
+<script>
+
+var x=0
+var y=0;
+
+var wa=document.getElementById("ima").width;
+var ha=document.getElementById("ima").height;
+var wb=document.getElementById("imb").width;
+var hb=document.getElementById("imb").height
+
+function showCoords(event) {
+	x=event.clientX;
+	y=event.clientY;
+	document.getElementById("diva").style.display="none";
+	document.getElementById("divb").style.display="none";
+
+	if( x<=wa && y<=ha ){
+		if( x>wa || y>ha ){
+			document.getElementById("diva").style.display="none";
+		} else {
+			document.getElementById("diva").style.display="inline";
+			document.getElementById("diva").style.backgroundPosition= x/2 + '% ' + y/2 + '%';
+		}
+		document.getElementById("spana").innerText="ima\n x=" + x + " y=" + y + "\nwa=" + wa + " ha=" + ha;
+		document.getElementById("spanb").innerText=" ... ";
+	}
+
+	if( x>wa && y>ha && x<(wa+wb) && y<(ha+hb) ){
+		if( (x>wb && y>hb) || (y>hb && x>wb) ){
+			if( x>wb ){x=x-wb;}
+			if( y>hb ){y=y-hb;}
+			if( x>wb && y>hb ){
+				document.getElementById("divb").style.display="none";
+			} else {
+				document.getElementById("divb").style.display="inline";
+				document.getElementById("divb").style.backgroundPosition= x/2 + '% ' + y/2 + '%';
+			}
+		document.getElementById("spanb").innerText="imb\n x=" + (x+wb) + " y=" + (y+hb) + "\nwb=" + wb + " hb=" + hb;
+		document.getElementById("spana").innerText=" ... ";
+		}
+	}
+}
+
+</script>
+
+</body>
+</html>

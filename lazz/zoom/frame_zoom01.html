@@ -1,0 +1,84 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>frame_zoom01</title>
+<style>
+
+@font-face {font-family:Fonte;src:url('../Merienda-Regular.ttf');}
+body {margin:0px; padding:0px; font-family:Fonte; font-size:20pt; color:#008; background-color:#bcc;}
+a {font-family:Fonte; text-decoration:none;color:#909; font-size:24pt;}
+a:hover {font-family:Fonte; text-decoration:none; color:#f00;font-style:italic;}
+hr {width:200px; height:4px; background-color:#008; style:solid;}
+div { position:absolute; left:-500px; top:-500px; width:0px; height:0px;}
+
+figure.zoom {
+  background-position: 50% 50%;
+  position: relative;
+  width: 300px;
+  overflow: hidden;
+  cursor: zoom-in;
+}
+figure.zoom img:hover {
+  opacity: 0;
+}
+figure.zoom img {
+  transition: opacity .5s;
+  display: block;
+  width: 100%;
+}
+</style>
+
+<script>
+	window.console = window.console || function(t) {};
+</script>
+<script>
+if (document.location.search.match(/type=embed/gi)) {
+	window.parent.postMessage("resize", "*");
+}
+</script>
+
+</head>
+
+<body>
+
+<center>
+<table><tr>
+<td><img style="cursor:pointer;" onclick="window.history.back();" onmouseover="this.src='../get_back_home_invert.png';" onmouseout="this.src='../get_back_home.png';" src="../get_back_home.png" title="get back home"></img></td>
+<td>
+<center>
+<!--
+Aumento A
+<figure class="zoom" onmousemove="zoom(event)" style="background-image: url(slide2.jpg)">
+<img src="slide1.jpg" />
+</figure>
+-->
+Photo by Amir Taheri on Unsplash
+<figure class="zoom" onmousemove="zoom(event)" style="background-image: url(amir-taheri-aFcJle4nUKY-unsplash.jpg)">
+<img src="amir-taheri-aFcJle4nUKY-unsplash-reduced.jpg" />
+</figure>
+</center>
+</td>
+<td><img style="cursor:pointer;" onclick="window.history.back();" onmouseover="this.src='../get_back_home_invert.png';" onmouseout="this.src='../get_back_home.png';" src="../get_back_home.png" title="get back home"></img></td>
+</tr></table>
+</center>
+
+<script id="rendered-js">
+
+function zoom(e) {
+  var zoomer = e.currentTarget;
+  e.offsetX ? offsetX = e.offsetX : offsetX = e.touches[0].pageX;
+  e.offsetY ? offsetY = e.offsetY : offsetX = e.touches[0].pageX;
+  x = offsetX / zoomer.offsetWidth * 100;
+  y = offsetY / zoomer.offsetHeight * 100;
+  zoomer.style.backgroundPosition = x + '% ' + y + '%';
+}
+
+//# sourceURL=pen.js
+//# https://codepen.io/ccrch/pen/yyaraz
+</script>
+
+</script>
+
+</body>
+</html>
