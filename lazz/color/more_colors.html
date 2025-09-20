@@ -1,0 +1,2769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="apple-touch-icon" type="image/png" href="https://static.codepen.io/assets/favicon/apple-touch-icon-5ae1a0698dcc2402e9712f7d01ed509a57814f994c660df9f7a952f3060705ee.png" />
+<meta name="apple-mobile-web-app-title" content="CodePen">
+<link rel="shortcut icon" type="image/x-icon" href="https://static.codepen.io/assets/favicon/favicon-aec34940fbc1a6e787974dcd360f2c6b63348d4b1f4e06c77743096d55480f33.ico" />
+<link rel="mask-icon" type="" href="https://static.codepen.io/assets/favicon/logo-pin-8f3771b1072e3c38bd662872f6b673a722f4b3ca2421637d5596661b4e2132cc.svg" color="#111" />
+<title>CodePen - CSS filter generator to convert from black to target hex color</title>
+
+
+
+<style>
+@font-face {font-family:Heebo; src:url('Heebo-Regular.ttf');}
+
+body { font-family:Heebo; font-size:14pt; font-weight:bold; background-color:#bcc;}
+table { padding:0px;}
+td { padding:0px;}
+a { font-family:Heebo; font-size:12pt; text-decoration:none;}
+b { font-family:Heebo; font-size:12pt;}
+p { padding:0px;}
+td { min-width:80px; font-family:Heebo; font-size:14pt; text-align:right; cursor:pointer;}
+label {font-size:18pt ;font-family:Heebo; font-weight:bold;}
+big { color:red; font-family:Heebo; font-size:18pt;}
+div {position:relative; width:0%; height:0%;}
+.pixel { display:inline-block; background-color:#000; width:90%; height:30px;}
+.target {font-size:18pt;font-family:Heebo; font-weight:bold;}
+.execute {font-size:18pt;font-family:Heebo; font-weight:bold;}
+.filterDetail { color:brown; font-family:Heebo; font-size:14pt;}
+.lossDetail { color:red; font-family:Heebo; font-size:18pt;}
+
+</style>
+
+<script>
+	window.console = window.console || function(t) {};
+</script>
+
+<script>
+	if (document.location.search.match(/type=embed/gi)) {
+		window.parent.postMessage("resize", "*");
+	}
+</script>
+
+</head>
+
+<body>
+
+<table width="99%">
+<tr valign="top">
+<td colspan="2" style="text-align:center;">
+<label>Target color</label>
+<input id="inputrgb" class="target" type="text" placeholder="target hex" value="#00a4d6" />
+<button class="execute">Compute Filters</button>
+</td>
+</tr>
+<tr>
+<td style="text-align:center;width:50%;"><br><b>Real pixel, color applied through CSS background-color:</b></td>
+<td style="text-align:center;"><br><b>Filtered pixel, color applied through CSS filter:</b></td>
+</tr>
+<tr>
+<td style="text-align:center;"><div class="pixel realPixel"></div></td>
+<td style="text-align:center;"><div class="pixel filterPixel"></div></td>
+</tr>
+<tr>
+<td colspan="2" class="target" style="text-align:center;" id="aqui"></td>
+</tr>
+<tr>
+<td colspan="2" style="text-align:center;">
+<b id="detalhe" class="filterDetail"></b><br>
+<b class="lossDetail"></b>
+</td>
+</tr>
+<tr>
+<td colspan="2" id="mac" style="font-family:Heebo;font-size:14pt;font-weight:normal;text-align:center;">Mercury 1951 - 8035</td>
+</tr>
+</table>
+<hr>
+<!--
+<span onclick='carga(this.innerText);'>152</span>
+-->
+
+<script>
+
+function reescreve(){
+var stralt=document.getElementById("aqui").innerText.replace("Color Name: ","");
+document.getElementById("mac").innerText="." + stralt + " {" + document.getElementById("detalhe").innerText + "}";
+}
+
+
+//alert (1234);
+
+var pos=0;
+var res="";
+var resrgb="";
+
+function carga(tx){
+
+pos=tx.search("#");
+res=tx.substr(0,pos);
+resrgb=tx.substr(pos,7);
+	document.getElementById("aqui").innerText="Color Name: " + roc[tx];
+	document.getElementById("inputrgb").value=rgbroc[tx];
+	document.body.scrollTop = 0;
+	document.documentElement.scrollTop = 0;
+	botao();
+reescreve();
+}
+
+function cargb(tx){
+
+//pos=tx.search("#");
+//res=tx.substr(0,pos);
+//resrgb=tx.substr(pos,7);
+	document.getElementById("aqui").innerText="Color Name: " + znom[tx];
+	document.getElementById("inputrgb").value=zrgb[tx];
+	document.body.scrollTop = 0;
+	document.documentElement.scrollTop = 0;
+	botao();
+reescreve();
+}
+
+
+
+
+
+
+
+
+
+</script>
+
+
+<!--
+-->
+<script src="kga.js"></script>
+
+<script src='jquery.min.js'></script>
+
+
+
+<script id="rendered-js">
+
+'use strict';
+
+class Color {
+  constructor(r, g, b) {
+    this.set(r, g, b);
+  }
+
+  toString() {
+    return `rgb(${Math.round(this.r)}, ${Math.round(this.g)}, ${Math.round(this.b)})`;
+  }
+
+  set(r, g, b) {
+    this.r = this.clamp(r);
+    this.g = this.clamp(g);
+    this.b = this.clamp(b);
+  }
+
+  hueRotate(angle = 0) {
+    angle = angle / 180 * Math.PI;
+    const sin = Math.sin(angle);
+    const cos = Math.cos(angle);
+
+    this.multiply([
+    0.213 + cos * 0.787 - sin * 0.213,
+    0.715 - cos * 0.715 - sin * 0.715,
+    0.072 - cos * 0.072 + sin * 0.928,
+    0.213 - cos * 0.213 + sin * 0.143,
+    0.715 + cos * 0.285 + sin * 0.140,
+    0.072 - cos * 0.072 - sin * 0.283,
+    0.213 - cos * 0.213 - sin * 0.787,
+    0.715 - cos * 0.715 + sin * 0.715,
+    0.072 + cos * 0.928 + sin * 0.072]);
+
+  }
+
+  grayscale(value = 1) {
+    this.multiply([
+    0.2126 + 0.7874 * (1 - value),
+    0.7152 - 0.7152 * (1 - value),
+    0.0722 - 0.0722 * (1 - value),
+    0.2126 - 0.2126 * (1 - value),
+    0.7152 + 0.2848 * (1 - value),
+    0.0722 - 0.0722 * (1 - value),
+    0.2126 - 0.2126 * (1 - value),
+    0.7152 - 0.7152 * (1 - value),
+    0.0722 + 0.9278 * (1 - value)]);
+
+  }
+
+  sepia(value = 1) {
+    this.multiply([
+    0.393 + 0.607 * (1 - value),
+    0.769 - 0.769 * (1 - value),
+    0.189 - 0.189 * (1 - value),
+    0.349 - 0.349 * (1 - value),
+    0.686 + 0.314 * (1 - value),
+    0.168 - 0.168 * (1 - value),
+    0.272 - 0.272 * (1 - value),
+    0.534 - 0.534 * (1 - value),
+    0.131 + 0.869 * (1 - value)]);
+
+  }
+
+  saturate(value = 1) {
+    this.multiply([
+    0.213 + 0.787 * value,
+    0.715 - 0.715 * value,
+    0.072 - 0.072 * value,
+    0.213 - 0.213 * value,
+    0.715 + 0.285 * value,
+    0.072 - 0.072 * value,
+    0.213 - 0.213 * value,
+    0.715 - 0.715 * value,
+    0.072 + 0.928 * value]);
+
+  }
+
+  multiply(matrix) {
+    const newR = this.clamp(this.r * matrix[0] + this.g * matrix[1] + this.b * matrix[2]);
+    const newG = this.clamp(this.r * matrix[3] + this.g * matrix[4] + this.b * matrix[5]);
+    const newB = this.clamp(this.r * matrix[6] + this.g * matrix[7] + this.b * matrix[8]);
+    this.r = newR;
+    this.g = newG;
+    this.b = newB;
+  }
+
+  brightness(value = 1) {
+    this.linear(value);
+  }
+  contrast(value = 1) {
+    this.linear(value, -(0.5 * value) + 0.5);
+  }
+
+  linear(slope = 1, intercept = 0) {
+    this.r = this.clamp(this.r * slope + intercept * 255);
+    this.g = this.clamp(this.g * slope + intercept * 255);
+    this.b = this.clamp(this.b * slope + intercept * 255);
+  }
+
+  invert(value = 1) {
+    this.r = this.clamp((value + this.r / 255 * (1 - 2 * value)) * 255);
+    this.g = this.clamp((value + this.g / 255 * (1 - 2 * value)) * 255);
+    this.b = this.clamp((value + this.b / 255 * (1 - 2 * value)) * 255);
+  }
+
+  hsl() {
+    // Code taken from https://stackoverflow.com/a/9493060/2688027, licensed under CC BY-SA.
+    const r = this.r / 255;
+    const g = this.g / 255;
+    const b = this.b / 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h,s,l = (max + min) / 2;
+
+    if (max === min) {
+      h = s = 0;
+    } else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r:
+          h = (g - b) / d + (g < b ? 6 : 0);
+          break;
+
+        case g:
+          h = (b - r) / d + 2;
+          break;
+
+        case b:
+          h = (r - g) / d + 4;
+          break;}
+
+      h /= 6;
+    }
+
+    return {
+      h: h * 100,
+      s: s * 100,
+      l: l * 100 };
+
+  }
+
+  clamp(value) {
+    if (value > 255) {
+      value = 255;
+    } else if (value < 0) {
+      value = 0;
+    }
+    return value;
+  }}
+
+
+class Solver {
+  constructor(target, baseColor) {
+    this.target = target;
+    this.targetHSL = target.hsl();
+    this.reusedColor = new Color(0, 0, 0);
+  }
+
+  solve() {
+    const result = this.solveNarrow(this.solveWide());
+    return {
+      values: result.values,
+      loss: result.loss,
+      filter: this.css(result.values) };
+
+  }
+
+  solveWide() {
+    const A = 5;
+    const c = 15;
+    const a = [60, 180, 18000, 600, 1.2, 1.2];
+
+    let best = { loss: Infinity };
+    for (let i = 0; best.loss > 25 && i < 3; i++) {if (window.CP.shouldStopExecution(0)) break;
+      const initial = [50, 20, 3750, 50, 100, 100];
+      const result = this.spsa(A, a, c, initial, 1000);
+      if (result.loss < best.loss) {
+        best = result;
+      }
+    }window.CP.exitedLoop(0);
+    return best;
+  }
+
+  solveNarrow(wide) {
+    const A = wide.loss;
+    const c = 2;
+    const A1 = A + 1;
+    const a = [0.25 * A1, 0.25 * A1, A1, 0.25 * A1, 0.2 * A1, 0.2 * A1];
+    return this.spsa(A, a, c, wide.values, 500);
+  }
+
+  spsa(A, a, c, values, iters) {
+    const alpha = 1;
+    const gamma = 0.16666666666666666;
+
+    let best = null;
+    let bestLoss = Infinity;
+    const deltas = new Array(6);
+    const highArgs = new Array(6);
+    const lowArgs = new Array(6);
+
+    for (let k = 0; k < iters; k++) {if (window.CP.shouldStopExecution(1)) break;
+      const ck = c / Math.pow(k + 1, gamma);
+      for (let i = 0; i < 6; i++) {if (window.CP.shouldStopExecution(2)) break;
+        deltas[i] = Math.random() > 0.5 ? 1 : -1;
+        highArgs[i] = values[i] + ck * deltas[i];
+        lowArgs[i] = values[i] - ck * deltas[i];
+      }window.CP.exitedLoop(2);
+
+      const lossDiff = this.loss(highArgs) - this.loss(lowArgs);
+      for (let i = 0; i < 6; i++) {if (window.CP.shouldStopExecution(3)) break;
+        const g = lossDiff / (2 * ck) * deltas[i];
+        const ak = a[i] / Math.pow(A + k + 1, alpha);
+        values[i] = fix(values[i] - ak * g, i);
+      }window.CP.exitedLoop(3);
+
+      const loss = this.loss(values);
+      if (loss < bestLoss) {
+        best = values.slice(0);
+        bestLoss = loss;
+      }
+    }window.CP.exitedLoop(1);
+    return { values: best, loss: bestLoss };
+
+    function fix(value, idx) {
+      let max = 100;
+      if (idx === 2 /* saturate */) {
+          max = 7500;
+        } else if (idx === 4 /* brightness */ || idx === 5 /* contrast */) {
+          max = 200;
+        }
+
+      if (idx === 3 /* hue-rotate */) {
+          if (value > max) {
+            value %= max;
+          } else if (value < 0) {
+            value = max + value % max;
+          }
+        } else if (value < 0) {
+        value = 0;
+      } else if (value > max) {
+        value = max;
+      }
+      return value;
+    }
+  }
+
+  loss(filters) {
+    // Argument is array of percentages.
+    const color = this.reusedColor;
+    color.set(0, 0, 0);
+
+    color.invert(filters[0] / 100);
+    color.sepia(filters[1] / 100);
+    color.saturate(filters[2] / 100);
+    color.hueRotate(filters[3] * 3.6);
+    color.brightness(filters[4] / 100);
+    color.contrast(filters[5] / 100);
+
+    const colorHSL = color.hsl();
+    return (
+      Math.abs(color.r - this.target.r) +
+      Math.abs(color.g - this.target.g) +
+      Math.abs(color.b - this.target.b) +
+      Math.abs(colorHSL.h - this.targetHSL.h) +
+      Math.abs(colorHSL.s - this.targetHSL.s) +
+      Math.abs(colorHSL.l - this.targetHSL.l));
+
+  }
+
+  css(filters) {
+    function fmt(idx, multiplier = 1) {
+      return Math.round(filters[idx] * multiplier);
+    }
+    return `filter: invert(${fmt(0)}%) sepia(${fmt(1)}%) saturate(${fmt(2)}%) hue-rotate(${fmt(3, 3.6)}deg) brightness(${fmt(4)}%) contrast(${fmt(5)}%);`;
+  }}
+
+
+
+function hexToRgb(hex) {
+  // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+  const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+  hex = hex.replace(shorthandRegex, (m, r, g, b) => {
+    return r + r + g + g + b + b;
+  });
+
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ?
+  [
+  parseInt(result[1], 16),
+  parseInt(result[2], 16),
+  parseInt(result[3], 16)] :
+
+  null;
+}
+
+
+$(document).ready(() => {
+  $('button.execute').click(() => {
+    const rgb = hexToRgb($('input.target').val());
+    if (rgb.length !== 3) {
+      alert('Invalid format!');
+      return;
+    }
+
+    const color = new Color(rgb[0], rgb[1], rgb[2]);
+    const solver = new Solver(color);
+    const result = solver.solve();
+
+    let lossMsg;
+    if (result.loss < 1) {
+      lossMsg = '<big style="color:#0c0;">This is a perfect result.</big>';
+    } else if (result.loss < 5) {
+      lossMsg = '<big style="color:blue;">The is close enough.</big>';
+    } else if (result.loss < 15) {
+      lossMsg = '<big>The color is somewhat off. Consider running it again.</big>';
+    } else {
+      lossMsg = '<big>The color is extremely off. Run it again!</big>';
+    }
+
+    $('.realPixel').css('background-color', color.toString());
+    $('.filterPixel').attr('style', result.filter);
+    $('.filterDetail').text(result.filter);
+    $('.lossDetail').html(`Loss: ${result.loss.toFixed(1)}. <b>${lossMsg}</b>`);
+  });
+});
+
+
+//# sourceURL=pen.js
+
+
+function botao()
+{
+    const rgb = hexToRgb($('input.target').val());
+    if (rgb.length !== 3) {
+      alert('Invalid format!');
+      return;
+    }
+
+    const color = new Color(rgb[0], rgb[1], rgb[2]);
+    const solver = new Solver(color);
+    const result = solver.solve();
+
+    let lossMsg;
+    if (result.loss < 1) {
+      lossMsg = '<big style="color:#0c0;">This is a perfect result.</big>';
+    } else if (result.loss < 5) {
+      lossMsg = '<big style="color:blue;">The is close enough.</big>';
+    } else if (result.loss < 15) {
+      lossMsg = '<big>The color is somewhat off. Consider running it again.</big>';
+    } else {
+      lossMsg = '<big>The color is extremely off. Run it again!</big>';
+    }
+
+    $('.realPixel').css('background-color', color.toString());
+    $('.filterPixel').attr('style', result.filter);
+    $('.filterDetail').text(result.filter);
+    $('.lossDetail').html(`Loss: ${result.loss.toFixed(1)}. <b>${lossMsg}</b>`);
+
+}
+
+
+
+</script>
+
+<script>
+
+// ********************************
+
+var roc=new Array(2000);
+
+roc[1]="Black";
+roc[2]="Navy blue";
+roc[3]="Duke blue";
+roc[4]="Medium blue";
+roc[5]="Blue";
+roc[6]="Phthalo blue";
+roc[7]="Zaffre";
+roc[8]="Blue (Pantone)";
+roc[9]="Oxford blue";
+roc[10]="Royal blue (dark)";
+roc[11]="Resolution blue";
+roc[12]="International Klein Blue";
+roc[13]="Prussian blue";
+roc[14]="UA blue";
+roc[15]="Rich black";
+roc[16]="Indigo dye";
+roc[17]="British racing green";
+roc[18]="Warm black";
+roc[19]="Cobalt blue";
+roc[20]="Absolute Zero";
+roc[21]="Midnight green (eagle green)";
+roc[22]="Deep jungle green";
+roc[23]="USAFA blue";
+roc[24]="Castleton green";
+roc[25]="Dark green (X11)";
+roc[26]="Pakistan green";
+roc[27]="Sapphire blue";
+roc[28]="Sapphire (Crayola)";
+roc[29]="Bottle green";
+roc[30]="Cadmium green";
+roc[31]="Honolulu blue";
+roc[32]="Dartmouth green";
+roc[33]="Spanish blue";
+roc[34]="French blue";
+roc[35]="Skobeloff";
+roc[36]="Tropical rainforest";
+roc[37]="CG blue";
+roc[38]="Celadon blue";
+roc[39]="Cerulean";
+roc[40]="Star command blue";
+roc[41]="Spanish viridian";
+roc[42]="Generic viridian";
+roc[43]="Azure";
+roc[44]="Ao (English)";
+roc[45]="Green (web)";
+roc[46]="Teal";
+roc[47]="Blue (NCS)";
+roc[48]="Dark cyan";
+roc[49]="Spanish green";
+roc[50]="Blue (Munsell)";
+roc[51]="Viridian green";
+roc[52]="Green-cyan";
+roc[53]="Paolo Veronese green";
+roc[54]="Shamrock green";
+roc[55]="Green (NCS)";
+roc[56]="Green (pigment)";
+roc[57]="Persian green";
+roc[58]="Jade";
+roc[59]="Green (Munsell)";
+roc[60]="GO green";
+roc[61]="Green (Pantone)";
+roc[62]="Cyan (process)";
+roc[63]="Capri";
+roc[64]="Deep sky blue";
+roc[65]="Caribbean green";
+roc[66]="Robin egg blue";
+roc[67]="Vivid sky blue";
+roc[68]="Dark turquoise";
+roc[69]="Medium spring green";
+roc[70]="Electric green";
+roc[71]="Green";
+roc[72]="Lime (web) (X11 green)";
+roc[73]="Erin";
+roc[74]="Spring green";
+roc[75]="Sea green (Crayola)";
+roc[76]="Turquoise blue";
+roc[77]="Aqua";
+roc[78]="Cyan";
+roc[79]="Spanish sky blue";
+roc[80]="Rich black (FOGRA39)";
+roc[81]="Rich black (FOGRA29)";
+roc[82]="Dark green";
+roc[83]="Forest green (traditional)";
+roc[84]="UP Forest green";
+roc[85]="Pine green";
+roc[86]="Blue (RYB)";
+roc[87]="Dark pastel green";
+roc[88]="Sacramento State green";
+roc[89]="Blue-green (color wheel)";
+roc[90]="Metallic Seaweed";
+roc[91]="Tiffany Blue";
+roc[92]="Malachite";
+roc[93]="Blue-green";
+roc[94]="Yale Blue";
+roc[95]="Sapphire";
+roc[96]="Smoky black";
+roc[97]="Egyptian blue";
+roc[98]="Green-blue";
+roc[99]="Phthalo green";
+roc[100]="Blue sapphire";
+roc[101]="India green";
+roc[102]="Denim";
+roc[103]="Fluorescent blue";
+roc[104]="Dark spring green";
+roc[105]="MSU green";
+roc[106]="Midnight blue";
+roc[107]="Lincoln green";
+roc[108]="Bright navy blue";
+roc[109]="Navy blue (Crayola)";
+roc[110]="Dark jungle green";
+roc[111]="Black chocolate";
+roc[112]="Eerie black";
+roc[113]="Brunswick green";
+roc[114]="English green";
+roc[115]="Trypan Blue";
+roc[116]="Persian blue";
+roc[117]="Pacific blue";
+roc[118]="Green (Crayola)";
+roc[119]="Space cadet";
+roc[120]="Cerulean (Crayola)";
+roc[121]="Dodger blue";
+roc[122]="Blue (Crayola)";
+roc[123]="Light sea green";
+roc[124]="Denim blue";
+roc[125]="Forest green (web)";
+roc[126]="St. Patrick's blue";
+roc[127]="Charleston green";
+roc[128]="Raisin black";
+roc[129]="Celtic blue";
+roc[130]="Dark cornflower blue";
+roc[131]="Lapis lazuli";
+roc[132]="Green-blue (Crayola)";
+roc[133]="Slimy green";
+roc[134]="Jungle green";
+roc[135]="Pine tree";
+roc[136]="Gunmetal";
+roc[137]="Cerulean blue";
+roc[138]="Outer space (Crayola)";
+roc[139]="True Blue";
+roc[140]="Picotee blue";
+roc[141]="Cosmic cobalt";
+roc[142]="YInMn Blue";
+roc[143]="B'dazzled blue";
+roc[144]="Sea green";
+roc[145]="Dark slate gray";
+roc[146]="Celadon green";
+roc[147]="Dark purple";
+roc[148]="Yellow-green (Color Wheel)";
+roc[149]="Mountain Meadow";
+roc[150]="Maximum blue green";
+roc[151]="Myrtle green";
+roc[152]="Bleu de France";
+roc[153]="Illuminating emerald";
+roc[154]="Persian indigo";
+roc[155]="Russian violet";
+roc[156]="Violet-blue";
+roc[157]="Lime green";
+roc[158]="Blue (pigment)";
+roc[159]="Jet";
+roc[160]="Onyx";
+roc[161]="Kombu green";
+roc[162]="Hunter green";
+roc[163]="Charcoal";
+roc[164]="Ming";
+roc[165]="Teal blue";
+roc[166]="Zomp";
+roc[167]="Neon green";
+roc[168]="Keppel";
+roc[169]="Black coffee";
+roc[170]="Black olive";
+roc[171]="Amazon";
+roc[172]="Dark sienna";
+roc[173]="Olive Drab #7";
+roc[174]="Bluetiful";
+roc[175]="Medium sea green";
+roc[176]="Black bean";
+roc[177]="Bistre";
+roc[178]="Tufts blue";
+roc[179]="Mint";
+roc[180]="Ultramarine";
+roc[181]="Harlequin";
+roc[182]="Viridian";
+roc[183]="Turquoise";
+roc[184]="Ultramarine blue";
+roc[185]="Royal blue (light)";
+roc[186]="Old burgundy";
+roc[187]="Queen blue";
+roc[188]="Verdigris";
+roc[189]="Rifle green";
+roc[190]="Han blue";
+roc[191]="Neon blue";
+roc[192]="Steel blue";
+roc[193]="Maximum blue";
+roc[194]="Dark lava";
+roc[195]="Taupe";
+roc[196]="Dark slate blue";
+roc[197]="Ocean green";
+roc[198]="Medium turquoise";
+roc[199]="Hooker's green";
+roc[200]="Dark moss green";
+roc[201]="Deep Space Sparkle";
+roc[202]="Indigo";
+
+roc[204]="Army green";
+roc[205]="Spanish violet";
+roc[206]="Independence";
+roc[207]="May green";
+roc[208]="Kelly green";
+roc[209]="Blue-violet (color wheel)";
+roc[210]="Feldgrau";
+roc[211]="Middle green";
+roc[212]="Purple navy";
+roc[213]="Ocean Blue";
+roc[214]="Fern green";
+roc[215]="Blue yonder";
+roc[216]="Sap green";
+roc[217]="Emerald";
+roc[218]="Paris Green";
+roc[219]="KSU purple";
+roc[220]="Han purple";
+roc[221]="Dark liver";
+roc[222]="Cadet";
+roc[223]="Dark electric blue";
+roc[224]="Payne's grey";
+roc[225]="Dark liver (horses)";
+roc[226]="Liberty";
+roc[227]="Black coral";
+roc[228]="Davy's grey";
+roc[229]="Ebony";
+roc[230]="Dark olive green";
+roc[231]="English violet";
+roc[232]="Avocado";
+roc[233]="Wintergreen Dream";
+roc[234]="Carolina blue";
+roc[235]="Cyber grape";
+roc[236]="Seal brown";
+roc[237]="Caput mortuum";
+roc[238]="Plump Purple";
+roc[239]="Iris";
+roc[240]="United Nations blue";
+roc[241]="Dark byzantium";
+roc[242]="Polished Pine";
+roc[243]="Blue jeans";
+roc[244]="Maximum green";
+roc[245]="Steel Teal";
+roc[246]="Cadet blue";
+roc[247]="Forest green (Crayola)";
+roc[248]="Shiny Shamrock";
+roc[249]="Majorelle blue";
+roc[250]="Glaucous";
+roc[251]="Eggplant";
+roc[252]="Umber";
+roc[253]="Pullman Brown (UPS Brown)";
+roc[254]="Cornflower blue";
+roc[255]="Rosewood";
+roc[256]="Dark brown";
+roc[257]="Blood red";
+roc[258]="Tyrian purple";
+roc[259]="Rebecca Purple";
+roc[260]="Van Dyke brown";
+roc[261]="Antique bronze";
+roc[262]="Dark blue-gray";
+roc[263]="Blue-gray";
+roc[264]="Livid";
+roc[265]="Green (RYB)";
+roc[266]="Medium aquamarine";
+roc[267]="Bright green";
+roc[268]="Screamin' Green";
+roc[269]="Old mauve";
+roc[270]="Wine dregs";
+roc[271]="Rose ebony";
+roc[272]="Liver";
+roc[273]="Granite gray";
+roc[274]="Russian green";
+roc[275]="Palatinate purple";
+roc[276]="Dim gray";
+roc[277]="Purple";
+roc[278]="Slate blue";
+roc[279]="Kobicha";
+roc[280]="Olive Drab (#3)";
+roc[281]="Liver (organ)";
+roc[282]="Eminence";
+roc[283]="Field drab";
+roc[284]="Little boy blue";
+roc[285]="Cerulean frost";
+roc[286]="Green Sheen";
+roc[287]="Electric indigo";
+roc[288]="Coffee";
+roc[289]="Tuscan brown";
+roc[290]="Persian plum";
+roc[291]="Prune";
+roc[292]="Midnight";
+roc[293]="Byzantium";
+roc[294]="Catawba";
+roc[295]="Sepia";
+roc[296]="Slate gray";
+roc[297]="Iceberg";
+roc[298]="Wine";
+roc[299]="Nickel";
+roc[300]="Air superiority blue";
+roc[301]="Maximum purple";
+roc[302]="Blue-violet (Crayola)";
+roc[303]="Xanadu";
+roc[304]="Maya blue";
+roc[305]="Mantis";
+roc[306]="Sonic silver";
+roc[307]="Violet-blue (Crayola)";
+roc[308]="Sky blue (Crayola)";
+roc[309]="Rhythm";
+roc[310]="Light slate gray";
+roc[311]="Shadow blue";
+roc[312]="French sky blue";
+roc[313]="Pansy purple";
+roc[314]="Royal purple";
+roc[315]="Bole";
+roc[316]="Old lavender";
+roc[317]="UP maroon";
+roc[318]="Chocolate (traditional)";
+roc[319]="Medium slate blue";
+roc[320]="Bud green";
+roc[321]="Barn red";
+roc[322]="Tuscan red";
+roc[323]="Aero";
+roc[324]="Lawn green";
+roc[325]="Electric blue";
+roc[326]="Deep taupe";
+roc[327]="Middle blue";
+roc[328]="Violet (color wheel)";
+roc[329]="Claret";
+roc[330]="Chartreuse (web)";
+roc[331]="Aquamarine";
+roc[332]="Maroon (web)";
+roc[333]="Burgundy";
+roc[334]="Oxblood";
+roc[335]="Patriarch";
+roc[336]="Purple (web)";
+roc[337]="Falu red";
+roc[338]="Russet";
+roc[339]="Spanish bistre";
+roc[340]="Olive";
+roc[341]="Gray (web)";
+roc[342]="Coyote brown";
+roc[343]="Raw umber";
+roc[344]="Roman silver";
+roc[345]="OU Crimson red";
+roc[346]="Antique ruby";
+roc[347]="Battleship grey";
+roc[348]="Old silver";
+roc[349]="Chinese violet";
+roc[350]="French bistre";
+roc[351]="Gold Fusion";
+roc[352]="Violet (RYB)";
+roc[353]="French lilac";
+roc[354]="Pomp and Power";
+roc[355]="Brandy";
+roc[356]="Fuzzy Wuzzy";
+roc[357]="Asparagus";
+roc[358]="Sky blue";
+roc[359]="Light sky blue";
+roc[360]="Spring Frost";
+roc[361]="Mardi Gras";
+roc[362]="French violet";
+roc[363]="Kobe";
+roc[364]="Sienna";
+roc[365]="Brown";
+roc[366]="Solid pink";
+roc[367]="Cordovan";
+roc[368]="Baby blue";
+roc[369]="Blue-violet";
+roc[370]="Burnt umber";
+roc[371]="Twilight lavender";
+roc[372]="Shadow";
+roc[373]="Rocket metallic";
+roc[374]="Moss green";
+roc[375]="Turtle green";
+roc[376]="Dark red";
+roc[377]="Dark magenta";
+roc[378]="Saddle brown";
+roc[379]="Middle blue purple";
+roc[380]="Taupe gray";
+roc[381]="Middle grey";
+roc[382]="Pewter Blue";
+roc[383]="Cool grey";
+roc[384]="Dark sky blue";
+roc[385]="Razzmic Berry";
+roc[386]="Morning blue";
+roc[387]="Apple green";
+roc[388]="Middle blue green";
+roc[389]="Quinacridone magenta";
+roc[390]="Plum";
+roc[391]="Electric violet";
+roc[392]="Violet";
+roc[393]="Artichoke";
+roc[394]="Dark sea green";
+roc[395]="Sheen green";
+roc[396]="Rose taupe";
+roc[397]="Light green";
+roc[398]="Sugar Plum";
+roc[399]="Antique fuchsia";
+roc[400]="Mauve taupe";
+roc[401]="Raspberry glace";
+roc[402]="Cadet grey";
+roc[403]="Red-violet (Color wheel)";
+roc[404]="Medium purple";
+roc[405]="Pistachio";
+roc[406]="Light cornflower blue";
+roc[407]="Dark violet";
+roc[408]="Chestnut";
+roc[409]="Carmine";
+roc[410]="Violet (crayola)";
+roc[411]="Bistre brown";
+roc[412]="Drab";
+roc[413]="Mode beige";
+roc[414]="Sand dune";
+roc[415]="Purple mountain majesty";
+roc[416]="Eton blue";
+roc[417]="Manatee";
+roc[418]="Liver chestnut";
+roc[419]="Cinereous";
+roc[420]="Spanish gray";
+roc[421]="Mint green";
+roc[422]="Dark orchid";
+roc[423]="Golden brown";
+roc[424]="Copper rose";
+roc[425]="Amethyst";
+roc[426]="Mountbatten pink";
+roc[427]="Purpureus";
+roc[428]="Olivine";
+roc[429]="Yellow-green";
+roc[430]="Ruby red";
+roc[431]="Pale cerulean";
+roc[433]="Purple Plum";
+roc[434]="Metallic Sunburst";
+roc[435]="Crimson (UA)";
+roc[436]="Rose Dust";
+roc[437]="French lime";
+roc[438]="Purple (Munsell)";
+roc[439]="Vivid violet";
+roc[440]="Vivid burgundy";
+roc[441]="Amaranth (M&P)";
+roc[442]="Magenta haze";
+roc[443]="Beaver";
+roc[444]="Citron";
+roc[445]="Purple (X11)";
+roc[446]="Veronica";
+roc[447]="Turquoise green";
+roc[448]="Burnished brown";
+roc[449]="Baby blue eyes";
+roc[450]="Flirt";
+roc[451]="Blue bell";
+roc[452]="Wild blue yonder";
+roc[453]="Cambridge blue";
+roc[454]="Redwood";
+roc[455]="Android green";
+roc[456]="Non-photo blue";
+roc[457]="Jazzberry jam";
+roc[458]="Auburn";
+roc[459]="Middle red purple";
+roc[460]="Blast-off bronze";
+roc[461]="Gold";
+roc[462]="Maximum red purple";
+roc[464]="French beige";
+roc[465]="Tuscan tan";
+roc[466]="Quick Silver";
+roc[467]="Windsor tan";
+roc[468]="Green Lizard";
+roc[469]="Spring bud";
+roc[470]="Rufous";
+roc[471]="Sweet Brown";
+roc[472]="China rose";
+roc[473]="Opal";
+roc[474]="Granny Smith apple";
+roc[475]="Grullo";
+roc[476]="Cadet blue (Crayola)";
+roc[477]="Laurel green";
+roc[478]="Chinese red";
+roc[479]="Heliotrope gray";
+roc[480]="Rose quartz";
+roc[481]="Silver (Metallic)";
+roc[482]="Magic mint";
+roc[483]="Amaranth purple";
+roc[484]="English red";
+roc[485]="Rose vale";
+roc[486]="Glossy grape";
+roc[487]="Silver chalice";
+roc[488]="Maximum blue purple";
+roc[489]="Middle green yellow";
+roc[490]="Celadon";
+roc[491]="Blizzard blue";
+roc[492]="Mystic maroon";
+roc[493]="Copper penny";
+roc[494]="Light blue";
+roc[495]="Green-yellow";
+roc[496]="Upsdell red";
+roc[497]="Lilac Luster";
+roc[498]="Medium carmine";
+roc[499]="Brown sugar";
+roc[500]="Uranian blue";
+roc[501]="Maroon (X11)";
+roc[502]="Acid green";
+roc[503]="Light steel blue";
+roc[504]="Powder blue";
+roc[505]="Firebrick";
+roc[506]="African violet";
+roc[507]="Ash gray";
+roc[508]="Inchworm";
+roc[509]="Celeste";
+roc[510]="Italian sky blue";
+roc[511]="Carnelian";
+roc[512]="Irresistible";
+roc[513]="Raspberry rose";
+roc[514]="English lavender";
+roc[515]="Fandango";
+roc[516]="Lavender (floral)";
+roc[517]="Olive green";
+roc[518]="Rust";
+roc[519]="Pearly purple";
+roc[520]="Opera mauve";
+roc[521]="Liver (dogs)";
+roc[522]="Copper";
+roc[523]="Dark goldenrod";
+roc[524]="Deep chestnut";
+roc[525]="Columbia Blue";
+roc[526]="International orange (engineering)";
+roc[527]="Medium orchid";
+roc[528]="Misty moss";
+roc[529]="Rosy brown";
+roc[530]="Sage";
+roc[531]="Beau blue";
+roc[532]="Pale aqua";
+roc[533]="Byzantine";
+roc[534]="Dark khaki";
+roc[535]="June bud";
+roc[536]="Popstar";
+roc[537]="Gray (X11 gray)";
+roc[538]="Electric purple";
+roc[539]="Bittersweet shimmer";
+roc[540]="Black Shadows";
+roc[541]="Silver sand";
+roc[542]="Bitter lime";
+roc[543]="Lime (color wheel)";
+roc[544]="International orange (Golden Gate Bridge)";
+roc[545]="Mahogany";
+roc[546]="Red-violet (Crayola)";
+roc[547]="Old rose";
+roc[548]="Tuscany";
+roc[549]="Silver";
+roc[550]="Aero blue";
+roc[551]="Fuchsia (Crayola)";
+roc[552]="Camel";
+roc[553]="Desert";
+roc[554]="Fallow";
+roc[555]="Lion";
+roc[556]="Wood brown";
+roc[557]="Rose red";
+roc[558]="Ecru";
+roc[559]="Sand";
+roc[560]="Pictorial carmine";
+roc[561]="Bright maroon";
+roc[562]="Maroon (Crayola)";
+roc[563]="Khaki (web)";
+roc[564]="Periwinkle (Crayola)";
+roc[565]="Red (NCS)";
+roc[566]="Cardinal";
+roc[567]="Alloy orange";
+roc[568]="Silver pink";
+roc[569]="Lavender gray";
+roc[570]="Mulberry";
+roc[571]="Vegas gold";
+roc[572]="Light periwinkle";
+roc[573]="Yellow-green (Crayola)";
+roc[574]="Medium violet-red";
+roc[575]="Red-violet";
+roc[576]="French raspberry";
+roc[577]="Fuchsia rose";
+roc[578]="Venetian red";
+roc[579]="Smitten";
+roc[580]="Mulberry (Crayola)";
+roc[581]="Lilac";
+roc[582]="Light French beige";
+roc[583]="Cedar Chest";
+roc[584]="Wisteria";
+roc[585]="Pale silver";
+roc[586]="Silver (Crayola)";
+roc[587]="Magenta (dye)";
+roc[588]="Bitter lemon";
+roc[589]="Sinopia";
+roc[590]="Brick red";
+roc[591]="Copper red";
+roc[592]="Satin sheen gold";
+roc[593]="Persian red";
+roc[594]="Madder Lake";
+roc[595]="Steel pink";
+roc[596]="Fuchsia purple";
+roc[597]="English vermillion";
+roc[598]="Burnt orange";
+roc[599]="Ochre";
+roc[600]="Puce";
+roc[601]="Lemon curry";
+roc[602]="Lavender blue";
+roc[603]="Periwinkle";
+roc[604]="Electric lime";
+roc[606]="Indian red";
+roc[607]="Cinnamon Satin";
+roc[608]="Bronze";
+roc[609]="Antique brass";
+roc[610]="Fire engine red";
+roc[611]="Ruber";
+roc[612]="Volt";
+roc[613]="Lava";
+roc[614]="Telemagenta";
+roc[615]="Super pink";
+roc[616]="Sky magenta";
+roc[617]="Old gold";
+roc[618]="Magenta (Pantone)";
+roc[619]="Tea green";
+roc[620]="Arctic lime";
+roc[621]="Spanish carmine";
+roc[622]="Rubine red";
+roc[623]="Pear";
+roc[624]="Chocolate (web)";
+roc[625]="Cocoa brown";
+roc[626]="Tan";
+roc[627]="Amaranth red";
+roc[628]="Metallic gold";
+roc[629]="Light gray";
+roc[630]="Rosso corsa";
+roc[631]="Wild orchid";
+roc[632]="French mauve";
+roc[633]="Gold (metallic)";
+roc[634]="Mystic";
+roc[635]="Raw sienna";
+roc[636]="Languid lavender";
+roc[637]="Carmine (M&P)";
+roc[638]="Dogwood rose";
+roc[639]="Pink (Pantone)";
+roc[640]="New York pink";
+roc[641]="Bright lilac";
+roc[642]="Pink lavender";
+roc[643]="Thistle";
+roc[644]="UA red";
+roc[645]="Maximum red";
+roc[646]="Vermilion";
+roc[647]="Middle purple";
+roc[648]="Shimmering Blush";
+roc[649]="Persian orange";
+roc[650]="Tan (Crayola)";
+roc[651]="Maximum green yellow";
+roc[652]="Barbie Pink";
+roc[653]="Rusty red";
+roc[654]="Deep cerise";
+roc[655]="Orchid";
+roc[656]="Copper (Crayola)";
+roc[657]="Harvest gold";
+roc[658]="Goldenrod";
+roc[659]="Timberwolf";
+roc[660]="Crimson";
+roc[661]="Gainsboro";
+roc[662]="Plum (web)";
+roc[663]="Cerise";
+roc[664]="Fandango pink";
+roc[665]="Blush";
+roc[666]="China pink";
+roc[667]="Liseran purple";
+roc[668]="Thulian pink";
+roc[669]="Pastel pink";
+roc[670]="Tumbleweed";
+roc[671]="Burlywood";
+roc[672]="Phlox";
+roc[673]="Psychedelic purple";
+roc[674]="Heliotrope";
+roc[675]="Chartreuse (traditional)";
+roc[676]="Ruby";
+roc[677]="CG red";
+roc[678]="Mauve";
+roc[679]="Light cyan";
+roc[680]="Permanent Geranium Lake";
+roc[681]="Earth yellow";
+roc[682]="Medium candy apple red";
+roc[683]="Flame";
+roc[684]="Terra cotta";
+roc[685]="Orchid (Crayola)";
+roc[686]="Cadmium red";
+roc[687]="Raspberry";
+roc[688]="Razzmatazz";
+roc[689]="Rose madder";
+roc[690]="Cinnabar";
+roc[691]="Vermilion";
+roc[692]="Indian yellow";
+roc[693]="Sunray";
+roc[694]="Bone";
+roc[695]="Mindaro";
+roc[696]="Red-purple";
+roc[697]="Mexican pink";
+roc[698]="Candy pink";
+roc[699]="Tango pink";
+roc[700]="Fulvous";
+roc[701]="Gamboge";
+roc[702]="Citrine";
+roc[703]="Straw";
+roc[704]="Amaranth";
+roc[705]="Middle red";
+roc[706]="Fawn";
+roc[707]="Platinum";
+roc[708]="Spanish red";
+roc[709]="Paradise pink";
+roc[710]="Charm pink";
+roc[711]="Gold (Crayola)";
+roc[712]="Lavender (web)";
+roc[713]="Kobi";
+roc[714]="Spanish orange";
+roc[715]="Queen pink";
+roc[716]="Key lime";
+roc[717]="Frostbite";
+roc[718]="Fire opal";
+roc[719]="Burnt sienna";
+roc[720]="Dark salmon";
+roc[721]="Arylide yellow";
+roc[722]="Hansa yellow";
+roc[723]="Nyanza";
+roc[724]="Marigold";
+roc[725]="Persimmon";
+roc[726]="Middle yellow red";
+roc[727]="Pale spring bud";
+roc[728]="Spring green (Crayola)";
+roc[729]="Red (pigment)";
+roc[730]="Imperial red";
+roc[731]="Red (Pantone)";
+roc[732]="Cadmium orange";
+roc[733]="Carrot orange";
+roc[734]="Desert sand";
+roc[735]="Alabaster";
+roc[736]="Red (Crayola)";
+roc[737]="Violet (web)";
+roc[738]="Safety yellow";
+roc[739]="Flax";
+roc[740]="Titanium yellow";
+roc[741]="Xanthic";
+roc[742]="Mauvelous";
+roc[743]="Cameo pink";
+roc[744]="Yellow (Munsell)";
+roc[745]="Almond";
+roc[746]="Dutch white";
+roc[747]="Light coral";
+roc[748]="Buff";
+roc[749]="Khaki (X11) (Light khaki)";
+roc[750]="Green-yellow (Crayola)";
+roc[751]="Eggshell";
+roc[752]="Alice blue";
+roc[753]="Honeydew";
+roc[754]="Azure (X11/web color)";
+roc[755]="Amaranth pink";
+roc[756]="Champagne pink";
+roc[757]="Red (Munsell)";
+roc[758]="Tangerine";
+roc[759]="Maximum yellow red";
+roc[760]="Orchid pink";
+roc[761]="Maize (Crayola)";
+roc[762]="Magnolia";
+roc[763]="Mandarin";
+roc[764]="Vanilla ice";
+roc[765]="Medium champagne";
+roc[766]="Vanilla";
+roc[767]="Fashion fuchsia";
+roc[768]="Hollywood cerise";
+roc[769]="Sandy brown";
+roc[770]="Baby pink";
+roc[771]="Tea rose";
+roc[772]="Saffron";
+roc[773]="Jonquil";
+roc[774]="Isabelline";
+roc[775]="Cyclamen";
+roc[776]="Princeton orange";
+roc[777]="Orange-yellow";
+roc[778]="Wheat";
+roc[779]="Minion yellow";
+roc[780]="Beige";
+roc[781]="Cultured";
+roc[782]="Mint cream";
+roc[783]="French rose";
+roc[784]="Magenta (Crayola)";
+roc[785]="Nadeshiko pink";
+roc[786]="Lemon meringue";
+roc[787]="Violet-red";
+roc[788]="Persian pink";
+roc[789]="Pink Sherbet";
+roc[790]="Spanish pink";
+roc[791]="Champagne";
+roc[792]="Congo pink";
+roc[793]="Coral pink";
+roc[794]="Tea rose";
+roc[795]="Mellow apricot";
+roc[796]="Orange-yellow (Crayola)";
+roc[797]="Jasmine";
+roc[798]="Mellow yellow";
+roc[799]="Ghost white";
+roc[800]="Rose bonbon";
+roc[801]="Orange soda";
+roc[802]="Salmon";
+roc[803]="Deep champagne";
+roc[804]="Sunset";
+roc[805]="Tuscan";
+roc[806]="Naples yellow";
+roc[807]="Royal yellow";
+roc[808]="Stil de grain yellow";
+roc[809]="Pale pink";
+roc[810]="Pale purple (Pantone)";
+roc[811]="Banana Mania";
+roc[812]="Antique white";
+roc[813]="Blond";
+roc[814]="Linen";
+roc[815]="Maximum yellow";
+roc[816]="Light goldenrod yellow";
+roc[817]="Tart Orange";
+roc[818]="Brink pink";
+roc[819]="Rajah";
+roc[820]="Apricot";
+roc[821]="Corn";
+roc[822]="Maize";
+roc[823]="Shocking pink";
+roc[824]="Ultra red";
+roc[825]="Wild watermelon";
+roc[826]="Pink flamingo";
+roc[827]="Tickle Me Pink";
+roc[828]="Golden poppy";
+roc[829]="Yellow (Crayola)";
+roc[830]="Icterine";
+roc[831]="Red Salsa";
+roc[832]="French fuchsia";
+roc[833]="French pink";
+roc[834]="Mango";
+roc[835]="Piggy pink";
+roc[836]="Aureolin";
+roc[837]="Old lace";
+roc[838]="Lemon glacier";
+roc[839]="Red (RYB)";
+roc[840]="Persian rose";
+roc[841]="Neon fuchsia";
+roc[842]="Purple pizzazz";
+roc[843]="Bittersweet";
+roc[844]="Melon";
+roc[845]="Light orange";
+roc[846]="Yellow (Pantone)";
+roc[847]="Yellow (RYB)";
+roc[848]="Baby powder";
+roc[849]="Red";
+roc[850]="Winter Sky";
+roc[851]="Rose";
+roc[852]="Magenta (process)";
+roc[853]="Fuchsia";
+roc[854]="Magenta";
+roc[855]="Candy apple red";
+roc[856]="Deep pink";
+roc[857]="Hot magenta";
+roc[858]="Scarlet";
+roc[859]="Razzle dazzle rose";
+roc[860]="Radical Red";
+roc[861]="Coquelicot";
+roc[862]="Sizzling Red";
+roc[863]="Wild Strawberry";
+roc[864]="Red-orange (Color wheel)";
+roc[865]="International orange (aerospace)";
+roc[866]="Orange-red (Crayola)";
+roc[867]="Red-orange";
+roc[868]="Fiery rose";
+roc[869]="Brilliant rose";
+roc[870]="Orange (Pantone)";
+roc[871]="Portland Orange";
+roc[872]="Tomato";
+roc[873]="Rose pink";
+roc[874]="Safety orange (blaze orange)";
+roc[875]="Orange-red";
+roc[876]="Red-orange (Crayola)";
+roc[877]="Hot pink";
+roc[878]="Outrageous Orange";
+roc[879]="Shocking pink (Crayola)";
+roc[880]="Ultra pink";
+roc[881]="Pumpkin";
+roc[882]="Orange (Crayola)";
+roc[883]="Safety orange";
+roc[884]="Heat Wave";
+roc[885]="Amber (SAE/ECE)";
+roc[886]="Orange";
+roc[887]="Coral";
+
+roc[888]="Mango Tango";
+roc[889]="Dark orange";
+roc[890]="Salmon pink";
+roc[891]="Baker-Miller pink";
+roc[892]="Schauss pink";
+roc[893]="Yellow Orange (Color Wheel)";
+roc[894]="Deep saffron";
+roc[895]="Atomic tangerine";
+roc[896]="Orange peel";
+roc[897]="Light salmon";
+roc[898]="Vivid tangerine";
+roc[899]="Neon Carrot";
+roc[900]="Orange (web)";
+roc[901]="Carnation pink";
+roc[902]="Chrome yellow";
+roc[903]="Bright yellow (Crayola)";
+roc[904]="Yellow Orange";
+roc[905]="Chinese yellow";
+roc[906]="Light pink";
+roc[907]="Cherry blossom pink";
+roc[908]="Selective yellow";
+roc[909]="Cotton candy";
+roc[910]="Macaroni and Cheese";
+roc[911]="Amber";
+roc[912]="Pink";
+roc[913]="Mikado yellow";
+roc[914]="Peach (Crayola)";
+roc[915]="Sunglow";
+roc[916]="Cyber yellow";
+roc[917]="Yellow (NCS)";
+roc[918]="Gold (web) (Golden)";
+roc[919]="School bus yellow";
+roc[920]="Peach puff";
+roc[921]="Mimi pink";
+roc[922]="Sizzling Sunrise";
+roc[923]="Mustard";
+roc[924]="Unbleached silk";
+roc[925]="Pink lace";
+roc[926]="Navajo white";
+roc[927]="Golden yellow";
+roc[928]="Bisque";
+roc[929]="Misty rose";
+roc[930]="Peach";
+roc[931]="Middle yellow";
+roc[932]="Blanched almond";
+roc[933]="Canary yellow";
+roc[934]="Yellow (process)";
+roc[935]="Papaya whip";
+roc[936]="Lavender blush";
+roc[937]="Lemon yellow";
+roc[938]="Seashell";
+roc[939]="Cadmium yellow";
+roc[940]="Lemon";
+roc[941]="Yellow Sunshine";
+roc[942]="Cornsilk";
+roc[943]="Cosmic latte";
+roc[944]="Lemon chiffon";
+roc[945]="Floral white";
+roc[946]="Snow";
+roc[947]="Cream";
+roc[948]="Yellow";
+roc[949]="Laser lemon";
+roc[950]="Unmellow yellow";
+roc[951]="Canary";
+roc[952]="Lemon yellow (Crayola)";
+roc[953]="Light yellow";
+roc[954]="Ivory";
+roc[955]="White";
+
+
+var rgbroc=new Array(2000);
+rgbroc[1]="#000000";
+rgbroc[2]="#000080";
+rgbroc[3]="#00009C";
+rgbroc[4]="#0000CD";
+rgbroc[5]="#0000FF";
+rgbroc[6]="#000F89";
+rgbroc[7]="#0014A8";
+rgbroc[8]="#0018A8";
+rgbroc[9]="#002147";
+rgbroc[10]="#002366";
+rgbroc[11]="#002387";
+rgbroc[12]="#002FA7";
+rgbroc[13]="#003153";
+rgbroc[14]="#0033AA";
+rgbroc[15]="#004040";
+rgbroc[16]="#00416A";
+rgbroc[17]="#004225";
+rgbroc[18]="#004242";
+rgbroc[19]="#0047AB";
+rgbroc[20]="#0048BA";
+rgbroc[21]="#004953";
+rgbroc[22]="#004B49";
+rgbroc[23]="#004F98";
+rgbroc[24]="#00563F";
+rgbroc[25]="#006400";
+rgbroc[26]="#006600";
+rgbroc[27]="#0067A5";
+rgbroc[28]="#0067A5";
+rgbroc[29]="#006A4E";
+rgbroc[30]="#006B3C";
+rgbroc[31]="#006DB0";
+rgbroc[32]="#00703C";
+rgbroc[33]="#0070B8";
+rgbroc[34]="#0072BB";
+rgbroc[35]="#007474";
+rgbroc[36]="#00755E";
+rgbroc[37]="#007AA5";
+rgbroc[38]="#007BA7";
+rgbroc[39]="#007BA7";
+rgbroc[40]="#007BB8";
+rgbroc[41]="#007F5C";
+rgbroc[42]="#007F66";
+rgbroc[43]="#007FFF";
+rgbroc[44]="#008000";
+rgbroc[45]="#008000";
+rgbroc[46]="#008080";
+rgbroc[47]="#0087BD";
+rgbroc[48]="#008B8B";
+rgbroc[49]="#009150";
+rgbroc[50]="#0093AF";
+rgbroc[51]="#009698";
+rgbroc[52]="#009966";
+rgbroc[53]="#009B7D";
+rgbroc[54]="#009E60";
+rgbroc[55]="#009F6B";
+rgbroc[56]="#00A550";
+rgbroc[57]="#00A693";
+rgbroc[58]="#00A86B";
+rgbroc[59]="#00A877";
+rgbroc[60]="#00AB66";
+rgbroc[61]="#00AD43";
+rgbroc[62]="#00B7EB";
+rgbroc[63]="#00BFFF";
+rgbroc[64]="#00BFFF";
+rgbroc[65]="#00CC99";
+rgbroc[66]="#00CCCC";
+rgbroc[67]="#00CCFF";
+rgbroc[68]="#00CED1";
+rgbroc[69]="#00FA9A";
+rgbroc[70]="#00FF00";
+rgbroc[71]="#00FF00";
+rgbroc[72]="#00FF00";
+rgbroc[73]="#00FF40";
+rgbroc[74]="#00FF7F";
+rgbroc[75]="#00FFCD";
+rgbroc[76]="#00FFEF";
+rgbroc[77]="#00FFFF";
+rgbroc[78]="#00FFFF";
+rgbroc[79]="#00FFFF";
+rgbroc[80]="#010203";
+rgbroc[81]="#010B13";
+rgbroc[82]="#013220";
+rgbroc[83]="#014421";
+rgbroc[84]="#014421";
+rgbroc[85]="#01796F";
+rgbroc[86]="#0247FE";
+rgbroc[87]="#03C03C";
+rgbroc[88]="#043927";
+rgbroc[89]="#064E40";
+rgbroc[90]="#0A7E8C";
+rgbroc[91]="#0ABAB5";
+rgbroc[92]="#0BDA51";
+rgbroc[93]="#0D98BA";
+rgbroc[94]="#0F4D92";
+rgbroc[95]="#0F52BA";
+rgbroc[96]="#100C08";
+rgbroc[97]="#1034A6";
+rgbroc[98]="#1164B4";
+rgbroc[99]="#123524";
+rgbroc[100]="#126180";
+rgbroc[101]="#138808";
+rgbroc[102]="#1560BD";
+rgbroc[103]="#15F4EE";
+rgbroc[104]="#177245";
+rgbroc[105]="#18453B";
+rgbroc[106]="#191970";
+rgbroc[107]="#195905";
+rgbroc[108]="#1974D2";
+rgbroc[109]="#1974D2";
+rgbroc[110]="#1A2421";
+rgbroc[111]="#1B1811";
+rgbroc[112]="#1B1B1B";
+rgbroc[113]="#1B4D3E";
+rgbroc[114]="#1B4D3E";
+rgbroc[115]="#1C05B3";
+rgbroc[116]="#1C39BB";
+rgbroc[117]="#1CA9C9";
+rgbroc[118]="#1CAC78";
+rgbroc[119]="#1D2951";
+rgbroc[120]="#1DACD6";
+rgbroc[121]="#1E90FF";
+rgbroc[122]="#1F75FE";
+rgbroc[123]="#20B2AA";
+rgbroc[124]="#2243B6";
+rgbroc[125]="#228B22";
+rgbroc[126]="#23297A";
+rgbroc[127]="#232B2B";
+rgbroc[128]="#242124";
+rgbroc[129]="#246BCE";
+rgbroc[130]="#26428B";
+rgbroc[131]="#26619C";
+rgbroc[132]="#2887C8";
+rgbroc[133]="#299617";
+rgbroc[134]="#29AB87";
+rgbroc[135]="#2A2F23";
+rgbroc[136]="#2a3439";
+rgbroc[137]="#2A52BE";
+rgbroc[138]="#2D383A";
+rgbroc[139]="#2D68C4";
+rgbroc[140]="#2E2787";
+rgbroc[141]="#2E2D88";
+rgbroc[142]="#2E5090";
+rgbroc[143]="#2E5894";
+rgbroc[144]="#2E8B57";
+rgbroc[145]="#2F4F4F";
+rgbroc[146]="#2F847C";
+rgbroc[147]="#301934";
+rgbroc[148]="#30B21A";
+rgbroc[149]="#30BA8F";
+rgbroc[150]="#30BFBF";
+rgbroc[151]="#317873";
+rgbroc[152]="#318CE7";
+rgbroc[153]="#319177";
+rgbroc[154]="#32127A";
+rgbroc[155]="#32174D";
+rgbroc[156]="#324AB2";
+rgbroc[157]="#32CD32";
+rgbroc[158]="#333399";
+rgbroc[159]="#343434";
+rgbroc[160]="#353839";
+rgbroc[161]="#354230";
+rgbroc[162]="#355E3B";
+rgbroc[163]="#36454F";
+rgbroc[164]="#36747D";
+rgbroc[165]="#367588";
+rgbroc[166]="#39A78E";
+rgbroc[167]="#39FF14";
+rgbroc[168]="#3AB09E";
+rgbroc[169]="#3B2F2F";
+rgbroc[170]="#3B3C36";
+rgbroc[171]="#3B7A57";
+rgbroc[172]="#3C1414";
+rgbroc[173]="#3C341F";
+rgbroc[174]="#3C69E7";
+rgbroc[175]="#3CB371";
+rgbroc[176]="#3D0C02";
+rgbroc[177]="#3D2B1F";
+rgbroc[178]="#3E8EDE";
+rgbroc[179]="#3EB489";
+rgbroc[180]="#3F00FF";
+rgbroc[181]="#3FFF00";
+rgbroc[182]="#40826D";
+rgbroc[183]="#40E0D0";
+rgbroc[184]="#4166F5";
+rgbroc[185]="#4169E1";
+rgbroc[186]="#43302E";
+rgbroc[187]="#436B95";
+rgbroc[188]="#43B3AE";
+rgbroc[189]="#444C38";
+rgbroc[190]="#446CCF";
+rgbroc[191]="#4666FF";
+rgbroc[192]="#4682B4";
+rgbroc[193]="#47ABCC";
+rgbroc[194]="#483C32";
+rgbroc[195]="#483C32";
+rgbroc[196]="#483D8B";
+rgbroc[197]="#48BF91";
+rgbroc[198]="#48D1CC";
+rgbroc[199]="#49796B";
+rgbroc[200]="#4A5D23";
+rgbroc[201]="#4A646C";
+rgbroc[202]="#4B0082";
+rgbroc[204]="#4B5320";
+rgbroc[205]="#4C2882";
+rgbroc[206]="#4C516D";
+rgbroc[207]="#4C9141";
+rgbroc[208]="#4CBB17";
+rgbroc[209]="#4D1A7F";
+rgbroc[210]="#4D5D53";
+rgbroc[211]="#4D8C57";
+rgbroc[212]="#4E5180";
+rgbroc[213]="#4F42B5";
+rgbroc[214]="#4F7942";
+rgbroc[215]="#5072A7";
+rgbroc[216]="#507D2A";
+rgbroc[217]="#50C878";
+rgbroc[218]="#50C878";
+rgbroc[219]="#512888";
+rgbroc[220]="#5218FA";
+rgbroc[221]="#534B4F";
+rgbroc[222]="#536872";
+rgbroc[223]="#536878";
+rgbroc[224]="#536878";
+rgbroc[225]="#543D37";
+rgbroc[226]="#545AA7";
+rgbroc[227]="#54626F";
+rgbroc[228]="#555555";
+rgbroc[229]="#555D50";
+rgbroc[230]="#556B2F";
+rgbroc[231]="#563C5C";
+rgbroc[232]="#568203";
+rgbroc[233]="#56887D";
+rgbroc[234]="#56A0D3";
+rgbroc[235]="#58427C";
+rgbroc[236]="#59260B";
+rgbroc[237]="#592720";
+rgbroc[238]="#5946B2";
+rgbroc[239]="#5A4FCF";
+rgbroc[240]="#5B92E5";
+rgbroc[241]="#5D3954";
+rgbroc[242]="#5DA493";
+rgbroc[243]="#5DADEC";
+rgbroc[244]="#5E8C31";
+rgbroc[245]="#5F8A8B";
+rgbroc[246]="#5F9EA0";
+rgbroc[247]="#5FA777";
+rgbroc[248]="#5FA778";
+rgbroc[249]="#6050DC";
+rgbroc[250]="#6082B6";
+rgbroc[251]="#614051";
+rgbroc[252]="#635147";
+rgbroc[253]="#644117";
+rgbroc[254]="#6495ED";
+rgbroc[255]="#65000B";
+rgbroc[256]="#654321";
+rgbroc[257]="#660000";
+rgbroc[258]="#66023C";
+rgbroc[259]="#663399";
+rgbroc[260]="#664228";
+rgbroc[261]="#665D1E";
+rgbroc[262]="#666699";
+rgbroc[263]="#6699CC";
+rgbroc[264]="#6699CC";
+rgbroc[265]="#66B032";
+rgbroc[266]="#66DDAA";
+rgbroc[267]="#66FF00";
+rgbroc[268]="#66FF66";
+rgbroc[269]="#673147";
+rgbroc[270]="#673147";
+rgbroc[271]="#674846";
+rgbroc[272]="#674C47";
+rgbroc[273]="#676767";
+rgbroc[274]="#679267";
+rgbroc[275]="#682860";
+rgbroc[276]="#696969";
+rgbroc[277]="#6A0DAD";
+rgbroc[278]="#6A5ACD";
+rgbroc[279]="#6B4423";
+rgbroc[280]="#6B8E23";
+rgbroc[281]="#6C2E1F";
+rgbroc[282]="#6C3082";
+rgbroc[283]="#6C541E";
+rgbroc[284]="#6CA0DC";
+rgbroc[285]="#6D9BC3";
+rgbroc[286]="#6EAEA1";
+rgbroc[287]="#6F00FF";
+rgbroc[288]="#6F4E37";
+rgbroc[289]="#6F4E37";
+rgbroc[290]="#701C1C";
+rgbroc[291]="#701C1C";
+rgbroc[292]="#702670";
+rgbroc[293]="#702963";
+rgbroc[294]="#703642";
+rgbroc[295]="#704214";
+rgbroc[296]="#708090";
+rgbroc[297]="#71A6D2";
+rgbroc[298]="#722F37";
+rgbroc[299]="#727472";
+rgbroc[300]="#72A0C1";
+rgbroc[301]="#733380";
+rgbroc[302]="#7366BD";
+rgbroc[303]="#738678";
+rgbroc[304]="#73C2FB";
+rgbroc[305]="#74C365";
+rgbroc[306]="#757575";
+rgbroc[307]="#766EC8";
+rgbroc[308]="#76D7EA";
+rgbroc[309]="#777696";
+rgbroc[310]="#778899";
+rgbroc[311]="#778BA5";
+rgbroc[312]="#77B5FE";
+rgbroc[313]="#78184A";
+rgbroc[314]="#7851A9";
+rgbroc[315]="#79443B";
+rgbroc[316]="#796878";
+rgbroc[317]="#7B1113";
+rgbroc[318]="#7B3F00";
+rgbroc[319]="#7B68EE";
+rgbroc[320]="#7BB661";
+rgbroc[321]="#7C0A02";
+rgbroc[322]="#7C4848";
+rgbroc[323]="#7CB9E8";
+rgbroc[324]="#7CFC00";
+rgbroc[325]="#7DF9FF";
+rgbroc[326]="#7E5E60";
+rgbroc[327]="#7ED4E6";
+rgbroc[328]="#7F00FF";
+rgbroc[329]="#7F1734";
+rgbroc[330]="#7FFF00";
+rgbroc[331]="#7FFFD4";
+rgbroc[332]="#800000";
+rgbroc[333]="#800020";
+rgbroc[334]="#800020";
+rgbroc[335]="#800080";
+rgbroc[336]="#800080";
+rgbroc[337]="#801818";
+rgbroc[338]="#80461B";
+rgbroc[339]="#807532";
+rgbroc[340]="#808000";
+rgbroc[341]="#808080";
+rgbroc[342]="#81613C";
+rgbroc[343]="#826644";
+rgbroc[344]="#838996";
+rgbroc[345]="#841617";
+rgbroc[346]="#841B2D";
+rgbroc[347]="#848482";
+rgbroc[348]="#848482";
+rgbroc[349]="#856088";
+rgbroc[350]="#856D4D";
+rgbroc[351]="#85754E";
+rgbroc[352]="#8601AF";
+rgbroc[353]="#86608E";
+rgbroc[354]="#86608E";
+rgbroc[355]="#87413F";
+rgbroc[356]="#87421F";
+rgbroc[357]="#87A96B";
+rgbroc[358]="#87CEEB";
+rgbroc[359]="#87CEFA";
+rgbroc[360]="#87FF2A";
+rgbroc[361]="#880085";
+rgbroc[362]="#8806CE";
+rgbroc[363]="#882D17";
+rgbroc[364]="#882D17";
+rgbroc[365]="#88540B";
+rgbroc[366]="#893843";
+rgbroc[367]="#893F45";
+rgbroc[368]="#89CFF0";
+rgbroc[369]="#8A2BE2";
+rgbroc[370]="#8A3324";
+rgbroc[371]="#8A496B";
+rgbroc[372]="#8A795D";
+rgbroc[373]="#8A7F80";
+rgbroc[374]="#8A9A5B";
+rgbroc[375]="#8A9A5B";
+rgbroc[376]="#8B0000";
+rgbroc[377]="#8B008B";
+rgbroc[378]="#8B4513";
+rgbroc[379]="#8B72BE";
+rgbroc[380]="#8B8589";
+rgbroc[381]="#8B8680";
+rgbroc[382]="#8BA8B7";
+rgbroc[383]="#8C92AC";
+rgbroc[384]="#8CBED6";
+rgbroc[385]="#8D4E85";
+rgbroc[386]="#8DA399";
+rgbroc[387]="#8DB600";
+rgbroc[388]="#8DD9CC";
+rgbroc[389]="#8E3A59";
+rgbroc[390]="#8E4585";
+rgbroc[391]="#8F00FF";
+rgbroc[392]="#8F00FF";
+rgbroc[393]="#8F9779";
+rgbroc[394]="#8FBC8F";
+rgbroc[395]="#8FD400";
+rgbroc[396]="#905D5D";
+rgbroc[397]="#90EE90";
+rgbroc[398]="#914E75";
+rgbroc[399]="#915C83";
+rgbroc[400]="#915F6D";
+rgbroc[401]="#915F6D";
+rgbroc[402]="#91A3B0";
+rgbroc[403]="#922B3E";
+rgbroc[404]="#9370DB";
+rgbroc[405]="#93C572";
+rgbroc[406]="#93CCEA";
+rgbroc[407]="#9400D3";
+rgbroc[408]="#954535";
+rgbroc[409]="#960018";
+rgbroc[410]="#963D7F";
+rgbroc[411]="#967117";
+rgbroc[412]="#967117";
+rgbroc[413]="#967117";
+rgbroc[414]="#967117";
+rgbroc[415]="#9678B6";
+rgbroc[416]="#96C8A2";
+rgbroc[417]="#979AAA";
+rgbroc[418]="#987456";
+rgbroc[419]="#98817B";
+rgbroc[420]="#989898";
+rgbroc[421]="#98FF98";
+rgbroc[422]="#9932CC";
+rgbroc[423]="#996515";
+rgbroc[424]="#996666";
+rgbroc[425]="#9966CC";
+rgbroc[426]="#997A8D";
+rgbroc[427]="#9A4EAE";
+rgbroc[428]="#9AB973";
+rgbroc[429]="#9ACD32";
+rgbroc[430]="#9B111E";
+rgbroc[431]="#9BC4E2";
+rgbroc[433]="#9C51B6";
+rgbroc[434]="#9C7C38";
+rgbroc[435]="#9E1B32";
+rgbroc[436]="#9E5E6F";
+rgbroc[437]="#9EFD38";
+rgbroc[438]="#9F00C5";
+rgbroc[439]="#9F00FF";
+rgbroc[440]="#9F1D35";
+rgbroc[441]="#9F2B68";
+rgbroc[442]="#9F4576";
+rgbroc[443]="#9F8170";
+rgbroc[444]="#9FA91F";
+rgbroc[445]="#A020F0";
+rgbroc[446]="#A020F0";
+rgbroc[447]="#A0D6B4";
+rgbroc[448]="#A17A74";
+rgbroc[449]="#A1CAF1";
+rgbroc[450]="#A2006D";
+rgbroc[451]="#A2A2D0";
+rgbroc[452]="#A2ADD0";
+rgbroc[453]="#A3C1AD";
+rgbroc[454]="#A45A52";
+rgbroc[455]="#A4C639";
+rgbroc[456]="#A4DDED";
+rgbroc[457]="#A50B5E";
+rgbroc[458]="#A52A2A";
+rgbroc[459]="#A55353";
+rgbroc[460]="#A57164";
+rgbroc[461]="#A57C00";
+rgbroc[462]="#A63A79";
+rgbroc[464]="#A67B5B";
+rgbroc[465]="#A67B5B";
+rgbroc[466]="#A6A6A6";
+rgbroc[467]="#A75502";
+rgbroc[468]="#A7F432";
+rgbroc[469]="#A7FC00";
+rgbroc[470]="#A81C07";
+rgbroc[471]="#A83731";
+rgbroc[472]="#A8516E";
+rgbroc[473]="#A8C3BC";
+rgbroc[474]="#A8E4A0";
+rgbroc[475]="#A99A86";
+rgbroc[476]="#A9B2C3";
+rgbroc[477]="#A9BA9D";
+rgbroc[478]="#AA381E";
+rgbroc[479]="#AA98A9";
+rgbroc[480]="#AA98A9";
+rgbroc[481]="#AAA9AD";
+rgbroc[482]="#AAF0D1";
+rgbroc[483]="#AB274F";
+rgbroc[484]="#AB4B52";
+rgbroc[485]="#AB4E52";
+rgbroc[486]="#AB92B3";
+rgbroc[487]="#ACACAC";
+rgbroc[488]="#ACACE6";
+rgbroc[489]="#ACBF60";
+rgbroc[490]="#ACE1AF";
+rgbroc[491]="#ACE5EE";
+rgbroc[492]="#AD4379";
+rgbroc[493]="#AD6F69";
+rgbroc[494]="#ADD8E6";
+rgbroc[495]="#ADFF2F";
+rgbroc[496]="#AE2029";
+rgbroc[497]="#AE98AA";
+rgbroc[498]="#AF4035";
+rgbroc[499]="#AF6E4D";
+rgbroc[500]="#AFDBF5";
+rgbroc[501]="#B03060";
+rgbroc[502]="#B0BF1A";
+rgbroc[503]="#B0C4DE";
+rgbroc[504]="#B0E0E6";
+rgbroc[505]="#B22222";
+rgbroc[506]="#B284BE";
+rgbroc[507]="#B2BEB5";
+rgbroc[508]="#B2EC5D";
+rgbroc[509]="#B2FFFF";
+rgbroc[510]="#B2FFFF";
+rgbroc[511]="#B31B1B";
+rgbroc[512]="#B3446C";
+rgbroc[513]="#B3446C";
+rgbroc[514]="#B48395";
+rgbroc[515]="#B53389";
+rgbroc[516]="#B57EDC";
+rgbroc[517]="#B5B35C";
+rgbroc[518]="#B7410E";
+rgbroc[519]="#B768A2";
+rgbroc[520]="#B784A7";
+rgbroc[521]="#B86D29";
+rgbroc[522]="#B87333";
+rgbroc[523]="#B8860B";
+rgbroc[524]="#B94E48";
+rgbroc[525]="#B9D9EB";
+rgbroc[526]="#BA160C";
+rgbroc[527]="#BA55D3";
+rgbroc[528]="#BBB477";
+rgbroc[529]="#BC8F8F";
+rgbroc[530]="#BCB88A";
+rgbroc[531]="#BCD4E6";
+rgbroc[532]="#BCD4E6";
+rgbroc[533]="#BD33A4";
+rgbroc[534]="#BDB76B";
+rgbroc[535]="#BDDA57";
+rgbroc[536]="#BE4F62";
+rgbroc[537]="#BEBEBE";
+rgbroc[538]="#BF00FF";
+rgbroc[539]="#BF4F51";
+rgbroc[540]="#BFAFB2";
+rgbroc[541]="#BFC1C2";
+rgbroc[542]="#BFFF00";
+rgbroc[543]="#BFFF00";
+rgbroc[544]="#C0362C";
+rgbroc[545]="#C04000";
+rgbroc[546]="#C0448F";
+rgbroc[547]="#C08081";
+rgbroc[548]="#C09999";
+rgbroc[549]="#C0C0C0";
+rgbroc[550]="#C0E8D5";
+rgbroc[551]="#C154C1";
+rgbroc[552]="#C19A6B";
+rgbroc[553]="#C19A6B";
+rgbroc[554]="#C19A6B";
+rgbroc[555]="#C19A6B";
+rgbroc[556]="#C19A6B";
+rgbroc[557]="#C21E56";
+rgbroc[558]="#C2B280";
+rgbroc[559]="#C2B280";
+rgbroc[560]="#C30B4E";
+rgbroc[561]="#C32148";
+rgbroc[562]="#C32148";
+rgbroc[563]="#C3B091";
+rgbroc[564]="#C3CDE6";
+rgbroc[565]="#C40233";
+rgbroc[566]="#C41E3A";
+rgbroc[567]="#C46210";
+rgbroc[568]="#C4AEAD";
+rgbroc[569]="#C4C3D0";
+rgbroc[570]="#C54B8C";
+rgbroc[571]="#C5B358";
+rgbroc[572]="#C5CBE1";
+rgbroc[573]="#C5E384";
+rgbroc[574]="#C71585";
+rgbroc[575]="#C71585";
+rgbroc[576]="#C72C48";
+rgbroc[577]="#C74375";
+rgbroc[578]="#C80815";
+rgbroc[579]="#C84186";
+rgbroc[580]="#C8509B";
+rgbroc[581]="#C8A2C8";
+rgbroc[582]="#C8AD7F";
+rgbroc[583]="#C95A49";
+rgbroc[584]="#C9A0DC";
+rgbroc[585]="#C9C0BB";
+rgbroc[586]="#C9C0BB";
+rgbroc[587]="#CA1F7B";
+rgbroc[588]="#CAE00D";
+rgbroc[589]="#CB410B";
+rgbroc[590]="#CB4154";
+rgbroc[591]="#CB6D51";
+rgbroc[592]="#CBA135";
+rgbroc[593]="#CC3333";
+rgbroc[594]="#CC3336";
+rgbroc[595]="#CC33CC";
+rgbroc[596]="#CC397B";
+rgbroc[597]="#CC474B";
+rgbroc[598]="#CC5500";
+rgbroc[599]="#CC7722";
+rgbroc[600]="#CC8899";
+rgbroc[601]="#CCA01D";
+rgbroc[602]="#CCCCFF";
+rgbroc[603]="#CCCCFF";
+rgbroc[604]="#CCFF00";
+rgbroc[606]="#CD5C5C";
+rgbroc[607]="#CD607E";
+rgbroc[608]="#CD7F32";
+rgbroc[609]="#CD9575";
+rgbroc[610]="#CE2029";
+rgbroc[611]="#CE4676";
+rgbroc[612]="#CEFF00";
+rgbroc[613]="#CF1020";
+rgbroc[614]="#CF3476";
+rgbroc[615]="#CF6BA9";
+rgbroc[616]="#CF71AF";
+rgbroc[617]="#CFB53B";
+rgbroc[618]="#D0417E";
+rgbroc[619]="#D0F0C0";
+rgbroc[620]="#D0FF14";
+rgbroc[621]="#D10047";
+rgbroc[622]="#D10056";
+rgbroc[623]="#D1E231";
+rgbroc[624]="#D2691E";
+rgbroc[625]="#D2691E";
+rgbroc[626]="#D2B48C";
+rgbroc[627]="#D3212D";
+rgbroc[628]="#D3AF37";
+rgbroc[629]="#D3D3D3";
+rgbroc[630]="#D40000";
+rgbroc[631]="#D470A2";
+rgbroc[632]="#D473D4";
+rgbroc[633]="#D4AF37";
+rgbroc[634]="#D65282";
+rgbroc[635]="#D68A59";
+rgbroc[636]="#D6CADD";
+rgbroc[637]="#D70040";
+rgbroc[638]="#D71868";
+rgbroc[639]="#D74894";
+rgbroc[640]="#D7837F";
+rgbroc[641]="#D891EF";
+rgbroc[642]="#D8B2D1";
+rgbroc[643]="#D8BFD8";
+rgbroc[644]="#D9004C";
+rgbroc[645]="#D92121";
+rgbroc[646]="#D9381E";
+rgbroc[647]="#D982B5";
+rgbroc[648]="#D98695";
+rgbroc[649]="#D99058";
+rgbroc[650]="#D99A6C";
+rgbroc[651]="#D9E650";
+rgbroc[652]="#DA1884";
+rgbroc[653]="#DA2C43";
+rgbroc[654]="#DA3287";
+rgbroc[655]="#DA70D6";
+rgbroc[656]="#DA8A67";
+rgbroc[657]="#DA9100";
+rgbroc[658]="#DAA520";
+rgbroc[659]="#DBD7D2";
+rgbroc[660]="#DC143C";
+rgbroc[661]="#DCDCDC";
+rgbroc[662]="#DDA0DD";
+rgbroc[663]="#DE3163";
+rgbroc[664]="#DE5285";
+rgbroc[665]="#DE5D83";
+rgbroc[666]="#DE6FA1";
+rgbroc[667]="#DE6FA1";
+rgbroc[668]="#DE6FA1";
+rgbroc[669]="#DEA5A4";
+rgbroc[670]="#DEAA88";
+rgbroc[671]="#DEB887";
+rgbroc[672]="#DF00FF";
+rgbroc[673]="#DF00FF";
+rgbroc[674]="#DF73FF";
+rgbroc[675]="#DFFF00";
+rgbroc[676]="#E0115F";
+rgbroc[677]="#E03C31";
+rgbroc[678]="#E0B0FF";
+rgbroc[679]="#E0FFFF";
+rgbroc[680]="#E12C2C";
+rgbroc[681]="#E1A95F";
+rgbroc[682]="#E2062C";
+rgbroc[683]="#E25822";
+rgbroc[684]="#E2725B";
+rgbroc[685]="#E29CD2";
+rgbroc[686]="#E30022";
+rgbroc[687]="#E30B5D";
+rgbroc[688]="#E3256B";
+rgbroc[689]="#E32636";
+rgbroc[690]="#E34234";
+rgbroc[691]="#E34234";
+rgbroc[692]="#E3A857";
+rgbroc[693]="#E3AB57";
+rgbroc[694]="#E3DAC9";
+rgbroc[695]="#E3F988";
+rgbroc[696]="#E40078";
+rgbroc[697]="#E4007C";
+rgbroc[698]="#E4717A";
+rgbroc[699]="#E4717A";
+rgbroc[700]="#E48400";
+rgbroc[701]="#E49B0F";
+rgbroc[702]="#E4D00A";
+rgbroc[703]="#E4D96F";
+rgbroc[704]="#E52B50";
+rgbroc[705]="#E58E73";
+rgbroc[706]="#E5AA70";
+rgbroc[707]="#E5E4E2";
+rgbroc[708]="#E60026";
+rgbroc[709]="#E63E62";
+rgbroc[710]="#E68FAC";
+rgbroc[711]="#E6BE8A";
+rgbroc[712]="#E6E6FA";
+rgbroc[713]="#E79FC4";
+rgbroc[714]="#E86100";
+rgbroc[715]="#E8CCD7";
+rgbroc[716]="#E8F48C";
+rgbroc[717]="#E936A7";
+rgbroc[718]="#E95C4B";
+rgbroc[719]="#E97451";
+rgbroc[720]="#E9967A";
+rgbroc[721]="#E9D66B";
+rgbroc[722]="#E9D66B";
+rgbroc[723]="#E9FFDB";
+rgbroc[724]="#EAA221";
+rgbroc[725]="#EC5800";
+rgbroc[726]="#ECB176";
+rgbroc[727]="#ECEBBD";
+rgbroc[728]="#ECEBBD";
+rgbroc[729]="#ED1C24";
+rgbroc[730]="#ED2939";
+rgbroc[731]="#ED2939";
+rgbroc[732]="#ED872D";
+rgbroc[733]="#ED9121";
+rgbroc[734]="#EDC9AF";
+rgbroc[735]="#EDEAE0";
+rgbroc[736]="#EE204D";
+rgbroc[737]="#EE82EE";
+rgbroc[738]="#EED202";
+rgbroc[739]="#EEDC82";
+rgbroc[740]="#EEE600";
+rgbroc[741]="#EEED09";
+rgbroc[742]="#EF98AA";
+rgbroc[743]="#EFBBCC";
+rgbroc[744]="#EFCC00";
+rgbroc[745]="#EFDECD";
+rgbroc[746]="#EFDFBB";
+rgbroc[747]="#F08080";
+rgbroc[748]="#F0DC82";
+rgbroc[749]="#F0E68C";
+rgbroc[750]="#F0E891";
+rgbroc[751]="#F0EAD6";
+rgbroc[752]="#F0F8FF";
+rgbroc[753]="#F0FFF0";
+rgbroc[754]="#F0FFFF";
+rgbroc[755]="#F19CBB";
+rgbroc[756]="#F1DDCF";
+rgbroc[757]="#F2003C";
+rgbroc[758]="#F28500";
+rgbroc[759]="#F2BA49";
+rgbroc[760]="#F2BDCD";
+rgbroc[761]="#F2C649";
+rgbroc[762]="#F2E8D7";
+rgbroc[763]="#F37A48";
+rgbroc[764]="#F38FA9";
+rgbroc[765]="#F3E5AB";
+rgbroc[766]="#F3E5AB";
+rgbroc[767]="#F400A1";
+rgbroc[768]="#F400A1";
+rgbroc[769]="#F4A460";
+rgbroc[770]="#F4C2C2";
+rgbroc[771]="#F4C2C2";
+rgbroc[772]="#F4C430";
+rgbroc[773]="#F4CA16";
+rgbroc[774]="#F4F0EC";
+rgbroc[775]="#F56FA1";
+rgbroc[776]="#F58025";
+rgbroc[777]="#F5BD1F";
+rgbroc[778]="#F5DEB3";
+rgbroc[779]="#F5E050";
+rgbroc[780]="#F5F5DC";
+rgbroc[781]="#F5F5F5";
+rgbroc[782]="#F5FFFA";
+rgbroc[783]="#F64A8A";
+rgbroc[784]="#F653A6";
+rgbroc[785]="#F6ADC6";
+rgbroc[786]="#F6EABE";
+rgbroc[787]="#F75394";
+rgbroc[788]="#F77FBE";
+rgbroc[789]="#F78FA7";
+rgbroc[790]="#F7BFBE";
+rgbroc[791]="#F7E7CE";
+rgbroc[792]="#F88379";
+rgbroc[793]="#F88379";
+rgbroc[794]="#F88379";
+rgbroc[795]="#F8B878";
+rgbroc[796]="#F8D568";
+rgbroc[797]="#F8DE7E";
+rgbroc[798]="#F8DE7E";
+rgbroc[799]="#F8F8FF";
+rgbroc[800]="#F9429E";
+rgbroc[801]="#FA5B3D";
+rgbroc[802]="#FA8072";
+rgbroc[803]="#FAD6A5";
+rgbroc[804]="#FAD6A5";
+rgbroc[805]="#FAD6A5";
+rgbroc[806]="#FADA5E";
+rgbroc[807]="#FADA5E";
+rgbroc[808]="#FADA5E";
+rgbroc[809]="#FADADD";
+rgbroc[810]="#FAE6FA";
+rgbroc[811]="#FAE7B5";
+rgbroc[812]="#FAEBD7";
+rgbroc[813]="#FAF0BE";
+rgbroc[814]="#FAF0E6";
+rgbroc[815]="#FAFA37";
+rgbroc[816]="#FAFAD2";
+rgbroc[817]="#FB4D46";
+rgbroc[818]="#FB607F";
+rgbroc[819]="#FBAB60";
+rgbroc[820]="#FBCEB1";
+rgbroc[821]="#FBEC5D";
+rgbroc[822]="#FBEC5D";
+rgbroc[823]="#FC0FC0";
+rgbroc[824]="#FC6C85";
+rgbroc[825]="#FC6C85";
+rgbroc[826]="#FC74FD";
+rgbroc[827]="#FC89AC";
+rgbroc[828]="#FCC200";
+rgbroc[829]="#FCE883";
+rgbroc[830]="#FCF75E";
+rgbroc[831]="#FD3A4A";
+rgbroc[832]="#FD3F92";
+rgbroc[833]="#FD6C9E";
+rgbroc[834]="#FDBE02";
+rgbroc[835]="#FDDDE6";
+rgbroc[836]="#FDEE00";
+rgbroc[837]="#FDF5E6";
+rgbroc[838]="#FDFF00";
+rgbroc[839]="#FE2712";
+rgbroc[840]="#FE28A2";
+rgbroc[841]="#FE4164";
+rgbroc[842]="#FE4EDA";
+rgbroc[843]="#FE6F5E";
+rgbroc[844]="#FEBAAD";
+rgbroc[845]="#FED8B1";
+rgbroc[846]="#FEDF00";
+rgbroc[847]="#FEFE33";
+rgbroc[848]="#FEFEFA";
+rgbroc[849]="#FF0000";
+rgbroc[850]="#FF007C";
+rgbroc[851]="#FF007F";
+rgbroc[852]="#FF0090";
+rgbroc[853]="#FF00FF";
+rgbroc[854]="#FF00FF";
+rgbroc[855]="#FF0800";
+rgbroc[856]="#FF1493";
+rgbroc[857]="#FF1DCE";
+rgbroc[858]="#FF2400";
+rgbroc[859]="#FF33CC";
+rgbroc[860]="#FF355E";
+rgbroc[861]="#FF3800";
+rgbroc[862]="#FF3855";
+rgbroc[863]="#FF43A4";
+rgbroc[864]="#FF4500";
+rgbroc[865]="#FF4F00";
+rgbroc[866]="#FF5349";
+rgbroc[867]="#FF5349";
+rgbroc[868]="#FF5470";
+rgbroc[869]="#FF55A3";
+rgbroc[870]="#FF5800";
+rgbroc[871]="#FF5A36";
+rgbroc[872]="#FF6347";
+rgbroc[873]="#FF66CC";
+rgbroc[874]="#FF6700";
+rgbroc[875]="#FF681F";
+rgbroc[876]="#FF681F";
+rgbroc[877]="#FF69B4";
+rgbroc[878]="#FF6E4A";
+rgbroc[879]="#FF6FFF";
+rgbroc[880]="#FF6FFF";
+rgbroc[881]="#FF7518";
+rgbroc[882]="#FF7538";
+rgbroc[883]="#FF7800";
+rgbroc[884]="#FF7A00";
+rgbroc[885]="#FF7E00";
+rgbroc[886]="#FF7F00";
+rgbroc[887]="#FF7F50";
+rgbroc[888]="#FF8243";
+rgbroc[889]="#FF8C00";
+rgbroc[890]="#FF91A4";
+rgbroc[891]="#FF91AF";
+rgbroc[892]="#FF91AF";
+rgbroc[893]="#FF9505";
+rgbroc[894]="#FF9933";
+rgbroc[895]="#FF9966";
+rgbroc[896]="#FF9F00";
+rgbroc[897]="#FFA07A";
+rgbroc[898]="#FFA089";
+rgbroc[899]="#FFA343";
+rgbroc[900]="#FFA500";
+rgbroc[901]="#FFA6C9";
+rgbroc[902]="#FFA700";
+rgbroc[903]="#FFAA1D";
+rgbroc[904]="#FFAE42";
+rgbroc[905]="#FFB200";
+rgbroc[906]="#FFB6C1";
+rgbroc[907]="#FFB7C5";
+rgbroc[908]="#FFBA00";
+rgbroc[909]="#FFBCD9";
+rgbroc[910]="#FFBD88";
+rgbroc[911]="#FFBF00";
+rgbroc[912]="#FFC0CB";
+rgbroc[913]="#FFC40C";
+rgbroc[914]="#FFCBA4";
+rgbroc[915]="#FFCC33";
+rgbroc[916]="#FFD300";
+rgbroc[917]="#FFD300";
+rgbroc[918]="#FFD700";
+rgbroc[919]="#FFD800";
+rgbroc[920]="#FFDAB9";
+rgbroc[921]="#FFDAE9";
+rgbroc[922]="#FFDB00";
+rgbroc[923]="#FFDB58";
+rgbroc[924]="#FFDDCA";
+rgbroc[925]="#FFDDF4";
+rgbroc[926]="#FFDEAD";
+rgbroc[927]="#FFDF00";
+rgbroc[928]="#FFE4C4";
+rgbroc[929]="#FFE4E1";
+rgbroc[930]="#FFE5B4";
+rgbroc[931]="#FFEB00";
+rgbroc[932]="#FFEBCD";
+rgbroc[933]="#FFEF00";
+rgbroc[934]="#FFEF00";
+rgbroc[935]="#FFEFD5";
+rgbroc[936]="#FFF0F5";
+rgbroc[937]="#FFF44F";
+rgbroc[938]="#FFF5EE";
+rgbroc[939]="#FFF600";
+rgbroc[940]="#FFF700";
+rgbroc[941]="#FFF700";
+rgbroc[942]="#FFF8DC";
+rgbroc[943]="#FFF8E7";
+rgbroc[944]="#FFFACD";
+rgbroc[945]="#FFFAF0";
+rgbroc[946]="#FFFAFA";
+rgbroc[947]="#FFFDD0";
+rgbroc[948]="#FFFF00";
+rgbroc[949]="#FFFF66";
+rgbroc[950]="#FFFF66";
+rgbroc[951]="#FFFF99";
+rgbroc[952]="#FFFF9F";
+rgbroc[953]="#FFFFE0";
+rgbroc[954]="#FFFFF0";
+rgbroc[955]="#FFFFFF";
+
+var znom=new Array(2000);
+var zrgb=new Array(2000);
+
+znom[1]="Pink";
+zrgb[1]="#FFC0CB";
+znom[2]="LightPink";
+zrgb[2]="#FFB6C1";
+znom[3]="HotPink";
+zrgb[3]="#FF69B4";
+znom[4]="DeepPink";
+zrgb[4]="#FF1493";
+znom[5]="PaleVioletRed";
+zrgb[5]="#DB7093";
+znom[6]="MediumVioletRed";
+zrgb[6]="#C71585";
+znom[7]="LightSalmon";
+zrgb[7]="#FFA07A";
+znom[8]="Salmon";
+zrgb[8]="#FA8072";
+znom[9]="DarkSalmon";
+zrgb[9]="#E9967A";
+znom[10]="LightCoral";
+zrgb[10]="#F08080";
+znom[11]="IndianRed";
+zrgb[11]="#CD5C5C";
+znom[12]="Crimson";
+zrgb[12]="#DC143C";
+znom[13]="Firebrick";
+zrgb[13]="#B22222";
+znom[14]="DarkRed";
+zrgb[14]="#8B0000";
+znom[15]="Red";
+zrgb[15]="#FF0000";
+znom[16]="OrangeRed";
+zrgb[16]="#FF4500";
+znom[17]="Tomato";
+zrgb[17]="#FF6347";
+znom[18]="Coral";
+zrgb[18]="#FF7F50";
+znom[19]="DarkOrange";
+zrgb[19]="#FF8C00";
+znom[20]="Orange";
+zrgb[20]="#FFA500";
+znom[21]="Yellow";
+zrgb[21]="#FFFF00";
+znom[22]="LightYellow";
+zrgb[22]="#FFFFE0";
+znom[23]="LemonChiffon";
+zrgb[23]="#FFFACD";
+znom[24]="LightGoldenrodYellow";
+zrgb[24]="#FAFAD2";
+znom[25]="PapayaWhip";
+zrgb[25]="#FFEFD5";
+znom[26]="Moccasin";
+zrgb[26]="#FFE4B5";
+znom[27]="PeachPuff";
+zrgb[27]="#FFDAB9";
+znom[28]="PaleGoldenrod";
+zrgb[28]="#EEE8AA";
+znom[29]="Khaki";
+zrgb[29]="#F0E68C";
+znom[30]="DarkKhaki";
+zrgb[30]="#BDB76B";
+znom[31]="Gold";
+zrgb[31]="#FFD700";
+znom[32]="Cornsilk";
+zrgb[32]="#FFF8DC";
+znom[33]="BlanchedAlmond";
+zrgb[33]="#FFEBCD";
+znom[34]="Bisque";
+zrgb[34]="#FFE4C4";
+znom[35]="NavajoWhite";
+zrgb[35]="#FFDEAD";
+znom[36]="Wheat";
+zrgb[36]="#F5DEB3";
+znom[37]="Burlywood";
+zrgb[37]="#DEB887";
+znom[38]="Tan";
+zrgb[38]="#D2B48C";
+znom[39]="RosyBrown";
+zrgb[39]="#BC8F8F";
+znom[40]="SandyBrown";
+zrgb[40]="#F4A460";
+znom[41]="Goldenrod";
+zrgb[41]="#DAA520";
+znom[42]="DarkGoldenrod";
+zrgb[42]="#B8860B";
+znom[43]="Peru";
+zrgb[43]="#CD853F";
+znom[44]="Chocolate";
+zrgb[44]="#D2691E";
+znom[45]="SaddleBrown";
+zrgb[45]="#8B4513";
+znom[46]="Sienna";
+zrgb[46]="#A0522D";
+znom[47]="Brown";
+zrgb[47]="#A52A2A";
+znom[48]="Maroon";
+zrgb[48]="#800000";
+znom[49]="DarkOliveGreen";
+zrgb[49]="#556B2F";
+znom[50]="Olive";
+zrgb[50]="#808000";
+znom[51]="OliveDrab";
+zrgb[51]="#6B8E23";
+znom[52]="YellowGreen";
+zrgb[52]="#9ACD32";
+znom[53]="LimeGreen";
+zrgb[53]="#32CD32";
+znom[54]="Lime";
+zrgb[54]="#00FF00";
+znom[55]="LawnGreen";
+zrgb[55]="#7CFC00";
+znom[56]="Chartreuse";
+zrgb[56]="#7FFF00";
+znom[57]="GreenYellow";
+zrgb[57]="#ADFF2F";
+znom[58]="SpringGreen";
+zrgb[58]="#00FF7F";
+znom[59]="MediumSpringGreen";
+zrgb[59]="#00FA9A";
+znom[60]="LightGreen";
+zrgb[60]="#90EE90";
+znom[61]="PaleGreen";
+zrgb[61]="#98FB98";
+znom[62]="DarkSeaGreen";
+zrgb[62]="#8FBC8F";
+znom[63]="MediumAquamarine";
+zrgb[63]="#66CDAA";
+znom[64]="MediumSeaGreen";
+zrgb[64]="#3CB371";
+znom[65]="SeaGreen";
+zrgb[65]="#2E8B57";
+znom[66]="ForestGreen";
+zrgb[66]="#228B22";
+znom[67]="Green";
+zrgb[67]="#008000";
+znom[68]="DarkGreen";
+zrgb[68]="#006400";
+znom[69]="Aqua";
+zrgb[69]="#00FFFF";
+znom[70]="Cyan";
+zrgb[70]="#00FFFF";
+znom[71]="LightCyan";
+zrgb[71]="#E0FFFF";
+znom[72]="PaleTurquoise";
+zrgb[72]="#AFEEEE";
+znom[73]="Aquamarine";
+zrgb[73]="#7FFFD4";
+znom[74]="Turquoise";
+zrgb[74]="#40E0D0";
+znom[75]="MediumTurquoise";
+zrgb[75]="#48D1CC";
+znom[76]="DarkTurquoise";
+zrgb[76]="#00CED1";
+znom[77]="LightSeaGreen";
+zrgb[77]="#20B2AA";
+znom[78]="CadetBlue";
+zrgb[78]="#5F9EA0";
+znom[79]="DarkCyan";
+zrgb[79]="#008B8B";
+znom[80]="Teal";
+zrgb[80]="#008080";
+znom[81]="LightSteelBlue";
+zrgb[81]="#B0C4DE";
+znom[82]="PowderBlue";
+zrgb[82]="#B0E0E6";
+znom[83]="LightBlue";
+zrgb[83]="#ADD8E6";
+znom[84]="SkyBlue";
+zrgb[84]="#87CEEB";
+znom[85]="LightSkyBlue";
+zrgb[85]="#87CEFA";
+znom[86]="DeepSkyBlue";
+zrgb[86]="#00BFFF";
+znom[87]="DodgerBlue";
+zrgb[87]="#1E90FF";
+znom[88]="CornflowerBlue";
+zrgb[88]="#6495ED";
+znom[89]="SteelBlue";
+zrgb[89]="#4682B4";
+znom[90]="RoyalBlue";
+zrgb[90]="#4169E1";
+znom[91]="Blue";
+zrgb[91]="#0000FF";
+znom[92]="MediumBlue";
+zrgb[92]="#0000CD";
+znom[93]="DarkBlue";
+zrgb[93]="#00008B";
+znom[94]="Navy";
+zrgb[94]="#000080";
+znom[95]="MidnightBlue";
+zrgb[95]="#191970";
+znom[96]="Lavender";
+zrgb[96]="#E6E6FA";
+znom[97]="Thistle";
+zrgb[97]="#D8BFD8";
+znom[98]="Plum";
+zrgb[98]="#DDA0DD";
+znom[99]="Violet";
+zrgb[99]="#EE82EE";
+znom[100]="Orchid";
+zrgb[100]="#DA70D6";
+znom[101]="Fuchsia";
+zrgb[101]="#FF00FF";
+znom[102]="Magenta";
+zrgb[102]="#FF00FF";
+znom[103]="MediumOrchid";
+zrgb[103]="#BA55D3";
+znom[104]="MediumPurple";
+zrgb[104]="#9370DB";
+znom[105]="BlueViolet";
+zrgb[105]="#8A2BE2";
+znom[106]="DarkViolet";
+zrgb[106]="#9400D3";
+znom[107]="DarkOrchid";
+zrgb[107]="#9932CC";
+znom[108]="DarkMagenta";
+zrgb[108]="#8B008B";
+znom[109]="Purple";
+zrgb[109]="#800080";
+znom[110]="Indigo";
+zrgb[110]="#4B0082";
+znom[111]="DarkSlateBlue";
+zrgb[111]="#483D8B";
+znom[112]="SlateBlue";
+zrgb[112]="#6A5ACD";
+znom[113]="MediumSlateBlue";
+zrgb[113]="#7B68EE";
+znom[114]="White";
+zrgb[114]="#FFFFFF";
+znom[115]="Snow";
+zrgb[115]="#FFFAFA";
+znom[116]="Honeydew";
+zrgb[116]="#F0FFF0";
+znom[117]="MintCream";
+zrgb[117]="#F5FFFA";
+znom[118]="Azure";
+zrgb[118]="#F0FFFF";
+znom[119]="AliceBlue";
+zrgb[119]="#F0F8FF";
+znom[120]="GhostWhite";
+zrgb[120]="#F8F8FF";
+znom[121]="WhiteSmoke";
+zrgb[121]="#F5F5F5";
+znom[122]="Seashell";
+zrgb[122]="#FFF5EE";
+znom[123]="Beige";
+zrgb[123]="#F5F5DC";
+znom[124]="OldLace";
+zrgb[124]="#FDF5E6";
+znom[125]="FloralWhite";
+zrgb[125]="#FFFAF0";
+znom[126]="Ivory";
+zrgb[126]="#FFFFF0";
+znom[127]="AntiqueWhite";
+zrgb[127]="#FAEBD7";
+znom[128]="Linen";
+zrgb[128]="#FAF0E6";
+znom[129]="LavenderBlush";
+zrgb[129]="#FFF0F5";
+znom[130]="MistyRose";
+zrgb[130]="#FFE4E1";
+znom[131]="Gainsboro";
+zrgb[131]="#DCDCDC";
+znom[132]="LightGray";
+zrgb[132]="#D3D3D3";
+znom[133]="Silver";
+zrgb[133]="#C0C0C0";
+znom[134]="DarkGray";
+zrgb[134]="#A9A9A9";
+znom[135]="Gray";
+zrgb[135]="#808080";
+znom[136]="DimGray";
+zrgb[136]="#696969";
+znom[137]="LightSlateGray";
+zrgb[137]="#778899";
+znom[138]="SlateGray";
+zrgb[138]="#708090";
+znom[139]="DarkSlateGray";
+zrgb[139]="#2F4F4F";
+znom[140]="Black";
+zrgb[140]="#000000";
+/**/
+
+document.getElementById("inputrgb").value="#228B22";botao();
+document.getElementById("aqui").innerText="Color Name: Forest green (web)";
+
+var conta=0;
+document.write ("<table><tr>"); 
+for(y=1;y<141;y++){
+	document.write ("<td><span title= '" + zrgb[y] + "' onclick=cargb('" + y + "');>" + znom[y] + "</span></td><td style='background:" + zrgb[y] + ";width:100px;height:20px;' onclick=cargb('" + y + "');></td>");
+	conta++;
+	if(conta>3){document.write("</tr><tr>"); conta=0;}
+}
+//document.write ("</table>");
+
+
+
+conta=0;
+//document.write ("<table><tr>");
+document.write ("</tr><tr><td colspan='8'><hr style='width:100%;height:8px;background:#228B22;'></td></tr><tr>");
+
+for(x=1;x<956;x++){
+//document.write ("<span onclick='carga(this.innerText);'>" + i +"</span><br>");
+//document.write ("&#60;span onclick='carga(this.innerText);'&#62;" + x + "&#60;/span&#62;<br>");
+//document.write ("<td><span onclick=carga('" + x + "');>" + x + " " +roc[x] + "</span></td><td style='background:" + rgbroc[x] +";width:100px;height:20px;' onclick=carga('" + x + "');></td>");
+document.write ("<td><span onclick=carga('" + x + "');>" + roc[x] + "</span></td><td style='background:" + rgbroc[x] +";width:100px;height:20px;' onclick=carga('" + x + "');></td>");
+conta++;
+if(conta>3){document.write("</tr><tr>"); conta=0;}
+}
+document.write ("</tr><tr><td colspan='8'><hr style='width:100%;height:8px;background:#228B22;'></td></tr>");
+document.write ("</table>");
+
+</script>
+
+<center>
+<div style="width:100%;background:#60992e;background-image:url('mercury_back.jpg');"></div>
+<br>
+<img src="mercury_png.png"></img>
+<p>The goal was to be able to create custom style sheets and allow for the coloring of icons for <a href="https://sosuke.com/creating-a-dovetail-agent-theme/" target="_blank">Creating a Dovetail Agent Theme</a>.
+<br>
+For this code to work well the starting color needs to be black. If your icon set isn't black you can prepend "brightness(0) saturate(100%)" to your filter property which will first turn the icon set to black.</p>
+<br>
+For as long as I worked on creating this solution from multiple resources I found some had spent far
+longer to create this already completed solution. Only slightly modified to focus on HEX colors. Credit
+goes to MultiplyByZer0 for their post <a href="https://stackoverflow.com/a/43960991/604861" target="_blank">https://stackoverflow.com/a/43960991/604861</a>
+</p>
+<br>
+<img style="cursor:pointer;" onclick="window.history.back();" onmouseover="this.src='../get_back_home_invert.png';" onmouseout="this.src='../get_back_home.png';" src="../get_back_home.png" title="get back home"></img>
+<br>
+</center>
+
+<img style="position:absolute;left:10px;top:10px;cursor:pointer;" onclick="window.history.back();" onmouseover="this.src='../get_back_home_invert.png';" onmouseout="this.src='../get_back_home.png';" src="../get_back_home.png" title="get back home"></img>
+<img id="imgvolta" style="position:absolute;left:10px;top:10px;cursor:pointer;" onclick="window.history.back();" onmouseover="this.src='../get_back_home_invert.png';" onmouseout="this.src='../get_back_home.png';" src="../get_back_home.png" title="get back home"></img>
+
+<script>
+var w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+var h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
+document.getElementById("imgvolta").style.left=w-92 + "px";
+//# sourceURL=pen.js
+
+</script>
+
+</body>
+</html>
