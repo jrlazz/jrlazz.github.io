@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>* Tunin * /tunin/9697/in1.html</title>
+<!-- Author: Jos&#233; Roberto Lazzareschi -->
+
+<script src="../../../js/wavesurfer.min.js"></script>
+<script src="../../../js/app.js"></script>
+
+<style>
+body {font-size:12pt;}
+input  {opacity:.8; filter: invert(48%) sepia(98%) saturate(2378%) hue-rotate(87deg) brightness(123%) contrast(125%);}
+td {padding:0px; border:0px;}
+a {text-decoration:none;}
+img {position:relative;}
+button {font-size:4pt; background-color:transparent; border:0px;}
+</style>
+</head>
+
+<body bgcolor="#000" background="fu9697b.jpg">
+<br>
+<center>
+
+<table width=100%>
+<tr>
+<td width=30%>
+<center>
+<img src="../des/dortunin.gif">
+<br>
+<img border=0 src="../des/dortmail.gif" style="top:-4px;" title="jrlazz@yahoo.com" style="cursor:pointer;">
+<br>
+<a href="../home.html"><img border=0 src="../des/dorthome.gif" style="top:-7px;"></a>
+<br>
+<img src="../des/agmidife.gif"><img src="../des/agmidifd.gif">
+<br>
+<img src="../des/br_png.png" width="30" onclick="brmens();" style="cursor:pointer;">
+<img src="../des/en_png.png" width="30" onclick="enmens();" style="cursor:pointer;">
+</center>
+</td>
+<td><img src="ag96971.gif"></td>
+<td>
+<center>
+<h1><font color="#996"><i id="mens">... doces<br>sonhos!</i><font></h1> 
+</font>
+</center>
+</td></tr></table>
+<br><br><br><br><br>
+<div class="container" style="width:400px;">
+<button id="playPause">
+<img id="play" src="../des/alt_fal_1.png" onclick="mostra();" style="width:40px;cursor:pointer;"></img>
+<img id="pause" src="../des/alt_fal_0.png" onclick="esconde();" style="width:40px;cursor:pointer;"></img>
+</button>
+<input id="inpa" onchange="vol();" type="range" min="0" max="1" value="0" step="0.01" style="width:320px;">
+
+<div id="waveform4" style="width:400px;height:128px;"></div>
+<script>
+var wavesurfer=WaveSurfer.create({
+	container:'#waveform4',waveColor:'#0f0',progressColor:'#f00',splitChannels:false,height:128,barWidth:.5
+});
+</script>
+
+
+<div id="playlist" hidden><a href="dbru9697.mp3" class="list-group-item active"></a></div>
+</div>
+</center>
+
+<script>
+document.getElementById("inpa").value=0.49;
+wavesurfer.setVolume(.5);
+function vol(){	wavesurfer.setVolume(document.getElementById("inpa").value);}
+function brmens(){document.getElementById("mens").innerHTML="... doces<br>sonhos!";}
+function enmens(){document.getElementById("mens").innerHTML="... sweet<br>dreams!";}
+function esconde(){document.getElementById("inpa").style.visibility="hidden";}
+function mostra(){document.getElementById("inpa").style.visibility="visible";}
+</script>
+
+</body>
+</html>

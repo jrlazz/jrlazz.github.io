@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>playlist_site</title>
+
+<!-- <link href="bootstrap3.css" rel="stylesheet"> -->
+<script src="wavesurfer.min.js"></script>
+<script src="app.js"></script>
+<style>
+body {margin:8px; background-color:#bcc;}
+table {padding:0px;}
+td {padding:0px; text-align:center; vertical-align:top;}
+input {filter: invert(100%) sepia(100%) saturate(100%) hue-rotate(200deg) brightness(50%) contrast(50%); opacity:.5;}
+a{text-decoration:none;}
+.container{padding:0px;margin-right:auto;margin-left:auto}@media (min-width:768px){.container{width:750px}}@media (min-width:992px){.container{width:970px}}@media (min-width:1200px){.container{width:1170px}}
+.btn{width:100%;font-family:Arial;font-size:12pt;font-weight:normal;background-color:#899;color:#eff;}
+.btn:hover{background-color:#bcc;color:#233;}
+.list-group{padding-left:0;margin-bottom:20px;}
+.list-group-item{position:relative;display:block;padding:10px 15px;margin-bottom:-1px;background-color:#dee;border:1px solid #008;font-family:Verdana;}
+.list-group-item.active,.list-group-item.active:focus,.list-group-item.active:hover{z-index:2;color:#eff;background-color:#899;border-color:#008}
+.list-group-item.active .list-group-item-text,.list-group-item.active:focus .list-group-item-text,.list-group-item.active:hover .list-group-item-text{color:#bcc}a.list-group-item,button.list-group-item{color:#566}a.list-group-item .list-group-item-heading,button.list-group-item .list-group-item-heading{color:#008}a.list-group-item:focus,a.list-group-item:hover,button.list-group-item:focus,button.list-group-item:hover{color:#555;text-decoration:none;background-color:#bcc}button.list-group-item{width:100%;text-align:left}
+</style>
+</head>
+
+<body>
+<center>
+<!-- width orig 580 -->
+<table><tr><td><img src="playbole2c.jpg" width="316"></img></td><td>
+<div class="container" style="width:600px;">
+	<div id="waveform4" style="width:600px;height:256px;background-color:#bcc;border: 0px solid #008;"></div>
+<script>
+var wavesurfer = WaveSurfer.create({
+	container: '#waveform4',
+	waveColor: '#233',
+	progressColor: '#cdd',
+	splitChannels: true,
+	height: 128,
+	barWidth: .5
+});
+</script>
+
+<br>
+	<button class="btn btn-success btn-block" id="playPause">
+	<span id="play" style="">Play</span>
+	<span id="pause" style="display:none;">Pause</span>
+	</button>
+<br>
+<input id="inpa" onchange="vol();" type="range" min="0" max="1" value="0" step="0.01" style="width: 100%">
+	<div id="playlist" style="text-align:left;">
+		<a href="unstress_you_red.mp3" class="list-group-item active">
+		2001 ... unstress_you_red.mp3</a>
+		<a href="comeplaywith_me_red.mp3" class="list-group-item">
+		2001 ... comeplaywith_me_red.mp3</a>
+		<a href="letmebe_red.mp3" class="list-group-item">
+		2001 ... letmebe_red.mp3</a>
+		<a href="notforsale_red.mp3" class="list-group-item">
+		2001 ... notforsale_red.mp3</a>
+	</div>
+</div>
+</td><td><img src="playbole2c.jpg" width="316"></img></td></tr>
+<tr>
+<td><img style="cursor:pointer;" onclick="window.history.back();" onmouseover="this.src='../get_back_home_invert.png';" onmouseout="this.src='../get_back_home.png';" src="../get_back_home.png" title="get back home"></img></td>
+<td><img src="playbog2jpg.jpg" width="600"></img></td>
+<td><img style="cursor:pointer;" onclick="window.history.back();" onmouseover="this.src='../get_back_home_invert.png';" onmouseout="this.src='../get_back_home.png';" src="../get_back_home.png" title="get back home"></img></td>
+</tr>
+</table>
+
+</center>
+<script>
+document.getElementById("inpa").value=0.2;
+wavesurfer.setVolume(.2);
+function vol(){
+	wavesurfer.setVolume(document.getElementById("inpa").value);
+}
+</script>
+
+</body>
+</html>
