@@ -5,222 +5,211 @@
 <meta charset="utf-8">
 
 <link rel="icon" type="image/png" href="img/github-mark.png">
-<meta name="description" content="Bikes">
+<meta name="description" content="Bicycle rack">
 <meta name="twitter:image" content="img/ag_baboy_right.png" />
 <meta name="twitter:image:type" content="png" />
 <meta name="twitter:image:width" content="19" />
 <meta name="twitter:image:height" content="47" />
 
 <style>
-@font-face {font-family:cas;src:url(../font/Cascadia.ttf);}
-body{margin:0;background-color:#bececa;overflow:hidden;}
-span{position:absolute;width:100%;text-align:center;top:0px;font-family:cas;font-size:12pt;font-weight:bold;color:#ff0;}
-a{font-family:Lucida Console;font-size:14pt;font-weight:bold;color:#900;text-decoration:none;}
+body{margin:0;background-color:#aba;overflow:hidden;}
+span{position:absolute;width:100%;text-align:center;top:0px;font-family:Lucida Console;font-size:14pt;font-weight:bold;color:#800;}
 </style>
 
-	</head>
-	<body>
+</head>
+<body>
 
-		<div id="info" style="position:absolute;left:40%;top:10px;color:#ff0;">
-			<a href="https://codepen.io/boytchev/pen/RNrWKoe" target="_blank" rel="noopener">Biciclet&aacute;rio</a><br/>
-		</div>
+<span>Biciclet&aacute;rio ... Bicycle rack</a><br/>
+
 <!-- \xE1 -->
 
-<!--
-<script async src="https://ga.jspm.io/npm:es-module-shims@1.5.1/dist/es-module-shims.js" crossorigin="anonymous"></script>
-<script type="importmap">
-  {
-	"imports": {
-	  "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
-			"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
-	}
-  }
-</script>
--->
-
-		<script type="module">
-// https://discourse.threejs.org/t/create-a-procedural-door-model/87149
-
-//import * as THREE from "three";
-//import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+<script type="module">
 import * as THREE from '../js/three.module_res_res.js';
 import { OrbitControls } from '../js/OrbitControls_res_res.js';
 
 var geo=[];
 var mat=[];
+var tex=[];
 var mes=[];
 var tor=[];
 var pla=[];
 var gru=[];for(let z=1;z<100;z++){gru[z]=new THREE.Group();}
+var scene, camera, renderer, controls, light, grid;
 
+	scene=new THREE.Scene();
+	camera= new THREE.PerspectiveCamera(80,innerWidth/innerHeight);
+	camera.position.set(0,300,500);
+	scene.rotation.set(0,1,0);
 
-//console.clear( );
-
-var scene= new THREE.Scene();
-
-var camera= new THREE.PerspectiveCamera( 80, innerWidth/innerHeight );
-	camera.position.set(-80,0,400 );
-	var renderer= new THREE.WebGLRenderer( {antialias: true,alpha:true});
+	renderer= new THREE.WebGLRenderer( {antialias: true,alpha:true});
 	renderer.setClearColor(0x003355,0);
 	renderer.setSize( innerWidth, innerHeight );
 	document.body.appendChild( renderer.domElement );
 			
-window.addEventListener( "resize", (event)=> {
-	camera.aspect= innerWidth/innerHeight;
-	camera.updateProjectionMatrix( );
-	renderer.setSize( innerWidth, innerHeight );
-});
+	window.addEventListener("resize",(event)=>{
+		camera.aspect=innerWidth/innerHeight;
+		camera.updateProjectionMatrix();
+		renderer.setSize(innerWidth,innerHeight);
+	});
 
-var controls= new OrbitControls( camera, renderer.domElement );
-	//controls.autoRotate= true;
-	controls.enableDamping= true;
+	controls=new OrbitControls(camera,renderer.domElement);
+	controls.enableDamping=true;
 
-	var light= new THREE.AmbientLight('#fc9',1);
-	//light.position.set( 1, 1, 1 );
-	scene.add( light );
+	light=new THREE.AmbientLight('#fc9',1);
+	scene.add(light);
 
-	//tex[1]=new THREE.TextureLoader().load('img/blocos/watchtower7.png');
+	tex[1]=new THREE.TextureLoader().load('img/block_hir.jpg');
+	tex[1].wrapS=THREE.RepeatWrapping;
+	tex[1].wrapT=THREE.RepeatWrapping;
+	tex[1].repeat.set(0.4,10)
 
 	geo[1]=new THREE.CylinderGeometry(10,10,300);// 3 polegadas
-	mat[1]=new THREE.MeshStandardMaterial({color:0x900000,transparent:true});
+	mat[1]=new THREE.MeshStandardMaterial({color:'#700'});
 	mes[1]=new THREE.Mesh(geo[1],mat[1]);
 	mes[1].position.set(0,0,0);
-mes[21]=mes[1].clone();
-mes[21].position.set(1200,0,0);
-
+		mes[21]=mes[1].clone();
+		mes[21].position.set(1200,0,0);
 
 	geo[2]=new THREE.CylinderGeometry(6.4,6.4,300);// 2.5 polegadas
-	mat[2]=new THREE.MeshStandardMaterial({color:0x900000,transparent:true});
+	mat[2]=new THREE.MeshStandardMaterial({color:'#700'});
 	mes[2]=new THREE.Mesh(geo[2],mat[2]);
 	mes[2].position.set(150,105,0);
 	mes[2].rotation.set(1.57,0,1.57);
 
 	geo[3]=new THREE.CylinderGeometry(5,5,300);// 2 polegadas suporte cobertura superior e tela superior
-	mat[3]=new THREE.MeshStandardMaterial({color:0xf000f0,transparent:true});
+	mat[3]=new THREE.MeshStandardMaterial({color:'#700'});
 	mes[3]=new THREE.Mesh(geo[3],mat[3]);
 	mes[3].position.set(150,175,-55);
 	mes[3].rotation.set(1.57,0,1.57);
 
 	geo[4]=new THREE.CylinderGeometry(5,5,50);// 2 polegadas suporte superior
-	mat[4]=new THREE.MeshStandardMaterial({color:0x00c090,transparent:true});
+	mat[4]=new THREE.MeshStandardMaterial({color:'#700'});
 	mes[4]=new THREE.Mesh(geo[4],mat[4]);
 	mes[4].position.set(0,145,-35);
 	mes[4].rotation.set(1.57,0,0);
-mes[41]=mes[4].clone();
+		mes[41]=mes[4].clone();
 
 	geo[5]=new THREE.CylinderGeometry(5,5,50);// 2 polegadas suporte inferior
-	mat[5]=new THREE.MeshStandardMaterial({color:0x00c090,transparent:true});
+	mat[5]=new THREE.MeshStandardMaterial({color:'#700'});
 	mes[5]=new THREE.Mesh(geo[5],mat[5]);
 	mes[5].position.set(0,-50,-35);
 	mes[5].rotation.set(1.57,0,0);
-mes[51]=mes[5].clone();
+		mes[51]=mes[5].clone();
 
 	geo[6]=new THREE.CylinderGeometry(5,5,35);// 2 polegadas suporte vertical auxiliar
-	mat[6]=new THREE.MeshStandardMaterial({color:0x0099cc,transparent:true});
+	mat[6]=new THREE.MeshStandardMaterial({color:'#700'});
 	mes[6]=new THREE.Mesh(geo[6],mat[6]);
 	mes[6].position.set(0,160,-55);
-mes[61]=mes[6].clone();
-
+		mes[61]=mes[6].clone();
 
 	geo[7]=new THREE.CylinderGeometry(6.4,6.4,300);// 2.5 polegadas suporte central
-	mat[7]=new THREE.MeshStandardMaterial({color:0x909090,transparent:true});
+	mat[7]=new THREE.MeshStandardMaterial({color:'#700'});
 	mes[7]=new THREE.Mesh(geo[7],mat[7]);
 	mes[7].position.set(0,0,0);
 
 	geo[8]=new THREE.CylinderGeometry(5,5,300);// 2 polegadas suporte tela inferior
-	mat[8]=new THREE.MeshStandardMaterial({color:0xf000f0,transparent:true});
+	mat[8]=new THREE.MeshStandardMaterial({color:'#700'});
 	mes[8]=new THREE.Mesh(geo[8],mat[8]);
 	mes[8].position.set(150,-50,-55);
 	mes[8].rotation.set(1.57,0,1.57);
 
 	geo[10]=new THREE.CylinderGeometry(5,5,30);// toco
-	mat[10]=new THREE.MeshStandardMaterial({color:0x900000,transparent:true});
+	mat[10]=new THREE.MeshStandardMaterial({color:'#700'});
 	mes[10]=new THREE.Mesh(geo[10],mat[10]);
 	mes[10].position.set(0,155,0);
-mes[101]=mes[10].clone();
-mes[101].position.set(0,155,0);;
+		mes[101]=mes[10].clone();
+		mes[101].position.set(0,155,0);;
 
-const grid=new THREE.GridHelper(300,15,'#060','#060');
-grid.rotation.set(1.57,1.57,0);
-grid.position.set(150,60,-55);
-grid.scale.set(0.75,1,1);
+	grid=new THREE.GridHelper(300,15,'#060','#060');
+	grid.rotation.set(1.57,1.57,0);
+	grid.position.set(150,60,-55);
+	grid.scale.set(0.75,1,1);
+
+	geo[11]=new THREE.BoxGeometry(400,2400,10);
+	mat[11]=new THREE.MeshBasicMaterial({color:'#ffc',side:THREE.DoubleSide,map:tex[1]});
+	pla[11]=new THREE.Mesh(geo[11],mat[11]);
+	pla[11].rotation.set(1.57,0,1.57);
+	pla[11].position.set(1000,-150,100);
+	scene.add(pla[11]);
+
+	geo[111]=new THREE.BoxGeometry(400,2400,10);
+	mat[111]=new THREE.MeshBasicMaterial({color:'#dca',side:THREE.DoubleSide,map:tex[1]});
+	pla[111]=new THREE.Mesh(geo[111],mat[111]);
+	pla[111].rotation.set(1.57,0,1.57);
+	pla[111].position.set(1000,-160,-300);
+	scene.add(pla[111]);
+
+	geo[112]=new THREE.BoxGeometry(20,2410,20);
+	mat[112]=new THREE.MeshBasicMaterial({color:'#aaa'});
+	pla[112]=new THREE.Mesh(geo[112],mat[112]);
+	pla[112].rotation.set(1.57,0,1.57);
+	pla[112].position.set(1000,-155,-100);
+	scene.add(pla[112]);
 
 
-geo[11]=new THREE.PlaneGeometry(300,2400);
-mat[11]=new THREE.MeshBasicMaterial({color:0xcc9966,side:THREE.DoubleSide});
-pla[11]=new THREE.Mesh(geo[11],mat[11]);
-pla[11].rotation.set(1.57,0,1.57);
-pla[11].position.set(1000,-150,0);
-scene.add(pla[11]);
+	geo[12]=new THREE.BoxGeometry(120,600,4);// cobertura
+	mat[12]=new THREE.MeshBasicMaterial({color:'#fec',side:THREE.DoubleSide,transparent:true,opacity:0.5});
+	pla[12]=new THREE.Mesh(geo[12],mat[12]);
+	pla[12].rotation.set(1.77,0,1.57);
+	pla[12].position.set(299,176,-20);
 
-geo[12]=new THREE.PlaneGeometry(120,620);// cobertura
-mat[12]=new THREE.MeshBasicMaterial({color:'#fec',side:THREE.DoubleSide,transparent:true,opacity:0.5});
-pla[12]=new THREE.Mesh(geo[12],mat[12]);
-pla[12].rotation.set(1.77,0,1.57);
-pla[12].position.set(300,175,-20);
-//scene.add(pla[12]);
+	for(let z=2;z<20;z++){if(mes[z]){gru[1].add(mes[z]);}}
 
+	for(let z=41;z<102;z++){if(mes[z]){gru[3].add(mes[z]);}}
 
-for(let z=2;z<20;z++){if(mes[z]){gru[1].add(mes[z]);}}
+	gru[1].add(grid)
+	gru[2]=gru[1].clone();
 
-for(let z=41;z<102;z++){if(mes[z]){gru[3].add(mes[z]);}}
+	gru[1].position.set(0,0,0);
+	gru[2].position.set(300,0,0);
+	gru[3].position.set(600,0,0);
 
+	gru[4].add(gru[1]);
+	gru[4].add(gru[2]);
+	gru[4].add(gru[3]);
+	gru[4].add(pla[12]);
 
-gru[1].add(grid)
-gru[2]=gru[1].clone();
+	scene.add(gru[4]);
+	gru[5]=gru[4].clone();
+	gru[5].position.set(600,0,0);
 
-gru[1].position.set(0,0,0);
-gru[2].position.set(300,0,0);
-gru[3].position.set(600,0,0);
+	scene.add(gru[4]);
+	scene.add(gru[5]);
 
-gru[4].add(gru[1]);
-gru[4].add(gru[2]);
-gru[4].add(gru[3]);
-gru[4].add(pla[12]);
+	scene.add(mes[1]);
+	scene.add(mes[21]);
 
-scene.add(gru[4]);
-gru[5]=gru[4].clone();
-gru[5].position.set(600,0,0);
+	geo[101]=new THREE.TorusGeometry(40,3,32,32);
+	mat[101]=new THREE.MeshBasicMaterial({color:'#000'});
+	tor[101]=new THREE.Mesh(geo[101],mat[101]);
+	tor[101].rotation.set(0,1.57,0);
+	tor[101].position.set(50,45,0);
+		tor[102]=tor[101].clone();
+		tor[102].position.set(50,-60,0);
+	scene.add(tor[101]);
+	scene.add(tor[102]);
 
-scene.add(gru[4]);
-scene.add(gru[5]);
-
-scene.add(mes[1]);
-scene.add(mes[21]);
-
-geo[101]=new THREE.TorusGeometry(40,3,32,32 ); 
-mat[101]=new THREE.MeshBasicMaterial({color:'#000'}); 
-tor[101]=new THREE.Mesh(geo[101],mat[101]);
-tor[101].rotation.set(0,1.57,0);
-tor[101].position.set(50,45,0);
-tor[102]=tor[101].clone();
-
-scene.add(tor[101]);
-tor[102].position.set(50,-60,0);
-scene.add(tor[102]);
-
-geo[103]=new THREE.TorusGeometry(11,2,16,16 ); 
-mat[103]=new THREE.MeshBasicMaterial({color:'#f00'}); 
-tor[103]=new THREE.Mesh(geo[103],mat[103]);
-tor[103].rotation.set(0,1.57,0);
-tor[103].position.set(50,102,0);
-tor[104]=tor[103].clone();
-tor[104].scale.set(0.5,0.7,0.8);
-
-scene.add(tor[103]);
-tor[104].position.set(50,88,0);
-tor[104].rotation.set(0,0,0);
-scene.add(tor[104]);
+	geo[103]=new THREE.TorusGeometry(11,2,16,16);
+	mat[103]=new THREE.MeshBasicMaterial({color:'#f00'});
+	tor[103]=new THREE.Mesh(geo[103],mat[103]);
+	tor[103].rotation.set(0,1.57,0);
+	tor[103].position.set(50,102,0);
+		tor[104]=tor[103].clone();
+		tor[104].scale.set(0.5,0.7,0.8);
+		tor[104].position.set(50,88,0);
+		tor[104].rotation.set(0,0,0);
+	scene.add(tor[103]);
+	scene.add(tor[104]);
 
 function animate(){
 	requestAnimationFrame(animate);
 	controls.update();
 	light.position.copy(camera.position);
-	renderer.render(scene,camera );
+	renderer.render(scene,camera);
 }
+
 animate();
 
 </script>
-
 </body>
 </html>
