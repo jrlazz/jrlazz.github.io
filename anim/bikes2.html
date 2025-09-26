@@ -13,7 +13,7 @@
 
 <style>
 body{margin:0;background-color:#aba;overflow:hidden;}
-span{position:absolute;width:100%;text-align:center;top:0px;font-family:Lucida Console;font-size:14pt;font-weight:bold;color:#800;}
+span{position:absolute;width:100%;text-align:center;top:10px;font-family:Lucida Console;font-size:14pt;font-weight:bold;color:#800;}
 </style>
 
 </head>
@@ -71,51 +71,43 @@ var scene, camera, renderer, controls, light, grid;
 		mes[21].position.set(1200,0,0);
 
 	geo[2]=new THREE.CylinderGeometry(6.4,6.4,300);// 2.5 polegadas
-	mat[2]=new THREE.MeshStandardMaterial({color:'#700'});
-	mes[2]=new THREE.Mesh(geo[2],mat[2]);
+	mes[2]=new THREE.Mesh(geo[2],mat[1]);
 	mes[2].position.set(150,105,0);
 	mes[2].rotation.set(1.57,0,1.57);
 
 	geo[3]=new THREE.CylinderGeometry(5,5,300);// 2 polegadas suporte cobertura superior e tela superior
-	mat[3]=new THREE.MeshStandardMaterial({color:'#700'});
-	mes[3]=new THREE.Mesh(geo[3],mat[3]);
+	mes[3]=new THREE.Mesh(geo[3],mat[1]);
 	mes[3].position.set(150,175,-55);
 	mes[3].rotation.set(1.57,0,1.57);
 
-	geo[4]=new THREE.CylinderGeometry(5,5,50);// 2 polegadas suporte superior
-	mat[4]=new THREE.MeshStandardMaterial({color:'#700'});
-	mes[4]=new THREE.Mesh(geo[4],mat[4]);
-	mes[4].position.set(0,145,-35);
+	geo[4]=new THREE.CylinderGeometry(5,5,60);// 2 polegadas suporte superior
+	mes[4]=new THREE.Mesh(geo[4],mat[1]);
+	mes[4].position.set(0,145,-29);
 	mes[4].rotation.set(1.57,0,0);
 		mes[41]=mes[4].clone();
 
-	geo[5]=new THREE.CylinderGeometry(5,5,50);// 2 polegadas suporte inferior
-	mat[5]=new THREE.MeshStandardMaterial({color:'#700'});
-	mes[5]=new THREE.Mesh(geo[5],mat[5]);
-	mes[5].position.set(0,-50,-35);
+	geo[5]=new THREE.CylinderGeometry(5,5,60);// 2 polegadas suporte inferior
+	mes[5]=new THREE.Mesh(geo[5],mat[1]);
+	mes[5].position.set(0,-50,-28);
 	mes[5].rotation.set(1.57,0,0);
 		mes[51]=mes[5].clone();
 
 	geo[6]=new THREE.CylinderGeometry(5,5,35);// 2 polegadas suporte vertical auxiliar
-	mat[6]=new THREE.MeshStandardMaterial({color:'#700'});
-	mes[6]=new THREE.Mesh(geo[6],mat[6]);
+	mes[6]=new THREE.Mesh(geo[6],mat[1]);
 	mes[6].position.set(0,160,-55);
 		mes[61]=mes[6].clone();
 
 	geo[7]=new THREE.CylinderGeometry(6.4,6.4,300);// 2.5 polegadas suporte central
-	mat[7]=new THREE.MeshStandardMaterial({color:'#700'});
-	mes[7]=new THREE.Mesh(geo[7],mat[7]);
+	mes[7]=new THREE.Mesh(geo[7],mat[1]);
 	mes[7].position.set(0,0,0);
 
 	geo[8]=new THREE.CylinderGeometry(5,5,300);// 2 polegadas suporte tela inferior
-	mat[8]=new THREE.MeshStandardMaterial({color:'#700'});
-	mes[8]=new THREE.Mesh(geo[8],mat[8]);
+	mes[8]=new THREE.Mesh(geo[8],mat[1]);
 	mes[8].position.set(150,-50,-55);
 	mes[8].rotation.set(1.57,0,1.57);
 
 	geo[10]=new THREE.CylinderGeometry(5,5,30);// toco
-	mat[10]=new THREE.MeshStandardMaterial({color:'#700'});
-	mes[10]=new THREE.Mesh(geo[10],mat[10]);
+	mes[10]=new THREE.Mesh(geo[10],mat[1]);
 	mes[10].position.set(0,155,0);
 		mes[101]=mes[10].clone();
 		mes[101].position.set(0,155,0);;
@@ -145,7 +137,6 @@ var scene, camera, renderer, controls, light, grid;
 	pla[112].rotation.set(1.57,0,1.57);
 	pla[112].position.set(1000,-155,-100);
 	scene.add(pla[112]);
-
 
 	geo[12]=new THREE.BoxGeometry(120,600,4);// cobertura
 	mat[12]=new THREE.MeshBasicMaterial({color:'#fec',side:THREE.DoubleSide,transparent:true,opacity:0.5});
