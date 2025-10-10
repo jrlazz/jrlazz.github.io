@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>vertex_1.html</title>
+
+<link rel="shortcut icon" href="images/arr_right.png"/>
+
+<script src="jsold/three.min60.js"></script>
+
+<style>
+body{margin:0;overflow:hidden;font-family:Monospace;}
+</style>
+
+</head>
+
+<body>
+
+<span id="spA" style="position:absolute;left:10px;top:10px;font-size:32pt;color:#0f0;">?</span>
+<span id="spB" style="position:absolute;left:10px;top:100px;font-size:12pt;color:#ff0;"></span>
+
+<script>
+
+var renderer;
+var scene;
+var camera;
+
+var control;
+var alvos=[];
+
+var geo=[];
+var mat=[];
+var mesh=[];
+var light=[];
+
+var gridH,gridV;
+
+var w=0;
+var ww=0;
+var conta=0;
+
+var pulo=0.1;
+
+var mousedu=0;
+
+var Hval=window.innerWidth/2;
+var Vval=window.innerHeight/2;
+
+function init(){
+
+	scene=new THREE.Scene();
+	camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,0.1,1000);
+	camera.position.set(0,30,30);
+
+	camera.lookAt(scene.position);
+
+	renderer=new THREE.WebGLRenderer();
+	renderer.setClearColor('#024',1.0);
+	renderer.setSize(window.innerWidth,window.innerHeight);
+
+	document.body.appendChild(renderer.domElement);
+
+	geo[1]=new THREE.SphereGeometry(3.5,4,5);
+	mat[1]=new THREE.MeshLambertMaterial({color:'#999',wireframe:true});
+	mesh[1]=new THREE.Mesh(geo[1],mat[1]);
+	mesh[1].position.set(0,0,0);
+	scene.add(mesh[1]);
+
+	mat[2]=new THREE.MeshLambertMaterial({color:'#666',wireframe:true});
+	mesh[2]=new THREE.Mesh(geo[1],mat[2]);
+	mesh[2].position.set(0,0,0);
+	scene.add(mesh[2]);
+
+	geo[3]=new THREE.SphereGeometry(3,32,32);
+	mat[3]=new THREE.MeshLambertMaterial({color:'#fa0'});
+	mesh[3]=new THREE.Mesh(geo[3],mat[3]);
+	mesh[3].position.set(10,5,0);
+	mesh[3].name='Orange';
+	scene.add(mesh[3]);
+	alvos.push(mesh[3]);
+
+	mat[4]=new THREE.MeshLambertMaterial({color:'#090'});
+	mesh[4]=new THREE.Mesh(geo[3],mat[4]);
+	mesh[4].position.set(0,0,10);
+	mesh[4].name='Green';
+	scene.add(mesh[4]);
+	alvos.push(mesh[4]);
+
+	mat[5]=new THREE.MeshLambertMaterial({color:'#06f'});
+	mesh[5]=new THREE.Mesh(geo[3],mat[5]);
+	mesh[5].position.set(0,5,-10);
+	mesh[5].name='Blue';
+	scene.add(mesh[5]);
+	alvos.push(mesh[5]);
+
+	mat[6]=new THREE.MeshLambertMaterial({color:'#c0c'});
+	mesh[6]=new THREE.Mesh(geo[3],mat[6]);
+	mesh[6].position.set(-10,0,0);
+	mesh[6].name='Purple';
+	scene.add(mesh[6]);
+	alvos.push(mesh[6]);
+
+	geo[7]=new THREE.SphereGeometry(0.25,16,16);
+	mat[7]=new THREE.MeshLambertMaterial({color:'#fff'});
+	mesh[7]=new THREE.Mesh(geo[7],mat[7]);
+	mesh[7].position.set(0,0,0);
+
+	geo[9]=new THREE.SphereGeometry(0.2,16,16);
+	mat[9]=new THREE.MeshLambertMaterial({color:'#f00'});
+	mesh[9]=new THREE.Mesh(geo[9],mat[9]);
+	mesh[9].position.set(-25,0,0);
+
+	for(var z=20;z<120;z++){mesh[z]=mesh[9].clone();}
+	conta=20;
+	var originPoint=mesh[1].position.clone();
+	for(var vertexIndex=0;vertexIndex<mesh[1].geometry.vertices.length;vertexIndex++){
+		var localVertex=mesh[1].geometry.vertices[vertexIndex].clone();
+		var globalVertex=localVertex.applyMatrix4(mesh[1].matrix);
+		var directionVector=globalVertex.sub(mesh[1].position);
+		mesh[conta].position.set(directionVector.x,directionVector.y+0,directionVector.z);scene.add(mesh[conta]);
+		conta++;
+	}
+
+	light[1]=new THREE.DirectionalLight();
+	light[1].position.set(25,23,15);
+	scene.add(light[1]);
+
+	light[3]=new THREE.DirectionalLight();
+	light[3].position.set(-25,23,15);
+	scene.add(light[3]);
+
+	light[4]=new THREE.DirectionalLight();
+	light[4].position.set(0,-20,0);
+	scene.add(light[4]);
+
+	render();
+}
+
+function checkCollision(){
+	alvos.forEach(function(moo){moo.material.transparent=false;moo.material.opacity=1.0;});
+	var originPoint=mesh[1].position.clone();
+	for(var vertexIndex=0;vertexIndex<mesh[1].geometry.vertices.length;vertexIndex++){
+		var localVertex=mesh[1].geometry.vertices[vertexIndex].clone();
+		var globalVertex=localVertex.applyMatrix4(mesh[1].matrix);
+		var directionVector=globalVertex.sub(mesh[1].position);
+		var ray=new THREE.Raycaster(originPoint,directionVector.clone().normalize());
+		var collisionResults=ray.intersectObjects(alvos);
+		if(collisionResults.length>0 && collisionResults[0].distance<directionVector.length()){
+			mesh[7].position.set(directionVector.x,directionVector.y,directionVector.z);scene.add(mesh[7]);
+			document.getElementById("spA").innerText=collisionResults[0].object.name+" Ball";
+			document.getElementById("spB").innerText=" vertexIndex: " + vertexIndex + " of " +mesh[1].geometry.vertices.length + " vertices";
+			collisionResults[0].object.material.transparent=true;
+			collisionResults[0].object.material.opacity=0.6;
+		}
+	}
+}
+
+function render(){
+	renderer.render(scene,camera);
+	checkCollision();
+	w++;
+	if(w<100){
+		mesh[3].position.y -=pulo;
+		mesh[4].position.y +=pulo;
+		mesh[5].position.y -=pulo;
+		mesh[6].position.y +=pulo;
+	}
+	if(w>100 && w<200){
+		mesh[3].position.y +=pulo;
+		mesh[4].position.y -=pulo;
+		mesh[5].position.y +=pulo;
+		mesh[6].position.y -=pulo;
+	}
+
+	if(w==300){
+		w=0;
+	}
+
+	ww++;
+	if(ww==45){
+		mesh[1].position.x=20*Math.random()-10;
+		mesh[1].position.y=10*Math.random()-5;
+		mesh[1].position.z=20*Math.random()-10;
+		ww=0;
+	}
+	requestAnimationFrame(render);
+}
+
+init();
+
+/*
+
+Just watching the vertices collide
+
+*/
+
+</script>
+
+</body>
+</html>
