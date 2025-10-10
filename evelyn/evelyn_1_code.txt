@@ -23,7 +23,17 @@ td{text-align:center;]
 
 </style>
 
+<!--
 <script type="importmap">{"imports":{"three":"https://esm.sh/three@0.175.0/build/three.module.js","three/addons/":"https://esm.sh/three@0.175.0/examples/jsm/"}}</script>
+-->
+
+<script type="importmap">
+	{
+	"imports": {
+		"three": "https://cdn.jsdelivr.net/npm/three@0.175/build/three.module.js",
+		"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.175/examples/jsm/"
+	}}
+</script>
 
 <script src="../js/jquery-3.5.1.min.js"></script>
 <script src="../js/jquery-ui.js"></script>
