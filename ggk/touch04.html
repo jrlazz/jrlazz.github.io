@@ -1,0 +1,232 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=.52" />
+<!--
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes", target-densitydpi=device-dpi />
+-->
+<link rel="shortcut icon" href="http://jrlazz.eu5.org/favicon.ico" />
+<title>touch04.html</title>
+
+
+<style>
+
+body { margin-top:20px; background-color:#bcc;}
+span {font-size:32pt; font-family:Arial;}
+input {font-size:32pt; font-family:Arial; border:5px inset white;}
+td {padding:20px; text-align:center;border:5px outset white;}
+.draggable {width:50px; height:50px; position:absolute; transform:rotate(0deg) translateX(0px);}
+
+.slidera {
+  -webkit-appearance: none;
+  width:100%; height:15px; background:#999; outline:none; opacity:0.7;
+  -webkit-transition: .2s; transition:opacity .2s;
+}
+.slidera::-webkit-slider-thumb { border-radius:100%;
+  -webkit-appearance:none; appearance:none;
+  width:80px; height:80px; background:#f00; cursor:pointer;
+}
+.slidera::-moz-range-thumb { border-radius:100%;
+  width:80px; height:80px; background:#f00; cursor: pointer;
+}
+
+
+.sliderb {
+  -webkit-appearance: none;
+  width:100%; height:15px; background:#999; outline:none; opacity:0.7;
+  -webkit-transition: .2s; transition: opacity .2s;
+}
+.sliderb::-webkit-slider-thumb { border-radius:100%;
+  -webkit-appearance:none; appearance:none;
+  width:80px; height:80px; background:#0c0; cursor:pointer;
+}
+.sliderb::-moz-range-thumb { border-radius:100%;
+  width:80px; height:80px; background:#0c0; cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<img src="Am_x1.jpg" class="draggable"    id="d1" style="width:100px;height:100px;left:250px;top:150px;background-color:  red;transform:rotate(0deg);z-index:1;"></img>
+<img src="Ig_x1.jpg" class="draggable"    id="d2" style="width:100px;height:100px;left:200px;top:250px;background-color:green;transform:rotate(0deg);z-index:1;"></img>
+<img src="papi_320.jpg" class="draggable" id="d3" style="width:100px;height:100px;left:100px;top:300px;transform:rotate(0deg);z-index:1;"></img>
+<br>
+<br>
+<span id="spana">?</span>
+<br>
+<span id="spanb">?</span>
+<br>
+
+
+<table style="position:absolute;left:0px;top:500px;width:90%;z-index:0;">
+<tr><td style="text-align:right;width:80px;"><span id="spanslidera">?</span></td><td><input id="inpa" class="slidera" onchange="vola();" type="range" min=0 max=45 value=0 step=1 style="width:90%;"></td></tr>
+<tr><td style="text-align:right;"><span id="spansliderb">?</span></td><td><input id="inpb" class="sliderb" onchange="volb();" type="range" min=.5 max="4" value=1 step=0.01 style="width:90%;"></td></tr>
+<tr><td colspan="2"><a href="touch04.html" style="font-size:50pt;font-family:Arial;text-decoration:none;border:5px outset white;">RECARGA</a></td></tr>
+<tr><td colspan="2"><input type="text" id="inptext"></input></td></tr>
+<tr><td colspan="2"><span id="overout" style="border:5px outset white;">OVER/OUT</span><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span id="soclick" style="border:5px outset white;">CLICK</span></td></tr>
+<tr><td colspan="2" style="border:0px;"><span>&nbsp;</span></td></tr>
+<tr><td colspan="2" style="border:0px;"><span>&nbsp;</span></td></tr>
+<tr><td colspan="2" style="border:0px;"><span>&nbsp;</span></td></tr>
+<tr><td colspan="2" style="border:0px;"><span>FIM</span></td></tr>
+</table>
+
+
+
+
+<script>
+
+var i=0;
+var ax="d2";
+var ay="";
+var str;
+var strdeg;
+var tam=1;
+var deg=0;
+
+document.getElementById("inpa").value=0
+document.getElementById("inpb").value=1;
+var largini=parseInt(document.getElementById(ax).style.width);
+var altini=parseInt(document.getElementById(ax).style.height);
+
+var nodeList=document.getElementsByClassName('draggable');
+ 
+for(i=0;i<nodeList.length;i++){
+	var obj = nodeList[i];
+
+	obj.addEventListener('touchmove',function(event){
+		var touch = event.targetTouches[0];
+		event.target.style.left=touch.pageX-parseInt(event.target.style.width)/2 + 'px';
+		event.target.style.top= touch.pageY-parseInt(event.target.style.height)/2 + 'px';
+		ax=event.target.id;
+		document.getElementById("spana").innerText=ax + " " + parseInt(touch.pageX);
+		document.getElementById("spanb").innerText=ax + " " + parseInt(event.target.style.height)/2;
+		adjustmove();
+		event.preventDefault();
+    	}, false);
+
+	obj.addEventListener('touchstart',function(event){
+		var touch = event.targetTouches[0];
+		ax=event.target.id;
+		document.getElementById("spana").innerText=ax + " " + parseInt(touch.pageX);
+		document.getElementById("spanb").innerText=ax + " " + parseInt(event.target.style.height)/2;
+		adjust();
+		event.preventDefault();
+	}, false);
+/*
+	obj.addEventListener('click',function(event){
+		document.getElementById("spana").innerText="José";
+		document.getElementById("spanb").innerText="Roberto";
+	}, false);
+
+	obj.addEventListener('mouseover',function(event){
+		document.getElementById("spana").innerText="1José";
+		document.getElementById("spanb").innerText="1Roberto";
+	}, false);
+
+	obj.addEventListener('mouseout',function(event){
+		document.getElementById("spana").innerText="2José";
+		document.getElementById("spanb").innerText="2Roberto";
+	}, false);
+*/
+
+
+	var inpu=document.getElementById('inptext');
+		inpu.addEventListener('keydown',function(event){
+			document.getElementById("spana").innerText="Tecla Pressionada";
+		}, false);
+
+	var oval=document.getElementById('overout');
+		oval.addEventListener('mouseover',function(event){
+			document.getElementById("spana").innerText="1José";
+			document.getElementById("spanb").innerText="1Roberto";
+		}, false);
+		oval.addEventListener('mouseout',function(event){
+			document.getElementById("spana").innerText="2José";
+			document.getElementById("spanb").innerText="2Roberto";
+		}, false);
+
+	var cli=document.getElementById('soclick');
+		cli.addEventListener('click',function(event){
+			document.getElementById("spana").innerText="José";
+			document.getElementById("spanb").innerText="Roberto";
+		}, false);
+
+// fim do for
+}
+
+
+
+function vola(){
+	deg=document.getElementById("inpa").value;
+	document.getElementById(ax).style.transform="rotate(" + deg + "deg)";
+	document.getElementById("spanslidera").innerText=document.getElementById("inpa").value;
+}
+
+function volb(){
+	tam=document.getElementById("inpb").value;
+	document.getElementById(ax).style.width=largini*tam + "px";
+	document.getElementById(ax).style.height=altini*tam + "px";
+	document.getElementById("spansliderb").innerText=parseInt(document.getElementById("inpb").value*100);
+}
+
+function adjust(){
+	strdeg=event.target.style.transform;
+	strdeg=strdeg.replace("rotate(","");
+	strdeg=strdeg.replace("deg)","");
+	document.getElementById("inpa").value=strdeg;
+	document.getElementById("inpb").value=parseInt(event.target.style.width)/100;
+	document.getElementById("spanslidera").innerText=document.getElementById("inpa").value;
+	document.getElementById("spansliderb").innerText=parseInt(document.getElementById("inpb").value*100);
+	adjustmove();
+}
+
+function adjustmove(){
+	for(i=0;i<nodeList.length;i++){
+		var opa = nodeList[i];
+		opa.style.zIndex="1";
+		opa.style.border="none";
+	}
+	document.getElementById(ax).style.border="2px solid #fff";	
+	event.target.style.zIndex="2";
+}
+
+document.getElementById("spanslidera").innerText=document.getElementById("inpa").value;
+document.getElementById("spansliderb").innerText=parseInt(document.getElementById("inpb").value*100);
+
+
+
+
+function mouseOver() {
+	document.getElementById("spana").innerText="1José";
+	document.getElementById("spanb").innerText="1Roberto";
+}
+
+function mouseOut() {
+	document.getElementById("spana").innerText="2José";
+	document.getElementById("spanb").innerText="2Roberto";
+}
+
+
+document.addEventListener("mousemove",function(){
+	var x=event.pageX;
+	var y=event.pageY;
+	var coords="x: "+x+" y:"+y;
+	document.getElementById("demo").innerHTML=coords;
+});
+
+
+</script>
+
+<b id="demo" style="position:absolute;left:80%;font-family:Arial;">POSxy</b>
+
+</body>
+</html>
