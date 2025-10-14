@@ -7,5 +7,4 @@
 <br>
 <a href="https://jrlazz.github.io/pages_anim.html" target="_blank" style="font-size:12pt;color:#c0c;">Index of ANIM</a><br>
 <br>
-<br>
 <a href="https://jrlazz.eu5.org/" target="_blank" style="font-size:12pt;color:#c0c;">Freewha</a>
