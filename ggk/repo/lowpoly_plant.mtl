@@ -1,0 +1,21 @@
+# Created with Anim8or 1.00
+# Object "Small_potted_plants":
+
+newmtl Potted_plants
+Ka 0.498 0.498 0.498
+Kd 0.498 0.498 0.498
+Ks 0.498 0.498 0.498
+Ns 582.0
+
+newmtl material01
+Ka 0.118 0.831 0.0157
+Kd 0.118 0.831 0.0157
+Ks 1 1 1
+Ns 752.6
+
+newmtl material02
+Ka 0.663 0.239 0.153
+Kd 0.663 0.239 0.153
+Ks 1 1 1
+Ns 752.6
+

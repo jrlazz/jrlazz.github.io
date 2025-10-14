@@ -1,0 +1,39 @@
+# Created with Anim8or 1.00
+# Object "cubeDobj2":
+
+newmtl m_1
+Ka 0.875 0.875 0.875
+Kd 0.875 0.875 0.875
+Ks 1 1 1
+Ns 752.6
+
+newmtl material01
+Ka 0.875 0.243 0.29
+Kd 0.875 0.243 0.29
+Ks 1 1 1
+Ns 752.6
+
+newmtl material02
+Ka 0.894 0.733 0.322
+Kd 0.894 0.733 0.322
+Ks 1 1 1
+Ns 752.6
+
+newmtl material03
+Ka 0.62 0.259 0.91
+Kd 0.62 0.259 0.91
+Ks 1 1 1
+Ns 752.6
+
+newmtl material04
+Ka 0.106 0.898 0.165
+Kd 0.106 0.898 0.165
+Ks 1 1 1
+Ns 752.6
+
+newmtl material05
+Ka 0.231 0.251 0.922
+Kd 0.231 0.251 0.922
+Ks 1 1 1
+Ns 752.6
+
