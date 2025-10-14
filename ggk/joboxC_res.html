@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>joboxC_res.html</title>
+<link rel="shortcut icon" href="../three.js.ico">
+
+<style>
+@font-face{font-family:tipo;src:url('../fonte/MysteryQuest-Regular.ttf');}
+span{position:absolute;font-size:40px;color:#fc0;}
+</style>
+
+</head>
+<body style="overflow:hidden;margin:0px;background-color:#035;cursor:pointer;">
+<span id="spanA" style="left:50px;font-family:tipo;">Why JoBOX was not accepted in FORTYNIGHTS ?</span>
+<span id="spanB" style="top:150px;"></span>
+<span id="spanC" style="top:250px;"></span>
+<input id="inp" type="text" style="position:absolute;width:50px;left:-80px;color:#fc0;font-size:32px;" value=0></input>
+
+<script type="module">
+
+import * as THREE from '../js/three.module_res_res.js';
+//import { OrbitControls } from '../js/OrbitControls_res_res.js';
+
+import { CameraControls } from '../js/CameraControls_res_res.js';
+
+//CameraControls.install( { THREE: THREE } );
+
+
+var clock = new THREE.Clock();
+var delta;
+var hasControlsUpdated;
+
+//var camera = new THREE.PerspectiveCamera( 60, width / height, 0.01, 1000 );
+
+
+
+var camera,scene,renderer,controls;
+var cameraControls;
+var mesh,intersection,clicked;
+var raycaster=new THREE.Raycaster();
+var mouse=new THREE.Vector2(1,1);
+
+var box=new Array();
+var pox=new Array();
+var ar=new Array();for(let g=1;g<21;g++){ar[g]=new THREE.Group();}
+var OK=new Array();for(let g=1;g<21;g++){OK[g]=new THREE.Group();}
+
+var BR=new THREE.Color(0xffffff);
+var PT=new THREE.Color(0x000000);
+var VD=new THREE.Color(0x008000);
+var VM=new THREE.Color(0xff0000);
+
+var w1=0;
+var w2=0;
+var w3=0;
+var w4=-10;
+
+var wmi=99;
+var treco=60;
+var angtreco=1.57/60;
+var i=0.3;
+var opa=1;
+
+
+	camera=new THREE.PerspectiveCamera(40,window.innerWidth/window.innerHeight,1,1000);
+	camera.position.set(-50,30,260);
+
+	scene=new THREE.Scene();
+	scene.position.set(0,10,0);
+
+	renderer=new THREE.WebGLRenderer();
+
+	renderer.setClearColor('#035',1.0);
+
+	renderer.setSize(window.innerWidth, window.innerHeight);
+
+	window.addEventListener('resize',onWindowResize);
+	document.addEventListener('pointerdown',onMouseDown);
+	document.addEventListener('pointermove',onMouseOver);
+
+	cameraControls=new CameraControls(camera,renderer.domElement);
+
+	//controls=new OrbitControls(camera,renderer.domElement);
+	//controls.minDistance=60;
+	//controls.maxDistance=600;
+	//controls.enablePan=true;
+	//controls.enableZoom=true;
+	//controls.enableRotate=true;
+
+	document.body.appendChild(renderer.domElement);
+
+	var loader=new THREE.TextureLoader();
+
+	var transp=new THREE.MeshBasicMaterial({transparent:true,opacity:0,wireframe:true,side:THREE.DoubleSide});
+	var reject=new THREE.MeshBasicMaterial({map:loader.load("img/papelao_rej.jpg"),side:THREE.DoubleSide});
+
+	var ambientLight=new THREE.AmbientLight("#fff",1.5);
+	ambientLight.position.set(30,20,30);
+	scene.add(ambientLight);
+
+	var imaOK=new THREE.MeshBasicMaterial({map:loader.load("img/papelao_acc.jpg"),transparent:true,opacity:1,side:THREE.DoubleSide});
+	var matOK=[imaOK,imaOK,imaOK,imaOK,imaOK,imaOK];
+	var geoOK=new THREE.BoxGeometry(32,32,32);
+	OK[0]=new THREE.Mesh(geoOK,matOK);
+	OK[0].position.set(-100,-33,-150);
+	OK[0].name="OK";
+	OK[20].add(OK[0]);
+	for(let p=1;p<13;p++){
+		OK[p]=OK[0].clone();
+		if(p<7){OK[p].position.x=-100+p*35;OK[20].add(OK[p]);}
+	}
+	for(let p=7;p<13;p++){
+		OK[p]=OK[0].clone();
+		OK[p].position.x=(OK[p].position.x-225)+p*35;OK[p].position.y=0;
+		OK[20].add(OK[p]);
+	}
+	scene.add(OK[20]);
+	OK[19]=OK[20].clone();OK[19].position.set(-30,0,-10);OK[19].rotation.y=1.57;
+	scene.add(OK[19]);
+	scene.add(OK[20]);
+	OK[18]=OK[20].clone();OK[18].position.set(330,0,-10);OK[18].rotation.y=1.57;
+	scene.add(OK[18]);
+
+	var imaCX=new THREE.MeshBasicMaterial({map:loader.load("img/papelao.jpg"),transparent:true,opacity:1,side:THREE.DoubleSide});
+	var matCX=[imaCX,imaCX,imaCX,imaCX,transp,imaCX];
+	var geoCX=new THREE.BoxGeometry(100,100,100);
+	var caixa=new THREE.Mesh(geoCX,matCX);
+	caixa.name="caixa";
+	scene.add(caixa);
+
+	var matCX2=[reject,imaCX,imaCX,imaCX,imaCX,imaCX];
+	var geoCX2=new THREE.PlaneGeometry(100,100);
+	var caixa2=new THREE.Mesh(geoCX2,matCX2);
+	caixa2.position.set(-50,-50);
+	caixa2.name="caixa2";
+
+	var geometryz=new THREE.CircleGeometry(4,32);
+	var materialz=new THREE.MeshBasicMaterial({color:0xff0000,side:THREE.DoubleSide});
+	var ponto=new THREE.Mesh(geometryz,materialz);
+	ponto.position.set(-88,-50,-2);
+	ponto.name="ponto";
+		var matOut=new THREE.MeshBasicMaterial({color:0x660000,side:THREE.BackSide});
+		var out = new THREE.Mesh(geometryz,matOut);
+		out.position.set(-88,-50,-1);
+		out.scale.multiplyScalar(1.2);
+
+	var imaCX3=new THREE.MeshBasicMaterial({map:loader.load("img/clique.png"),transparent:true,side:THREE.DoubleSide});
+	var matCX3=[imaCX3,imaCX3,imaCX3,imaCX3,imaCX3,imaCX3];
+	var geoCX3=new THREE.PlaneGeometry(16,16);
+	var cli=new THREE.Mesh(geoCX3,matCX3);
+	cli.position.set(-86,-62,-1)
+	cli.name="cli";
+
+	ar[11].add(caixa2);
+	ar[11].add(cli);
+	ar[11].add(ponto);
+	ar[11].add(out);
+	ar[11].position.set(-50,50,50);
+	ar[11].rotation.y=3.14;
+	scene.add(ar[11]);
+
+	var ima4=new THREE.MeshBasicMaterial({map:loader.load("img/borda4.jpg"),transparent:true,opacity:1,side:THREE.DoubleSide});
+	var mat4=[ima4,ima4,ima4,ima4,ima4,ima4];
+	var geo4=new THREE.BoxGeometry(32,32,32);
+	box[0]=new THREE.Mesh(geo4,mat4);
+	box[0].position.y=16;
+	box[0].name="box0";
+	scene.add(box[0]);
+
+var geoV=new THREE.BoxGeometry(32,32,32);
+var matV=new THREE.MeshBasicMaterial({color:0xccbbaa,vertexColors:THREE.FaceColors});
+box[50]=new THREE.Mesh(geoV,matV);
+geoV.faces[8].color=PT;
+geoV.faces[9].color=PT;
+	box[51]=box[50].clone();
+	box[51].scale.set(0.1,0.1,0.1);
+	box[51].position.set(-8,6,18);
+		box[52]=box[51].clone();
+		box[52].position.set(8,6,18);
+
+var geoBG=new THREE.BoxGeometry(32,32,32);
+var matBG=new THREE.MeshBasicMaterial({color:0xccbbaa});
+var meshBR1=new THREE.Mesh(geoBG,matBG);
+	meshBR1.scale.set(0.28,0.28,0.28);
+	meshBR1.position.set(-8,6,12);
+		var meshBR2=meshBR1.clone();
+		meshBR2.position.set(8,6,12);
+
+var geoP=new THREE.BoxGeometry(32,32,32);
+var GR=new THREE.MeshBasicMaterial({color:0x008000,side:THREE.DoubleSide});
+var transp=new THREE.MeshBasicMaterial({transparent:true,opacity:0,wireframe:true,side:THREE.DoubleSide});
+var matP=[GR,GR,GR,GR,transp,GR];
+var meshc=new THREE.Mesh(geoP,matP);
+	meshc.scale.set(0.3,0.3,0.3);
+	meshc.position.set(-8,6,16);
+		var meshd=meshc.clone();
+		meshd.position.set(8,6,16);
+
+ar[10].add(meshc);//palpebra dir
+ar[10].add(meshd);//palpebra esq
+ar[10].add(meshBR1);//globo dir
+ar[10].add(meshBR2);//globo esq
+ar[10].add(box[51]);//olho dir
+ar[10].add(box[52]);//olho esq
+ar[10].position.set(0,16,0);
+scene.add(ar[10]);
+
+	var grid=new THREE.GridHelper(640,64);//size,divisions
+	grid.material.color.setHex(0xffffff);
+	grid.position.set(0,-50,0);
+	scene.add(grid);
+
+	var ima8=new THREE.MeshBasicMaterial({map:loader.load("img/borda8.jpg"),transparent:true,opacity:1});
+	var mat8=[ima8,ima8,ima8,ima8,ima8,ima8];
+	var geo8=new THREE.BoxGeometry(8,8,8);
+	pox[0]=new THREE.Mesh(geo8,mat8);
+	for(let p=1;p<101;p++){pox[p]=pox[0].clone();}
+
+// ******** ******** ******** ********
+
+pox[21].position.set(-16,-8,0);scene.add(pox[21]);
+pox[22].position.set(-24,-8,0);scene.add(pox[22]);
+pox[23].position.set(4,-4,4);ar[1].add(pox[23]);
+pox[24].position.set(4,-12,4);ar[1].add(pox[24]);
+pox[25].position.set(-4,-20,4);ar[1].add(pox[25]);
+ar[1].position.set(-28,-4,4);
+ar[1].rotation.x=3.14;
+scene.add(ar[1]);
+
+pox[41].position.set(16,-8,0);scene.add(pox[41]);
+pox[42].position.set(24,-8,0);scene.add(pox[42]);
+pox[43].position.set(4,-4,4);ar[2].add(pox[43]);
+pox[44].position.set(4,-12,4);ar[2].add(pox[44]);
+pox[45].position.set(12,-20,4);ar[2].add(pox[45]);
+ar[2].position.set(20,-4,4);
+ar[2].rotation.x=3.14;
+scene.add(ar[2]);
+
+pox[51].position.set(-8,-16,16);scene.add(pox[51]);
+pox[52].position.set(-8,-16,24);scene.add(pox[52]);
+pox[54].position.set(4,-4,4);ar[3].add(pox[54]);
+pox[55].position.set(4,-12,4);ar[3].add(pox[55]);
+pox[57].position.set(4,-20,12);ar[3].add(pox[57]);
+ar[3].position.set(-12,-20,28);
+ar[3].rotation.x=0;
+scene.add(ar[3]);
+
+pox[71].position.set(8,-16,16);scene.add(pox[71]);
+pox[72].position.set(8,-16,24);scene.add(pox[72]);
+pox[74].position.set(4,-4,4);ar[4].add(pox[74]);
+pox[75].position.set(4,-12,4);ar[4].add(pox[75]);
+pox[77].position.set(4,-20,12);ar[4].add(pox[77]);
+ar[4].position.set(4,-20,28);
+ar[4].rotation.x=0;
+scene.add(ar[4]);
+
+var dente1=meshBR1.clone();dente1.position.set(0,8,17);dente1.scale.set(0.05,0.05,0.05);scene.add(dente1);
+var dente2=dente1.clone();dente2.position.set(-3,8,17);scene.add(dente2);
+var nariz=meshBR1.clone();nariz.position.set(0,16,18);nariz.scale.set(0.1,0.1,0.1);scene.add(nariz);
+var orelha1=nariz.clone();orelha1.position.set(-18,16,0);scene.add(orelha1);
+var orelha2=nariz.clone();orelha2.position.set(18,16,0);scene.add(orelha2);
+
+// ******** ******** ******** ********
+
+	var matTR=[ima4,ima4,ima4,ima4,ima4,ima4];
+	var geoTR=new THREE.BoxGeometry(24,24,24);
+	var TR=new THREE.Mesh(geoTR,matTR);
+	TR.position.set(0,-12,0);scene.add(TR);
+
+	var matCD=new THREE.MeshBasicMaterial({color:'#035'});
+	var geoCD=new THREE.BoxGeometry(16,16,16);
+	var CD=new THREE.Mesh(geoCD,matCD);
+	CD.position.set(0,-32,0);scene.add(CD);
+		var geoCD2=new THREE.BoxGeometry(10,10,10);
+		var CD2=new THREE.Mesh(geoCD2,matCD);
+		CD2.position.set(0,-45,0);scene.add(CD2);
+	var matOut2=new THREE.MeshBasicMaterial({color:0x999999,side:THREE.BackSide});
+	var out2=new THREE.Mesh(geoCD,matOut2);
+	out2.position.set(0,-32,0);
+	out2.scale.multiplyScalar(1.030);
+	scene.add(out2);
+	var out3=new THREE.Mesh(geoCD2,matOut2);
+	out3.position.set(0,-45,0);
+	out3.scale.multiplyScalar(1.030);
+	scene.add(out3);
+
+// ******** ******** ******** ********
+
+function onWindowResize() {
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function onMouseDown(event){
+	var e=window.event;
+	// comment next line for MouseOver
+	if(e.which==1){clicked=1;}
+	mouse.x=(event.clientX/window.innerWidth)*2-1;
+	mouse.y=-(event.clientY/window.innerHeight)*2+1;
+}
+
+function onMouseOver(event) {
+	var x=event.clientX;
+	var y=event.clientY;
+	// uncomment next line for MouseOver
+	//clicked=1;
+	mouse.x=(event.clientX/window.innerWidth)*2-1;
+	mouse.y=-(event.clientY/window.innerHeight)*2+1;
+	let vx=parseInt(mouse.x*1000)/1000;
+	let vy=parseInt(mouse.y*1000)/1000;
+//	document.getElementById("spanC").innerHTML=vx+" "+vy;
+}
+
+function animate(){
+	delta=clock.getDelta();
+	hasControlsUpdated = cameraControls.update( delta );
+
+	//requestAnimationFrame( anim );
+
+	// you can skip this condition to render though
+	//if(hasControlsUpdated){renderer.render(scene,camera);}
+
+	requestAnimationFrame(animate);
+	render();
+}
+
+function render(){
+
+	w1++;
+	if(document.getElementById("inp").value!=wmi){
+		wmi=document.getElementById("inp").value;
+		treco=w1;angtreco=(1.57/treco);
+		w1=0;
+	}
+
+	w2++;
+	if(w2>0 && w2<21){box[51].rotation.y -=(0.047);box[52].rotation.y -=(0.047);}
+	if(w2>20 && w2<41){box[51].rotation.y +=(0.022);box[52].rotation.y +=(0.022);}
+	if(w2>40 && w2<81){box[51].rotation.y +=(0.022);box[52].rotation.y +=(0.023);}
+	if(w2>80 && w2<121){meshc.rotation.x +=(0.05);meshd.rotation.x +=(0.05);}
+	if(w2>120 && w2<161){meshc.rotation.x -=(0.05);meshd.rotation.x -=(0.05);}
+	if(w2>160){w2=0;box[51].rotation.y=0;box[52].rotation.y=0;}
+
+	w3++;
+	if(w3<=(treco/2)){ar[3].rotation.x +=angtreco;ar[4].rotation.x +=angtreco;ar[1].rotation.x +=angtreco;ar[2].rotation.x +=angtreco;ponto.material.color=BR;}//ar[11].rotation.y -=angtreco;}
+	if(w3>(treco/2)){ar[3].rotation.x -=angtreco;ar[4].rotation.x -=angtreco;ar[1].rotation.x -=angtreco;ar[2].rotation.x -=angtreco;ponto.material.color=VM;}//ar[11].rotation.y +=angtreco;}
+	if(w3>=(treco)){w3=0;ar[3].rotation.x=0;ar[4].rotation.x=0;ar[1].rotation.x=3.14;ar[2].rotation.x=3.14;}
+
+	if(w4>0){w4++;}
+	if(w4==3){ar[11].remove(cli);ar[11].remove(ponto);ar[11].remove(out);}
+	if(w4>0 && w4<250){ar[11].rotation.y -=0.008;}
+	if(w4>250 && w4<500){caixa.position.z -=(0.7+i);ar[11].position.z -=(0.7+i);i=i+0.4;if(opa>0){caixa.material[0].opacity=opa;OK[0].material[0].opacity=opa;opa=opa-0.02;};camera.position.z -=0.3;document.getElementById("spanA").style.color="#0f0";document.getElementById("spanA").innerText="Because it is a BoxGeometry experience !";}
+	if(w4==500){
+		scene.remove(caixa);scene.remove(ar[11]);
+		for(let h=18;h<21;h++){
+			scene.remove(OK[h]);
+		}
+	}
+
+	if(clicked==1){
+		raycaster.setFromCamera(mouse,camera);
+		intersection=raycaster.intersectObjects(scene.children,true);
+		if(intersection.length>0){
+			//console.log(intersection[0].object.name);
+			//document.getElementById("spanB").innerText=" ... " + intersection[0].object.name + " ... " + intersection[0].object.geometry.name + " ... ";
+			if(w4<0 && intersection[0].object.name=="ponto"){w4=1;}
+		}
+		clicked=0;
+	}
+
+	renderer.render(scene, camera);
+}
+
+animate();
+
+var mi=0;
+var myInterval=setInterval(pupa,1000);
+
+function pupa(){
+	mi=(new Date().getSeconds());
+	document.getElementById("inp").value=mi;
+}
+
+/*
+
+JoBOX... a BoxGeometry experience. 
+
+Hello discourse.threejs.org Friends,
+
+I have modified the three.js reference in OrbitControls.js,
+ renamed it to OrbitControls_res_res.js,
+ to work with Three files installed in my site.
+Easy way to change the center of a mesh,
+ scenning it with an array.
+Easy way to do intersection with mouse click.
+Easy way to change to intersection with mouse over.
+Hope You like... here:
+
+http://jrlazz.eu5.org/nana/joboxB_res.html
+
+Thanks for the great Three.js!
+
+Jose Roberto Lazzareschi
+
+*/
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>nananana.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="../three.js.ico">
+
+<style>
+body{margin:0;background-color:#3d4a99;overflow:hidden;}
+input[type=range][orient=vertical]{ position:absolute; left:10px; top:40px; writing-mode:bt-lr; -webkit-appearance:slider-vertical; width:8px; height:300px; padding:0 5px; cursor:pointer;}
+span{position:absolute;font-size:12pt;}
+.gre{}
+.slider{-webkit-appearance:none; width:60px; height:3px; background:#080;}
+.slider::-webkit-slider-thumb{-webkit-appearance: none; appearance: none; width:12px; height:12px; border-radius:50px; background:#ccc; cursor:pointer;}
+.slider::-moz-range-thumb{width:12px; height:12px; border-radius:50px; background:#ccc; cursor:pointer;}
+</style>
+
+</head>
+
+<body>
+
+<audio id="som" controls style="position:absolute;top:50px;left:-50px;width:50px;display:none;">
+<source src="nanananaG.mp3" type="audio/mpeg">
+</audio> 
+
+<span id="spanA" style="left:5px;top:5px;color:#009;font-size:32pt;display:none;"></span>
+<img id="pray" src="img/pray.png" style="position:absolute;left:10px;top:10px;width:40px;display:;"></img>
+<img id="alto" onclick="somtoca();" class="gre" src="img/aud.png" style="position:absolute;left:10px;top:110px;width:40px;display:none;cursor:pointer;"></img>
+<img id="clique" src="img/clique.png" style="position:absolute;left:17px;top:400px;width:32px;display:;cursor:default;opacity:0.4;display:none;"></img>
+<input class="slider" id="inpa" onchange="vol();" type="range" min="0" max="1" value="0" step="0.01" style="position:absolute;left:60px;top:127px;display:none;">
+
+<div id="container"></div>
+
+<script type="module">
+
+import * as THREE from '../js/three.module_res_res.js';
+import { OrbitControls } from '../js/OrbitControls_res_res.js';
+import { STLLoader } from '../js/STLLoader_res_res.js';
+import { FontLoader} from '../js/FontLoader_res_res.js';
+import { TextGeometry } from '../js/TextGeometry_res_res.js';
+
+const container = document.getElementById( 'container' );
+
+let renderer,scene,camera,material,geometry,objLoader;
+let ambient,ppotLight,qpotLight,spotLight;
+
+var altera=0;
+
+var mesh=null;
+var color=Math.random()*0xffffff;
+var sub;
+
+var rot=0;
+var tex=new Array();
+
+var target=new THREE.Vector3(); // create once an reuse it
+
+var loader=new Array();
+
+var v=1;
+var j=0;
+
+var k=0;
+var w=0;
+var ww=0;
+var www=0;
+
+var Tgeometry;
+
+var target=new THREE.Vector3(); // create once an reuse it
+
+let BDs,BEs,PDs,PEs,CI,TR,MA,MB;
+var group=new THREE.Group();
+var groupCATR=new THREE.Group();
+var groupTR=new THREE.Group();
+var groupCI=new THREE.Group();
+var CA=new THREE.Group();
+
+var clock=new THREE.Clock();
+var speed=3; //units a second
+var delta=0;
+
+var quando=150;
+
+var audio;
+var passo=.04;
+//var fator=12.5;
+var fator=12;
+var fatorsom=0;
+var qtd=0;
+var qtdmax=1;
+var a12=0;
+
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	container.appendChild( renderer.domElement );
+
+	renderer.shadowMap.enabled=true;
+	
+	renderer.setClearColor(0x3d4a99);
+
+	scene=new THREE.Scene();
+	scene.position.set(0,-2,0);
+
+	camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,1,1000);
+	camera.position.set(0,10,20);
+
+	window.addEventListener('resize',onResize,false);
+
+	// sky
+	loader=new THREE.TextureLoader();
+	loader.load('models/sky_cores_3.jpg',function(texture){
+	texture.mapping=THREE.EquirectangularReflectionMapping;
+	scene.background=texture;  
+	});
+
+	const controls=new OrbitControls(camera,renderer.domElement);
+	controls.enablePan=true;
+	controls.enableDamping=true;// precisa de controls update em animate
+	controls.minDistance=1;
+	controls.maxDistance=200;
+
+	loader=new STLLoader();
+	loader.load('models/extras/stl_bd.stl',function(geometry){
+		material=new THREE.MeshLambertMaterial();
+		BDs=new THREE.Mesh(geometry,material);
+		BDs.material.color.set('#45a');
+		BDs.rotation.set(-1.57,0,0);
+		BDs.castShadow=true;
+		BEs=BDs.clone();
+		PDs=BDs.clone();
+		PEs=BDs.clone();
+		});
+
+	loader.load('models/extras/stl_ci.stl',function(geometry){
+		material=new THREE.MeshLambertMaterial();
+		CI=new THREE.Mesh(geometry,material);
+		CI.material.color.set('#45a');
+		CI.rotation.set(-1.57,0,0);
+		CI.castShadow=true;
+	});
+
+	loader.load('models/extras/stl_trB.stl',function(geometry){
+		material=new THREE.MeshLambertMaterial();
+		TR=new THREE.Mesh(geometry,material);
+		TR.material.color.set('#45a');
+		TR.rotation.set(-1.57,0,0);
+		TR.castShadow=true;
+	});
+
+	loader.load('models/extras/stl_ca3.stl',function(geometry){
+		material=new THREE.MeshPhongMaterial();
+		MA=new THREE.Mesh(geometry,material);
+		MA.material.color.set('#45a');
+		MA.rotation.set(-1.57,0,0);
+		MA.castShadow=true;
+	});
+
+	loader.load('models/extras/stl_ca2.stl',function(geometry){
+		material=new THREE.MeshPhongMaterial();
+		MB=new THREE.Mesh(geometry,material);
+		MB.material.color.set('#9af');
+		MB.rotation.set(-1.57,0,0);
+		MB.position.set(0,0,-0.3);
+	});
+
+	loader=new THREE.TextureLoader();
+	var mats=['img/John_d.jpg','img/Paul_l.jpg','img/George_d.jpg','img/Ringo_l.jpg','img/Brian_d.jpg','img/Martin_d.jpg',
+	].map(pic =>{return new THREE.MeshLambertMaterial({map:loader.load(pic)});});
+	var geom=new THREE.BoxBufferGeometry(3,3,3);
+	var box=new THREE.Mesh(geom,mats);
+	box.position.set(6,5,0);
+
+	// Grid
+	var geop=new THREE.BoxGeometry(20,20,0.01);
+	var matp=new THREE.MeshPhongMaterial({color:0x3d4a99,side:THREE.DoubleSide,transparent:true,opacity:0.3});
+	var piso=new THREE.Mesh(geop,matp);
+	piso.position.set(0,-0.02,0);piso.rotation.set(0,0,0);piso.rotation.x=1.57;
+	piso.receiveShadow=true;
+
+	var grid=new THREE.GridHelper(20,20);
+	grid.material.color.setHex(0x0066cc);
+	grid.position.set(0,0,0);
+
+	// Text
+
+	let textMesh1, textMesh2, textGeo, materials;
+	let text="GGK-3404",bevelEnabled=true,font=undefined;
+	const height=3,size=20,hover=5,curveSegments=4,bevelThickness=3,bevelSize=1;
+
+	loader=new FontLoader();
+	loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json',function(response){
+	font=response;
+	createText();
+	});
+
+function createText() {
+	textGeo=new TextGeometry(text,{font:font,size:size,height:height,curveSegments:curveSegments,bevelThickness:bevelThickness,bevelSize:bevelSize,bevelEnabled:bevelEnabled});
+        textGeo.center();
+	materials=[
+		new THREE.MeshPhongMaterial({color:0xffffff,flatShading:true}),// front
+		new THREE.MeshPhongMaterial({color:0x3d4a99})// side
+	];
+
+	text="Fab6...";
+	var textGeo2=new TextGeometry(text,{font:font,size:size,height:height,curveSegments:curveSegments,bevelThickness:bevelThickness,bevelSize:bevelSize,bevelEnabled:bevelEnabled});
+        textGeo2.center();
+	textMesh2=new THREE.Mesh(textGeo2,materials);
+	textMesh2.position.set(0,0,-40);
+	textMesh2.rotation.set(0,0,0);
+	textMesh2.scale.set(0.03,0.03,0.03);
+}
+
+
+// Light
+	ambient=new THREE.AmbientLight("#aaa",0.5);
+	scene.add(ambient);
+
+	var sun=new THREE.PointLight("#ccc",1);
+	sun.position.set(0,20,-10);
+	sun.shadow.mapSize.width=1024;
+	sun.shadow.mapSize.height=1024;
+	sun.castShadow=true;
+	scene.add(sun);
+	var spot=new THREE.PointLight("#ccc",1);
+	spot.position.set(0,1,10);
+	spot.shadow.mapSize.width=1024;
+	spot.shadow.mapSize.height=1024;
+	scene.add(spot);
+
+	// Edifício Evelyn, Rua Girassol, 594 Apto. 502, CEP: 05433-001
+
+function onResize() {
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function animate() {
+	requestAnimationFrame(animate);
+	controls.update();
+	ww++;
+	if(altera==0 && ww==quando){alterando();}
+	if(altera>0 && fatorsom>0){
+		switch(true){
+			case (fatorsom>160):
+				rot=2;
+				BDs.rotation.y=3.14;BEs.rotation.y=3.14;groupCI.rotation.y=3.14;CA.rotation.y=0.7;MB.material.color.set('#f00');
+				scene.add(box);
+				scene.add(textMesh2);
+				break;
+			case (fatorsom>150):rot=1;som.volume=0.2;break;
+			case (fatorsom>140):rot=0;break;
+			case (fatorsom>130):rot=1;break;
+			case (fatorsom>120):rot=0;break;
+			case (fatorsom>110):rot=1;break;
+			case (fatorsom>100):rot=0;break;
+			case (fatorsom>90):rot=1;break;
+			case (fatorsom>80):rot=0;break;
+			case (fatorsom>70):rot=1;break;
+			case (fatorsom>60):rot=0;break;
+			case (fatorsom>50):rot=1;break;
+			case (fatorsom>40):rot=0;break;
+			case (fatorsom>30):rot=1;break;
+			case (fatorsom>20):rot=0;break;
+			case (fatorsom>10):rot=1;break;
+			case (fatorsom>0):rot=0;break;
+		}
+
+		if(rot==0){
+			CA.rotation.y +=passo/2;
+			MB.material.color.set('#9af');
+			groupCI.rotation.y -=passo/2;
+			BDs.rotation.y +=passo;
+			BEs.rotation.y +=passo;
+		}else if(rot==1){
+			CA.rotation.y -=passo/2;
+			MB.material.color.set('#238');
+			groupCI.rotation.y +=passo/2;
+			BDs.rotation.y -=passo;
+			BEs.rotation.y -=passo;
+		}
+	}
+
+	if(fatorsom<164){document.getElementById("pon").style.left=(fatorsom*1.84)-2+"px";}
+
+	w++;
+	if(w==1){
+		group.position.set(0,7,0);
+	}
+	scene.updateMatrixWorld(true);
+	target.setFromMatrixPosition(box.matrixWorld);
+	if(textMesh2){textMesh2.position.set(target.x,target.y+6,target.z);}
+
+	box.rotation.x +=0.007;box.rotation.y +=0.015;box.rotation.z +=0.009;
+
+	delta=clock.getDelta();
+
+	fatorsom=(som.currentTime)*fator;
+
+	 document.getElementById("spanA").innerText=(som.currentTime)*fator + "\n " + (som.duration)*fator + " " +33.500/som.duration + "\n " + speed*delta;
+
+	passo=speed*delta;
+
+	renderer.render(scene,camera);
+}
+
+function alterando(){
+
+	//alert("... Alert to make it possible ... Please Click OK!\n... Pode clicar ... Boa Sorte!");
+
+	CA.add(MA);
+	CA.add(MB);
+
+	CA.position.set(0,-1,0);
+	TR.position.set(0,-1,0);
+
+	BDs.position.set(-4, 0,0);
+	BEs.position.set( 4, 0,0);
+
+	PDs.position.set(-3,-2,0);
+	PEs.position.set(3,-2,0);
+
+	groupCI.add(CI);groupCI.add(PDs);groupCI.add(PEs);
+	groupCI.position.set(0,-8,0);
+
+	groupTR.add(TR);groupTR.add(CA);groupTR.add(BDs);groupTR.add(BEs);
+
+	groupCATR.add(groupTR);groupCATR.add(groupCI);
+
+	group.add(groupCATR);
+
+	scene.add(group);
+
+	group.scale.set(0.5,0.5,0.5);
+
+	scene.add(piso);
+	document.getElementById("pray").style.display="none";
+	document.getElementById("track").style.display="";
+	document.getElementById("alto").style.display="";
+	document.getElementById("clique").style.display="";
+	document.getElementById("alto").style.display="";
+	document.getElementById("inpa").style.display="";
+	document.getElementById("spanA").innerText="";
+
+	BDs.rotation.y=2.0;//2.3
+	BEs.rotation.y=2.0;
+	CA.rotation.y=-0.7;
+
+	altera++;
+}
+
+animate();
+
+</script>
+
+
+
+<script>
+
+document.getElementById("inpa").value=0.3;
+som.volume=0.3;
+
+function vol(){som.volume=document.getElementById("inpa").value;}
+
+var ur=window.location.href;
+//alert(ur);
+
+function somtoca(){
+	if(document.getElementById("alto").className=="gre"){
+		som.play();document.getElementById("alto").className="#f00";
+		document.getElementById("inpa").style.background="#dc143c";
+		document.getElementById("alto").src="img/reset.png";
+		document.getElementById("clique").style.display="none";
+	}else{
+		window.location.replace(ur);
+	}
+}
+
+
+var element = document.getElementById("clique");
+var opa=400;
+var co=0;
+//setInterval(function(){opa=opa-10;element.style.top=opa+"px";},200);
+var myInterval=setInterval(pupa,100);
+
+function pupa(){
+	co++;
+	opa=opa-5;
+	element.style.top=opa+"px";
+	if(opa==150){opa=400;}
+if(co>49){clearInterval(myInterval);}
+}
+</script>
+
+<!--
+Move and audio play synch - skeleton follows NaNaNaNa
+A hard way to synchronize, I accep more elegant js alternatives.
+-->
+
+<div id="track" style="position:absolute;width:99%;top:0px;display:none;">
+<center>
+<table><tr><td>
+<div style="position:relative;left:0px;top:0px;width:300px;height:80px;background-image:url(img/clip.png);background-size:300px 80px;opacity:1;">
+<span id="pon" style="position:absolute;left:-2px;top:11px;color:#009;font-size:33px;">.</span>
+</div>
+</td></tr>
+</table>
+</center>
+</div>
+
+</body>
+</html>

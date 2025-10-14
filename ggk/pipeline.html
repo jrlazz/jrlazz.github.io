@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>pipeline.html</title>
+<meta charset="utf-8">
+<style>
+body{overflow:hidden;margin:0px;font-family:Monospace;}
+span{position:absolute;left:5px;top:5px;color:#ff0;cursor:pointer;z-index:1;}
+</style>
+
+</head>
+
+<script src="../js/pipeline_js/three.js"></script>
+<script src="../js/pipeline_js/OrbitControls.js"></script>
+<script src="../js/pipeline_js/FontLoader.js"></script>
+<script src="../js/pipeline_js/TextGeometry.js"></script>
+	
+<body>
+
+<span>right click inspect</span>
+
+<script>
+
+var plane=[];
+var geo=[];
+var mat=[];
+var ball=[];
+var cap=[];
+var circ=[];
+var cube=[];
+var cyli=[];
+var wire=[];
+var mesh=[];
+var path=[];
+var coupling=[];
+var con=[];
+var str=[];
+var Ar=[];
+
+var um, dois, tres, quatro, cinco, seis, pipe1, pipe4, pipex, tampa;
+
+var w1=0;
+var w2=0;
+
+var camera, scene, renderer, controls, ambLight, poiLight, text;
+
+	camera=new THREE.PerspectiveCamera(70,window.innerWidth/window.innerHeight,1,1000);
+	camera.position.set(0,20,50);
+	scene=new THREE.Scene();
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	document.body.appendChild(renderer.domElement);
+	renderer.setClearColor('#048',1.0);
+
+	
+	controls=new THREE.OrbitControls(camera,renderer.domElement);
+
+	for(let p=1;p<=19;p++){
+		plane[p]=new THREE.GridHelper(10,2,0x666666,0x666666);
+		plane[p].scale.set(2,1,2);
+		plane[p].rotation.x=0.2854;
+		plane[p].position.set(-90+10*p,20,-50);
+		scene.add(plane[p]);
+	}
+
+	plane[30]=new THREE.GridHelper(90,90,0x333333,0x666666);
+	plane[30].position.set(0,-10,-20);
+	scene.add(plane[30]);
+
+	ambLight=new THREE.AmbientLight("#fff",0.5);
+	ambLight.position.set(30,20,30);
+	scene.add(ambLight);
+
+	poiLight=new THREE.PointLight("#fc9",5);
+	poiLight.position.set(0,10,20);
+	scene.add(poiLight);
+
+	text="\x53",font=undefined,hover=30;// S
+	mat[1]=[new THREE.MeshStandardMaterial({color:'#ff0',emissive:'#ff0',emissiveIntensity:1,metalness:0.5,roughness:0.2}),new THREE.MeshStandardMaterial({color:'#333',emissive:'#333',emissiveIntensity:1,metalness:0.5,roughness:0.2})];
+	loader=new THREE.FontLoader();
+	loader.load('../fonte/tubes.json',function(response){font=response;createText();});
+	function createText(){
+		geo[1]=new THREE.TextGeometry(text,{font:font,size:4.5,height:3,
+		curveSegments:12,bevelThickness:1,bevelSize:2,bevelEnabled:false});
+      	  	geo[1].center();
+		coupling[0]=new THREE.Mesh(geo[1],mat[1]);
+		coupling[0].position.set(0,-6,0);
+		coupling[0].rotation.set(1.57,0,0);
+		coupling[0].scale.set(1,1,1);coupling[1]=coupling[0].clone();
+		coupling[2]=coupling[0].clone();coupling[3]=coupling[0].clone();
+		coupling[4]=coupling[0].clone();coupling[5]=coupling[0].clone();
+		coupling[6]=coupling[0].clone();coupling[7]=coupling[0].clone();
+		coupling[8]=coupling[0].clone();coupling[9]=coupling[0].clone();
+	}
+
+	mat[2]=new THREE.MeshStandardMaterial({color:'#444',emissive:'#444',emissiveIntensity:1,metalness:0.5,roughness:0.2,side:THREE.DoubleSide})
+
+	class CustomSinCurve1 extends THREE.Curve {
+		constructor(scale=1){super();this.scale=scale;}
+		getPoint(t,optionalTarget=new THREE.Vector3()){
+			const tx=t*3-1.5;const ty=Math.sin(Math.PI*t);const tz=1;
+			return optionalTarget.set(tx,ty,tz).multiplyScalar(this.scale);
+		}
+	}
+	path[1]=new CustomSinCurve1(10);
+	geo[2]=new THREE.TubeGeometry(path[1],60,14,18,false);
+	mesh[7]=new THREE.Mesh(geo[2],mat[2]);
+	mesh[7].scale.set(0.15,0.15,0.15);
+	mesh[7].position.set(5,12,3);
+	mesh[7].rotation.set(0,0,5.49);
+
+	class CustomSinCurve2 extends THREE.Curve{
+		constructor(scale=1){super();this.scale=scale;}
+		getPoint(t,optionalTarget=new THREE.Vector3()){
+			const tx=t*3-1.5;const ty=1;const tz=1;
+			return optionalTarget.set(tx,ty,tz).multiplyScalar(this.scale);
+		}
+	}
+	path[2]=new CustomSinCurve2(10);
+	geo[3]=new THREE.TubeGeometry(path[2],60,4,18,false);
+	mesh[1]=new THREE.Mesh(geo[3],mat[2]);
+	mesh[1].scale.set(0.5,0.5,0.5);
+	mesh[1].position.set(-7.5,0.35,0);
+	mesh[1].rotation.set(0,0,0);
+
+	mesh[2]=mesh[1].clone();
+	mesh[2].scale.set(0.4,0.5,0.5);
+
+	mesh[3]=mesh[1].clone();
+	mesh[3].scale.set(0.1,0.5,0.5);
+	mesh[3].rotation.set(0,0,1.57);
+
+	mesh[12]=mesh[1].clone();
+	mesh[12].scale.set(0.2,0.5,0.5);
+	mesh[12].rotation.set(0,0,1.57);
+
+	mesh[13]=mesh[1].clone();
+	mesh[13].scale.set(0.2,0.5,0.5);
+	mesh[13].rotation.set(1.57,0,1.57);
+
+	mesh[14]=mesh[13].clone();
+
+	mesh[15]=mesh[1].clone();
+	mesh[15].scale.set(0.1,0.5,0.5);
+
+	mesh[16]=mesh[1].clone();
+
+	mesh[17]=mesh[15].clone();
+
+	geo[4]=new THREE.BoxGeometry(4,4,4);
+	mat[3]=new THREE.MeshBasicMaterial({color:'#999',wireframe:true});
+	cube[1]=new THREE.Mesh(geo[4],mat[3]);
+		mat[4]=new THREE.MeshBasicMaterial({color:'#999',transparent:true,opacity:0.0});
+		cube[2]=new THREE.Mesh(geo[4],mat[4]);
+	geo[5]=new THREE.CylinderGeometry(8,7,8,32,32,true);
+	mat[5]=new THREE.MeshBasicMaterial({color:'#069',side:THREE.DoubleSide});
+	cyli[1]=new THREE.Mesh(geo[5],mat[5]);
+	cyli[1].position.set(32,2.5,-20);
+		geo[6]=new THREE.CircleGeometry(7,32);
+		mat[6]=new THREE.MeshBasicMaterial({color:'#08a',side:THREE.DoubleSide});
+		circ[1]=new THREE.Mesh(geo[6],mat[6]);
+		circ[1].position.set(0,2,0);
+		circ[1].rotation.set(-1.57,0,0);
+		cyli[1].add(circ[1]);
+	geo[7]=new THREE.SphereGeometry(1.9,32,32);
+	ball[1]=new THREE.Mesh(geo[7],mat[6]);
+	ball[1].position.set(0,-10,23);
+		ball[2]=ball[1].clone();
+		ball[2].position.set(0,-10,25);
+	geo[8]=new THREE.CylinderGeometry(2,1.9,2,32);
+	mat[8]=new THREE.MeshBasicMaterial({color:'#f90'});
+	cap[1]=new THREE.Mesh(geo[8],mat[8]);
+
+function animate() {
+	requestAnimationFrame(animate);
+	render();
+}
+
+function render(){
+	if(w1>50){
+		if(um){um.rotation.x +=0.02;um.rotation.y +=0.02;}
+		if(dois){dois.rotation.y +=0.02;dois.rotation.z +=0.02;}
+		if(tres){tres.rotation.x -=0.02;tres.rotation.z -=0.02;}
+		if(quatro){quatro.rotation.y -=0.02;quatro.rotation.z -=0.02;}
+		if(cinco){cinco.rotation.y -=0.02;cinco.rotation.x -=0.02;}
+		if(seis){seis.rotation.y -=0.02;seis.rotation.z -=0.02;}
+		if(pipe1){pipe1.rotation.y -=0.02;pipe1.rotation.z -=0.02;}
+		if(pipe4){pipe4.rotation.y -=0.02;pipe4.rotation.z -=0.02;}
+		if(pipex){pipex.rotation.y -=0.02;pipex.rotation.z -=0.02;}
+		if(tampa){tampa.rotation.y -=0.02;tampa.rotation.z -=0.02;}
+
+		ball[2].position.y -=0.2;
+		if(ball[2].position.y>-16){ball[1].position.z=23;}
+		if(ball[2].position.y<-13){ball[1].position.z +=0.4;}
+		if(ball[2].position.y<-16){ball[2].position.y=-10;ball[1].position.z=24;}
+	}
+
+
+
+	w1++;
+	if(w1==50){
+
+		um=cube[1].clone();
+			coupling[9].position.set(0,0,0);
+			coupling[9].rotation.set(0,0,0);
+		um.add(coupling[9]);
+		//	um.scale.set(1,1,1);
+		um.position.set(-60,20,-50);
+		scene.add(um);
+
+		dois=cube[1].clone();
+		mesh[11]=mesh[7].clone();
+		mesh[11].scale.set(0.15,0.15,0.15);
+		mesh[11].position.set(-1.5,-1.5,-1.5);
+		dois.add(mesh[11]);
+			coupling[1].scale.set(1,1,1);
+			coupling[1].rotation.set(1.57,0,1.57);
+			coupling[1].position.set(0,-4,0);
+			coupling[1].material=[new THREE.MeshStandardMaterial({color:'#ff0',emissive:'#ff0',emissiveIntensity:1,metalness:0.5,roughness:0.2}),new THREE.MeshStandardMaterial({color:'#333',emissive:'#333',emissiveIntensity:1,metalness:0.5,roughness:0.2})];
+		dois.add(coupling[1]);
+			coupling[2].scale.set(1,1,1);
+			coupling[2].rotation.set(0,1.57,0);
+			coupling[2].position.set(-4,0,0);
+			coupling[2].material=[new THREE.MeshStandardMaterial({color:'#ff0',emissive:'#ff0',emissiveIntensity:1,metalness:0.5,roughness:0.2}),new THREE.MeshStandardMaterial({color:'#333',emissive:'#333',emissiveIntensity:1,metalness:0.5,roughness:0.2})];
+		dois.add(coupling[2]);
+		dois.position.set(0,-12,7);
+		//	dois.scale.set(1,1,1);
+		dois.position.set(-40,20,-50);
+		scene.add(dois);
+
+		tres=cube[1].clone();
+		mesh[2].position.set(0,-5,-5);
+		tres.add(mesh[2]);
+		mesh[3].position.set(5,-3,-5);
+		mesh[3].scale.set(0.2,0.5,0.5);
+		tres.add(mesh[3]);
+		tres.add(coupling[3]);
+			coupling[4].position.set(6,0,0);
+			coupling[4].rotation.set(1.57,1.57,1.57);
+		tres.add(coupling[4]);
+			coupling[5].position.set(-6,0,0);
+			coupling[5].rotation.set(1.57,1.57,1.57);
+		tres.add(coupling[5]);
+		tres.rotation.set(-0.78,0,-0.78);
+		//	tres.scale.set(1,1,1);
+		tres.position.set(-20,20,-50);
+		scene.add(tres);
+
+		quatro=tres.clone();
+		quatro.position.set(20,0,0);
+		quatro.rotation.set(-0.78,0,1.57);
+		mesh[12].position.set(5,3,-5);
+		quatro.add(mesh[12]);
+			coupling[6].position.set(0,6,0);
+			coupling[6].rotation.set(1.57,0,1.57);
+		quatro.add(coupling[6]);
+		//	quatro.scale.set(1,1,1);
+		quatro.position.set(0,20,-50);
+		scene.add(quatro);
+
+		cinco=quatro.clone();
+		cinco.position.set(-20,0,0);
+			coupling[7].position.set(0,0,6);
+			coupling[7].rotation.set(0,0,1.57);
+		cinco.add(coupling[7]);
+		mesh[13].position.set(5,5,4);
+		cinco.add(mesh[13]);
+		//	cinco.scale.set(1,1,1);
+		cinco.position.set(20,20,-50);
+		scene.add(cinco);
+
+		seis=cinco.clone();
+		seis.position.set(-40,0,0);
+			coupling[8].position.set(0,0,-6);
+			coupling[8].rotation.set(0,0,1.57);
+		seis.add(coupling[8]);
+		mesh[14].position.set(5,5,-4);
+		seis.add(mesh[14]);
+		//	seis.scale.set(1,1,1);
+		seis.position.set(40,20,-50);
+		scene.add(seis);
+
+		pipe1=cube[1].clone();
+		mesh[15].position.set(0,-5,-5);
+		pipe1.add(mesh[15]);
+		//	pipe1.scale.set(1,1,1);
+		pipe1.position.set(60,20,-50);
+		scene.add(pipe1);
+
+		pipe4=cube[1].clone();
+		mesh[16].position.set(-6,-5,-5);
+		pipe4.add(mesh[16]);
+		//	pipe4.scale.set(1,1,1);
+		pipe4.position.set(80,20,-50);
+		scene.add(pipe4);
+
+		pipex=cube[2].clone();
+		mesh[17].position.set(0,-5,-5);
+		pipex.add(mesh[17]);
+		pipex.position.set(100,20,-50);
+		scene.add(pipex);
+
+		tampa=cap[1].clone();
+		tampa.position.set(-80,20,-50);
+		scene.add(tampa);
+
+		scene.add(cyli[1]);
+		scene.add(ball[1]);
+		scene.add(ball[2]);
+
+		// ... 6.2832 ... 3.1416 ... 1.5708 ... 0.2854
+
+		w2++;str[w2]="1, 5,  0,-10,-20,	0,0,0,			1,";
+		w2++;str[w2]="1, 8, -8,-10,-20,	0,0,0,			1,";
+		w2++;str[w2]="1, 1,-21,-10,-20,	0,1.5708,0,		1,";
+		w2++;str[w2]="1, 8,-23,-10,-20,	0,0,0,			1,";
+		w2++;str[w2]="1, 2,-41,-10,-20,	0,3.1416,0,		1,";
+		w2++;str[w2]="1, 7,-41,-20,-20,	0,0,1.5708,		3,";
+		w2++;str[w2]="1, 2,-41,-30,-20,	3.1416,3.1416,0,	1,";
+		w2++;str[w2]="1, 9, -5,-30,-20,	0,0,3.1416,		21,";
+		w2++;str[w2]="1, 2, 32,-30,-20,	3.1416,3.1416,1.5708,	1,";
+		w2++;str[w2]="1, 9, 32,-13,-20,	0,0,1.5708,		8,";
+		w2++;str[w2]="1,10,  0, -2,-20,	0,0,0,			1,";
+		w2++;str[w2]="1,10,  0,-18,-20,	0,0,0,			1,";
+		w2++;str[w2]="1,10,  8,-10,-20,	0,0,1.5708,		1,";
+		w2++;str[w2]="1, 9,  0,-10,  5,	0,1.5708,0,		12,";
+
+		for(let j=1;j<=w2;j++){
+			Ar=str[j].split(",");
+			switch(Number(Ar[1])){
+				case 1:con[Ar[0]]=um.clone();break;
+				case 2:con[Ar[0]]=dois.clone();break;
+				case 3:con[Ar[0]]=tres.clone();break;
+				case 4:con[Ar[0]]=quatro.clone();break;
+				case 5:con[Ar[0]]=cinco.clone();break;
+				case 6:con[Ar[0]]=seis.clone();break;
+				case 7:con[Ar[0]]=pipe1.clone();break;
+				case 8:con[Ar[0]]=pipe4.clone();break;
+				case 9:con[Ar[0]]=pipex.clone();break;
+				case 10:con[Ar[0]]=tampa.clone();break;
+			}
+			con[Ar[0]].scale.set(Ar[8],1,1);
+			con[Ar[0]].position.set(Ar[2],Ar[3],Ar[4]);
+			con[Ar[0]].rotation.set(Ar[5],Ar[6],Ar[7]);
+			scene.add(con[Ar[0]]);
+		}
+	}
+
+	renderer.render(scene, camera);
+}
+
+animate();
+
+/*
+Some types of pipe fittings connecting straight sections of pipes.
+
+Hello discourse.threejs.org Friends,
+
+It is a kit of connections and pipes.
+
+A tool for basic pipelines creations... here:
+
+http://jrlazz.eu5.org/nana/pipeline.html
+
+Thanks for the great Three.js Team!
+
+Jose Roberto Lazzareschi
+
+*/
+
+</script>
+</body>
+</html>

@@ -1,0 +1,367 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+<meta charset="utf-8" />
+
+<title>Example and tutorial: Simple synth keyboard - The_video_keyboard - code sample</title>
+
+<style>
+@font-face {font-family:Dosis;src:url('Dosis-Medium.ttf');}
+body { background-color:#bcc; font-family:Dosis; font-size:30px;}
+b { position:absolute; font-family:Dosis; font-size:14pt; width:120px; cursor:pointer; border:1px outset #fff; border-color:#fff #000 #000 #fff;}
+b:hover { border:1px inset #fff; border-color:#000 #fff #fff #000;}
+span { position:relative; font-size:24px; left:-100px; top:200px;}
+select { font-size:18px; background-color:transparent;}
+div { position:absolute;font-family:Dosis; font-size:10.5px; cursor:pointer;}
+.db { left:0px;top:40px;width:20px;height:100px;border-radius:3px;background-color:#ccc;color:#008;border:2px outset #fc0;border-color: #fff #000 #000 #fff;text-align:center;display:inline-block;white-space:nowrap;font-weight:bold;}
+.ds { left:0px;top:40px;width:20px;height: 50px;border-radius:3px;background-color:#444;color:#fd0;border:2px outset #fc0;border-color: #fff #000 #000 #fff;text-align:center;display:inline-block;white-space:nowrap;z-index:1;}
+</style>
+
+<script src="../js/console.min.js"></script>
+
+</head>
+
+<body>
+<center>
+<span style="left:-100px;top:5px;font-size:14pt;font-style:italic;">baseado em https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Simple_synth</span>
+<br>
+<span style="left:-100px;top:10px;">
+Mouse Over<input type="checkbox" id="mover" onclick="myFunction()">
+&nbsp;&nbsp;Mouse Down<input type="checkbox" id="mdown" onclick="myFunction()">
+&nbsp;&nbsp;Volume&nbsp;<input style="position:relative;top:8px;" onchange="altVol(this.value);" type="range" min="0.0" max="1.0" step="0.01" value="0.1" id="vol">
+&nbsp;&nbsp;Duração&nbsp;<input style="position:relative;top:8px;" onchange="altDur(this.value);" type="range" min="100" max="1000" step="10" value="300" id="dur">
+<br>
+Forma de Onda <select onchange="altosci(this.value);" id="wave">
+	<option value="sine">Senoidal</option>
+	<option value="square">Quadrada</option>
+	<option value="sawtooth">Dente de Serra</option>
+	<option value="triangle">Triangular</option>
+	<option value="cust">Modulada</option>
+</select>
+</span>
+<br>
+<span id="spana" style="font-family:Lucida Console;font-size:24px;top:140px;">&nbsp;</span>
+</center>
+
+
+
+<div style="position:absolute;left:100px;top:105px;">
+
+<script>
+
+var tocasim=0;
+var tocbsim=1;
+var mover=document.getElementById("mover");
+var mdown=document.getElementById("mdown");
+mover.checked=false;
+mdown.checked=true;
+
+function myFunction() {
+	if(mover.checked==true){
+		tocasim=1;
+	} else {
+		tocasim=0;
+	}
+	if(mdown.checked==true){
+		tocbsim=1;
+	} else {
+		tocbsim=0;
+	}
+}
+
+var audioContext=new (window.AudioContext || window.webkitAudioContext)();
+var masterGainNode=null;
+var sineTerms=new Float32Array([0, 0, 1, 0, 1]);
+var cosineTerms=new Float32Array(sineTerms.length);
+var customWaveform=audioContext.createPeriodicWave(cosineTerms, sineTerms);
+
+var nota=[];
+nota[1]="AZ027.500000000000000";
+nota[2]="A#029.135235094880619";
+nota[3]="BZ030.867706328507756";
+nota[4]="CZ132.703195662574829";
+nota[5]="C#134.647828872109012";
+nota[6]="DZ136.708095989675945";
+nota[7]="D#138.890872965260113";
+nota[8]="EZ141.203444614108741";
+nota[9]="FZ143.653528929125485";
+nota[10]="F#146.249302838954299";
+nota[11]="GZ148.999429497718661";
+nota[12]="G#151.913087197493142";
+//ini
+nota[13]="AZ155.000000000000000";
+nota[14]="A#158.270470189761239";
+nota[15]="BZ161.735412657015513";
+
+nota[16]="CZ265.406391325149658";
+nota[17]="C#269.295657744218024";
+nota[18]="DZ273.416191979351890";
+nota[19]="D#277.781745930520227";
+nota[20]="EZ282.406889228217482";
+nota[21]="FZ287.307057858250971";
+nota[22]="F#292.498605677908599";
+nota[23]="GZ297.998858995437323";
+nota[24]="G#2103.826174394986284";
+nota[25]="AZ2110.000000000000000";
+nota[26]="A#2116.540940379522479";
+nota[27]="BZ2123.470825314031027";
+
+nota[28]="CZ3130.812782650299317";
+nota[29]="C#3138.591315488436048";
+nota[30]="DZ3146.832383958703780";
+nota[31]="D#3155.563491861040455";
+nota[32]="EZ3164.813778456434964";
+nota[33]="FZ3174.614115716501942";
+nota[34]="F#3184.997211355817199";
+nota[35]="GZ3195.997717990874647";
+nota[36]="G#3207.652348789972569";
+nota[37]="AZ3220.000000000000000";
+nota[38]="A#3233.081880759044958";
+nota[39]="BZ3246.941650628062055";
+
+nota[40]="CZ4261.625565300598634";
+nota[41]="C#4277.182630976872096";
+nota[42]="DZ4293.664767917407560";
+nota[43]="D#4311.126983722080910";
+nota[44]="EZ4329.627556912869929";
+nota[45]="FZ4349.228231433003884";
+nota[46]="F#4369.994422711634398";
+nota[47]="GZ4391.995435981749294";
+nota[48]="G#4415.304697579945138";
+nota[49]="AZ4440.000000000000000";
+nota[50]="A#4466.163761518089916";
+nota[51]="BZ4493.883301256124111";
+
+nota[52]="CZ5523.251130601197269";
+nota[53]="C#5554.365261953744192";
+nota[54]="DZ5587.329535834815120";
+nota[55]="D#5622.253967444161821";
+nota[56]="EZ5659.255113825739859";
+nota[57]="FZ5698.456462866007768";
+nota[58]="F#5739.988845423268797";
+nota[59]="GZ5783.990871963498588";
+nota[60]="G#5830.609395159890277";
+nota[61]="AZ5880.000000000000000";
+nota[62]="A#5932.327523036179832";
+nota[63]="BZ5987.766602512248223";
+
+nota[64]="CZ61046.502261202394538";
+nota[65]="C#61108.730523907488384";
+nota[66]="DZ61174.659071669630241";
+nota[67]="D#61244.507934888323642";
+nota[68]="EZ61318.510227651479718";
+nota[69]="FZ61396.912925732015537";
+nota[70]="F#61479.977690846537595";
+nota[71]="GZ61567.981743926997176";
+nota[72]="G#61661.218790319780554";
+nota[73]="AZ61760.000000000000000";
+nota[74]="A#61864.655046072359665";
+nota[75]="BZ61975.533205024496447";
+
+nota[76]="CZ72093.004522404789077";
+nota[77]="C#72217.461047814976769";
+nota[78]="DZ72349.318143339260482";
+nota[79]="D#72489.015869776647285";
+nota[80]="EZ72637.020455302959437";
+nota[81]="FZ72793.825851464031075";
+nota[82]="F#72959.955381693075191";
+nota[83]="GZ73135.963487853994352";
+nota[84]="G#73322.437580639561108";
+nota[85]="AZ73520.000000000000000";
+//fim
+nota[86]="A#73729.310092144719331";
+nota[87]="BZ73951.066410048992894";
+
+nota[88]="CZ84186.009044809578154";
+
+ 
+masterGainNode=audioContext.createGain();
+masterGainNode.connect(audioContext.destination);
+masterGainNode.gain.value=.01;
+
+
+var i;
+var j;
+let k=0;
+var tidn;
+var st;
+var cA=0;
+var cS=1;
+var tiposc="sine";
+var tiposc1="sine";
+var dura=300;
+
+function altosci(osci){
+	tiposc=osci;
+	oscillator.type=osci;
+	if(osci=="cust"){oscillator.setPeriodicWave(customWaveform);}
+}
+
+function toca(tid){
+if(tocasim==1){
+//alert(tocasim);
+	let osc=audioContext.createOscillator();
+	let osc1=audioContext.createOscillator();
+	osc.connect(masterGainNode);
+	if(tiposc=="cust"){
+		osc.setPeriodicWave(customWaveform);
+	} else {
+		osc.type=tiposc;
+	}
+	osc1.connect(masterGainNode);
+	if(tiposc=="cust"){
+		osc1.setPeriodicWave(customWaveform);
+	} else {
+		osc1.type=tiposc;
+	}
+	//alert(tid.substring(0,3));
+	tidn=parseInt(tid.substring(0,3))-88;
+	//alert(parseInt(tid.substring(0,3))-88);
+	//alert(nota[tidn].substring(3));
+	document.getElementById("spana").innerText="Frequência= " + nota[tidn].substring(3)+ " Hertz";
+	osc.frequency.value=(nota[tidn].substring(3));
+	osc.start();
+	osc1.frequency.value=(nota[tidn].substring(3)*1.5);
+	osc1.start();
+	setTimeout(function(){ osc.stop();osc1.stop(); }, dura);
+}
+}
+
+function tocb(tid){
+if(tocbsim==1){
+//alert(tocbsim);
+	let osc=audioContext.createOscillator();
+	let osc1=audioContext.createOscillator();
+	osc.connect(masterGainNode);
+	if(tiposc=="cust"){
+		osc.setPeriodicWave(customWaveform);
+	} else {
+		osc.type=tiposc;
+	}
+	osc1.connect(masterGainNode);
+	if(tiposc=="cust"){
+		osc1.setPeriodicWave(customWaveform);
+	} else {
+		osc1.type=tiposc;
+	}
+	//alert(tid.substring(0,3));
+	tidn=parseInt(tid.substring(0,3))-88;
+	//alert(parseInt(tid.substring(0,3))-88);
+	//alert(nota[tidn].substring(3));
+	document.getElementById("spana").innerText="Frequência= " + nota[tidn].substring(3)+ " Hertz";
+	osc.frequency.value=(nota[tidn].substring(3));
+	osc.start();
+	osc1.frequency.value=(nota[tidn].substring(3)*1.5);
+	osc1.start();
+	setTimeout(function(){ osc.stop();osc1.stop(); }, dura);
+}
+}
+
+i=-1;
+for(j=1;j<7;j++){
+i++;
+cA++;st=100+cA+"A"+j;			document.write("<div id='"+st+"' onmouseover='toca(this.id);' onmousedown='tocb(this.id);' class='db' style='left:"+(    i*168)+"px;'><br><br><br><br><br>A<br>"+j+"</div>");
+cS++;st=100+cS+"A#"+j;			document.write("<div id='"+st+"' onmouseover='toca(this.id);' onmousedown='tocb(this.id);' class='ds' style='left:"+( 11+i*168)+"px;'>A<br>#<br>"+j+"</div>");
+cA++;cA++;st=100+cA+"B"+j;		document.write("<div id='"+st+"' onmouseover='toca(this.id);' onmousedown='tocb(this.id);' class='db' style='left:"+( 24+i*168)+"px;'><br><br><br><br><br>B<br>"+j+"</div>");
+cA++;st=100+cA+"C"+j;			document.write("<div id='"+st+"' onmouseover='toca(this.id);' onmousedown='tocb(this.id);' class='db' style='left:"+( 48+i*168)+"px;'><br><br><br><br><br>C<br>"+j+"</div>");
+cS++;cS++;cS++;st=100+cS+"C#"+j;	document.write("<div id='"+st+"' onmouseover='toca(this.id);' onmousedown='tocb(this.id);' class='ds' style='left:"+( 59+i*168)+"px;'>C<br>#<br>"+j+"</div>");
+cA++;cA++;st=100+cA+"D"+j;		document.write("<div id='"+st+"' onmouseover='toca(this.id);' onmousedown='tocb(this.id);' class='db' style='left:"+( 71+i*168)+"px;'><br><br><br><br><br>D<br>"+j+"</div>");
+cS++;cS++;st=100+cS+"D#"+j;		document.write("<div id='"+st+"' onmouseover='toca(this.id);' onmousedown='tocb(this.id);' class='ds' style='left:"+( 84+i*168)+"px;'>D<br>#<br>"+j+"</div>");
+cA++;cA++;st=100+cA+"E"+j;		document.write("<div id='"+st+"' onmouseover='toca(this.id);' onmousedown='tocb(this.id);' class='db' style='left:"+( 96+i*168)+"px;'><br><br><br><br><br>E<br>"+j+"</div>");
+cA++;st=100+cA+"F"+j;			document.write("<div id='"+st+"' onmouseover='toca(this.id);' onmousedown='tocb(this.id);' class='db' style='left:"+(120+i*168)+"px;'><br><br><br><br><br>F<br>"+j+"</div>");
+cS++;cS++;cS++;st=100+cS+"F#"+j;	document.write("<div id='"+st+"' onmouseover='toca(this.id);' onmousedown='tocb(this.id);' class='ds' style='left:"+(130+i*168)+"px;'>F<br>#<br>"+j+"</div>");
+cA++;cA++;st=100+cA+"G"+j;		document.write("<div id='"+st+"' onmouseover='toca(this.id);' onmousedown='tocb(this.id);' class='db' style='left:"+(144+i*168)+"px;'><br><br><br><br><br>G<br>"+j+"</div>");
+cS++;cS++;st=100+cS+"G#"+j;		document.write("<div id='"+st+"' onmouseover='toca(this.id);' onmousedown='tocb(this.id);' class='ds' style='left:"+(155+i*168)+"px;'>G<br>#<br>"+j+"</div>");
+cA++;
+cS++;
+}
+cA++;st=100+cA+"A"+j;			document.write("<div id='"+st+"' onmouseover='toca(this.id);' onmousedown='tocb(this.id);' class='db' style='left:"+(168+i*168)+"px;'><br><br><br><br><br>A<br>"+j+"</div>");
+
+//var d=document.getElementsByTagName("div");alert(d.length);
+
+// ok
+//<?php
+//	for ($x=1; $x<74; $x++){
+//		echo "document.getElementsByTagName('div')[".$x."].onmouseover=function(event){toquenota(document.getElementsByTagName('div')[".$x."].id);};";
+//		echo "document.getElementsByTagName('div')[".$x."].onmousedown=function(event){toquenota(document.getElementsByTagName('div')[".$x."].id);};";
+//	}
+//?>
+
+//ok
+//document.getElementsByTagName('div')[29].addEventListener('mouseover', function(event){toquenota(document.getElementsByTagName('div')[29].id);},false);
+//document.getElementsByTagName('div')[30].addEventListener('mouseover', function(event){toquenota(document.getElementsByTagName('div')[30].id);},false);
+//document.getElementsByTagName('div')[31].addEventListener('mouseover', function(event){toquenota(document.getElementsByTagName('div')[31].id);},false);
+
+function altVol(val){
+	masterGainNode.gain.value=val;
+	video.volume=val;
+}
+function altDur(dur){
+	dura=dur;
+}
+masterGainNode.gain.value=.1;
+document.getElementById("vol").value=.1;
+document.getElementById("dur").value=300;
+document.getElementById("wave").value="sine";
+</script>
+
+</div>
+
+<span style="top:150px;"><center>
+<!--
+<video id="video" width="200" height="150" controls loop style="border:2px outset white;border-color:#fff #000 #000 #fff;">
+-->
+<video id="video" width="200" height="114" controls loop style="border:2px outset white;border-color:#fff #000 #000 #fff;">
+<source src="altofinho.mp4" type="video/mp4">
+</video></center>
+</span>
+
+<canvas id="canvasB" width="90" height="35" style="position:absolute;left:760px;top:100px;">
+
+<script>
+
+var canvas=document.getElementById("canvasB");
+var ctx=canvas.getContext("2d");
+var p=30;// period
+var o=15;// oscillation
+var x;
+var y;
+var h=8;
+
+function square(x){return( (x%p)<o?o:0 );}
+function sawtooth(x){return( x%p );}
+function triangular(x){return( Math.abs((x%p)-o));}
+function custom(r){return(8+ Math.cos(x*Math.PI/h)*h + Math.sin(2*x*Math.PI/h)*h*1.5 + Math.cos(4*x*Math.PI/h)*h/4);}
+function senoidal(x){return(8+ Math.sin(x*Math.PI/h)*h);}
+
+function func(){
+	x=x+2;
+	if(tiposc=="sine"){y=senoidal(x);ctx.lineTo(x,2*y);}
+	if(tiposc=="square"){y=square(x);ctx.lineTo(x,2*y);}
+	if(tiposc=="sawtooth"){y=sawtooth(x);ctx.lineTo(x,y);}
+	if(tiposc=="triangle"){y=triangular(x);ctx.lineTo(x,2*y);}
+	if(tiposc=="cust"){y=custom(x);ctx.lineTo(x,y+10);}
+	ctx.strokeStyle="#c00";
+	ctx.lineWidth=1;
+	ctx.stroke();
+	if(x>119){clearInterval(myVar);ctx.clearRect(0,0,90,35);noka();}
+}
+function noka(){
+	x=-2;
+	ctx.beginPath();
+	myVar=setInterval(func,20);
+}
+
+noka();
+
+var video=document.getElementById("video");
+//video.volume=.1;
+video.play();
+</script>
+
+</body>
+</html>

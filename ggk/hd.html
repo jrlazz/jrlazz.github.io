@@ -1,0 +1,136 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+<meta charset="utf-8" /> 
+<title>Canvas and JavaScript</title>
+</head>
+
+<style>
+
+body { background:#bcc;}
+i { color:#808; }
+.rotateA { animation: rotation 6s infinite linear;}
+@keyframes rotation { from { transform: rotate(0deg); } to { transform: rotate(360deg); }}
+
+//img { position:absolute; left:100px; top:100px; filter: grayscale (10%);}
+img { position:absolute; left:100px; top:100px; filter: invert(10%) sepia(30%) saturate(9000%) hue-rotate(90deg) brightness(100%) contrast(80%);}
+#arm{ transform: rotate(-50deg); left:225px; top:164px; filter: invert(30%) sepia(40%) saturate(5000%) hue-rotate(0deg) brightness(100%) contrast(100%);}
+#deitado{left:55px;top:57px; filter: invert(50%) sepia(80%) saturate(4000%) hue-rotate(190deg) brightness(60%) contrast(100%);}
+
+
+
+
+button {position:absolute;left:110px;top:10px;width:380px;font-size:20pt;border:3px; border-style:outset; border-color: white black black white;}
+button:hover {font-size:20pt;border:3px; border-style:inset; border-color: black white white black;}
+</style>
+
+<body>
+
+<img id="deitado" src="hd100deitado_2.png"></img>
+<img id="disco" src="hd100disk.png" class="rotateA"></img>
+<img onclick="vaiprala();" id="arm" src="hd100arm4a.png"  width="400"></img>
+
+<!--
+<button id="but" onclick="recomeca();">Ir para a posição de leitura</button>
+-->
+<span id="spana" style="position:absolute;left:600px;"></span>
+<span id="spanb" style="position:absolute;left:650px;top:50px;font-family:Arial;font-size:48pt;color:black;"></span>
+
+<span id="spanc" style="position:absolute;left:380px;top:120px;font-family:Arial;font-size:10pt;font-weight:bold;color:#009;">&nbsp;Disco girando&nbsp;</span>
+<img src="seta_azul.png" style="position:absolute;left:400px;top:140px;width:50px;filter:none;"></img>
+<span id="spand" style="position:absolute;left:200px;top:408px;font-family:Arial;font-size:10pt;font-weight:bold;color:#d00;">&nbsp;Braço com sensor magnético&nbsp;</span>
+<img src="seta_verm.png" style="position:absolute;left:330px;top:370px;width:40px;filter:none;"></img>
+
+<img src="grupo.png" style="position:absolute;left:650px;top:120px;width:250px;filter:none;"></img>
+<span id="spane" style="position:absolute;left:580px;top:380px;font-family:Arial;font-size:18pt;background-color:#ccc;color:#008;height:30px;border-radius:10px;border:2px solid #008;">&nbsp;A pinta no disco está "imantada"&nbsp;</span>
+<span id="spanf" style="position:absolute;left:80px;top:460px;font-family:Arial;font-size:14pt;color:#008;"><b>Hard disk</b> ... disco rígido (<i>bem duro</i>), para não ter ondulações ou sobressaltos 
+que dificultam a "leitura" das informações.<br>
+Antes haviam discos flexíveis coma "cabeça de leitura" apertando o "disquete". Sua capacidade de
+ armazenamento era ... muito menor!!!<br>
+As fitas plásticas impregnadas com óxido de ferro ou cromo (<i>que possibilitam a magnetização de regiões</i>) também eram utilizadas para gravação de dados.
+ E usadas também para tocar músicas nos gravadores, mini-cassetes, etc.</span>
+
+
+
+<script>
+
+//var myVar = setInterval(canta, 80);
+var myVarB = setInterval(degree, 150);
+var w=-50;
+var altera=1;
+
+function canta(){
+if(altera==1){
+	w=w+1;
+} else {
+	w=w-1;
+}
+document.getElementById("arm").style.transform="rotate("+w+"deg)";
+if(altera==1){
+	if(w==-15){altera=0;}
+} else {
+	if(w==-50){altera=1;}
+}
+}
+
+function vaiprala(){
+  clearInterval(myVar);
+document.getElementById("arm").style.transform="rotate(-44deg)";
+}
+
+function recomeca(){
+if(document.getElementById("but").innerText=="Ir para a posição de leitura"){
+	clearInterval(myVar);
+	document.getElementById("arm").style.transform="rotate(-32deg)";
+	document.getElementById("but").innerText="Reiniciar";
+} else {
+	w=-50;
+	myVar = setInterval(canta, 200);
+	document.getElementById("but").innerText="Ir para a posição de leitura";
+}
+}
+
+function degree(){
+var el = document.getElementById("disco");
+var st = window.getComputedStyle(el, null);
+var tr = st.getPropertyValue("-webkit-transform") ||
+         st.getPropertyValue("-moz-transform") ||
+         st.getPropertyValue("-ms-transform") ||
+         st.getPropertyValue("-o-transform") ||
+         st.getPropertyValue("transform") ||
+         "FAIL";
+
+// With rotate(30deg)...
+// matrix(0.866025, 0.5, -0.5, 0.866025, 0px, 0px)
+console.log('Matrix: ' + tr);
+
+// rotation matrix - http://en.wikipedia.org/wiki/Rotation_matrix
+
+var values = tr.split('(')[1].split(')')[0].split(',');
+var a = values[0];
+var b = values[1];
+var c = values[2];
+var d = values[3];
+
+var scale = Math.sqrt(a*a + b*b);
+
+console.log('Scale: ' + scale);
+
+// arc sin, convert from radians to degrees, round
+var sin = b/scale;
+// next line works for 30deg but not 130deg (returns 50);
+// var angle = Math.round(Math.asin(sin) * (180/Math.PI));
+var angle = Math.round(Math.atan2(b, a) * (180/Math.PI));
+
+//document.getElementById("spana").innerText='Rotate: ' + (180+Number(angle)) + 'deg';
+if( Number(angle)>24){document.getElementById("spanb").innerText="SIM (1)";document.getElementById("spanb").style.color="#0c0";}
+if( Number(angle)>40){document.getElementById("spanb").innerText="NÃO (0)";document.getElementById("spanb").style.color="#f00";}
+if( Number(angle)>-100){document.getElementById("arm").style.transform="rotate(-" + ((180+Number(angle))/9 + 9) + "deg)";}
+}
+
+</script>
+</body>
+</html>
