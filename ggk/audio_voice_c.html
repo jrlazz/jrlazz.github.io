@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>audio_voice_C.html</title>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="moonblue.ico" />
+<style>
+body{margin:0px;border:none;background-color:#036;font-family:Monospace;overflow:hidden;}
+//table, th, td {  border: 1px solid white;}
+</style>
+</head>
+
+<body>
+
+<button id="bostart" style="position:absolute;left:600px;top:200px;display:;font-size:50pt;background-color:#f00;color:#fff;font-weight:bold;cursor:pointer;"> start </button>
+<!--
+<span style="position:absolute;left:0%;top:200px;width:99%;text-align:center;">
+<span id="bostart" style="font-size:41pt;color:#c90;">... will be ready in seconds... I promise!</span>
+</span>
+-->
+<table style="position:absolute;left:0px;top:8px;width:99%;color:#fc0;z-index:2;">
+<tr>
+<td style="width:20%;">
+<a id="code" href="audio_voice_c.txt" target="_blank" style="color:#fc0;text-decoration:none;font-size:16pt;">The Code</a>
+</td>
+<td style="width:50%;">
+<center>
+<button id="bo" style="width:200px;display:none;font-size:12pt;height:32px;background-color:#fc0;color:#000;font-weight:bold;cursor:pointer;"> Play/Pause </button>
+</center>
+</td>
+
+<td style="width:5%;">
+<span id="spansel" style="display:none;color:#cc0;font-size:12pt;">audio&nbsp;
+<select id="sel" autocomplete="off" style="background-color:#630;color:#ff0;font-size:12pt;border:1px inset #999;cursor:pointer;display:none;" onchange="troca();">
+<option value="mp3/Lennon_Now_And_Then_stereo.mp3">Lennon_Now_And_Then_stereo</option>
+<option value="mp3/satisfaction.mp3">Satisfaction</option>
+<option value="mp3/124810.mp3">1 2 4 8 10 kHz</option>
+<option value="mp3/Lennon_Now_And_Then_mono.mp3">Lennon_Now_And_Then_mono</option>
+<option value="mp3/voices.mp3">voices</option>
+<option value="mp3/Two.mp3">Two</option>
+</select>
+</span>
+</td>
+
+<td style="width:10%;">
+<input id="volin" type="range" style="display:none;width:100px;cursor:pointer;" value="0.4" min="0" max="1" step="0.02" autocomplete="off"></input>
+</td><td style="width:10%;">
+<span id="spanB" style="display:none;position:relative;top:-3px;color:#fc0;font-size:9pt;"></span>
+</td>
+
+</tr></table>
+
+<script src="build/three.min.js"></script>
+<script src="js/loaders/DDSLoader.js"></script>
+<script src="js/loaders/MTLLoader.js"></script>
+<script src="js/loaders/OBJLoader.js"></script>
+<script src="js/controls/OrbitControls.js"></script>
+
+<script>
+
+var scene, camera, renderer, analyser, uniforms, controls, texture, texture2;
+var box=[];
+var geo=[];
+var mat=[];
+
+var w=0;
+var currentTime;
+var volval=document.getElementById("volin");
+var gainNode, audio;
+
+var CA;
+
+var ww=0;
+var str="";
+
+var mesh=[];
+var p=Math.PI;
+
+var tex=[];
+var marca=[];
+
+	var start=document.getElementById('bostart');start.onclick=function StartAnimation(){init();}
+	var inpA=document.getElementById('volin');inpA.onchange=function StartAnimation(){mudavol();}
+	var sela=document.getElementById('sel');sela.onchange=function StartAnimation(){troca();}
+
+function init() {
+
+	document.getElementById("bostart").style.display="none";
+	document.getElementById("bo").style.display="";
+	document.getElementById("volin").style.display="";
+	document.getElementById("spanB").style.display="";
+
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setSize( window.innerWidth,window.innerHeight);
+	renderer.setClearColor(0x003366);
+	renderer.setPixelRatio(window.devicePixelRatio);
+	document.body.appendChild(renderer.domElement);
+	scene=new THREE.Scene();
+	camera=new THREE.PerspectiveCamera(90,window.innerWidth/window.innerHeight,1,1000);
+	camera.position.set(0,0,300);
+
+	var esq=new THREE.DirectionalLight('#ccc',1);
+	esq.position.set(-30,30,60).normalize();
+	scene.add(esq);
+	var dir=new THREE.DirectionalLight('#ccc',1);
+	dir.position.set(30,-30,-60).normalize();
+	scene.add(dir);
+	var amb=new THREE.AmbientLight('#999',1);
+	scene.add(amb);
+
+	geo[0]=new THREE.BoxGeometry(2,0.5,5);
+	mat[0]=new THREE.MeshStandardMaterial({color:0xffffff});
+	box[0]=new THREE.Mesh(geo[0],mat[0]);
+
+	tex[1]=new THREE.TextureLoader().load('img/r1kHz.png');
+	tex[2]=new THREE.TextureLoader().load('img/r2kHz.png');
+	tex[4]=new THREE.TextureLoader().load('img/r4kHz.png');
+	tex[8]=new THREE.TextureLoader().load('img/r8kHz.png');
+	tex[10]=new THREE.TextureLoader().load('img/r10kHz.png');
+
+	for(let m=1;m<11;m++){
+		if(tex[m]){marca[m]=new THREE.MeshStandardMaterial({map:tex[m],transparent:true,opacity:0.5});}
+	}
+
+	for(let m=1;m<11;m++){
+		if(marca[m]){box[600+m]=new THREE.Mesh(geo[0],marca[m]);}
+	}
+
+	box[601].position.set(-334,-75,1);box[601].scale.set(1,500,5);scene.add(box[601]);
+	box[602].position.set(-274,-75,1);box[602].scale.set(1,500,5);scene.add(box[602]);
+	box[604].position.set(-144,-75,1);box[604].scale.set(1,500,5);scene.add(box[604]);
+	box[608].position.set( 114,-75,1);box[608].scale.set(1,500,5);scene.add(box[608]);
+	box[610].position.set( 240,-75,1);box[610].scale.set(1,500,5);scene.add(box[610]);
+
+	for(let z=1;z<257;z++){
+		geo[z]=geo[0].clone();
+		mat[z]=new THREE.MeshStandardMaterial({color:'hsl('+z*2+',50%,50%)',metalness:0.5,roughness:0.5});
+		box[z]=new THREE.Mesh(geo[z],mat[z]);
+		box[z].scale.set(0.5,1,10);
+		box[z].position.x=-400+z*6;
+		scene.add(box[z]);
+	}
+
+	controls=new THREE.OrbitControls(camera,renderer.domElement);
+	controls.minDistance=50;
+	controls.maxDistance=800;
+	controls.enablePan=true;
+	controls.enableDamping=true;
+
+	audio=new Audio();
+	audio.src="mp3/voices.mp3";//"mp3/124810.mp3";
+	audio.load();
+	audio.play();
+
+	var duration=0;
+	window.AudioContext=window.AudioContext||window.webkitAudioContext; // old safari trick
+	var audioContext=new AudioContext();
+	analyser=audioContext.createAnalyser();
+
+	var masterGain=audioContext.createGain();
+	masterGain.connect(audioContext.destination);
+	gainNode=audioContext.createGain();
+	gainNode.connect(masterGain);
+	gainNode.connect(audioContext.destination);
+	gainNode.gain.value=0.4;
+	var source=audioContext.createMediaElementSource(audio);
+	source.connect(analyser);
+	source.connect(gainNode);
+	audio.volume=0.9;
+	//audio.play();
+	document.getElementById("bo").style.display="block";
+	duration=audio.duration;
+
+	document.getElementById("bo").addEventListener("click",function(){
+		if(audio.paused){
+			audio.play();scene.add(mesh[3]);scene.remove(mesh[4]);
+		}else{
+			audio.pause();
+		}
+	})
+
+
+	audio.addEventListener("ended", function() {
+    		//alert("The audio has ended.");
+		scene.add(mesh[4]);scene.remove(mesh[3]);
+	})
+
+
+	window.addEventListener('resize',onWindowResize);
+
+	gainNode.gain.value=volval.value;
+
+	geo[1]=new THREE.CircleGeometry(12,16);
+	mat[1]=new THREE.MeshBasicMaterial({color:'#900'});//side:THREE.DoubleSide
+	mesh[1]=new THREE.Mesh(geo[1],mat[1]);
+	mesh[1].rotation.set(0,0,0);
+
+	geo[2]=new THREE.RingGeometry(12,14,16);
+	mat[2]=new THREE.MeshBasicMaterial({color:'#f00'});
+	mesh[2]=new THREE.Mesh(geo[2],mat[2]);
+	mesh[2].rotation.set(0,0,0);
+
+	mesh[2].add(mesh[1]);
+
+	var textureLoader=new THREE.TextureLoader();
+	texture=textureLoader.load('models/steve/Steve_f_0.png');
+	texture2=textureLoader.load('models/steve/Steve_f_1.png');
+	
+	geo[3]=new THREE.PlaneGeometry(100,100);
+	mat[3]=new THREE.MeshBasicMaterial({map:texture});
+	mesh[3]=new THREE.Mesh(geo[3],mat[3]);
+	mesh[3].rotation.set(0,0,0);
+	mesh[3].position.set(0.1,75,49.9);
+
+	mesh[2].scale.y=0.1;
+	mesh[2].scale.x=1.5;
+	mesh[2].position.set(0,-36,2);
+
+	mesh[3].add(mesh[2]);
+
+	mesh[3].scale.multiplyScalar(1);
+
+	scene.add(mesh[3]);
+
+	geo[4]=new THREE.PlaneGeometry(100,100);
+	mat[4]=new THREE.MeshBasicMaterial({map:texture2});
+	mesh[4]=new THREE.Mesh(geo[4],mat[4]);
+	mesh[4].rotation.set(0,0,0);
+	mesh[4].position.set(0.1,75,50.2);
+	//scene.add(mesh[4]);
+
+	var onProgress=function(xhr){
+		if(xhr.lengthComputable){
+			var percentComplete=xhr.loaded/xhr.total*100;
+			console.log(Math.round(percentComplete,2)+'% downloaded');
+		}
+	};
+	var onError=function(xhr){};
+
+	var mtlLoader=new THREE.MTLLoader();
+	var objLoader=new THREE.OBJLoader();
+	var k=0;
+	var setpat='models/steve/';
+	mtlLoader.setPath(setpat);mtlLoader.load('partesfoscas.mtl',function(materials){materials.preload();objLoader.setMaterials(materials);objLoader.setPath(setpat);objLoader.load('steve_ca.obj',function(object){CA=object;CA.scale.multiplyScalar(50);CA.position.set(0,25,-2);scene.add(CA);},onProgress,onError);});
+}
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function mudavol(){
+	gainNode.gain.value=volval.value;
+	document.getElementById("spanB").innerText="gain= "+volval.value;
+}
+function mudagain(){
+	gainNode.gain.value=volgain.value;
+	document.getElementById("spanA").innerText="gain= "+volgain.value;
+}
+
+function troca(){
+	var select=document.getElementById('sel');
+	var value=select.options[select.selectedIndex].value;
+	audio.src=value;
+	audio.play();
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	if(analyser){
+		function getDataFromAudio(){
+			analyser.fftSize=512;
+			var freqByteData=new Uint8Array(analyser.fftSize/2);
+			var timeByteData=new Uint8Array(analyser.fftSize/2);
+			analyser.getByteFrequencyData(freqByteData);
+			analyser.getByteTimeDomainData(timeByteData);
+			return {f:freqByteData,t:timeByteData};// array of all 1024 levels
+		}
+
+		var data=[];
+		data=getDataFromAudio();
+		var ff=[];ff=data.f;var tt=[];tt=data.t;
+ 		for (let j=1;j<257;j++){
+			if(ff[j]*2>20 && j<64){mesh[2].scale.y=ff[j]/220;}//document.getElementById("indi").innerText=ff[j]*2;
+			box[j].scale.y=ff[j];
+			if(j<129){box[j].position.y=-200+(ff[j]/4);}
+			if(j>128){scene.remove(box[j]);}
+		}
+	}
+	if(renderer){renderer.render(scene,camera);}
+}
+
+//init();
+
+animate();
+
+document.getElementById("spanB").innerText="gain= "+volval.value;
+
+
+/*
+
+Voices, lip and mouth movements
+
+An experience...
+
+I was inspired by the recent work done on 'And Now And Then' and would like to see Steve singing the filtered excerpt of Lennon's voice.
+I isolated the excerpt from the film 'The Beatles - Now And Then - The Last Beatles Song' and coded the page and was satisfied for the moment.
+For publication I didn't use John's voice (of course)... I got free voices on the Internet.
+
+the link:
+
+http://jrlazz.eu5.org/r90/examples/audio_voice.html
+
+
+Thanks to the Three.js Team!
+
+
+*/
+
+console.log("The console log:\nTHREE.Matrix3: .getInverse() can't invert matrix, determinant is 0\nwill be repaired in newer versions");
+
+</script>
+
+</body>
+</html>

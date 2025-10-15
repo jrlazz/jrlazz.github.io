@@ -1,7 +1,8 @@
 # Created with Anim8or 1.00
 # Object "steve_to":
 
-mtllib steve_to.mtl
+# mtllib steve_to.mtl
+mtllib partesfoscas.mtl
 
 # Shape "mesh01":
 g mesh01
