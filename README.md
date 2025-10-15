@@ -9,8 +9,6 @@
 <a href="https://jrlazz.github.io/anim/Vdrag.html" target="_blank" style="color:#00c;">City construction</a><br>
 </h2>
 
-<br>
-
 <h2>
 <a href="https://jrlazz.github.io/pages_anim.html" target="_blank" style="color:#c0c;">Index of ANIM</a><br>
 <br>
