@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="99.9%" height="99.9%" style="font-family:cursive;font-size:24px;" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
+
+  <rect x="0" y="0" width="100%" height="100%" style="fill:#9aa;stroke-width:4;stroke:#455;" />
+
+<g>
+  <circle cx="50" cy="50" r="55" stroke-width="1" stroke="#009" fill="yellow">
+    <animateMotion  path="M100,100 100,0 200,0 200,200 0,200  z " dur="10s" repeatCount="indefinite" />
+   <animate attributeName="r" type="translate" values="5;40;5" begin="0s" dur="10s" fill="freeze" repeatCount="indefinite" />
+   <animate attributeName="stroke-width" type="translate" values="1;5;1" begin="0s" dur="10s" fill="freeze" repeatCount="indefinite" />
+   <animate attributeName="fill" type="translate" values="green;red;yellow;green" begin="0s" dur="10s" fill="freeze" repeatCount="indefinite" />
+   <animate attributeName="cx" type="translate" values="50;255;50" begin="0s" dur="10s" fill="freeze" repeatCount="indefinite" />
+   <animate attributeName="cy" type="translate" values="50;255;50" begin="0s" dur="4s" fill="freeze" repeatCount="indefinite" />
+ </circle>
+</g>
+
+
+<g>
+  <path transform="translate(150,130) rotate(0)" d="M0,0 200,0 200,200 0,200  z " stroke-width="1" stroke="black" fill="transparent" />
+  <text x="150" y="130" fill="#090" text-anchor="middle" dominant-baseline="middle">50</text>
+  <text x="350" y="130" fill="#009" text-anchor="middle" dominant-baseline="middle">200</text>
+  <text x="350" y="330" fill="red" text-anchor="middle" dominant-baseline="middle">200</text>
+  <text x="1150" y="130" fill="red" text-anchor="middle" dominant-baseline="middle">1000</text>
+</g>
+
+
+<g  transform="translate(100,100) rotate(0)">
+  <animateMotion  path="M0,0 200,0 200,200 0,200  z " dur="5s" repeatCount="indefinite" stroke-width="1" stroke="black" />
+<!--
+text-anchor... start middle end
+dominant-baseline... auto middle hanging
+
+  <animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0" to="-360" dur="3s" additive="sum" repeatCount="indefinite" />
+-->
+  <circle cx="50" cy="30" r="5" stroke-width="1" stroke="#008" fill="red"/>
+  <text x="50" y="0" fill="#900" text-anchor="start" dominant-baseline="middle">start SVG!</text>
+  <text x="50" y="30" fill="#090" text-anchor="middle" dominant-baseline="middle">middle SVG!</text>
+  <text x="50" y="60" fill="#009" text-anchor="end" dominant-baseline="middle">end SVG!</text>
+  <text x="50" y="90" fill="red" text-anchor="middle" dominant-baseline="middle">love SVG!</text>
+</g>
+
+
+
+
+<!-- Crian&ccedil;as -->
+<g transform="scale(1.5,1.5)">
+<image href="Ig_x1.jpg" x="100" height="100" width="100" opacity="0.5">
+<animateMotion path="M 280 145 C 280, 219.5 205.5,280 145,280 C 70.5,280 10,219.5 10,145 C 10,70.5  70.5,10  145,10  C 219.5,10  280,70.5  280,145 Z" dur="16s" repeatCount="indefinite" />
+<animate attributeName="opacity" type="translate" values="0;1;1;0;" begin="0s" dur="16s" fill="freeze" repeatCount="indefinite" />
+<animate attributeName="href" type="translate" values="Ig_x1.jpg;Am_x1.jpg;" begin="0s" dur="32s" fill="freeze" repeatCount="indefinite" />
+
+<!--
+ accumulate="sum"
+M 50,100 a 50,50 0 1,0 100,0 a 50,50,0 1,0 -100,0
+M 50,100 a 50,50 0 0,1 100,0 a 50,50,0 0,1 -100,0
+
+M 100,100 m -50,0 a 50,50 0 1 0 100,0 a 50,50,0 1 0 -100,0
+M 100,100 m -50,0 a 50,50 0 0 1 100,0 a 50,50,0 0 1 -100,0
+
+M 280 145 C 280, 219.5 205.5,280 145,280 C 70.5,280 10,219.5 10,145 C 10,70.5  70.5,10  145,10  C 219.5,10  280,70.5  280,145 Z
+M 280,145 C 280,  70.5 219.5,10  145,10  C 70.5,10  10,70.5  10,145 C 10,219.5 70.5,280 145,280 C 205.5,280 280,219.5 280,145 Z
+
+path="M100,100 100,0 200,0 200,200 0,200  z "
+        M cx - r, cy
+        a r,r 0 1,0 (r * 2),0
+        a r,r 0 1,0 -(r * 2),0
+
+        M cx, cy
+        m -r, 0
+        a r,r 0 1,0 (r * 2),0
+        a r,r 0 1,0 -(r * 2),0
+-->
+</image>
+
+<!--
+<image href="Am_x1.jpg" x="300" height="100" width="100">
+<animate attributeName="x" type="translate" values="0;255;0" begin="0s" dur="4s" fill="freeze" repeatCount="indefinite" />
+<animateMotion  path="M50,100 a50,50 0 0,1 100,0 a50,50,0 0,1 -100,0" dur="4s" repeatCount="indefinite" />
+</image>
+-->
+</g>
+
+
+
+
+
+
+
+<!-- anti-hor&aacute;rio -->
+<g  transform="translate(0,150) scale(2,2)">
+<path id="P1" stroke="#377" fill="transparent" stroke-width="12"  
+d="M 25,100 C 25,134 75,134 75,100 S 25,67 25,100"
+/>
+<!--
+M 0,0 Q 40,80 80,0 M 80,0 Q 80,-40 40,-40 T 0,0
+M 25,100 C 25,150 75,150 75,100 S 100,25 150,75
+-->
+<circle cx="50" cy="100" r="26" stroke="lime" stroke-opacity="1" fill="transparent" stroke-width="2">
+<animate attributeName="stroke-opacity" type="translate" values="0;1;0" begin="0s" dur="3s" fill="freeze" repeatCount="indefinite" />
+</circle>
+</g>
+<!-- hor&aacute;rio -->
+<g transform="translate(0,0) scale(2,2)">
+<path id="P1" stroke="#636" fill="transparent" stroke-width="12"  
+d="M 25,100 C 25,66 75,66 75,100 S 25,132 25,100"
+/>
+<circle cx="50" cy="100" r="26" stroke="#f3f" stroke-opacity="1" fill="transparent" stroke-width="2">
+<animate attributeName="stroke-opacity" type="translate" values="0;1;0" begin="0s" dur="3s" fill="freeze" repeatCount="indefinite" />
+</circle>
+</g>
+
+
+
+
+
+
+
+<foreignObject x="5" y="450" width="210" height="110">
+<svg>
+  <rect x="0" y="0" width="210" height="110" style="fill:#030;stroke-width:1;stroke:#000;" />
+</svg>
+</foreignObject>
+
+
+
+<foreignObject x="10" y="455" width="200" height="100">
+<svg>
+<defs>
+<filter id="filtB">
+	<feGaussianBlur stdDeviation="1" in="SourceGraphic" edgeMode="wrap" result="blur3"/>
+</filter>
+<filter id="filtC" filterUnits="userSpaceOnUse">
+  <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+  <feSpecularLighting in="blur" surfaceScale="2" specularConstant="1" specularExponent="7" lighting-color="#cfc" result="specOut">
+     <fePointLight x="-5000" y="-10000" z="15000" />
+  </feSpecularLighting>
+   </filter>
+</defs>
+
+  <g filter="url(#filtC)" >
+    <text fill="#f00" stroke-width="3" stroke="#ff0" font-size="60" font-family="Verdana" x="30" y="70">J R L</text>
+  </g>
+  <g filter="url(#filtB)" >
+    <text fill="#0f0" stroke-width="2" stroke="#000" font-size="60" font-family="Verdana" x="30" y="70">J R L</text>
+  </g>
+</svg>
+</foreignObject>
+
+
+
+
+
+  <foreignObject width="300" height="200" opacity="0.5">
+    <svg>
+     <rect opacity="0.5" fill="green" stroke-width="4" height="50" width="50" y="50" x="50" stroke="#000"/>
+     <circle fill="#f00" stroke="#000" stroke-width="4" cx="100" cy="50" r="25"/>     
+    </svg>
+  </foreignObject>
+
+
+
+
+
+
+
+
+
+
+ <path d="M0,40 Q10,80 20,40 T 40,40 M40,40 Q50,0 60,40 T 80,40" fill="none" stroke-width="2" stroke="blue" />
+ <path transform="translate(0,-50) scale(2,2)" d="M4,80 Q6,64 19,64 T 34,80" fill="none" stroke-width="2" stroke="#c00" />
+ <path transform="translate(0,-50) scale(2,2)" d="M4,80 Q6,94 19,94 T 34,80" fill="none" stroke-width="2" stroke="#c00" />
+ <circle fill="none" stroke="#0ff" stroke-width="1" cx="38" cy="108" r="30"/>     
+
+
+<path transform="translate(200,-100)" d=" M 23,150 C 23,185 75,185 76,150   M 23,150 C 25,113 75,113 76,150" fill="none" stroke="#09f" stroke-width="4" />
+<circle transform="translate(200,-100)" fill="none" stroke="#ff0" stroke-width="2" cx="50" cy="150" r="30"/>     
+
+<path transform="translate(200,-50)" d=" M 23,150 C 23,185 75,185 76,150   M 76,150 C 75,113 23,113 23,150" fill="none" stroke="#09f" stroke-width="4" />
+<circle transform="translate(200,-50)" fill="none" stroke="#ff0" stroke-width="2" cx="50" cy="150" r="30"/>     
+
+<!-- Netos em path de curvas -->
+<g transform="translate(600,0) scale(1,1)" stroke="#008" stroke-width="2" fill="none">
+<image href="Ig_x1.jpg" x="100" height="100" width="100" opacity="0.5">
+<animateMotion path="M23,150 C23,113 75,113 75,150 M75,150 C75,185 23,185 23,150" dur="3s" repeatCount="indefinite" />
+<animate attributeName="opacity" type="translate" values="0;1;1;0;" begin="0s" dur="3s" fill="freeze" repeatCount="indefinite" />
+<animate attributeName="href" type="translate" values="Ig_x1.jpg;Am_x1.jpg;" begin="0s" dur="6s" fill="freeze" repeatCount="indefinite" />
+</image>
+<!--
+M23,150 C23,113 75,113 76,150 M75,150 C75,185 23,185 23,150
+M23,150 C23,185 75,185 76,150 M75,150 C75,113 23,113 23,150
+-->
+</g>
+
+
+<!-- linhas que formam as curvas -->
+<g transform="translate(600,200) scale(2,2)" stroke="#07c" stroke-width="3" fill="none">
+<path d="M23,150 C23,113 75,113 75,150  M75,150 C75,185 23,185 23,150" />
+
+<line x1="23" y1="150" x2="23" y2="113" />
+<line x1="75" y1="113" x2="75" y2="150" />
+<line x1="75" y1="150" x2="75" y2="185" stroke="#080"/>
+<line x1="23" y1="185" x2="23" y2="150" stroke="#080"/>
+
+<circle cx="49" cy="149" r="26" stroke-width="1" stroke="#f90" />
+
+<circle cx="23" cy="150" r="4" stroke-width="1" stroke="#cf0" /><circle cx="23" cy="113" r="2" stroke-width="1" stroke="#000" fill="#000" />
+<circle cx="75" cy="113" r="4" stroke-width="1" stroke="#cf0" /><circle cx="75" cy="150" r="2" stroke-width="1" stroke="#000" fill="#000" />
+<circle cx="75" cy="150" r="4" stroke-width="1" stroke="#f00" /><circle cx="75" cy="185" r="2" stroke-width="1" stroke="#000" fill="#000" />
+<circle cx="23" cy="185" r="4" stroke-width="1" stroke="#f00" /><circle cx="23" cy="150" r="2" stroke-width="1" stroke="#000" fill="#000" />
+
+<!--
+<defs>
+    <linearGradient id="e" x1="40" y1="50" x2="100" y2="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#f00"/>
+      <stop offset="100%" stop-color="#0f0"/>
+    </linearGradient>
+</defs>
+<line x1="40" y1="50" x2="100" y2="50" stroke="url(#e)" stroke-width="5" />
+-->
+</g>
+
+
+
+
+
+
+
+
+
+<circle fill="hsl(5,100%,50%)" stroke="#000" stroke-width="4" cx="600" cy="200" r="80">
+<animate attributeName="fill" type="translate" values="hsl(0,80%,30%);hsl(60,80%,30%);hsl(120,80%,30%);hsl(180,80%,30%);hsl(240,80%,60%);hsl(300,80%,30%);hsl(355,80%,30%)"  begin="0s" dur="3s" fill="freeze" repeatCount="indefinite" />
+</circle>
+
+
+<!--
+rgb(200,0,0);rgb(100,200,0);rgb(200,0,0)
+#000;#00f;#000;#0f0;#000;#f00;#000;#0ff;#fff;#000
+hsl(70,50%,50%);hsl(250,100%,50%);hsl(70,50%,50%)
+hsl(0,80%,50%);hsl(60,80%,50%);hsl(120,80%,50%);hsl(180,80%,50%);hsl(240,80%,50%);hsl(300,80%,50%);hsl(355,80%,50%)
+-->
+
+
+
+
+
+
+
+
+
+<!-- Elephants -->
+
+<g transform="translate(100,100) scale(-0.1,0.1)" 
+fill="#363" stroke-width="32" stroke="#040">
+<path d="M9580 6123 c-262 -25 -363 -50 -547 -136 -154 -72 -190 -85 -317
+-122 -213 -61 -460 -89 -781 -90 l-250 0 -255 52 c-337 69 -451 83 -678 83
+-334 0 -563 -54 -807 -188 -424 -235 -731 -704 -884 -1352 -54 -229 -65 -334
+-81 -795 -27 -751 -66 -1128 -150 -1440 -63 -235 -90 -400 -90 -560 l1 -70 45
+130 c142 404 142 405 254 1355 59 499 56 486 76 469 26 -21 44 -65 60 -146 9
+-43 29 -113 45 -156 38 -103 38 -154 -6 -502 -42 -334 -54 -401 -107 -610 -93
+-364 -193 -621 -425 -1087 -95 -190 -173 -351 -173 -357 0 -11 24 -19 160 -50
+128 -29 235 -42 384 -44 123 -2 137 0 163 19 31 24 32 33 18 184 -10 106 19
+206 167 574 130 325 175 423 188 410 11 -12 43 -123 101 -349 27 -104 64 -243
+84 -308 49 -166 60 -270 46 -458 -12 -166 -12 -169 41 -169 15 0 140 -13 278
+-30 283 -34 395 -37 463 -14 56 19 127 91 127 129 0 45 -38 103 -129 199 -93
+97 -111 125 -160 248 -123 310 -171 568 -171 918 0 210 19 316 76 431 36 72
+42 76 154 104 35 9 72 21 82 26 9 5 40 47 68 93 28 47 64 96 80 110 46 38 125
+50 243 37 54 -6 149 -11 211 -11 160 0 160 0 866 241 253 87 278 92 437 93 79
+1 143 0 143 -2 0 -1 -7 -48 -15 -105 -51 -334 -56 -518 -21 -757 41 -275 42
+-315 12 -475 -14 -77 -39 -230 -56 -340 -78 -516 -111 -636 -222 -808 -39 -61
+-71 -117 -72 -126 -1 -23 103 -55 244 -76 227 -32 720 -12 720 31 0 37 -47
+127 -101 194 -154 190 -149 182 -149 227 0 57 19 109 107 298 46 98 109 261
+163 420 104 307 148 425 160 425 13 0 109 -122 162 -205 25 -38 76 -126 113
+-194 37 -68 100 -178 141 -245 143 -233 215 -468 244 -801 7 -72 15 -133 18
+-136 4 -4 106 -14 228 -23 345 -26 418 -6 622 172 34 30 62 60 62 66 0 18
+-242 268 -325 336 -40 32 -80 74 -88 93 -10 21 -20 85 -27 165 -18 239 -56
+349 -290 822 -158 321 -190 399 -250 620 -17 63 -52 179 -76 257 -75 241 -84
+284 -84 430 0 252 29 357 110 401 48 25 84 26 476 6 100 -5 140 -2 238 16 64
+12 124 29 132 37 11 12 13 31 7 96 -13 149 -13 152 27 155 48 5 89 -9 270 -88
+85 -37 207 -83 270 -103 140 -44 198 -81 261 -166 194 -264 265 -459 549
+-1506 156 -573 204 -785 257 -1135 22 -143 27 -213 28 -385 1 -184 3 -210 17
+-213 9 -2 54 8 100 22 46 14 94 26 106 26 12 0 22 1 22 3 0 1 -6 34 -14 72 -8
+39 -20 187 -26 330 -38 908 -95 1393 -271 2328 -33 175 -57 321 -55 326 7 11
+26 16 199 51 76 16 154 37 175 48 35 18 81 77 69 88 -3 3 -54 12 -114 20 -297
+41 -358 59 -399 121 -12 18 -49 106 -82 195 -264 711 -398 990 -623 1291 -201
+271 -379 404 -670 501 -90 31 -132 38 -280 51 -208 18 -228 23 -344 85 -173
+92 -424 184 -548 200 -72 9 -91 10 -157 3z"/>
+<path d="M2675 3574 c-11 -2 -45 -9 -75 -15 -30 -6 -102 -33 -160 -59 -240
+-109 -573 -144 -835 -87 -187 40 -251 48 -385 48 -262 -1 -424 -61 -592 -220
+-123 -116 -211 -263 -281 -471 -59 -171 -76 -282 -87 -542 -19 -473 -38 -667
+-80 -835 -38 -156 -50 -225 -49 -292 l0 -56 29 80 c60 163 67 198 115 605 19
+162 37 315 41 340 l6 45 19 -24 c10 -13 19 -31 19 -40 0 -10 11 -55 25 -101
+l25 -83 -25 -197 c-46 -369 -122 -615 -305 -980 -45 -89 -80 -163 -78 -165 13
+-10 158 -37 239 -45 97 -9 145 -3 160 21 3 6 2 32 -4 59 -13 67 6 138 95 362
+91 231 90 230 117 144 12 -37 21 -74 21 -80 0 -7 18 -77 41 -157 39 -136 41
+-151 40 -271 -1 -125 -1 -128 21 -132 50 -10 288 -36 332 -36 62 0 111 22 130
+58 19 37 7 61 -67 141 -42 46 -59 75 -88 157 -64 173 -74 235 -74 454 0 184 1
+198 24 248 22 49 27 53 78 68 46 13 60 23 86 61 67 96 45 88 229 88 l163 0
+260 89 c226 78 271 90 344 94 l83 5 -5 -39 c-25 -177 -30 -308 -18 -402 27
+-198 25 -228 -23 -512 -49 -293 -61 -335 -117 -431 -22 -36 -39 -68 -39 -71 0
+-20 172 -48 295 -48 93 0 211 13 223 24 12 12 -12 59 -68 131 -76 99 -77 111
+-6 269 29 67 79 199 111 294 31 94 61 172 65 172 14 0 91 -114 150 -220 156
+-282 181 -349 202 -540 l13 -115 70 -6 c39 -4 106 -7 151 -8 71 -1 88 3 140
+29 32 16 77 47 98 69 l39 40 -56 63 c-31 35 -77 80 -102 101 -65 55 -74 72
+-84 174 -13 119 -41 200 -155 440 -84 177 -104 228 -161 429 -69 241 -74 276
+-55 409 13 85 34 111 98 121 26 4 88 1 139 -5 72 -10 111 -10 170 -1 114 17
+113 17 106 102 l-6 71 32 -6 c18 -4 79 -27 134 -51 56 -24 126 -51 155 -60 75
+-22 108 -49 163 -133 82 -126 126 -256 264 -773 119 -446 174 -757 160 -902
+-7 -78 -6 -79 82 -53 l51 15 -8 38 c-5 20 -13 141 -19 267 -22 451 -55 721
+-158 1283 -13 76 -14 95 -4 102 7 4 47 13 88 20 109 19 181 73 111 84 -169 25
+-213 37 -234 58 -12 13 -54 111 -94 218 -155 418 -307 675 -471 796 -28 20
+-91 54 -140 75 -74 32 -107 40 -206 50 -104 11 -126 17 -188 49 -142 74 -231
+102 -335 106 -52 2 -104 1 -115 -2z"/>
+<animateTransform attributeName="transform" type="translate" additive="sum" values="0,0;-4000,500;0,0;-8000,2500;0,0" begin="0s" dur="16s" repeatCount="indefinite"/>
+<animateTransform attributeName="transform" type="scale" additive="sum" values="0,0;0.3,0.3;0,0;0.3,0.3;0,0" begin="0s" dur="24s" repeatCount="indefinite"/>
+<animateTransform attributeName="transform" type="rotate" additive="sum" values="0;360;0;-360;0" begin="0s" dur="24s" repeatCount="indefinite"/>
+<animate attributeName="fill" type="translate" values="rgb(0,100,0);rgb(150,150,0);rgb(0,100,150);rgb(0,100,0)"  begin="0s" dur="6s" fill="freeze" repeatCount="indefinite" />
+</g>
+<!--
+-->
+
+
+
+
+</svg>
+
+
+<!--
+<svg width="640" height="480" xmlns="http://www.w3.org/2000/svg">
+  <foreignObject id="G" width="300" height="200">
+    <svg>
+     <rect fill="black" stroke-width="2" height="112" width="84" y="55" x="55" stroke="#000000"/>
+     <circle fill="#FF0000" stroke="#000000" stroke-width="5"  cx="155" cy="65" id="svg_7" r="50"/>     
+    </svg>
+  </foreignObject>
+</svg>
+-->
+
+
+
+
+<!--
+d="M136.5,141 136.5,139.5 136.5,139.5 139.5,139.5 139.5,142 139.5,135.5  144,135.5 139.5,135.5 139.5,136.4 138,136.4 139.5,136.4      139.5,142 139.5,139.5 136.5,139.5 136.5,141 "
+M20,50 C20,-50 180,150 180,50 C180-50 20,150 20,50 z
+-->

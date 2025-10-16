@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+<meta charset="utf-8" /> 
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+<meta name="viewport" content="width=maximum-scale, initial-scale=1.0">
+-->
+<link rel='shortcut icon' type='image/x-icon' href='http://jrlazz.eu5.org/html/svg.ico' />
+
+<title>svg.html</title>
+
+<style>
+
+@font-face {font-family:Schoolbell;src:url('Schoolbell.ttf');}
+@font-face {font-family:lesser;src:url('lesser concern.ttf');}
+@font-face {font-family:shadow;src:url('lesser concern shadow.ttf');}
+
+body { margin:0px; background-color:#899;}
+svg { position:absolute; left:0px; top:0px;}
+path { fill:transparent;}
+polyline {fill:transparent; stroke:#060; stroke-width:0.01;}
+ellipse { fill:transparent; transform:translate(200px,200px); stroke-dasharray:10; stroke-dashoffset:500; animation:dash 10s linear forwards infinite;}
+@keyframes dash { to { stroke-dashoffset: 0;}}
+
+</style>
+
+</head>
+
+<body>
+
+<svg width="400" height="400" viewBox="-10,-10,420,420">
+
+<polyline id="poly1" />
+<polyline id="poly2" />
+<script>
+var str="";
+var po1=document.getElementById("poly1");
+var po2=document.getElementById("poly2");
+po1.setAttribute("transform","scale(20,20) rotate(90) translate(0,-20)");
+po2.setAttribute("transform","scale(20,20) rotate( 0) translate(0,  0)");
+for(w=0;w<21;w++){str=str + w + ",0 " + w + ",20 " + w + ",0 ";}
+//alert(str);
+po1.setAttribute("points",str);
+po2.setAttribute("points",str);
+</script>
+
+<path transform="translate(200,200)" d="M 0,0 L0,-50 " fill="none" stroke="#c60" stroke-width="2" />
+
+<circle cx="0" cy="0" r="5" stroke="#f00" fill="#ff0" stroke-width="2" />
+<circle transform="translate(200,200)" cx="0" cy="0" r="5" stroke="#f00" stroke-width="8" />
+
+<ellipse cx="0" cy="0" rx="50" ry="50" stroke="#fff" stroke-width="4" />
+<ellipse cx="0" cy="0" rx="20" ry="20" stroke="#0ff" stroke-width="4" />
+
+<path transform="translate(100,100)" d=" M 40,0 A 40,40 0,1,1,40,-0.1"  stroke="#fff" stroke-width="4"/>
+<path transform="translate(100,100)" d=" M 60,0 A 60,60 0,1,1,60,-0.1"  stroke="#ddd" stroke-width="4"/>
+<path transform="translate(100,100)" d=" M 80,0 A 80,80 0,1,1,80,-0.1"  stroke="#bbb" stroke-width="4"/>
+
+<path transform="scale(1,1) rotate(5) translate(0,0)" d=" M 50,0 A 50,50,0,0,1,0,50"  stroke="#009" stroke-width="4"/>
+
+<text transform="translate(200,200) scale(2,2) rotate(-45)" x="0" y="5" fill="#fc6" font-family="sans-serif" font-size="20px" font-weight="bold" text-anchor="middle">I love SVG!</text>
+
+
+<text onclick="cli();" style="cursor:pointer;" transform="translate(200,200) rotate(-15) scale(1.5,1.5)" x="0" y="-40" stroke="#9c9" font-size="40px" font-family="shadow" font-weight="bold" text-anchor="middle">Jos&eacute;,
+  <tspan x="0" y="0">Roberto,</tspan>
+  <tspan x="0" y="40">Lazzareschi!</tspan>
+</text>
+
+
+</svg>
+
+<script>
+
+function cli(){alert("click or mouseover");}
+
+</script>
+
+</body>
+</html>

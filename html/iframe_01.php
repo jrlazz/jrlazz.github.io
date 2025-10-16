@@ -1,0 +1,23 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+<meta charset="utf-8" /> 
+
+<title>iframe_01</title>
+
+<script src="../js/console.min.js"></script>
+
+</head>
+
+<body>
+
+<?php
+echo file_get_contents("teste.txt");
+?> 
+
+</body>
+</html>
