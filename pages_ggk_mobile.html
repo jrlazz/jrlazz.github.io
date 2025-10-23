@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>pages_ggk.html</title>
+<meta charset="utf-8" />
+<link rel="icon" type="image/png" href="img/github-mark.png">
+<style>
+body {margin:16px;background-color:#bececa;font-family:Monospace;font-size:14pt;color:#009;}
+p{font-size:20.5pt;color:#c09;}
+</style>
+
+</head>
+
+<body>
+<center><p>INDEX OF GGK</p></center>
+<img id="fix" src="img_html/makegear.jpg" style="position:absolute;left:-100px;top:0px;height:70px;width:70px;"></img>
+<span id="tex" style="position:absolute;left:0px;top:0px;"></span>
+
+<img id="ima" src="img_html/nada.png" style="position:absolute;left:-100px;top:0px;"></img>
+<span id="demo"></p>
+
+<script>
+
+var s=[];
+var ss="";
+var myArray;
+var newstr="";
+var origstr;
+var t="";
+
+//text3d.html,
+
+s[1]="4_audios.html,96.html,audio_voice_c.html,bezcurto.html,clock2.html,drone.html,evelyn_1.php,fatlines_1.html,fatlines_1c.html,";
+s[2]="fire.html,gears.html,ggk.html,ggk_car.php,ggk_car_before.php,ggk_car_res_res.php,hd.html,heli_iframe_res_res.php,";
+s[3]="heli_res_res.php,horwood.html,i_r_3.html,ia.php,joboxB_res.html,joboxC_res.html,limpeza_de_computador.html,";
+s[4]="maissom.php,maissom_back.php,nananana.html,nanananaGress.html,nightballSteve.html,onemp3.html,pipeline.html,";
+s[5]="quacurto.html,rectgrid.html,skate90.html,sha.html,sobresom.html,steve_1.html,steve_2.html,steve_grass.html,steve_grass_2.html,svgC_index_1.html,text3d_res_res.html,";
+s[6]="touch04.html,tubes.html,twosounds.html,vertex_1.html,visu5.php,woody.html,wrap.php,";
+
+for(z=0;z<50;z++){if(s[z]){ss=ss+s[z];}}
+
+myArray=ss.split(",");
+
+for(z=0;z<500;z++){
+	if(myArray[z]){
+		origstr=myArray[z];
+		if(origstr.slice(-5)==".html"){
+			t=t+"<img src='img/ag_baboy_right.png' width=10><a onmouseover='javascript:mika("+z+");' href='https://jrlazz.github.io/ggk/" + myArray[z]+"' target='_blank'>"+ myArray[z]+"</a><br>";
+		}
+	}
+}
+
+document.getElementById("demo").innerHTML = t;
+
+document.addEventListener('mousemove', function(event) {
+	let pageX = event.pageX;
+	let pageY = event.pageY;
+	document.getElementById("ima").style.left=pageX+"px";
+	document.getElementById("ima").style.left="400px";
+	document.getElementById("ima").style.top=pageY+"px";
+	document.getElementById("ima").style.top=window.pageYOffset+60+"px";
+	document.getElementById("tex").style.left="400px";
+	document.getElementById("tex").style.top=window.pageYOffset+300+"px";
+});
+
+function mika(z){
+	document.getElementById("ima").style.left="-100px";
+	document.getElementById("ima").style.height="240px";
+	document.getElementById("ima").src="img_html/nada.png";
+	document.getElementById("tex").innerText="";
+	document.getElementById("tex").style.left="400px";
+	origstr=myArray[z];
+	newstr="img_html/"+origstr.substring(0,origstr.length-5)+".jpg";
+	document.getElementById("ima").src=newstr;
+	document.getElementById("tex").innerText=myArray[z];//+" "+z;
+}
+
+</script>
+
+</body>
+</html>

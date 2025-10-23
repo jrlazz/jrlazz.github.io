@@ -16,6 +16,25 @@ span{background-color:#ded;font-family:Monospace;font-size:12pt;color:#006;}
 
 </head>
 
+<script>{
+    function isMobileDevice() {
+        const mobileKeywords = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+        return mobileKeywords.test(navigator.userAgent);
+    }
+
+    if (isMobileDevice()) {
+        console.log("Mobile device detected.");
+        // Perform mobile-specific actions
+	location.href = "index_mobile.html";
+    } else {
+        console.log("Desktop device detected.");
+	//location.href = "index_mobile.html";
+        // Perform desktop-specific actions
+    }
+}
+</script>
+
+
 <body>
 <center>
 <h1 style="color:#06c;">My GitHub Site</h1>
