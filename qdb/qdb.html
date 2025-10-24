@@ -1,0 +1,168 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+<meta charset="utf-8" /> 
+
+<title>qdb.html</title>
+
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+
+<!-- 127.0.0.1/github/qdb/qdb.html -->
+
+<style>
+
+@font-face {font-family:tipo;src:url('../fonte/Lato-Bold.ttf');}
+body { margin:0px; margin-top:0px; background-color:#fff;font-family:tipo; font-size:30pt; font-weight:bold; overflow:viisible;}
+span { font-family:tipo; font-size:14pt;}
+img { position:relative;}
+div { border-radius:50%; border:1px solid transparent; z-index:9; cursor:move; position:absolute; visibility:hidden; overflow:hidden; padding:5px; text-align:center;}
+div:active { border:1px solid #fc0;}
+a { text-decoration:none; color:#008;}
+a:hover { color:#f00;}
+.noselect { -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;}
+.tro { transform: rotate(0deg) translateX(0px);}
+
+</style>
+
+</head>
+
+<body class="noselect">
+
+<center>
+<p style="position:absolute;top:-10px;line-height:10px;width:99%;text-align:center;">
+QUARTO DA BAGUN&Ccedil;A
+<br><br><br>
+<span>CLIQUE NO OBJETO E ARRASTE-O PARA ONDE DESEJAR.<br><br>SE A IMAGEM "COLAR", D&Ecirc; UM DUPLO CLIQUE E COMECE TUDO DE NOVO COM O BOT&Atilde;O VERMELHO!</span>
+</p>
+</center>
+
+<script>
+var s=[];
+var ss="";
+var imarray=[];
+var gem=[];
+
+s[1]="quarto_01_vv_alm.png,quarto_01_vv_almofolha.png,quarto_01_vv_amarelo.png,quarto_01_vv_ampulhetag.png,quarto_01_vv_azulg.png,quarto_01_vv_boni.png,quarto_01_vv_bor.png,quarto_01_vv_canec.png,quarto_01_vv_canet.png,quarto_01_vv_celula.png,";
+s[2]="quarto_01_vv_cha.png,quarto_01_vv_cob.png,quarto_01_vv_coiso2g.png,quarto_01_vv_coisog.png,quarto_01_vv_cont.png,quarto_01_vv_copo.png,quarto_01_vv_dragao.png,quarto_01_vv_escor.png,quarto_01_vv_esp.png,quarto_01_vv_estatuag.png,";
+s[3]="quarto_01_vv_estoj.png,quarto_01_vv_frut.png,quarto_01_vv_lim.png,quarto_01_vv_liv.png,quarto_01_vv_lum.png,quarto_01_vv_luv1.png,quarto_01_vv_luv2.png,quarto_01_vv_maneki.png,quarto_01_vv_moed.png,quarto_01_vv_naninha.png,";
+s[4]="quarto_01_vv_porca.png,quarto_01_vv_rat.png,quarto_01_vv_relog.png,quarto_01_vv_rosag.png,";
+s[5]="quarto_01_vv_tacag.png,quarto_01_vv_tiara.png,quarto_01_vv_transf.png,quarto_01_vv_vermelhog.png,";
+
+for(z=0;z<50;z++){if(s[z]){ss=ss+s[z];}}
+imarray=ss.split(",");
+//alert(imarray[37]);
+
+for(let z=0;z<38;z++){
+	if(imarray[z]){
+		gem[z]=new Image();
+		gem[z].src="../img/quarto_01/"+imarray[z];
+		document.write("<div ondblclick='restart();' style='padding:"+parseInt(gem[z].width/12)+"px;border:0px solid black;' id='div"+(z+1)+"'><img ondblclick='restart();' lass='tro' id='imgimg"+z+"' title='"+(z+1)+"' src='../img/quarto_01/"+imarray[z+1]+"' style='width:"+parseInt(gem[z].width/3)+"px;'></img></div>");
+	}
+}
+var imgimgId="";
+var divId="";
+var divIdaux="";
+var i=0;
+var divQtd=0;
+var jsarray=[];
+
+for(let z=0;z<38;z++){
+	let dime=parseInt(gem[z].width/3);
+	if(dime<100){dime="0"+dime;}
+	jsarray[z]="500050001000500000050000005000"+dime+imarray[z];
+}
+
+var jsvimpro=new Array();
+var jsvimdeg=new Array();
+var jsvimcor=new Array();
+var jsvimleft=new Array();
+var jsvimtop=new Array();
+var jsvimw=new Array();
+var jsvimimg=new Array();
+var nId="";
+var pro=0;
+var quantas=38;
+
+// cria as function()'s referentes aos dragstart's
+
+for(let z=1;z<=38;z++){
+	document.getElementById("div"+z).onmousedown=function(event){divId="div"+z;comum(divId);}
+}
+		
+function comum(divId){
+	nId=divId.substr(3);
+	for(i=1;i<divQtd;i++){divIdaux="div"+i;document.getElementById(divIdaux).style.zIndex=9;}
+	document.getElementById(divId).style.zIndex=99;
+	let shiftX=event.clientX-document.getElementById(divId).getBoundingClientRect().left;let shiftY=event.clientY-document.getElementById(divId).getBoundingClientRect().top;
+	document.body.append(document.getElementById(divId));
+	moveAt(event.pageX,event.pageY);
+	function moveAt(pageX, pageY){
+		document.getElementById(divId).style.left=pageX-shiftX+'px';
+		document.getElementById(divId).style.top=pageY-shiftY+'px';
+		nIdpos(divId,nId,jsvimdeg[nId],jsvimpro[nId]);
+	}
+	function onMouseMove(event){moveAt(event.pageX, event.pageY);}
+	document.addEventListener('mousemove',onMouseMove);
+	document.getElementById(divId).onmouseup=function(){document.removeEventListener('mousemove',onMouseMove);document.getElementById(divId).onmouseup=null;};
+	document.getElementById(divId).onmouseup=function(){document.removeEventListener('mousemove',onMouseMove);document.getElementById(divId).onmouseup=null;};
+	document.getElementById(divId).onmouseup=function(){document.removeEventListener('mousemove',onMouseMove);document.getElementById(divId).onmouseup=null;};
+}
+
+// busca da quantidade de elementos div
+var x=document.getElementsByTagName("div");
+divQtd=x.length;
+
+for(i=0;i<(divQtd);i++){
+	jsvimpro[i+1]=jsarray[i].substr(0,4);
+	jsvimdeg[i+1]=jsarray[i].substr(4,4);
+	jsvimcor[i+1]=jsarray[i].substr(8,4);
+	jsvimleft[i+1]=jsarray[i].substr(12,7);
+	jsvimtop[i+1]=jsarray[i].substr(19,7);
+	jsvimw[i+1]=jsarray[i].substr(26,7);
+	jsvimimg[i+1]=jsarray[i].substr(33);
+}
+
+// posicionamentos
+
+for(i=1;i<=divQtd-1;i++){
+	divId="div"+i;
+	document.getElementById(divId).style.left=(100+400*Math.random())+"px";
+	document.getElementById(divId).style.top=(250+200*Math.random())+"px";
+	document.getElementById(divId).style.visibility="visible";
+}
+
+</script>
+
+<form id='form_id' method="POST" action="qdb.html" enctype="multipart/form-data" hidden>
+
+<script>
+for(let z=1;z<=38;z++){document.write("<input type='text' id='pos"+z+"' name='pos"+z+"' value='" +jsarray[z]+"'></input>");}
+</script>
+
+<input type="text" id="assunto" name="assunto" value=""></input>
+<input type="submit"></input>
+</form>
+
+<script>
+
+// alterando dados de formulário
+for(z=1;z<=quantas;z++){
+	document.getElementById("pos" + z).value=jsvimpro[z].toString() + jsvimdeg[z].toString() + jsvimcor[z] + (5000000+parseInt(document.getElementById("div" + z).style.left)).toString() + (5000000+parseInt(document.getElementById("div" + z).style.top)).toString() + jsvimw[z] + jsvimimg[z];
+}
+
+function nIdpos(divId,nId,deg,pro){
+	document.getElementById("pos" + nId).value=pro.toString() + deg.toString() + jsvimcor[nId] + (5000000+parseInt(document.getElementById(divId).style.left)).toString() + (5000000+parseInt(document.getElementById(divId).style.top)).toString() + jsvimw[nId] + jsvimimg[nId];
+}
+
+function restart(){
+	window.location.href='qdb.html';
+}
+
+</script>
+
+</body>
+</html>
