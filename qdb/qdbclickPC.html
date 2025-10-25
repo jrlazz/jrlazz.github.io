@@ -1,77 +1,31 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-<title>qdbclick.html</title>
+<title>qdbclickPC.html</title>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=.52" />
-<!-- <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes", target-densitydpi=device-dpi /> -->
 <link rel="shortcut icon" href="../img/github-mark.png" />
 
 <style>
 
 @font-face {font-family:tipo;src:url('../fonte/MysteryQuest-Regular.ttf');}
 body { margin-top:20px; background-color:#bcc;}
-span {font-size:36pt; font-family:monospace;color:#c00;}
-input {font-size:36pt; font-family:monospace; border:5px inset white;}
-td {padding:20px; text-align:center;border:5px outset white;font-weight:bold;}
-.tdsem{padding:10px; text-align:center;border:0px outset white;}
-.tdtipo{font-family:tipo;padding:10px;text-align:center;border:none;font-size:48pt;color:#909;}
+span {font-size:18pt; font-family:monospace;color:#c00;}
+input {font-size:18pt; font-family:monospace; border:5px inset white;}
+td {text-align:center;font-weight:bold;}
+.tdsem{text-align:center;border:0px outset white;}
+.tdtipo{font-family:tipo;text-align:center;border:none;font-size:20.5pt;color:#909;}
 .draggable {width:50px; height:50px; position:absolute; transform:rotate(0deg) translateX(0px);}
-
-.slidera {
-  -webkit-appearance: none;
-  width:100%; height:15px; background:#999; outline:none; opacity:0.7;
-  -webkit-transition: .2s; transition:opacity .2s;
-}
-.slidera::-webkit-slider-thumb { border-radius:100%;
-  -webkit-appearance:none; appearance:none;
-  width:80px; height:80px; background:#f00; cursor:pointer;
-}
-.slidera::-moz-range-thumb { border-radius:100%;
-  width:80px; height:80px; background:#f00; cursor: pointer;
-}
-
-.sliderb {
-  -webkit-appearance: none;
-  width:100%; height:15px; background:#999; outline:none; opacity:0.7;
-  -webkit-transition: .2s; transition: opacity .2s;
-}
-.sliderb::-webkit-slider-thumb { border-radius:100%;
-  -webkit-appearance:none; appearance:none;
-  width:80px; height:80px; background:#0c0; cursor:pointer;
-}
-.sliderb::-moz-range-thumb { border-radius:100%;
-  width:80px; height:80px; background:#0c0; cursor:pointer;
-}
 
 </style>
 
 </head>
 
-<script>{
-    function isMobileDevice() {
-        const mobileKeywords = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
-        return mobileKeywords.test(navigator.userAgent);
-    }
-
-    if (isMobileDevice()) {
-        console.log("Mobile device detected.");
-        // Perform mobile-specific actions
-    } else {
-        console.log("Desktop device detected.");
-	//location.href = "index_mobile.html";
-        // Perform desktop-specific actions
-	location.href = "qdbclickPC.html";
-    }
-}
-</script>
-
 <body>
 
-<!-- 127.0.0.1/github/qdb/qdbclick.html -->
+<!-- 127.0.0.1/github/qdb/qdbclickPC.html -->
 
 <script>
 var s=[];
@@ -92,15 +46,15 @@ imarray=ss.split(",");
 
 for(let z=0;z<37;z++){
 	if(imarray[z]){
-		mw=Math.random()*500;
-		mh=Math.random()*500;
+		mw=200+Math.random()*300;
+		mh=10+Math.random()*300;
 		gem[z]=new Image();
 		gem[z].src="../img/quarto_01/"+imarray[z];
-		document.write("<img ondblclick='restart();' class='draggable' id='imgimg"+z+"' title='"+z+"' src='../img/quarto_01/"+imarray[z+1]+"' style='height:200px;left:"+mw+"px;top:"+mh+"px;width:200px;'></img>");
+		document.write("<img ondblclick='restart();' class='draggable' id='imgimg"+z+"' title='"+z+"' src='../img/quarto_01/"+imarray[z+1]+"' style='width:70px;height:70px;left:"+mw+"px;top:"+mh+"px;'></img>");
 	}
 }
 
-function restart(){window.location.href='qdbclick.html';}
+function restart(){window.location.href='qdbclickPC.html';}
 
 </script>
 
@@ -109,21 +63,24 @@ function restart(){window.location.href='qdbclick.html';}
 <img src="Ig_x1.jpg"></img>
 <img src="papi_320.jpg"></img>
 -->
+<br><br><br><br><br><br><br><br><br><br><br><br><br>
 
-<table style="position:absolute;left:5%;top:800px;width:90%;z-index:0;">
-<tr><td class="tdsem"></td></tr>
-<tr><td class="tdsem"></td></tr>
-<tr><td><input id="inpa" class="slidera" onchange="vola();" type="range" min="-180" max="180" value=0 step=1 style="width:90%;"></td></tr>
-<tr><td class="tdsem"></td></tr>
-<tr><td class="tdsem"></td></tr>
-<tr><td><input id="inpb" class="sliderb" onchange="volb();" type="range" min="-200" max="200" value="0" step=0.01 style="width:90%;"></td></tr>
-<tr><td class="tdsem"></td></tr>
+<table style="position:absolute;left:60%;top:5%;z-index:0;">
 <tr><td class="tdtipo">Quarto da Bagun&ccedil;a</td></tr>
 <tr><td class="tdsem"></td></tr>
-<tr><td><span onclick="restart();">RESTART</span></td></tr>
+<tr><td class="tdsem"></td></tr>
+<tr><td class="tdsem"></td></tr>
+<tr><td><input id="inpa" class="slidera" onchange="vola();" type="range" min="-180" max="180" value=0 step=1 style="width:200px;"></td></tr>
+<tr><td class="tdsem"></td></tr>
+<tr><td class="tdsem"></td></tr>
+<tr><td><input id="inpb" class="sliderb" onchange="volb();" type="range" min="-70" max="70" value="0" step=1 style="width:200px;"></td></tr>
 <tr><td class="tdsem"></td></tr>
 
+<tr><td class="tdsem"></td></tr>
+<tr><td><span onclick="restart();" style="cursor:pointer;">RESTART</span></td></tr>
+<tr><td class="tdsem"></td></tr>
 </table>
+
 
 <script>
 
@@ -254,19 +211,13 @@ for (i = 0; i < nodeList.length; i++) {
   });
 }
 
-
-
-
-
 function vola(){
 	deg=document.getElementById("inpa").value;
 	document.getElementById(ax).style.transform="rotate(" + deg + "deg)";
 }
 
 function volb(){
-	largini=parseInt(document.getElementById(ax).style.width);
-	altini=parseInt(document.getElementById(ax).style.height);
-	largini=200;altini=200;
+	largini=70;altini=70;
 	document.getElementById(ax).style.width=largini+Number(document.getElementById("inpb").value) + "px";
 	document.getElementById(ax).style.height=altini+Number(document.getElementById("inpb").value) + "px";
 }
@@ -293,4 +244,3 @@ function adjustmove(){
 </script>
 </body>
 </html>
-
