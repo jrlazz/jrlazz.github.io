@@ -1,0 +1,246 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>qdbclickPC.html</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+<meta charset="UTF-8">
+<link rel="shortcut icon" href="../img/github-mark.png" />
+
+<style>
+
+@font-face {font-family:tipo;src:url('../fonte/MysteryQuest-Regular.ttf');}
+body { margin-top:20px; background-color:#bcc;}
+span {font-size:18pt; font-family:monospace;color:#c00;}
+input {font-size:18pt; font-family:monospace; border:5px inset white;}
+td {text-align:center;font-weight:bold;}
+.tdsem{text-align:center;border:0px outset white;}
+.tdtipo{font-family:tipo;text-align:center;border:none;font-size:20.5pt;color:#909;}
+.draggable {width:50px; height:50px; position:absolute; transform:rotate(0deg) translateX(0px);}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- 127.0.0.1/github/qdb/qdbclickPC.html -->
+
+<script>
+var s=[];
+var ss="";
+var imarray=[];
+var gem=[];
+var mw=0;
+var mh=0;
+
+s[1]="quarto_01_vv_alm.png,quarto_01_vv_almofolha.png,quarto_01_vv_amarelo.png,quarto_01_vv_ampulhetag.png,quarto_01_vv_azulg.png,quarto_01_vv_boni.png,quarto_01_vv_bor.png,quarto_01_vv_canec.png,quarto_01_vv_canet.png,quarto_01_vv_celula.png,";
+s[2]="quarto_01_vv_cha.png,quarto_01_vv_cob.png,quarto_01_vv_coiso2g.png,quarto_01_vv_coisog.png,quarto_01_vv_cont.png,quarto_01_vv_copo.png,quarto_01_vv_dragao.png,quarto_01_vv_escor.png,quarto_01_vv_esp.png,quarto_01_vv_estatuag.png,";
+s[3]="quarto_01_vv_estoj.png,quarto_01_vv_frut.png,quarto_01_vv_lim.png,quarto_01_vv_liv.png,quarto_01_vv_lum.png,quarto_01_vv_luv1.png,quarto_01_vv_luv2.png,quarto_01_vv_maneki.png,quarto_01_vv_moed.png,quarto_01_vv_naninha.png,";
+s[4]="quarto_01_vv_porca.png,quarto_01_vv_rat.png,quarto_01_vv_relog.png,quarto_01_vv_rosag.png,";
+s[5]="quarto_01_vv_tacag.png,quarto_01_vv_tiara.png,quarto_01_vv_transf.png,quarto_01_vv_vermelhog.png,";
+
+for(z=0;z<50;z++){if(s[z]){ss=ss+s[z];}}
+imarray=ss.split(",");
+
+for(let z=0;z<37;z++){
+	if(imarray[z]){
+		mw=200+Math.random()*300;
+		mh=10+Math.random()*300;
+		gem[z]=new Image();
+		gem[z].src="../img/quarto_01/"+imarray[z];
+		document.write("<img ondblclick='restart();' class='draggable' id='imgimg"+z+"' title='"+z+"' src='../img/quarto_01/"+imarray[z+1]+"' style='width:70px;height:70px;left:"+mw+"px;top:"+mh+"px;'></img>");
+	}
+}
+
+function restart(){window.location.href='qdbclickPC.html';}
+
+</script>
+
+<!--
+<img src="Am_x1.jpg"></img>
+<img src="Ig_x1.jpg"></img>
+<img src="papi_320.jpg"></img>
+-->
+<br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+<table style="position:absolute;left:60%;top:5%;z-index:0;">
+<tr><td class="tdtipo">Quarto da Bagun&ccedil;a</td></tr>
+<tr><td class="tdsem"></td></tr>
+<tr><td class="tdsem"></td></tr>
+<tr><td class="tdsem"></td></tr>
+<tr><td><input id="inpa" class="slidera" onchange="vola();" type="range" min="-180" max="180" value=0 step=1 style="width:200px;"></td></tr>
+<tr><td class="tdsem"></td></tr>
+<tr><td class="tdsem"></td></tr>
+<tr><td><input id="inpb" class="sliderb" onchange="volb();" type="range" min="-70" max="70" value="0" step=1 style="width:200px;"></td></tr>
+<tr><td class="tdsem"></td></tr>
+
+<tr><td class="tdsem"></td></tr>
+<tr><td><span onclick="restart();" style="cursor:pointer;">RESTART</span></td></tr>
+<tr><td class="tdsem"></td></tr>
+</table>
+
+
+<script>
+
+var i=0;
+var ax="imgimg2";
+var ay="";
+var str;
+var strdeg;
+var deg=0;
+var largini=20;
+var altini=20;
+
+document.getElementById("inpa").value=0
+document.getElementById("inpb").value=1;
+var largini=0;//=parseInt(document.getElementById(ax).style.width);
+var altini=0;//parseInt(document.getElementById(ax).style.height);
+
+var nodeList=document.getElementsByClassName('draggable');
+
+// For Touch
+/*
+for(i=0;i<nodeList.length;i++){
+	var obj = nodeList[i];
+	obj.addEventListener('mousemove',function(event){
+		var touch = event.targetTouches[0];
+		event.target.style.left=touch.pageX-parseInt(event.target.style.width)/2 + 'px';
+		event.target.style.top= touch.pageY-parseInt(event.target.style.height)/2 + 'px';
+		ax=event.target.id;
+		adjustmove();
+		event.preventDefault();
+    	}, false);
+
+	obj.addEventListener('click',function(event){
+		var touch = event.targetTouches[0];
+		ax=event.target.id;
+		adjust();
+		event.preventDefault();
+	}, false);
+// fim do for
+}
+
+*/
+
+// For Click
+/*
+for (i = 0; i < nodeList.length; i++) {
+  let obj = nodeList[i];
+  let dragging = false;
+
+  obj.addEventListener('mousedown', function (event) {
+    dragging = true;
+    ax = event.target.id;
+    adjust();
+    event.preventDefault();
+  });
+
+  window.addEventListener('mousemove', function (event) {
+    if (!dragging) return;
+    const target = document.getElementById(ax);
+    target.style.left = event.pageX - parseInt(target.style.width) / 2 + 'px';
+    target.style.top = event.pageY - parseInt(target.style.height) / 2 + 'px';
+    adjustmove();
+  });
+
+  window.addEventListener('mouseup', function () {
+    dragging = false;
+  });
+}
+*/
+
+// For Touch and Click
+for (i = 0; i < nodeList.length; i++) {
+  const obj = nodeList[i];
+  let offsetX = 0, offsetY = 0;
+  let dragging = false;
+
+  // ---- Mouse Events ----
+  obj.addEventListener('mousedown', function (event) {
+    dragging = true;
+    ax = event.target.id;
+    adjust();
+
+    const rect = event.target.getBoundingClientRect();
+    offsetX = event.clientX - rect.left;
+    offsetY = event.clientY - rect.top;
+
+    event.preventDefault();
+  });
+
+  window.addEventListener('mousemove', function (event) {
+    if (!dragging) return;
+    const target = document.getElementById(ax);
+    target.style.left = event.pageX - offsetX + 'px';
+    target.style.top = event.pageY - offsetY + 'px';
+    adjustmove();
+  });
+
+  window.addEventListener('mouseup', function () {
+    dragging = false;
+  });
+
+  // ---- Touch Events ----
+  obj.addEventListener('touchstart', function (event) {
+    const touch = event.targetTouches[0];
+    dragging = true;
+    ax = event.target.id;
+    adjust();
+
+    const rect = event.target.getBoundingClientRect();
+    offsetX = touch.clientX - rect.left;
+    offsetY = touch.clientY - rect.top;
+
+    event.preventDefault();
+  });
+
+  obj.addEventListener('touchmove', function (event) {
+    if (!dragging) return;
+    const touch = event.targetTouches[0];
+    const target = document.getElementById(ax);
+    target.style.left = touch.pageX - offsetX + 'px';
+    target.style.top = touch.pageY - offsetY + 'px';
+    adjustmove();
+    event.preventDefault();
+  });
+
+  obj.addEventListener('touchend', function () {
+    dragging = false;
+  });
+}
+
+function vola(){
+	deg=document.getElementById("inpa").value;
+	document.getElementById(ax).style.transform="rotate(" + deg + "deg)";
+}
+
+function volb(){
+	largini=70;altini=70;
+	document.getElementById(ax).style.width=largini+Number(document.getElementById("inpb").value) + "px";
+	document.getElementById(ax).style.height=altini+Number(document.getElementById("inpb").value) + "px";
+}
+
+function adjust(){
+	strdeg=event.target.style.transform;
+	strdeg=strdeg.replace("rotate(","");
+	strdeg=strdeg.replace("deg)","");
+	document.getElementById("inpa").value=strdeg;
+	document.getElementById("inpb").value=parseInt(event.target.style.width)/100;
+	adjustmove();
+}
+
+function adjustmove(){
+	for(i=0;i<nodeList.length;i++){
+		var opa = nodeList[i];
+		opa.style.zIndex="1";
+		opa.style.border="none";
+	}
+	document.getElementById(ax).style.border="2px solid #fff";	
+	event.target.style.zIndex="2";
+}
+
+</script>
+</body>
+</html>
