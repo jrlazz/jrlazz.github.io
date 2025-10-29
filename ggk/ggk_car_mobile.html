@@ -173,9 +173,6 @@ ddir.onmouseup=function AB(){teclaH=0;}
 	renderer.setSize(window.innerWidth,window.innerHeight);
 	document.body.appendChild( renderer.domElement );
 
-	//renderer.shadowMap.enabled=true;
-	//renderer.shadowMap.type=THREE.PCFSoftShadowMap;
-
 	//renderer.outputEncoding=THREE.sRGBEncoding;
 	
 	renderer.setClearColor(0x003344);
@@ -204,19 +201,19 @@ var moaa="models/extras/ggk.mtl";
 var f1aa="models/extras/ggk.obj";
 var mocc="models/extras/f1cc.mtl";
 var f1cc="models/extras/f1cc.obj";
-new MTLLoader(manager).load(moaa,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1aa,function(object){object.children[k].castShadow=true;f1[0]=object;scene.add(object);},manager.onProgress,manager.onError);});
-new MTLLoader(manager).load(mocc,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1cc,function(object){object.children[k].castShadow=true;f1[3]=object;scene.add(object);},manager.onProgress,manager.onError);});
-new MTLLoader(manager).load(mocc,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1cc,function(object){object.children[k].castShadow=true;f1[4]=object;scene.add(object);},manager.onProgress,manager.onError);});
-new MTLLoader(manager).load(mocc,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1cc,function(object){object.children[k].castShadow=true;f1[5]=object;scene.add(object);},manager.onProgress,manager.onError);});
-new MTLLoader(manager).load(mocc,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1cc,function(object){object.children[k].castShadow=true;f1[6]=object;scene.add(object);},manager.onProgress,manager.onError);});
+new MTLLoader(manager).load(moaa,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1aa,function(object){f1[0]=object;scene.add(object);},manager.onProgress,manager.onError);});
+new MTLLoader(manager).load(mocc,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1cc,function(object){f1[3]=object;scene.add(object);},manager.onProgress,manager.onError);});
+new MTLLoader(manager).load(mocc,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1cc,function(object){f1[4]=object;scene.add(object);},manager.onProgress,manager.onError);});
+new MTLLoader(manager).load(mocc,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1cc,function(object){f1[5]=object;scene.add(object);},manager.onProgress,manager.onError);});
+new MTLLoader(manager).load(mocc,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1cc,function(object){f1[6]=object;scene.add(object);},manager.onProgress,manager.onError);});
 
 //... scene.add(object);});});
 
 var mo="models/steve/partes.mtl";
 var cox="models/steve/vivicox.obj";
-new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load('models/steve/steve_ca.obj',function(object){object.children[k].castShadow=true;CA=object;},manager.onProgress,manager.onError);});
-new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load('models/steve/steve_to.obj',function(object){object.children[k].castShadow=true;TR=object;},manager.onProgress,manager.onError);});
-new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(cox,function(object)                        {object.children[k].castShadow=true;BDs=object;},manager.onProgress,manager.onError);});
+new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load('models/steve/steve_ca.obj',function(object){CA=object;},manager.onProgress,manager.onError);});
+new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load('models/steve/steve_to.obj',function(object){TR=object;},manager.onProgress,manager.onError);});
+new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(cox,function(object)                        {BDs=object;},manager.onProgress,manager.onError);});
 
 var yemtl="models/extras/yellarrow.mtl";
 var yeobj="models/extras/yellarrow.obj";
@@ -225,7 +222,7 @@ new MTLLoader(manager).load(yemtl,function(mat){mat.preload();new OBJLoader(mana
 
 mo="models/artes/Town.mtl";
 var arteA="models/artes/Town.obj";
-new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(arteA,function(object){object.children[k].castShadow=true;arte[1]=object;arte[1].position.set(9.5,-0.75,23);scene.add(arte[1]);},manager.onProgress,manager.onError);});
+new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(arteA,function(object){arte[1]=object;arte[1].position.set(9.5,-0.75,23);scene.add(arte[1]);},manager.onProgress,manager.onError);});
 
 
 j++;
@@ -237,7 +234,6 @@ j++;
 	mat[j]=new THREE.MeshBasicMaterial({map:tex[j]});
 	var ACube=new THREE.Mesh(geo[j],mat[j]);
 	ACube.position.set(-4,5,-9);
-	ACube.castShadow=true;
 	scene.add(ACube);
 j++;
 	tex[j]=new THREE.TextureLoader(manager).load('models/futebol.jpg');
@@ -248,8 +244,6 @@ j++;
 	//geo[j].computeFaceNormals();
 	mat[j]=new THREE.MeshPhongMaterial({map:tex[j]});
 	const futebol=new THREE.Mesh(geo[j],mat[j]);
-	futebol.receiveShadow=true;
-	//futebol.castShadow=true;
 	futebol.position.set(-15,0.015,-9);
 	scene.add(futebol);
 
@@ -262,7 +256,6 @@ j++;
 	//geo[j].computeFaceNormals();
 	mat[j]=new THREE.MeshPhongMaterial({map:tex[j]});
 	var goldenrodB=new THREE.Mesh(geo[j],mat[j]);
-	goldenrodB.receiveShadow=true;
 	goldenrodB.position.set(-13,0.01,-9);
 	scene.add(goldenrodB);
 
@@ -274,7 +267,6 @@ j++;
 	geo[j]=new THREE.BoxGeometry(1.5,4,1.5);
 	mat[j]=new THREE.MeshBasicMaterial({map:tex[j]});
 	mesh[j]=new THREE.Mesh(geo[j],mat[j]);
-	mesh[j].castShadow=true;
 	mesh[j].position.set(10,2,-5);
 	scene.add(mesh[j]);
 
@@ -285,7 +277,6 @@ j++;
 	geo[j]=new THREE.BoxGeometry(1.5,6,1.5);
 	mat[j]=new THREE.MeshBasicMaterial({map:tex[j]});
 	mesh[j]=new THREE.Mesh(geo[j],mat[j]);
-	mesh[j].castShadow=true;
 	mesh[j].position.set(15,3,-5);
 	scene.add(mesh[j]);
 
@@ -307,7 +298,6 @@ j++;
 	geo[j]=new THREE.BoxGeometry(1.5,3,1.5);
 	mat[j]=new THREE.MeshBasicMaterial({map:tex[j]});
 	var DCube=new THREE.Mesh(geo[j],mat[j]);
-	DCube.castShadow=true;
 	DCube.position.set(5,1.5,0);
 	scene.add(DCube);
 
@@ -318,7 +308,6 @@ j++;
 	geo[j]=new THREE.BoxGeometry(1.5,3,1.5);
 	mat[j]=new THREE.MeshBasicMaterial({map:tex[j]});
 	var ECube=new THREE.Mesh(geo[j],mat[j]);
-	ECube.castShadow=true;
 	ECube.position.set(10,1.5,0);
 	scene.add(ECube);
 
@@ -329,7 +318,6 @@ j++;
 	geo[j]=new THREE.BoxGeometry(1.5,3,1.5);
 	mat[j]=new THREE.MeshBasicMaterial({map:tex[j]});
 	var FCube=new THREE.Mesh(geo[j],mat[j]);
-	FCube.castShadow=true;
 	FCube.position.set(15,1.5,0);
 	scene.add(FCube);
 
@@ -350,7 +338,6 @@ j++;
 	mat[j]=new THREE.MeshPhongMaterial({color:0x333333,side:THREE.DoubleSide});
 	var piso=new THREE.Mesh(geo[j],mat[j]);
 	piso.position.set(0,0,0);piso.rotation.set(0,0,0);piso.rotation.x=de2ra(90);
-	piso.receiveShadow=true;
 	scene.add(piso);
 	var grid=new THREE.GridHelper(100,50);//size,divisions
 	grid.material.color.setHex(0xffffff);
@@ -363,7 +350,6 @@ j++;
 	var AArua=new THREE.Mesh(ruaGeo,ruaMat);
 	AArua.position.set(-0.78,0.01,0);
 	AArua.rotation.set(de2ra(90),0,de2ra(90));
-	AArua.receiveShadow=true;
 	scene.add(AArua);
 
 	var ruaGeoB=new THREE.BoxGeometry(100,2,0.01);
@@ -371,13 +357,11 @@ j++;
 	var ABrua=new THREE.Mesh(ruaGeoB,ruaMatB);
 	ABrua.position.set(0.5,0.0075,0);
 	ABrua.rotation.set(de2ra(90),0,de2ra(90));
-	ABrua.receiveShadow=true;
 	scene.add(ABrua);
 
 	var ACrua=new THREE.Mesh(ruaGeo,ruaMat);
 	ACrua.position.set(0.78,0.01,0);
 	ACrua.rotation.set(de2ra(90),0,de2ra(90));
-	ACrua.receiveShadow=true;
 	scene.add(ACrua);
 
 	ruaGeo=new THREE.BoxGeometry(100,3,0.01);
@@ -385,7 +369,6 @@ j++;
 	var Brua=new THREE.Mesh(ruaGeo,ruaMat);
 	Brua.position.set(0,0.005,-25);
 	Brua.rotation.set(de2ra(90),0,de2ra(0));
-	Brua.receiveShadow=true;
 	scene.add(Brua);
 
 	ruaGeo=new THREE.BoxGeometry(100,2,0.01);
@@ -393,7 +376,6 @@ j++;
 	var Drua=new THREE.Mesh(ruaGeo,ruaMat);
 	Drua.position.set(0,0.005,3);
 	Drua.rotation.set(de2ra(90),0,de2ra(0));
-	Drua.receiveShadow=true;
 	scene.add(Drua);
 
 	ruaGeo=new THREE.BoxGeometry(100,2,0.01);
@@ -401,7 +383,6 @@ j++;
 	var Erua=new THREE.Mesh(ruaGeo,ruaMat);
 	Erua.position.set(0,0.005,9);
 	Erua.rotation.set(de2ra(90),0,de2ra(0));
-	Erua.receiveShadow=true;
 	scene.add(Erua);
 
 	ruaGeo=new THREE.BoxGeometry(100,2,0.01);
@@ -409,7 +390,6 @@ j++;
 	var Frua=new THREE.Mesh(ruaGeo,ruaMat);
 	Frua.position.set(0,0.005,15);
 	Frua.rotation.set(de2ra(90),0,de2ra(0));
-	Frua.receiveShadow=true;
 	scene.add(Frua);
 
 // Text
@@ -456,7 +436,6 @@ if(home==1){
 		object.scale.set(0.04,0.04,0.04);
 		object.position.set(-6,0,6);
 		object.rotation.set(-1.54,0,0);
-		object.children[k].castShadow=true;
 		jrl[1]=object;
 	scene.add(jrl[1]);
 	});
@@ -469,7 +448,6 @@ if(home==1){
 		object.scale.set(0.005,0.005,0.005);
 		object.position.set(-6,0,0);
 		object.rotation.set(-1.54,0,0);
-		object.children[k].castShadow=true;
 		jrl[2]=object;
 	scene.add(jrl[2]);
 	});
@@ -484,9 +462,6 @@ if(home==1){
 
 	var sun=new THREE.PointLight("#963",2);
 	sun.position.set(0,15,0);
-	sun.shadow.mapSize.width=1024;
-	sun.shadow.mapSize.height=1024;
-	sun.castShadow=true;
 	scene.add(sun);
 
 
