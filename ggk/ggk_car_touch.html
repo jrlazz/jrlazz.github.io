@@ -191,32 +191,29 @@ ddir.ontouchend=function DB(){teclaH=0;}
 
 	// MTL
 
-var moaa="models/extras/ggk.mtl";
-var f1aa="models/extras/ggk.obj";
-var mocc="models/extras/f1cc.mtl";
-var f1cc="models/extras/f1cc.obj";
-new MTLLoader(manager).load(moaa,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1aa,function(object){f1[0]=object;scene.add(object);},manager.onProgress,manager.onError);});
-new MTLLoader(manager).load(mocc,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1cc,function(object){f1[3]=object;scene.add(object);},manager.onProgress,manager.onError);});
-new MTLLoader(manager).load(mocc,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1cc,function(object){f1[4]=object;scene.add(object);},manager.onProgress,manager.onError);});
-new MTLLoader(manager).load(mocc,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1cc,function(object){f1[5]=object;scene.add(object);},manager.onProgress,manager.onError);});
-new MTLLoader(manager).load(mocc,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1cc,function(object){f1[6]=object;scene.add(object);},manager.onProgress,manager.onError);});
+	var moaa="models/extras/ggk.mtl";
+	var f1aa="models/extras/ggk.obj";
+	var mocc="models/extras/f1cc.mtl";
+	var f1cc="models/extras/f1cc.obj";
+	new MTLLoader(manager).load(moaa,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1aa,function(object){f1[0]=object;scene.add(object);},manager.onProgress,manager.onError);});
+	new MTLLoader(manager).load(mocc,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1cc,function(object){f1[3]=object;scene.add(object);},manager.onProgress,manager.onError);});
+	new MTLLoader(manager).load(mocc,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1cc,function(object){f1[4]=object;scene.add(object);},manager.onProgress,manager.onError);});
+	new MTLLoader(manager).load(mocc,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1cc,function(object){f1[5]=object;scene.add(object);},manager.onProgress,manager.onError);});
+	new MTLLoader(manager).load(mocc,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(f1cc,function(object){f1[6]=object;scene.add(object);},manager.onProgress,manager.onError);});
 
-//... scene.add(object);});});
+	var mo="models/steve/partes.mtl";
+	var cox="models/steve/vivicox.obj";
+	new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load('models/steve/steve_ca.obj',function(object){CA=object;},manager.onProgress,manager.onError);});
+	new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load('models/steve/steve_to.obj',function(object){TR=object;},manager.onProgress,manager.onError);});
+	new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(cox,function(object)                        {BDs=object;},manager.onProgress,manager.onError);});
 
-var mo="models/steve/partes.mtl";
-var cox="models/steve/vivicox.obj";
-new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load('models/steve/steve_ca.obj',function(object){CA=object;},manager.onProgress,manager.onError);});
-new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load('models/steve/steve_to.obj',function(object){TR=object;},manager.onProgress,manager.onError);});
-new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(cox,function(object)                        {BDs=object;},manager.onProgress,manager.onError);});
+	var yemtl="models/extras/yellarrow.mtl";
+	var yeobj="models/extras/yellarrow.obj";
+	new MTLLoader(manager).load(yemtl,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(yeobj,function(object){f1[7]=object;},manager.onProgress,manager.onError);});
 
-var yemtl="models/extras/yellarrow.mtl";
-var yeobj="models/extras/yellarrow.obj";
-new MTLLoader(manager).load(yemtl,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(yeobj,function(object){f1[7]=object;},manager.onProgress,manager.onError);});
-
-
-mo="models/artes/Town.mtl";
-var arteA="models/artes/Town.obj";
-new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(arteA,function(object){arte[1]=object;arte[1].position.set(9.5,-0.75,23);scene.add(arte[1]);},manager.onProgress,manager.onError);});
+	mo="models/artes/Town.mtl";
+	var arteA="models/artes/Town.obj";
+	new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(arteA,function(object){arte[1]=object;arte[1].position.set(9.5,-0.75,23);scene.add(arte[1]);},manager.onProgress,manager.onError);});
 
 
 j++;
@@ -390,7 +387,7 @@ j++;
 
 	let textMesh1, textMesh2, textGeo, materials;
 	let text="GGK-3404",bevelEnabled=true,font=undefined;
-	const height=20,size=170,hover=30,curveSegments=8,bevelThickness=3,bevelSize=2.5;
+	const height=10,size=100,hover=30,curveSegments=8,bevelThickness=3,bevelSize=2.5;
 	loader=new FontLoader();
 	loader.load('../js/roboto_italic.typeface.json',function(response){
 	font=response;
@@ -431,9 +428,8 @@ if(home==1){
 		object.position.set(-6,0,6);
 		object.rotation.set(-1.54,0,0);
 		jrl[1]=object;
-	scene.add(jrl[1]);
+		scene.add(jrl[1]);
 	});
-
 
 	loader=new TDSLoader();
 	loader.load('models/extras/conifera.3ds',function(object){
@@ -443,14 +439,11 @@ if(home==1){
 		object.position.set(-6,0,0);
 		object.rotation.set(-1.54,0,0);
 		jrl[2]=object;
-	scene.add(jrl[2]);
+		scene.add(jrl[2]);
 	});
-
 }
 
-
 // Light
-
 	ambient=new THREE.AmbientLight("#cff",0.5);
 	scene.add(ambient);
 
@@ -460,58 +453,51 @@ if(home==1){
 
 
 	// Edificio Evelyn, Rua Girassol, 594 Apto. 502, CEP: 05433-001
+/*
+	dfrente.addEventListener('touchstart',function(event){
+		event.preventDefault(); // Prevent default long-press behavior
+		// Add your custom touchstart logic here
+	});
+	dfrente.addEventListener('touchend',function(event){
+		// Add your custom touchend logic here
+	})
 
+	dtras.addEventListener('touchstart',function(event){
+		event.preventDefault(); // Prevent default long-press behavior
+		// Add your custom touchstart logic here
+	});
+	dtras.addEventListener('touchend',function(event){
+		// Add your custom touchend logic here
+	})
 
+	desq.addEventListener('touchstart',function(event){
+		event.preventDefault(); // Prevent default long-press behavior
+		// Add your custom touchstart logic here
+	});
+	desq.addEventListener('touchend',function(event){
+		// Add your custom touchend logic here
+	})
 
-
-function limpa(){
-	myTimeout = setTimeout(myGreeting, 500);
+	ddir.addEventListener('touchstart',function(event){
+		event.preventDefault(); // Prevent default long-press behavior
+		// Add your custom touchstart logic here
+	});
+	ddir.addEventListener('touchend',function(event){
+		// Add your custom touchend logic here
+	})
+*/
+const paragraphs=document.getElementsByTagName('img');
+for (let i = 0; i < paragraphs.length; i++) {
+// paragraphs[i].style.color = 'red'; // Change 'green' to your desired color
+// paragraphs[i].style.color = 'red';
+	paragraphs[i].addEventListener('touchstart',function(event){
+		event.preventDefault(); // Prevent default long-press behavior
+		// Add your custom touchstart logic here
+		});
+	paragraphs[i].addEventListener('touchend',function(event){
+		// Add your custom touchend logic here
+	})
 }
-
-function myGreeting() {
-	teclaA=0;teclaD=0;teclaW=0;teclaS=0;teclaG=0;teclaH=0;teclaC=0;teclaB=0;teclaV=0;setaE=0;setaD=0;setaC=0;setaB=0;teclaL=0;teclaP=0;
-  clearTimeout(myTimeout);
-}
-
-//function myStopFunction() {
-//  clearTimeout(myTimeout);
-//}
-
-
-    dfrente.addEventListener('touchstart', function(event) {
-        event.preventDefault(); // Prevent default long-press behavior
-        // Add your custom touchstart logic here
-    });
-    dfrente.addEventListener('touchend', function(event) {
-        // Add your custom touchend logic here
-    })
-
-
-    dtras.addEventListener('touchstart', function(event) {
-        event.preventDefault(); // Prevent default long-press behavior
-        // Add your custom touchstart logic here
-    });
-    dtras.addEventListener('touchend', function(event) {
-        // Add your custom touchend logic here
-    })
-
-    desq.addEventListener('touchstart', function(event) {
-        event.preventDefault(); // Prevent default long-press behavior
-        // Add your custom touchstart logic here
-    });
-
-    desq.addEventListener('touchend', function(event) {
-        // Add your custom touchend logic here
-    })
-
-    ddir.addEventListener('touchstart', function(event) {
-        event.preventDefault(); // Prevent default long-press behavior
-        // Add your custom touchstart logic here
-    });
-
-    ddir.addEventListener('touchend', function(event) {
-        // Add your custom touchend logic here
-    })
     
 function onResize() {
 	camera.aspect=window.innerWidth/window.innerHeight;
