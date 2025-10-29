@@ -49,13 +49,12 @@ import { TDSLoader } from '../js/TDSLoader_res_res.js';
 import { FontLoader } from '../js/FontLoader_res_res.js';
 import { TextGeometry } from '../js/TextGeometry_res_res.js'
 
-let renderer,scene,camera,material,geometry,objLoader;
-let ambient,ppotLight,qpotLight,spotLight;
+let renderer,scene,camera,material,geometry,objLoader,loader,manager;
+let ambient,sun,items;
 
 var altera=0;
 
 var mesh=null;
-var color=Math.random()*0xffffff;
 
 var k=0;
 var w=0;
@@ -71,10 +70,6 @@ var mesh=new Array();
 var tex=new Array();
 var rot=new Array();rot[1]=0;
 var jrl=new Array();
-
-
-var loader=new Array();
-var loaderCount=0;
 
 var v=1;
 var j=0;
@@ -125,8 +120,6 @@ var mika=0;
 var duration;
 var ur=window.location.href;
 var quando=200;
-var home=1;
-//if(ur.includes("127")){quando=100;home=1;}
 
 var normal;
 
@@ -150,13 +143,11 @@ desq.ontouchend=function CB(){teclaG=0;}
 ddir.ontouchstart=function DA(){teclaH=1;}
 ddir.ontouchend=function DB(){teclaH=0;}
 
-// ***************************************************************
+// ********
 	renderer=new THREE.WebGLRenderer({antialias:true});
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth,window.innerHeight);
 	document.body.appendChild( renderer.domElement );
-
-	//renderer.setClearColor(0x003344);
 
 	scene=new THREE.Scene();
 	scene.position.set(0,0,0);
@@ -170,9 +161,7 @@ ddir.ontouchend=function DB(){teclaH=0;}
 	camera=new THREE.PerspectiveCamera(70,window.innerWidth/window.innerHeight,1,1000);
 	camera.position.set(0,10,20);
 
-	window.addEventListener('resize',onResize,false);
-
-	const manager=new THREE.LoadingManager();
+	manager=new THREE.LoadingManager();
 	manager.onStart=function(url,itemsLoaded,itemsTotal){console.log('Started loading file:'+url+'.\nLoaded '+itemsLoaded+' of '+itemsTotal + ' files.' );};
 	manager.onLoad=function(){console.log('Loading complete!');};
 	manager.onProgress=function(url,itemsLoaded,itemsTotal){console.log('loading texture'+url+' '+(itemsLoaded/itemsTotal*100)+'%');};
@@ -408,7 +397,6 @@ function createText() {
 
 // 3DS
 
-//if(home==1){
 	loader=new TDSLoader();
 	loader.load('models/extras/palm.3ds',function(object){
 		//object.traverse(function(child){});
@@ -428,75 +416,34 @@ function createText() {
 		jrl[2]=object;
 		scene.add(jrl[2]);
 	});
-//}
 
 // Light
 	ambient=new THREE.AmbientLight("#cff",0.5);
 	scene.add(ambient);
 
-	var sun=new THREE.PointLight("#fc0",1);
+	sun=new THREE.PointLight("#fc0",1);
 	sun.position.set(0,65,0);
 	scene.add(sun);
 
-
 	// Edificio Evelyn, Rua Girassol, 594 Apto. 502, CEP: 05433-001
-/*
-	dfrente.addEventListener('touchstart',function(event){
-		event.preventDefault(); // Prevent default long-press behavior
-		// Add your custom touchstart logic here
-	});
-	dfrente.addEventListener('touchend',function(event){
-		// Add your custom touchend logic here
-	})
 
-	dtras.addEventListener('touchstart',function(event){
-		event.preventDefault(); // Prevent default long-press behavior
-		// Add your custom touchstart logic here
-	});
-	dtras.addEventListener('touchend',function(event){
-		// Add your custom touchend logic here
-	})
-
-	desq.addEventListener('touchstart',function(event){
-		event.preventDefault(); // Prevent default long-press behavior
-		// Add your custom touchstart logic here
-	});
-	desq.addEventListener('touchend',function(event){
-		// Add your custom touchend logic here
-	})
-
-	ddir.addEventListener('touchstart',function(event){
-		event.preventDefault(); // Prevent default long-press behavior
-		// Add your custom touchstart logic here
-	});
-	ddir.addEventListener('touchend',function(event){
-		// Add your custom touchend logic here
-	})
-*/
-const paragraphs=document.getElementsByTagName('img');
+items=document.getElementsByTagName('img');
 for (let i = 0; i < paragraphs.length; i++) {
-// paragraphs[i].style.color = 'red'; // Change 'green' to your desired color
-// paragraphs[i].style.color = 'red';
-	paragraphs[i].addEventListener('touchstart',function(event){
+	// items[i].style.color = 'red'; // Change color to your desired color
+	items[i].addEventListener('touchstart',function(event){
 		event.preventDefault(); // Prevent default long-press behavior
 		// Add your custom touchstart logic here
 		});
-	paragraphs[i].addEventListener('touchend',function(event){
+	items[i].addEventListener('touchend',function(event){
 		// Add your custom touchend logic here
 	})
 }
     
-function onResize() {
-	camera.aspect=window.innerWidth/window.innerHeight;
-	camera.updateProjectionMatrix();
-	renderer.setSize(window.innerWidth,window.innerHeight);
-}
-
 function animate() {
 	requestAnimationFrame(animate);
 
-	//controls.update();
-ww++;
+	ww++;
+
 	if(altera==0 && ww==quando){alterando();}
 
 	if(altera>0){
@@ -558,11 +505,8 @@ ww++;
 		f1[4].rotation.y=1.57;
 		f1[5].rotation.y=1.57;
 		f1[6].rotation.y=1.57;
-//alert("w="+w);
-//teclaW=1;
-//teclaH=1;
+
 		if(teclaW==1){
-//alert("teclaW");
 			f1[3].rotation.x +=0.07;
 			f1[4].rotation.x +=0.07;
 			f1[5].rotation.z +=0.07;
@@ -588,16 +532,10 @@ ww++;
 		//if(Math.abs(f1[0].position.x)>40 || Math.abs(f1[0].position.z)>40){maluca();}
 		//}
 	}
-
-//alert("w="+w);
-
 	renderer.render(scene,camera);
 }
 
 function alterando(){
-	document.getElementById("spancompleto").innerText="... wait twice ...";
-
-	//alert("... Espere a mensagem 'Pode clicar'...\n... ent\xE3o clique...\n... Boa Sorte no Evelyn!");
 	alert("... Please Click to Start ...");
 
 		f1[0].add(f1[3]);
@@ -627,7 +565,7 @@ function alterando(){
 		f1[7].scale.set(0.6,0.2,0.2);
 		f1[7].position.set(3,0.0,9);
 		f1[7].rotation.set(1.57,0,0);
-		//f1[7].rotation.set(1.57,0,3.14);
+
 		scene.add(f1[7]);
 
 		jar[1].position.set(0, f1LP,-8);
@@ -637,29 +575,26 @@ function alterando(){
 		arte[1].position.set(9.5,-0.75,23);
 		scene.add(arte[1]);
 
-
-
-
-// **************************** ainda alterando
+// ******** ainda alterando
 
 	CA.position.set( 0  ,2.1,0); // steve_ca
 	TR.position.set( 0  ,2  ,0); // steve_to
 
 	BDs.position.set(-1.75,   1,0); // vivicox
-BDi=BDs.clone();
-	BDi.position.set(-1.75,-0.5,0);
-BEs=BDs.clone();
-	BEs.position.set( 1.75,   1,0);
-BEi=BDs.clone();
-	BEi.position.set( 1.75,-0.5,0);
-PDs=BDs.clone();
-	PDs.position.set(0.025,   0,0);
-PDi=BDs.clone();
-	PDi.position.set(0.025,-1.5,0);
-PEs=BDs.clone();
-	PEs.position.set(0.56,    0,0);
-PEi=BDs.clone();
-	PEi.position.set(0.56, -1.5,0);
+	BDi=BDs.clone();
+		BDi.position.set(-1.75,-0.5,0);
+	BEs=BDs.clone();
+		BEs.position.set( 1.75,   1,0);
+	BEi=BDs.clone();
+		BEi.position.set( 1.75,-0.5,0);
+	PDs=BDs.clone();
+		PDs.position.set(0.025,   0,0);
+	PDi=BDs.clone();
+		PDi.position.set(0.025,-1.5,0);
+	PEs=BDs.clone();
+		PEs.position.set(0.56,    0,0);
+	PEi=BDs.clone();
+		PEi.position.set(0.56, -1.5,0);
 
 	BDs.scale.y=0.5;
 	BEs.scale.y=0.5;
@@ -708,7 +643,6 @@ PEi=BDs.clone();
 	pPDs=PDs.clone();pPDi=PDi.clone();
 	pPEs=PEs.clone();pPEi=PEi.clone();
 
-
 		pBDs.scale.y=1;
 		pBDi.scale.y=1;
 		pBDi.position.y=-2;
@@ -720,7 +654,6 @@ PEi=BDs.clone();
 		pBEi.position.y=-2;
 		pBEi.rotation.x=-0.5;
 		pBEi.rotation.z=-0.2;
-
 
 	pBDs.scale.y=1;
 	pBEs.scale.y=1;
@@ -765,19 +698,14 @@ PEi=BDs.clone();
 
 	f1[0].add(pgroup);
 
-if(home==1){
 	jrl[3]=jrl[1].clone();jrl[3].position.set(-10,0,6);scene.add(jrl[3]);
 	jrl[4]=jrl[2].clone();jrl[4].position.set(-10,0,0);scene.add(jrl[4]);
 	jrl[5]=jrl[1].clone();jrl[5].position.set(-14,0,6);scene.add(jrl[5]);
 	jrl[6]=jrl[2].clone();jrl[6].position.set(-14,0,0);scene.add(jrl[6]);
 	jrl[7]=jrl[1].clone();jrl[7].position.set(-18,0,6);scene.add(jrl[7]);
 	jrl[8]=jrl[2].clone();jrl[8].position.set(-18,0,0);scene.add(jrl[8]);
-}
-
-
 
 	altera++;
-
 }
 
 animate();
