@@ -18,16 +18,16 @@ body{margin:0;background-color:#012;color:#ff0;font-family:Verdana;font-size:13p
 
 <table style="position:absolute;left:200px;top:20px;">
 <tr>
-<td style="text-align:center;" colspan="2"><img src="../img/arr_front.png" width="50" id="frente"></img><td>
+<td style="text-align:center;" colspan="2"><img src="../img/arr_front.png" width="90" id="frente"></img><td>
 </tr>
 
 <tr><td>
-<img src="../img/arr_left.png" width="80" id="esq"></img>
-<img src="../img/arr_right.png" width="80" id="dir"></img>
+<img src="../img/arr_left.png" width="180" id="esq"></img>
+<img src="../img/arr_right.png" width="180" id="dir"></img>
 </td></tr>
 
 <tr>
-<td style="text-align:center;" colspan="2"><img src="../img/arr_back.png" width="50" id="tras"></img><td>
+<td style="text-align:center;" colspan="2"><img src="../img/arr_back.png" width="90" id="tras"></img><td>
 </tr>
 
 <tr>
@@ -151,11 +151,11 @@ var ddir=document.getElementById("dir");
 //var dcima=document.getElementById("cima");
 //var dbaixo=document.getElementById("baixo");
 
-dfrente.onmousedown=function AA(){teclaW=1;}
-dfrente.onmouseup=function AB(){teclaW=0;}
+dfrente.onmousedown=function AA(){teclaW=1;alert("front");}
+dfrente.onmouseup=function AB(){teclaW=0;alert("front");}
 
-dtras.onmousedown=function AA(){teclaV=1;}
-dtras.onmouseup=function AB(){teclaV=0;}
+dtras.onmousedown=function AA(){teclaV=1;alert("tras");}
+dtras.onmouseup=function AB(){teclaV=0;alert("tras");}
 
 desq.onmousedown=function AA(){teclaG=1;}
 desq.onmouseup=function AB(){teclaG=0;}
