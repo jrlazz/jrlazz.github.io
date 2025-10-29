@@ -34,9 +34,6 @@ body{margin:0;background-color:#012;color:#ff0;font-family:Verdana;font-size:13p
 -->
 </table>
 
-
-
-
 <img src="img/cockpit2.jpg" width="150" style="position:absolute;left:20px;top:500px;border:2px inset;border-color: #000 #ff0 #ff0 #000;"></img>
 
 <span id="spanid"  style="position:absolute;left:5px;top:12px;font-family:Lucida Console;color:#006;font-size:12pt;"></span>
@@ -614,9 +611,9 @@ ww++;
 		if(teclaH==1){f1[0].rotation.y -=.05;ang-=.05;angfrente=-0.8;if(teclaV==1){angfrente=0.8;}f1[5].rotation.y=1.57+angfrente;f1[6].rotation.y=1.57+angfrente;}//G
 		if(teclaG==1){f1[0].rotation.y +=.05;ang+=.05;angfrente= 0.8;if(teclaV==1){angfrente=-0.8;}f1[5].rotation.y=1.57+angfrente;f1[6].rotation.y=1.57+angfrente;}//H
 
-		if(home==1){
-//			if(Math.abs(f1[0].position.x)>40 || Math.abs(f1[0].position.z)>40){maluca();}
-		}
+		//if(home==1){
+		if(Math.abs(f1[0].position.x)>40 || Math.abs(f1[0].position.z)>40){maluca();}
+		//}
 	}
 
 //alert("w="+w);
@@ -823,87 +820,8 @@ animate();
 var keys=[];
 
 var ang=0;
-/*
-window.addEventListener("keydown",function(e){
-        keys[e.keyCode]=e.keyCode;
-	alert(e.keyCode);
-        var keysArray=getNumberArray(keys);
-	teclaA=0;teclaD=0;teclaW=0;teclaS=0;teclaG=0;teclaH=0;teclaC=0;teclaB=0;teclaV=0;setaE=0;setaD=0;setaC=0;setaB=0;teclaL=0;teclaP=0;
-	for(var i=0;i<keysArray.length;i++){
-	if(keysArray[i]==37 || keysArray[i]==76){teclaG=1;}//G Rot+
-	if(keysArray[i]==39 || keysArray[i]==82){teclaH=1;}//H Rot-
-	if(keysArray[i]==87){teclaW=1;}//W Frente
-	if(keysArray[i]==83){teclaV=1;}//V Pilot Tras
-	if(keysArray[i]==38){teclaW=1;}//W Frente
-	if(keysArray[i]==40){teclaV=1;}//V Pilot Tras
-	if(keysArray[i]==76){teclaL=1;}//L
-	if(keysArray[i]==80){teclaP=1;}//P
-	if(keysArray[i]==79){
-		if(querocontrols==0){
-			querocontrols=1;
-			const controls=new OrbitControls(camera,renderer.domElement);
-			controls.enablePan=true;
-			controls.enableDamping=true;// precisa de controls update em animate
-			controls.minDistance=1;
-			controls.maxDistance=200;
-		}
-	}//C
-	if(keysArray[i]==67){
-		window.location.replace(ur);
-		querocontrols=0;
-		OrbitControls.enabled=false;
-	}//B
-	}
-        //if(keysArray.toString()=="17,65"){document.getElementById("spanid").innerText +=" Select all!";}
-},false);
-
-*/
-
-/*
-window.addEventListener('keyup',function(e){
-        keys[e.keyCode]=false;
-	teclaA=0;teclaD=0;teclaW=0;teclaS=0;teclaG=0;teclaH=0;teclaC=0;teclaB=0;teclaV=0;setaE=0;setaD=0;setaC=0;setaB=0;teclaL=0;teclaP=0;
-	for(var i=0;i<getNumberArray(keys).length;i++){
-	if(getNumberArray(keys)[i]==37 || getNumberArray(keys)[i]==76){teclaG=1;}//G Rot+
-	if(getNumberArray(keys)[i]==39 || getNumberArray(keys)[i]==82){teclaH=1;}//H Rot-
-	if(getNumberArray(keys)[i]==87){teclaW=1;}//W Frente
-	if(getNumberArray(keys)[i]==83){teclaV=1;}//V Pilot Tras
-	if(getNumberArray(keys)[i]==38){teclaW=1;}//W Frente
-	if(getNumberArray(keys)[i]==40){teclaV=1;}//V Pilot Tras
-	if(getNumberArray(keys)[i]==76){teclaL=1;}//L
-	if(getNumberArray(keys)[i]==80){teclaP=1;}//P
-	if(getNumberArray(keys)[i]==79){
-		if(querocontrols==0){
-			querocontrols=1;
-			controls=new OrbitControls(camera,renderer.domElement);
-			controls.enablePan=true;
-			controls.enableDamping=true;// precisa de controls update em animate
-			controls.minDistance=1;
-			controls.maxDistance=200;
-		}
-	}//C
-	if(getNumberArray(keys)[i]==67){
-		//window.location.replace("http://jrlazz.eu5.org/anim/ggk_car.php");
-		window.location.replace(ur);
-		querocontrols=0;
-		OrbitControls.enabled=false;
-	}//B
-	}
-},false);
 
 
-*/
-
-
-function getNumberArray(arr){
-	var newArr = new Array();
-	for(var i=0;i<arr.length;i++){
-		if(typeof arr[i]=="number"){
-			newArr[newArr.length]=arr[i];
-		}
-	}
-	return newArr;
-}
 
 var sca=0;
 var scale=0;
