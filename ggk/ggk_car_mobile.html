@@ -143,6 +143,9 @@ var home=1;
 
 var normal;
 
+var myTimeout;// = setTimeout(myGreeting, 5000)
+
+
 
 var dfrente=document.getElementById("frente");
 var dtras=document.getElementById("tras");
@@ -155,18 +158,18 @@ var ddir=document.getElementById("dir");
 //dfrente.onmousedown=function AA(){teclaW=1;}
 //dfrente.onmouseup=function AB(){teclaW=0;}
 
-dfrente.onclick=function AA(){teclaW=1;}
-dfrente.ondblclick=function AB(){teclaW=0;}
+dfrente.onclick=function AA(){teclaW=1;limpa();}
+//dfrente.ondblclick=function AB(){teclaW=0;}
 
 
-dtras.onmousedown=function AA(){teclaV=1;}
-dtras.onmouseup=function AB(){teclaV=0;}
+dtras.onclick=function AA(){teclaV=1;limpa();}
+//dtras.onmouseup=function AB(){teclaV=0;}
 
-desq.onmousedown=function AA(){teclaG=1;}
-desq.onmouseup=function AB(){teclaG=0;}
+desq.onclick=function AA(){teclaG=1;limpa();}
+//desq.onmouseup=function AB(){teclaG=0;}
 
-ddir.onmousedown=function AA(){teclaH=1;}
-ddir.onmouseup=function AB(){teclaH=0;}
+ddir.onclick=function AA(){teclaH=1;limpa();}
+//ddir.onmouseup=function AB(){teclaH=0;}
 
 //	dbi.onclick=function BI(){v=1-v;}
 
@@ -471,6 +474,25 @@ if(home==1){
 
 
 	// Edificio Evelyn, Rua Girassol, 594 Apto. 502, CEP: 05433-001
+
+
+
+
+function limpa(){
+	myTimeout = setTimeout(myGreeting, 500);
+}
+
+function myGreeting() {
+	teclaA=0;teclaD=0;teclaW=0;teclaS=0;teclaG=0;teclaH=0;teclaC=0;teclaB=0;teclaV=0;setaE=0;setaD=0;setaC=0;setaB=0;teclaL=0;teclaP=0;
+  clearTimeout(myTimeout);
+}
+
+//function myStopFunction() {
+//  clearTimeout(myTimeout);
+//}
+
+
+
 
 function onResize() {
 	camera.aspect=window.innerWidth/window.innerHeight;
