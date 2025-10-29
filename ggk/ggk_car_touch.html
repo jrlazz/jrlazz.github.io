@@ -14,16 +14,16 @@ body{margin:0;background-color:#012;color:#ff0;font-family:Verdana;font-size:13p
 
 <body>
 
-<table style="position:absolute;left:20px;top:20px;background-color:#666;">
+<table id="tab" style="position:absolute;left:80%;top:70%;background-color:#666;">
 <tr>
-<td style="text-align:center;" colspan="3"><img src="../img/arr_front.png" style="width:100px;height:50px;" id="frente"></img><td>
+<td style="text-align:center;" colspan="3"><img src="../img/arr_front.png" style="width:200px;height:100px;" id="frente"></img><td>
 </tr>
 <tr><td>
-<img src="../img/arr_left.png" style="width:75px;height:80px;" id="esq"></img>&nbsp;&nbsp;&nbsp;&nbsp;
-<img src="../img/arr_right.png" style="width:75px;height:80px;" id="dir"></img>
+<img src="../img/arr_left.png" style="width:150px;height:160px;" id="esq"></img>&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="../img/arr_right.png" style="width:150px;height:160px;" id="dir"></img>
 </td></tr>
 <tr>
-<td style="text-align:center;" colspan="3"><img src="../img/arr_back.png" style="width:100px;height:50px;" id="tras"></img><td>
+<td style="text-align:center;" colspan="3"><img src="../img/arr_back.png" style="width:200px;height:100px;" id="tras"></img><td>
 </tr>
 <!--
 <tr>
@@ -34,7 +34,7 @@ body{margin:0;background-color:#012;color:#ff0;font-family:Verdana;font-size:13p
 -->
 </table>
 
-<img src="img/cockpit2.jpg" width="150" style="position:absolute;left:20px;top:600px;border:2px inset;border-color: #000 #ff0 #ff0 #000;"></img>
+<img src="img/cockpit2.jpg" width="150" style="position:absolute;left:10px;top:10px;border:2px inset;border-color: #000 #ff0 #ff0 #000;"></img>
 
 <span  id="spancompleto" style="position:absolute;left:500px;top:120px;font-size:32pt;color:#f0f;">... Please. wait for the alert ...</span>
 
@@ -843,6 +843,9 @@ function maluca(){
 
 function myFunction(cor){return;}
 myFunction(0);
+
+document.getElementById("tab").style.left=window.innerWidth-340+"px";
+document.getElementById("tab").style.top=window.innerHeight-400+"px";
 
 </script>
 
