@@ -531,6 +531,9 @@ function animate() {
 	requestAnimationFrame(animate);
 
 	ww++;
+
+	document.getElementById("spancompleto").innerText="... wait twice ...";
+
 	if(altera==0 && ww==quando){alterando();}
 
 	if(altera>0){
@@ -634,7 +637,7 @@ function animate() {
 }
 
 function alterando(){
-	document.getElementById("spancompleto").innerText="... wait twice ...";
+//	document.getElementById("spancompleto").innerText="... wait twice ...";
 
 //alert("... Espere a mensagem 'Pode clicar'...\n... ent\xE3o clique...\n... Boa Sorte no Evelyn!");
 alert("... Alert to make it possible ... Please Click OK!\n... Pode clicar ... Boa Sorte!");
