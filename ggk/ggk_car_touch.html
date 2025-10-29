@@ -445,14 +445,14 @@ function animate() {
 	if(altera>0){
 	document.getElementById("spancompleto").innerText="";
 
-	if(querocontrols==0){
+	//if(querocontrols==0){
 		scene.updateMatrixWorld(true);
 		target.setFromMatrixPosition(jar[2].matrixWorld);
 		camera.lookAt(target.x,target.y,target.z);
 		scene.updateMatrixWorld(true);
 		target.setFromMatrixPosition(jar[1].matrixWorld);
 		camera.position.set(target.x,target.y,target.z);
-	}
+	//}
 
 	if(groupPD.rotation.x> 1.07){rot[1]=1;PEi.rotation.x=0;}
 	if(groupPD.rotation.x<-1.07){rot[1]=0;PDi.rotation.x=0;}
