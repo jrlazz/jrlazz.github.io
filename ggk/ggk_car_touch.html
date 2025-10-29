@@ -408,11 +408,10 @@ function createText() {
 
 // 3DS
 
-if(home==1){
+//if(home==1){
 	loader=new TDSLoader();
 	loader.load('models/extras/palm.3ds',function(object){
-		object.traverse(function(child){
-		});
+		//object.traverse(function(child){});
 		object.scale.set(0.04,0.04,0.04);
 		object.position.set(-6,0,6);
 		object.rotation.set(-1.54,0,0);
@@ -422,22 +421,21 @@ if(home==1){
 
 	loader=new TDSLoader();
 	loader.load('models/extras/conifera.3ds',function(object){
-		object.traverse(function(child){
-		});
+		//object.traverse(function(child){});
 		object.scale.set(0.005,0.005,0.005);
 		object.position.set(-6,0,0);
 		object.rotation.set(-1.54,0,0);
 		jrl[2]=object;
 		scene.add(jrl[2]);
 	});
-}
+//}
 
 // Light
 	ambient=new THREE.AmbientLight("#cff",0.5);
 	scene.add(ambient);
 
-	var sun=new THREE.PointLight("#963",1);
-	sun.position.set(0,15,0);
+	var sun=new THREE.PointLight("#fc0",1);
+	sun.position.set(0,65,0);
 	scene.add(sun);
 
 
