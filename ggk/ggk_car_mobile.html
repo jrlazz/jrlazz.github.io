@@ -151,11 +151,11 @@ var ddir=document.getElementById("dir");
 //var dcima=document.getElementById("cima");
 //var dbaixo=document.getElementById("baixo");
 
-dfrente.onmousedown=function AA(){teclaW=1;alert("front");}
-dfrente.onmouseup=function AB(){teclaW=0;alert("front");}
+dfrente.onmousedown=function AA(){teclaW=1;}
+dfrente.onmouseup=function AB(){teclaW=0;}
 
-dtras.onmousedown=function AA(){teclaV=1;alert("tras");}
-dtras.onmouseup=function AB(){teclaV=0;alert("tras");}
+dtras.onmousedown=function AA(){teclaV=1;}
+dtras.onmouseup=function AB(){teclaV=0;}
 
 desq.onmousedown=function AA(){teclaG=1;}
 desq.onmouseup=function AB(){teclaG=0;}
@@ -565,6 +565,7 @@ ww++;
 		f1[6].rotation.y=1.57;
 
 		if(teclaW==1){
+alert("teclaW");
 			f1[3].rotation.x +=0.07;
 			f1[4].rotation.x +=0.07;
 			f1[5].rotation.z +=0.07;
