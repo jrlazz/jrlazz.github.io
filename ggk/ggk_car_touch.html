@@ -130,10 +130,6 @@ var home=1;
 
 var normal;
 
-var myTimeout;// = setTimeout(myGreeting, 5000)
-
-
-
 var dfrente=document.getElementById("frente");
 var dtras=document.getElementById("tras");
 var desq=document.getElementById("esq");
@@ -141,7 +137,6 @@ var ddir=document.getElementById("dir");
 
 //var dcima=document.getElementById("cima");
 //var dbaixo=document.getElementById("baixo");
-
 
 dfrente.ontouchstart=function AA(){teclaW=1;}
 dfrente.ontouchend=function AB(){teclaW=0;}
@@ -154,8 +149,6 @@ desq.ontouchend=function CB(){teclaG=0;}
 
 ddir.ontouchstart=function DA(){teclaH=1;}
 ddir.ontouchend=function DB(){teclaH=0;}
-
-
 
 // ***************************************************************
 	renderer=new THREE.WebGLRenderer({antialias:true});
@@ -215,7 +208,6 @@ ddir.ontouchend=function DB(){teclaH=0;}
 	var arteA="models/artes/Town.obj";
 	new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(arteA,function(object){arte[1]=object;arte[1].position.set(9.5,-0.75,23);scene.add(arte[1]);},manager.onProgress,manager.onError);});
 
-
 j++;
 	//goldenrod
 	tex[j]=new THREE.TextureLoader(manager).load('img/fl4.jpg');
@@ -249,7 +241,6 @@ j++;
 	var goldenrodB=new THREE.Mesh(geo[j],mat[j]);
 	goldenrodB.position.set(-13,0.01,-9);
 	scene.add(goldenrodB);
-
 
 j++;
 	tex[j]=new THREE.TextureLoader(manager).load('img/fl1.jpg');
@@ -311,7 +302,6 @@ j++;
 	var FCube=new THREE.Mesh(geo[j],mat[j]);
 	FCube.position.set(15,1.5,0);
 	scene.add(FCube);
-
 
 	var group1=new THREE.Group();
 	var group2=new THREE.Group();
@@ -416,7 +406,6 @@ function createText() {
 	scene.add(textMesh2);
 }
 
-
 // 3DS
 
 if(home==1){
@@ -447,7 +436,7 @@ if(home==1){
 	ambient=new THREE.AmbientLight("#cff",0.5);
 	scene.add(ambient);
 
-	var sun=new THREE.PointLight("#963",2);
+	var sun=new THREE.PointLight("#963",1);
 	sun.position.set(0,15,0);
 	scene.add(sun);
 
@@ -799,36 +788,19 @@ var keys=[];
 
 var ang=0;
 
-
-
-var sca=0;
-var scale=0;
-window.addEventListener('wheel',function(e){
-	scale += e.deltaY * -0.1;
-	if(scale>sca){teclaL=1;sca=scale;}
-	if(scale<sca){teclaP=1;sca=scale;}
-setTimeout(function(){teclaL=0;teclaP=0;},300);
-},false);
-
-
-var mika=0;
-
-
 function maluca(){
 	window.location.replace("ggk_car_mobile.html");
 }
 
-
 </script>
-
 
 <script>
 
 function myFunction(cor){return;}
 myFunction(0);
 
-document.getElementById("tab").style.left=window.innerWidth-340+"px";
-document.getElementById("tab").style.top=window.innerHeight-400+"px";
+document.getElementById("tab").style.left=window.innerWidth-320+"px";
+document.getElementById("tab").style.top=window.innerHeight-380+"px";
 
 </script>
 
