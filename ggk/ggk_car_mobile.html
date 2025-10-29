@@ -192,7 +192,7 @@ ddir.onmouseup=function AB(){teclaH=0;}
 	manager.onStart=function(url,itemsLoaded,itemsTotal){console.log('Started loading file:'+url+'.\nLoaded '+itemsLoaded+' of '+itemsTotal + ' files.' );};
 	manager.onLoad=function(){console.log('Loading complete!');};
 	manager.onProgress=function(url,itemsLoaded,itemsTotal){console.log('loading texture'+url+' '+(itemsLoaded/itemsTotal*100)+'%');};
-	manager.onError=function(url){console.log('Error loading texture:'+url);};
+	manager.onError=function(url){console.log('Error loading texture:'+url);alert('Error loading texture:'+url);};
 	manager.addHandler(/\.dds$/i,new DDSLoader());
 
 	const axesHelper=new THREE.AxesHelper(0.5);
