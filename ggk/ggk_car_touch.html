@@ -487,8 +487,41 @@ function myGreeting() {
 //}
 
 
+    dfrente.addEventListener('touchstart', function(event) {
+        event.preventDefault(); // Prevent default long-press behavior
+        // Add your custom touchstart logic here
+    });
+    dfrente.addEventListener('touchend', function(event) {
+        // Add your custom touchend logic here
+    })
 
 
+    dtras.addEventListener('touchstart', function(event) {
+        event.preventDefault(); // Prevent default long-press behavior
+        // Add your custom touchstart logic here
+    });
+    dtras.addEventListener('touchend', function(event) {
+        // Add your custom touchend logic here
+    })
+
+    desq.addEventListener('touchstart', function(event) {
+        event.preventDefault(); // Prevent default long-press behavior
+        // Add your custom touchstart logic here
+    });
+
+    desq.addEventListener('touchend', function(event) {
+        // Add your custom touchend logic here
+    })
+
+    ddir.addEventListener('touchstart', function(event) {
+        event.preventDefault(); // Prevent default long-press behavior
+        // Add your custom touchstart logic here
+    });
+
+    ddir.addEventListener('touchend', function(event) {
+        // Add your custom touchend logic here
+    })
+    
 function onResize() {
 	camera.aspect=window.innerWidth/window.innerHeight;
 	camera.updateProjectionMatrix();
