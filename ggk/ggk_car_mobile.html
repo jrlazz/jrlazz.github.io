@@ -10,7 +10,9 @@
 body{margin:0;background-color:#012;color:#ff0;font-family:Verdana;font-size:13px;overscroll-behavior:none;line-height:20px;overflow:hidden;}
 </style>
 
+<!--
 <script src="../js/jquery-3.5.1.min.js"></script>
+-->
 
 </head>
 
@@ -94,7 +96,6 @@ var de2ra=function(degree){return degree*(Math.PI/180);};
 
 var passo=0.02;
 
-var w=0;
 var ww=0;
 var f1LP=5;
 
@@ -137,8 +138,8 @@ var mika=0;
 var duration;
 var ur=window.location.href;
 var quando=200;
-var home=0;
-if(ur.includes("127")){quando=100;home=1;}
+var home=1;
+//if(ur.includes("127")){quando=100;home=1;}
 
 var normal;
 
@@ -539,7 +540,7 @@ ww++;
 		f1[4].rotation.y=1.57;
 		f1[5].rotation.y=1.57;
 		f1[6].rotation.y=1.57;
-alert("w="+w);
+//alert("w="+w);
 		if(teclaW==1){
 alert("teclaW");
 			f1[3].rotation.x +=0.07;
@@ -564,9 +565,11 @@ alert("teclaW");
 		if(teclaG==1){f1[0].rotation.y +=.05;ang+=.05;angfrente= 0.8;if(teclaV==1){angfrente=-0.8;}f1[5].rotation.y=1.57+angfrente;f1[6].rotation.y=1.57+angfrente;}//H
 
 		if(home==1){
-			if(Math.abs(f1[0].position.x)>40 || Math.abs(f1[0].position.z)>40){maluca();}
+//			if(Math.abs(f1[0].position.x)>40 || Math.abs(f1[0].position.z)>40){maluca();}
 		}
 	}
+
+//alert("w="+w);
 
 	renderer.render(scene,camera);
 }
@@ -857,6 +860,7 @@ setTimeout(function(){teclaL=0;teclaP=0;},300);
 
 var mika=0;
 
+/*
 function maluca(){
 	duration=200;
 	$({to:0}).animate({to:1}, duration, function() {
@@ -874,6 +878,7 @@ function mais(){
 	mika=1;malucar=1;f1[0].rotation.set(0,3.14,0);f1[0].position.set(0,0.02,0);fim();
 	})
 }
+*/
 
 function fim(){
 	duration=200;
