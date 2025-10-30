@@ -28,7 +28,7 @@ a{color: #2983ff;}
 ... please be patient ...
 </span>
 
-<table id="tabD" style="position:absolute;left:100%;top:100%;background-color:#444;">
+<table id="tabD" style="position:absolute;left:0px;top:0px;background-color:#444;">
 <tr>
 <td style="text-align:center;" colspan="3"><img src="../img/arr_front.png" style="width:140px;height:90px;" id="frente"></img><td>
 </tr>
@@ -41,7 +41,7 @@ a{color: #2983ff;}
 </tr>
 </table>
 
-<table id="tabE" style="position:absolute;left:-100%;top:-100%;background-color:#444;">
+<table id="tabE" style="position:absolute;left:0px;top:0px;background-color:#444;">
 <tr>
 <td style="text-align:center;"><img src="../img/go_up.png" style="width:140px;height:90px;" id="cima"></img><br><br>
 <img src="../img/go_down.png" style="width:140px;height:90px;" id="baixo"></img>
@@ -648,8 +648,8 @@ function myFunction(cor){
 
 myFunction(0);
 
-document.getElementById("tabD").style.left=window.innerWidth-340+"px";
-document.getElementById("tabD").style.top=window.innerHeight-330+"px";
+document.getElementById("tabD").style.left=window.innerWidth-360+"px";
+document.getElementById("tabD").style.top=window.innerHeight-360+"px";
 document.getElementById("tabE").style.left=5+"px";
 document.getElementById("tabE").style.top=window.innerHeight-220+"px";
 
