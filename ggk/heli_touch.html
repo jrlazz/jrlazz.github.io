@@ -121,11 +121,11 @@ desq.ontouchend=function CB(){teclaG=0;}
 ddir.ontouchstart=function DA(){teclaH=1;}
 ddir.ontouchend=function DB(){teclaH=0;}
 
-			dcima.ontouchstart=function EA(){teclaC=1;}
-			dcima.ontouchend=function EB(){teclaC=0;}
+dcima.ontouchstart=function EA(){teclaC=1;}
+dcima.ontouchend=function EB(){teclaC=0;}
 
-			dbaixo.ontouchstart=function FA(){teclaB=1;}
-			dbaixo.ontouchend=function FB(){teclaB=0;}
+dbaixo.ontouchstart=function FA(){teclaB=1;}
+dbaixo.ontouchend=function FB(){teclaB=0;}
 
 	renderer=new THREE.WebGLRenderer( { antialias: true } );
 	renderer.setPixelRatio( window.devicePixelRatio );
@@ -244,17 +244,14 @@ ddir.ontouchend=function DB(){teclaH=0;}
 	cubeGeometry=new THREE.BoxGeometry(1.5,5,1.5);
 	cubeMaterial=new THREE.MeshBasicMaterial({color:0x006699});
 	DCube=new THREE.Mesh(cubeGeometry,cubeMaterial);
-	DCube.receiveShadow=true;
 	DCube.position.set(3,2.5,0);scene.add(DCube);
 
 	cubeMaterial=new THREE.MeshBasicMaterial({color:0x996699});
 	ECube=new THREE.Mesh(cubeGeometry,cubeMaterial);
-	ECube.receiveShadow=true;
 	ECube.position.set(6,2.5,0);scene.add(ECube);
 
 	cubeMaterial=new THREE.MeshBasicMaterial({color:0x000099});
 	FCube=new THREE.Mesh(cubeGeometry,cubeMaterial);
-	FCube.receiveShadow=true;
 	FCube.position.set(9,2.5,0);scene.add(FCube);
 
 	cubeGeometry=new THREE.BoxGeometry(1,1,1);
@@ -299,14 +296,12 @@ ddir.ontouchend=function DB(){teclaH=0;}
 	gridBase=new THREE.Mesh(gridBaseGeo,gridBaseMat);
 	gridBase.position.set(0,0,0);
 	gridBase.rotation.x=de2ra(90);
-	gridBase.receiveShadow=true;
 	scene.add(gridBase);
 
 	gridBaseMat=new THREE.MeshPhongMaterial({color:0x001122});
 	gridBase=new THREE.Mesh(gridBaseGeo,gridBaseMat);
 	gridBase.position.set(0,-0.1,0);
 	gridBase.rotation.x=de2ra(90);
-	gridBase.receiveShadow=true;
 	scene.add(gridBase);
 
 	grid=new THREE.GridHelper(100,50);//size,divisions
@@ -320,7 +315,6 @@ ddir.ontouchend=function DB(){teclaH=0;}
 	Arua=new THREE.Mesh(ruaGeo,ruaMat);
 	Arua.position.set(0,0.2,0);
 	Arua.rotation.set(de2ra(90),0,de2ra(90));
-	Arua.receiveShadow=true;
 	scene.add(Arua);
 
 	ruaGeo=new THREE.BoxGeometry(100,2,0.01);
@@ -328,7 +322,6 @@ ddir.ontouchend=function DB(){teclaH=0;}
 	Brua=new THREE.Mesh(ruaGeo,ruaMat);
 	Brua.position.set(0,0.2,-25);
 	Brua.rotation.set(de2ra(90),0,de2ra(0));
-	Brua.receiveShadow=true;
 	scene.add(Brua);
 
 	// textos
