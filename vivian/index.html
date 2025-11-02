@@ -17,7 +17,18 @@ body {  margin: 0; background: #f4f9d0;}
 
 <body>
 <center>
-<img id="main-img" src="Vivi_self.jpg" width="100%"></img>
+<img id="main-img" src="Vivi2013.jpg" width="100%"></img>
 </center>
+<script>
+var items=document.getElementsByTagName('img');
+for (let i = 0; i < items.length; i++) {
+	// items[i].style.color = 'red';
+	items[i].addEventListener('touchstart',function(event){
+		event.preventDefault();
+		});
+	items[i].addEventListener('touchend',function(event){
+	})
+}
+</script>
 </body>
 </html>
