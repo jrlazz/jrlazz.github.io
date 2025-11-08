@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>wine.html</title>
+<meta charset="utf-8">
+
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+<meta name="description" content="Glass of Wine">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+
+<style>
+@font-face {font-family:myq;src:url('../fonte/MysteryQuest-Regular.ttf');}
+body{overflow:hidden;margin:0px;background-color:#699;font-family:Monospace;}
+span{position:absolute;font-family:myq;font-size:41px;}
+a{font-size:16pt;}
+</style>
+
+<script type="importmap">
+	{
+		"imports":{
+	"three":"https://unpkg.com/three@0.171.0/build/three.module.js",
+	"three/addons/":"https://unpkg.com/three@0.171.0/examples/jsm/"
+		}
+	}
+</script>
+
+</head>
+
+<body>
+
+<span style="left:10%;top:2%;width:80%;text-align:center;color:#ff0;">Enjoy a glass of wine ... SVGs on Three.js</span>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
+
+var renderer, scene, camera, loader, controls ;
+var steps, depth, bevelEnabled, bevelThickness, bevelSize, bevelOffset, bevelSegments;
+
+var iW=window.innerWidth;
+var iH=window.innerHeight;
+
+var geo=[];
+var luz=[];
+var mat=[];
+var mesh=[];
+
+var paths=[];
+var shapes=[];
+var dep=0.6;
+var cur=20;
+
+var group=new THREE.Group();
+var groupp=new THREE.Group();
+
+var gro=[];for(let z=1;z<300;z++){gro[z]=new THREE.Group();}
+
+var gru1=new THREE.Group();
+var gru11=new THREE.Group();
+
+var sim=0;
+var p=Math.PI;
+
+function init(){
+	camera=new THREE.PerspectiveCamera(80,iW/iH,1,1000,1);
+	camera.position.set(40,90,400);
+	scene=new THREE.Scene();
+	scene.position.set(0,-100,0);
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(iW,iH);
+	renderer.colorSpace=THREE.SRGBColorSpace;
+
+	document.body.appendChild(renderer.domElement);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+
+	luz[1]=new THREE.AmbientLight("#fff",1);scene.add(luz[1]);
+	luz[2]=new THREE.PointLight('#fff',3000);luz[2].position.set(0,36,36);scene.add(luz[2]);
+	luz[3]=new THREE.PointLight('fcc',6000);luz[3].position.set(0,80,0);scene.add(luz[3]);
+
+	let materials=[
+		new THREE.MeshPhongMaterial({color:'gold',transparent:true,opacity:0.9,}),
+		new THREE.MeshPhongMaterial({color:'gold',transparent:true,opacity:0.9,})
+	];
+
+	loader=new SVGLoader();
+	loader.load('img/taca_3.svg',function(data){
+		paths=data.paths;
+		shapes=SVGLoader.createShapes(paths[0]);
+		geo[1]=new THREE.ExtrudeGeometry(shapes[0],{depth:dep,curveSegments:cur});
+		mesh[1]=new THREE.Mesh(geo[1],materials);
+		mesh[1].position.set(0,0,0);
+		mesh[1].rotation.set(p,0,0);
+	})
+	
+	loader=new SVGLoader();
+	loader.load('img/garra_3.svg',function(data){
+		paths=data.paths;
+		shapes=SVGLoader.createShapes(paths[0]);
+		geo[11]=new THREE.ExtrudeGeometry(shapes[0],{depth:dep,curveSegments:cur});
+		mesh[11]=new THREE.Mesh(geo[11],new THREE.MeshStandardMaterial({color:'#c0c'}));
+		mesh[11].position.set(0,0,0);
+		mesh[11].scale.setScalar(10);
+	})
+
+	geo[2]=new THREE.CylinderGeometry(200,200,15,128,128);
+	mesh[2]=new THREE.Mesh(geo[2],new THREE.MeshStandardMaterial({color:'#699',side:THREE.DoubleSide})) ;
+	mesh[2].position.set(0,-36,0);
+	scene.add(mesh[2]);
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	if(mesh[1] && mesh[11] && sim==0){
+		group.add(mesh[1]);
+		group.position.set(0,0,0);
+		let k=0;
+		for(let z=0;z<360;z++){
+			k=k+2*p/360;
+			gro[z]=group.clone();
+			gro[z].rotation.set(0,k,0);
+			gru1.add(gro[z]);
+		}
+		gru1.position.set(-100,0,0);
+		scene.add(gru1);
+
+		groupp.add(mesh[11]);
+		groupp.position.set(0,0,0);
+		k=0;
+		for(let z=0;z<360;z++){
+			k=k+2*p/360;
+			gro[z]=groupp.clone();
+			gro[z].rotation.set(0,k,0);
+			gru11.add(gro[z]);
+		}
+		gru11.position.set(100,-36,0);
+		scene.add(gru11);
+
+		sim=1;
+	}
+	renderer.render(scene,camera);
+}
+
+init();
+animate();
+
+</script>
+</body>
+</html>
+
