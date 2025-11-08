@@ -82,7 +82,7 @@ function init(){
 
 	luz[1]=new THREE.AmbientLight("#fff",1);scene.add(luz[1]);
 	luz[2]=new THREE.PointLight('#fff',3000);luz[2].position.set(0,36,36);scene.add(luz[2]);
-	luz[3]=new THREE.PointLight('fcc',6000);luz[3].position.set(0,80,0);scene.add(luz[3]);
+	luz[3]=new THREE.PointLight('#fcc',6000);luz[3].position.set(0,80,0);scene.add(luz[3]);
 
 	let materials=[
 		new THREE.MeshPhongMaterial({color:'gold',transparent:true,opacity:0.9,}),
