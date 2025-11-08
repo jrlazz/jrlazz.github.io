@@ -55,15 +55,18 @@ var shapes=[];
 var dep=0.6;
 var cur=20;
 
-var group=new THREE.Group();
-var groupp=new THREE.Group();
+var group1=new THREE.Group();
+var group2=new THREE.Group();
+var group3=new THREE.Group();
 
-var gro=[];for(let z=1;z<300;z++){gro[z]=new THREE.Group();}
+var gro=[];for(let z=1;z<400;z++){gro[z]=new THREE.Group();}
 
 var gru1=new THREE.Group();
-var gru11=new THREE.Group();
+var gru2=new THREE.Group();
+var gru3=new THREE.Group();
 
 var sim=0;
+var k=0;
 var p=Math.PI;
 
 function init(){
@@ -82,68 +85,93 @@ function init(){
 
 	luz[1]=new THREE.AmbientLight("#fff",1);scene.add(luz[1]);
 	luz[2]=new THREE.PointLight('#fff',3000);luz[2].position.set(0,36,36);scene.add(luz[2]);
-	luz[3]=new THREE.PointLight('#fcc',6000);luz[3].position.set(0,80,0);scene.add(luz[3]);
-
-	let materials=[
-		new THREE.MeshPhongMaterial({color:'gold',transparent:true,opacity:0.9,}),
-		new THREE.MeshPhongMaterial({color:'gold',transparent:true,opacity:0.9,})
-	];
-
 	loader=new SVGLoader();
 	loader.load('img/taca_3.svg',function(data){
 		paths=data.paths;
 		shapes=SVGLoader.createShapes(paths[0]);
 		geo[1]=new THREE.ExtrudeGeometry(shapes[0],{depth:dep,curveSegments:cur});
-		mesh[1]=new THREE.Mesh(geo[1],materials);
+		mesh[1]=new THREE.Mesh(geo[1],new THREE.MeshStandardMaterial({color:'#fff',transparent:true,opacity:0.3}));
 		mesh[1].position.set(0,0,0);
 		mesh[1].rotation.set(p,0,0);
 	})
-	
+
 	loader=new SVGLoader();
-	loader.load('img/garra_3.svg',function(data){
+	loader.load('img/taca_31.svg',function(data){
 		paths=data.paths;
 		shapes=SVGLoader.createShapes(paths[0]);
-		geo[11]=new THREE.ExtrudeGeometry(shapes[0],{depth:dep,curveSegments:cur});
-		mesh[11]=new THREE.Mesh(geo[11],new THREE.MeshStandardMaterial({color:'#c0c'}));
-		mesh[11].position.set(0,0,0);
-		mesh[11].scale.setScalar(10);
+		geo[2]=new THREE.ExtrudeGeometry(shapes[1],{depth:dep,curveSegments:cur});
+		mesh[2]=new THREE.Mesh(geo[2],new THREE.MeshStandardMaterial({color:'#c0c'}));
+		mesh[2].position.set(0,0,0);
+		mesh[2].rotation.set(p,0,0);
+	})
+	
+	loader=new SVGLoader();
+	loader.load('img/garra_35.svg',function(data){
+		paths=data.paths;
+		shapes=SVGLoader.createShapes(paths[0]);
+		geo[3]=new THREE.ExtrudeGeometry(shapes[0],{depth:0.5,curveSegments:cur});
+		mesh[3]=new THREE.Mesh(geo[3],new THREE.MeshStandardMaterial({color:'#0fc',transparent:true,opacity:0.1}));
+		mesh[3].position.set(0,0,0);
+		mesh[3].scale.setScalar(10);
 	})
 
-	geo[2]=new THREE.CylinderGeometry(200,200,15,128,128);
-	mesh[2]=new THREE.Mesh(geo[2],new THREE.MeshStandardMaterial({color:'#699',side:THREE.DoubleSide})) ;
-	mesh[2].position.set(0,-36,0);
-	scene.add(mesh[2]);
+	geo[10]=new THREE.CylinderGeometry(200,200,15,128,128);
+	mesh[10]=new THREE.Mesh(geo[10],new THREE.MeshStandardMaterial({color:'#699',side:THREE.DoubleSide})) ;
+	mesh[10].position.set(0,-36,0);
+	scene.add(mesh[10]);
+
+	geo[11]=new THREE.CylinderGeometry(57,57,180,32,32);
+	mesh[11]=new THREE.Mesh(geo[11],new THREE.MeshStandardMaterial({color:'#c0c'})) ;
+	mesh[11].position.set(100,65,0);
+	// scene.add(mesh[11]);
 }
 
 function animate(){
 	requestAnimationFrame(animate);
-	if(mesh[1] && mesh[11] && sim==0){
-		group.add(mesh[1]);
-		group.position.set(0,0,0);
-		let k=0;
+	if(mesh[1] && mesh[2] && mesh[3] && sim==0){
+		group1.add(mesh[1]);
+		group1.position.set(0,0,0);
+		k=0;
 		for(let z=0;z<360;z++){
 			k=k+2*p/360;
-			gro[z]=group.clone();
+			gro[z]=group1.clone();
 			gro[z].rotation.set(0,k,0);
 			gru1.add(gro[z]);
 		}
 		gru1.position.set(-100,0,0);
-		scene.add(gru1);
 
-		groupp.add(mesh[11]);
-		groupp.position.set(0,0,0);
+		group2.add(mesh[2]);
+		group2.position.set(0,0,0);
 		k=0;
 		for(let z=0;z<360;z++){
 			k=k+2*p/360;
-			gro[z]=groupp.clone();
+			gro[z]=group2.clone();
 			gro[z].rotation.set(0,k,0);
-			gru11.add(gro[z]);
+			gru2.add(gro[z]);
 		}
-		gru11.position.set(100,-36,0);
-		scene.add(gru11);
+		gru2.position.set(-100,0,0);
+
+		group3.add(mesh[3]);
+		group3.position.set(0,0,0);
+		k=0;
+		for(let z=0;z<360;z++){
+			k=k+2*p/360;
+			gro[z]=group3.clone();
+			gro[z].rotation.set(0,k,0);
+			gru3.add(gro[z]);
+		}
+		gru3.position.set(100,-36,0);
 
 		sim=1;
 	}
+	if(sim==1){
+		scene.add(gru1);
+		scene.add(gru3);
+		scene.add(gru2);
+		scene.add(mesh[11]);
+		sim=2;	
+	}
+
 	renderer.render(scene,camera);
 }
 
