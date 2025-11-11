@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+<meta charset="utf-8" />
+<link rel="shortcut icon" href="../img/github-mark.png">
+<title>iaX.html</title>
+</head>
+
+<style>
+@font-face {font-family:tipo;src:url('../fonte/MysteryQuest-Regular.ttf');}
+@font-face {font-family:consola;src:url('../fonte/consola.ttf');}
+body { overflow:;}
+td {text-align:center;}
+.cla { position:absolute; top:0px; left:0px; width:30px; height:30px;}
+.clc { position:relative; width:28px; height:28px; border:1px solid white;cursor:pointer;}
+span { font-family:tipo; font-size:14pt;}
+b { position:relative; left:0px; top:0px; height:18px; font-family:Arial; font-size:11pt; color:#009; border:1px outset #999;}
+input { width:35px; height:16px; color:#000; font-size:11pt; font-family:consola; font-weight:bold; text-align:right; padding:0px; padding-right:2px;}
+select {color:#000; font-size:11pt; height:19px; font-family:Arial; font-weight:bold; color:#008; cursor:pointer;}
+button { font-family:consola; text-align:center; font-weight:bold; border:2px; border-style:outset; border-color:white black black white;}
+button:hover { border-style:inset; border-color:black white white black;}
+.tro { transform: rotate(0deg) translateX(0px);}
+.sal { position:relative;left:0px;top:0px;height:40px;cursor:pointer;}
+.tdf {font-family:Arial; font-size:10pt; text-align:left;}
+.inpfil { width:100px; cursor:pointer;}
+</style>
+
+<script>
+
+var ajuda="none";
+var altimg=0;
+var alt=0;
+var altu=0;
+var aumOUdim="";
+var canvas=false; var ctx=false;
+var cornerX=0;
+var cornerY=0;
+var d=false; var dtx=false;
+var cliX=0;
+var cliY=0;
+var currX=0;
+var currY=0;
+var danW=0;
+var danH=0;
+var dot_flag=false;
+var fig=0;
+var filtro="";
+var flag=false;
+var fotoN="";
+var fotoW=0;
+var fotoH=0;
+var geom="";
+var i=0;
+var img=new Image();
+var lar=0;
+var linX=0;
+var linY=0;
+var linXant=-1;
+var linYant=-1;
+var origH=0;
+var origW=0;
+var ovl1=false; var ctx1=false;
+var ovl2=false; var ctx2=false;
+var ovl3=false; var ctx3=false;
+var pegacor=0;
+var pick="";
+var ponta="cir";
+var prevX=0;
+var prevY=0;
+var sca=1;
+var tid="";
+var totaum=1;
+var totrot=0;
+var valAumDim=0;
+var x="red";
+var xant="red";
+var y=5;
+
+var w=window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+var h=window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
+</script>
+
+</head>
+
+<body onload="init();">
+
+<div id="bug" style="position:absolute;top:40px;left:100px;width:1000px;height:500px;border:2px solid #009;text-align:center;opacity:.1;">
+	<img src="ia_desenhando.png"></img>
+</div>
+
+
+<img id="imatest" src=""></img>
+
+<script>
+	document.getElementById("bug").style.width=w-180+"px";
+</script>
+
+<div id="todo" style="position:absolute;left:0px;top:0px;width:100%;height:100%;display:none;">
+
+<span id="spanpick" style="display:none;">incolor</span>
+
+<canvas id="can" onmousemove="showCoords(event);" onclick="pinte();" width="1000" height="500" style="position:absolute;top:40px;left:100px;border:2px solid green;display:none;"></canvas>
+<canvas id="dan" onmousemove="showCoords(event);" onclick="toprint();" width="1000" height="500" style="position:absolute;top:40px;left:100px;border:2px solid black;background:url('cinq2.png');opacity:1;display:none;"></canvas>
+<canvas id="ovl1" width="1000" height="500" style="position:absolute;top:40px;left:100px;border:2px solid #c60;opacity:.5;display:none;background:url('v1.png');background-repeat:no-repeat;background-color:#fc2;"></canvas>
+<canvas id="ovl2" width="1000" height="500" style="position:absolute;top:40px;left:100px;border:2px solid #c60;opacity:.5;display:none;background:url('v2.png');background-repeat:no-repeat;background-color:#fc2;"></canvas>
+<canvas id="ovl3" width="1000" height="500" style="position:absolute;top:40px;left:100px;border:2px solid #c60;opacity:.5;display:none;background:url('v3.png');background-repeat:no-repeat;background-color:#fc2;"></canvas>
+
+<img id="penera" src="pencil.png" style="position:absolute;left:25px;top:33px;width:50px;border:0px;background-color:red;"></img>
+<img id="figura" src="transpa.png" style="position:absolute;left:25px;top:33px;width:50px;border:0px;background-color:transparent;"></img>
+
+<!-- Filtros de Cor -->
+<img id="logofilt" src="filt.png" onclick="javascript:document.getElementById('divfilt').style.display='inline';" style="position:absolute;left:1100px;top:5px;width:32px;border:0px;display:none;"></img>
+<div id="divfilt" onmouseover="jcentra();" style="position:absolute;left:1080px;top:2px;width:180px;height:337px;border:2px;border-style:outset;border-color: #fff #000 #000 #fff;background-color:#aebeba;display:none;">
+<table>
+<tr><td class="tdf">Acinzentar</td><td><input class="inpfil" id="gs" name="gs" type="range" min="0" max="100" value="0" onchange="jfi();"></td></tr>
+<tr><td class="tdf">Desfocar</td><td><input class="inpfil" id="blur" name="blur" type="range" min="0" max="10" value="0" onchange="jfi();"></td></tr>
+<tr><td class="tdf">Exposi&ccedil;&atilde;o</td><td><input class="inpfil" id="br" name="br" type="range" min="-50" max="200" value="100" onchange="jfi();"></td></tr>
+<tr><td class="tdf">Contrastar</td><td><input class="inpfil" id="ct" name="ct" type="range" min="0" max="200" value="100" onchange="jfi();"></td></tr>
+<tr><td class="tdf">Tonalidade</td><td><input class="inpfil" id="huer" name="huer" type="range" min="0" max="360" value="0" onchange="jfi();"></td></tr>
+<tr><td class="tdf">Opacidade</td><td><input class="inpfil" id="opacity" name="opacity" type="range" min="0" max="100" value="100" onchange="jfi();"></td></tr>
+<tr><td class="tdf">Inverter</td><td><input class="inpfil" id="invert" name="invert" type="range" min="0" max="100" value="0" onchange="jfi();"></td></tr>
+<tr><td class="tdf">Saturar</td><td><input class="inpfil" id="saturate" name="saturate" type="range" min="0" max="500" value="100" onchange="jfi();"></td></tr>
+<tr><td class="tdf">S&eacute;pia</td><td><input class="inpfil" id="sepia" name="sepia" type="range" min="0" max="100" value="0" onchange="jfi();"></td></tr>
+<tr><td class="tdf">Colorir</td><td><input class="inpfil" id="colore" name="colore" type="range" min="0" max="17" value="0" onchange="jfi();"></td></tr>
+<tr><td class="tdf" colspan="2" onclick="jresfilt();" style="cursor:pointer;background-color:#cededa;"><center>Recarregar Padr&otilde;es</center></td></tr>
+</table>
+</div>
+
+<!-- Para Desenha e Apaga -->
+<img id="desenha" src="pencil.png" onclick="jdesenha();" style="position:absolute;left:10px;top:100px;width:32px;background-color:red;cursor:pointer;"></img>
+<img id="apaga" src="apaga.png" onclick="japaga();" style="position:absolute;left:10px;top:150px;width:32px;cursor:pointer;"></img>
+<img id="picka" src="picker1.png" onclick="jpick();" style="position:absolute;left:10px;top:200px;width:32px;cursor:pointer;"></img>
+<img id="sair" src="sair.png" onclick="jsair();" style="position:absolute;left:10px;top:250px;width:32px;cursor:pointer;"></img>
+
+<!-- Tamanho e Cor da pena -->
+<div style="position:absolute;left:100px;top:0px;width:200px;padding:0px;">
+<b style="left:0px;top:-8px;">&nbsp;l&aacute;pis&nbsp;</b>
+<input type="color" id="favcolor" name="favcolor" value="#ff0000" onchange="jcolor(this);" style="position:relative;left:8px;top:-4px;width:20px;border:0px;padding:0px;"></input>
+<img id="fakecor" src="cor.png" title="Para escolher cor de desenhar" style="position:relative;left:15px;top:3px;width:32px;"></img>
+<select id="escolhagross" style="position:relative;left:20px;top:-7px;">
+<script>
+	for(let x=1;x<=21;x++){
+		document.write("<option value='"+x+"' onclick='pin("+x+");'>"+x+"</option>");
+	}
+</script>
+</select>
+<!-- Tamanho inicial da Ponta, escolhagross e var y -->
+<img id="imgpin" src="pin.png" style="position:relative;left:25px;top:-10px;width:5px;background-color:red;"></img>
+</div>
+
+<!-- Ponta Redonda ou Quadrada -->
+<div style="position:absolute;left:310px;top:2px;width:120px;padding:0px;height:37px;">
+<b style="left:0px;top:8px;">&nbsp;ponta&nbsp;</b>
+<img id="pontacir" src="cirF.png" onclick="jponta(this);" style="position:relative;left:7px;top:11px;width:15px;background-color:red;"></img>
+<img id="pontaret" src="retF.png" onclick="jponta(this);" style="position:relative;left:14px;top:11px;width:15px;background-color:#ccc;"></img>
+</div>
+
+<!-- Para Figuras SVG -->
+<select id="escolhafiguras" onclick='jimg(this.value)' style="position:absolute;left:700px;top:558px;width:200px;">
+<option value="">figuras</option>
+
+
+<script>
+
+var Nry=[];
+var Wry=[];
+var Hry=[];
+
+
+
+	var ss="";
+	var myArray;
+	var svg=[];
+	svg[1]="cadeado_1.svg,cursor.svg,cadeado_3.svg,conversacao.svg,circulos.svg,";
+	svg[2]="camera fot.svg,lixo_1.svg,rolo.svg,relogio.svg,lixo_2.svg,ideia_2.svg,";
+	svg[3]="aperto-de-mao.svg,ok_2.svg,quebra_cabeca_1.svg,careta_1.svg,maleta.svg,ideia_1.svg,boia.svg,ok_1.svg,";
+	svg[4]="meus_contatos.svg,porta_lapis.svg,apontando.svg,paisagem_4.svg,binoculo_2.svg,informacao.svg,";
+	svg[5]="engrenagens_1.svg,caixa_ferram.svg,sol.svg,paisagem_2_P.svg,binoculo_1.svg,visto.svg,casa_2.svg,";
+	svg[6]="batman.svg,nao_pode.svg,mulher_1.svg,bola_P.svg,casa_3.svg,mulher_3.svg,direcao-correta.svg,pra_la_pra_ca.svg,";
+	svg[7]="chave.svg,chave_de_boca.svg,amizade.svg,casa_1.svg,grupo_2.svg,quebra_cabeca_2.svg,musica.svg,homem_1.svg,";
+	svg[8]="engrenagens_2.svg,fechado.svg,cadeado_4.svg,folder.svg,cancel.svg,lupa.svg,grupo_3.svg,pasta_2_ab.svg,grupo_1.svg,";
+	svg[9]="homem_2.svg,cadeado_5.svg,paisagem_3.svg,lixo_3.svg,calendario.svg,para_a_nuvem.svg,paisagem_1.svg,cadeado_2_P.svg,";
+	svg[10]="careta_2.svg,configuracoes.svg,caixa_1.svg,plus.svg,quebra_cabeca_3.svg,documento.svg,recomecar.svg,pasta_1_ab.svg,";
+	svg[11]="jornal.svg,caixa_2.svg,mulher_2.svg,menu.svg,marca_livro.svg,passaro.svg,";
+	for(z=0;z<40;z++){if(svg[z]){ss=ss+svg[z];}}
+	myArray=ss.split(",");
+	for(z=0;z<400;z++){
+		if(myArray[z]){
+			document.write("<option value='../img/svg/"+myArray[z]+"'>"+myArray[z]+"</option>"); //".str_replace(".svg","",myArray[z].
+		}
+	}
+</script>
+
+</select>
+
+<!-- Para Geometrias e Texto -->
+<div style="position:absolute;left:60px;top:100px;width:30px;">
+	<div><img class="clc" id="cirA" onclick="jgeo(this.id);" src="cirA.png" style="background-color:red;"></img></div>
+	<div><img class="clc" id="cirF" onclick="jgeo(this.id);" src="cirF.png" style="background-color:red;"></img></div>
+	<div><img class="clc" id="retA" onclick="jgeo(this.id);" src="retA.png" style="background-color:red;"></img></div>
+	<div><img class="clc" id="retF" onclick="jgeo(this.id);" src="retF.png" style="background-color:red;"></img></div>
+	<div><img class="clc" id="chaA" onclick="jgeo(this.id);" src="chaA.png" style="background-color:red;"></img></div>
+	<div><img class="clc" id="line" onclick="jgeo(this.id);" src="line.png" style="background-color:red;"></img></div>
+	<div><img class="clc" id="ponto" onclick="jgeo(this.id);" src="ponto.png" style="background-color:red;"></img></div>
+</div>
+
+<!-- Entrada de Texto -->
+<div id="divtexto" style="position:absolute;top:40px;left:100px;width:1000px;height:500px;border:2px solid red;background-color:#ffc;display:none;">
+<center>
+<b style="position:relative;left:0px;top:-8px;">&nbsp;tamanho&nbsp;</b>
+<input id="infontesize" style="width:200px;" type="range" min=8 max=96 value=60 step=4 onchange="fontesize();"></input><cite id="numsize" style="position:relative;top:-8px;"></cite><br>
+<b style="position:relative;left:0px;top:-8px;">&nbsp;espessura&nbsp;</b>
+<input id="infonteweight" style="width:200px;" type="range" min=100 max=900 value=200 step=100 onchange="fonteweight();"></input><cite id="numweight" style="position:relative;top:-9px;"></cite><br>
+<b style="position:relative;left:0px;top:0px;">&nbsp;fam&iacute;lia&nbsp;</b>
+<select id="qualfonte" style="position:relative;left:10px;top:0px;">
+	<option value="tipo" onclick="fontefamily(this);">MysteryQuest</option>
+	<option value="Arial" onclick="fontefamily(this);">Arial</option>
+	<option value="Comic Sans MS" onclick="fontefamily(this);">Comic Sans MS</option>
+	<option value="Lucida Console" onclick="fontefamily(this);">Lucida Console</option>
+	<option value="Times New Roman" onclick="fontefamily(this);">Times New Roman</option>
+</select>
+<br>
+<b style="position:relative;left:0px;top:6px;font-size:15pt;color:red;">&nbsp;texto:&nbsp;</b>
+<input id="otexto" style="position:relative;width:800px;top:6px;text-align:left;font-size:12pt;" type="text" value="" onkeydown="alteratexto();" onkeyup="alteratexto();"></input><br>
+</center>
+<div id="afonte" style="position:relative;left:0px;top:20px;width:100%;font-family:tipo;font-size:60px;font-weight:200;font-style:normal;text-align:center;">abc</div>
+<button onclick="fechadiv();" style="position:absolute;left:60%;top:440px;cursor:pointer;font-size:24pt;color:#0a0;">&nbsp;prosseguir&nbsp;</button>
+<button style="position:absolute;left:80%;top:440px;font-size:24pt;border:0px;background:transparent;">&nbsp;ou&nbsp;</button>
+<img src="tools.png" onclick="fecha();" style="position:absolute;left:90%;top:433px;height:56px;cursor:pointer;"></img>
+</div>
+<div id="absafonte" onmousemove="showCoords(event);" style="position:absolute;left:0px;top:20px;font-family:tipo;font-size:60px;font-weight:200;font-style:normal;text-align:left;border:1px solid green;display:none;cursor:pointer;">abc</div>
+
+<!-- Para Imagens do QDB e do Pix -->
+<div id="items" style="position:absolute;left:10px;top:340px;width:80px;height:160px;overflow:auto;">
+
+<script>
+	var qua=[];
+	ss="";
+	qua[1]="quarto_01_vv_estoj.png,quarto_01_vv_lim.png,quarto_01_vv_maneki.png,quarto_01_vv_luv1.png,quarto_01_vv_cha.png,quarto_01_vv_rat.png,";
+	qua[2]="quarto_01_vv_relog.png,quarto_01_vv_porca.png,quarto_01_vv_almofolha.png,quarto_01_vv_bor.png,quarto_01_vv_azulg.png,heart.png,quarto_01_vv_estatuag.png,";
+	qua[3]="quarto_01_vv_esp.png,cat.png,quarto_01_vv_tiara.png,quarto_01_vv_liv.png,quarto_01_vv_cont.png,quarto_01_vv_boni.png,quarto_01_vv_luv2.png,";
+	qua[4]="quarto_01_vv_transf.png,quarto_01_vv_coiso2g.png,quarto_01_vv_lum.png,fly.png,quarto_01_vv_tacag.png,quarto_01_vv_canet.png,quarto_01_vv_cob.png,";
+	qua[5]="quarto_01_vv_canec.png,quarto_01_vv_alm.png,quarto_01_vv_copo.png,quarto_01_vv_escor.png,quarto_01_vv_naninha.png,quarto_01_vv_coisog.png,quarto_01_vv_moed.png,";
+	qua[6]="quarto_01_vv_dragao.png,quarto_01_vv_frut.png,bug.png,dog.png,quarto_01_vv_celula.png,quarto_01_vv_ampulhetag.png,quarto_01_vv_vermelhog.png,quarto_01_vv_rosag.png,quarto_01_vv_amarelo.png,";
+	for(z=0;z<30;z++){if(qua[z]){ss=ss+qua[z];}}
+	myArray=ss.split(",");
+	for(z=0;z<200;z++){
+		if(myArray[z]){
+			document.write("<img class='clc' id='../img/quarto_01/"+myArray[z]+"' onclick='jimg(this.id)' src='../img/quarto_01/dest/"+myArray[z]+"' width='30'></img>");
+		}
+	}
+</script>
+
+<hr>
+<img class="clc" id="cat.png" onclick="jimg(this.id);" src="../img/quarto_01/dest/cat.png"></img><img class="clc" id="dog.png" onclick="jimg(this.id);" src="../img/quarto_01/dest/dog.png"></img><br>
+<img class="clc" id="fly.png" onclick="jimg(this.id);" src="../img/quarto_01/dest/fly.png"></img><img class="clc" id="bug.png" onclick="jimg(this.id);" src="../img/quarto_01/dest/bug.png"></img><br>
+<img class="clc" id="heart.png" onclick="jimg(this.id);" src="../img/quarto_01/dest/heart.png"></img>
+<hr>
+</div>
+
+<script>
+
+function init(){
+	canvas=document.getElementById('can');
+	ctx=canvas.getContext("2d");
+	canvas.addEventListener("mousemove",function(e){findxy('move',e)},false);
+	canvas.addEventListener("mousedown",function(e){findxy('down',e)},false);
+	canvas.addEventListener("mouseup",function(e){findxy('up',e)},false);
+	canvas.addEventListener("mouseout",function(e){findxy('out',e)},false);
+	ovl1=document.getElementById('ovl1');
+	ctx1=ovl1.getContext("2d");
+	ovl2=document.getElementById('ovl2');
+	ctx2=ovl2.getContext("2d");
+	ovl3=document.getElementById('ovl3');
+	ctx3=ovl3.getContext("2d");
+	d=document.getElementById("dan");
+	dtx=d.getContext("2d");
+}
+
+function jponta(pon){
+switch (pon.id){
+	case "pontacir":
+		document.getElementById("pontacir").style.backgroundColor="red";
+		document.getElementById("pontaret").style.backgroundColor="#ccc";
+		ponta="cir";break;
+	case "pontaret":
+		document.getElementById("pontacir").style.backgroundColor="#ccc";
+		document.getElementById("pontaret").style.backgroundColor="red";
+		ponta="ret";break;
+	}
+}
+
+function japaga(){
+	fecha();
+	document.getElementById("can").style.cursor="url('erasepeq.cur'),auto";
+	document.getElementById("penera").src="apaga.png";
+	document.getElementById("figura").src="transpa.png";
+	document.getElementById("figura").style.backgroundColor="transparent";
+	x="erase";
+}
+
+function jdesenha(){
+	fecha();
+	x=document.getElementById("favcolor").value;
+	document.getElementById("can").style.cursor="pointer";
+	document.getElementById("penera").src="pencil.png";
+	document.getElementById("penera").style.backgroundColor=x;
+	document.getElementById("desenha").style.backgroundColor=x;
+	document.getElementById("figura").src="transpa.png";
+	document.getElementById("figura").style.backgroundColor="transparent";
+}
+
+function jpick(){
+	fecha();
+	document.getElementById("can").style.cursor="url('pick.cur'),auto";
+	pegacor=1;
+}
+
+function jsair(){
+	fecha();
+}
+
+function jcolor(obj){
+	xant=x;
+	fig=0;
+	if(pegacor==1){
+		if(pick!="incolor"){
+			x="#"+pick;
+			document.getElementById("favcolor").value="#"+pick;
+			//alert(pick);
+			pegacor=0;
+		}
+		pegacor=0;
+	} else {
+		x=obj.value;
+	}
+	document.getElementById("afonte").style.color=x;
+	document.getElementById("absafonte").style.color=x;
+	document.getElementById("can").style.cursor="pointer";
+	document.getElementById("cirA").style.backgroundColor=x;
+	document.getElementById("cirF").style.backgroundColor=x;
+	document.getElementById("retA").style.backgroundColor=x;
+	document.getElementById("retF").style.backgroundColor=x;
+	document.getElementById("chaA").style.backgroundColor=x;
+	document.getElementById("line").style.backgroundColor=x;
+	document.getElementById("ponto").style.backgroundColor=x;
+	document.getElementById("desenha").style.backgroundColor=x;
+	if(geom==""){
+		document.getElementById("penera").style.backgroundColor=x;
+		document.getElementById("figura").src="transpa.png";
+	}
+}
+
+function pin(gro){
+	ctx.lineWidth=gro;
+	y=gro;
+	var topgro=1;
+	topgro=(gro/2)-13;
+	document.getElementById("imgpin").style.width=gro+"px";
+	document.getElementById("imgpin").style.top=topgro+"px";
+}
+
+function draw(){
+	if(x=="erase"){
+		ctx.globalCompositeOperation="destination-out";
+		ctx.beginPath();
+		if(ponta=="ret"){
+			ctx.fillRect(currX,currY,y,y);
+		} else {
+			ctx.stroke();
+			ctx.arc(currX-y/4,currY-y/4,y/2,0,2*Math.PI);
+			ctx.fill();
+		}
+	} else {
+		x=document.getElementById("favcolor").value;
+		ctx.globalCompositeOperation="source-over";
+		ctx.beginPath();
+		jctxponta();
+		ctx.moveTo(prevX,prevY);
+		ctx.lineTo(currX,currY);
+		ctx.strokeStyle=x;
+		ctx.lineWidth=y;
+		ctx.stroke();
+		ctx.strokeStyle=x;
+		ctx.closePath();
+	}
+}
+
+function pinte(){
+	if(geom=="line"){fazlin();}
+	if(geom=="ponto"){fazponto();}
+}
+
+function erase(){if(confirm("Limpar tudo?")){ctx.clearRect(0,0,w,h);}}
+    
+function fucor(cor){
+	if(confirm("Quer borrar tudo com esta cor? \xC9 mesmo?\nVai apagar todo seu desenho!\n")){
+		ctx.fillStyle=cor.value;
+		ctx.fillRect(0,0,w,h);
+		document.getElementById("figura").src="transpa.png";
+	}
+}
+
+function findxy(res,e){
+	if(res=='down' && event.button!=2){
+		prevX=currX;
+		prevY=currY;
+		currX=e.clientX-canvas.offsetLeft;
+		currY=e.clientY-canvas.offsetTop;
+		flag=true;dot_flag=true;
+		if(geom=="line" || geom=="ponto"){flag=false;dot_flag=false;}
+		if(x=="erase"){flag=true;dot_flag=false;}
+		if(pegacor==1){flag=false;dot_flag=false;}
+		if (dot_flag){
+			ctx.beginPath();
+			ctx.fillStyle=x;
+			if(ponta=="ret"){
+				ctx.lineJoin="bevel";
+				ctx.lineCap="square";
+				ctx.fillRect(currX-y/2,currY-y/2,y,y);
+				ctx.stroke();
+			} else {
+				ctx.lineJoin="round";
+				ctx.lineCap="round";
+				ctx.arc(currX-y/4,currY-y/4,y/2,0,2*Math.PI);
+				ctx.fill();
+			}
+			ctx.closePath();
+			dot_flag=false;
+		}
+		if(pegacor==1){jcolor(pick);}
+	}
+	if(res=='up' || res=="out"){flag=false;}
+	if(res=='move'){
+		if(geom=="chaA"){
+			var vemY=parseInt(document.getElementById("absafonte").style.fontSize);
+			var paraY=0;
+			paraY=vemY-45;
+			var afonte=document.getElementById("absafonte").style.fontFamily;
+			if(afonte=="Comic Sans MS"){paraY=(vemY*.97)-35;}
+			if(afonte=="Arial"){paraY=(vemY*.97)-45;}
+			if(afonte=="Lucida Console"){paraY=(vemY*.96)-47;}
+			if(afonte=="Times New Roman"){paraY=(vemY*.96)-46;}
+			document.getElementById("absafonte").style.display="inline";
+			document.getElementById("absafonte").style.left=e.clientX-2+"px";
+			document.getElementById("absafonte").style.top=e.clientY-2+"px";
+			document.getElementById("absafonte").onclick=function(){
+				var strfonte=document.getElementById("absafonte").style.fontWeight+" "+document.getElementById("absafonte").style.fontSize+" "+document.getElementById("absafonte").style.fontFamily;
+				ctx.font=strfonte;
+				ctx.fillStyle=x;
+				ctx.textAlign="left";
+				ctx.fillText(document.getElementById("absafonte").innerText,e.clientX-103,e.clientY+paraY);
+			}
+		}
+		if(geom=="line" || geom=="ponto"){flag=false;}
+		if(flag){
+			prevX=currX;prevY=currY;
+			currX=e.clientX-canvas.offsetLeft;currY=e.clientY-canvas.offsetTop;
+			draw();
+		}
+	}
+}
+
+function fazlin(){
+	if(x=="erase"){document.getElementById("can").style.cursor="pointer";}
+	ctx.globalCompositeOperation="source-over";
+	x=document.getElementById("favcolor").value;
+	linX=currX;
+	linY=currY;
+	if(linXant==-1){linXant=linX;}
+	if(linYant==-1){linYant=linY;}
+	ctx.beginPath();
+	jctxponta();
+	ctx.strokeStyle=x;
+	ctx.lineWidth=y;
+	ctx.moveTo(linXant,linYant);
+	ctx.lineTo(linX,linY);
+	ctx.stroke();
+	linXant=linX;
+	linYant=linY;
+}
+
+function fazponto(){
+	if(x=="erase"){document.getElementById("can").style.cursor="pointer";}
+	x=document.getElementById("favcolor").value;
+	ctx.globalCompositeOperation="source-over";
+	ctx.beginPath();
+	ctx.fillStyle=x;
+	if(ponta=="ret"){
+		ctx.fillRect(currX,currY,y,y);
+	} else {
+		ctx.stroke();
+		ctx.arc(currX-y/4,currY-y/4,y/2,0,2*Math.PI);
+		ctx.fill();
+	}
+}
+
+function jimg(tid){
+	fig=1;
+	totrot=0;
+	document.getElementById("dan").style.display="inline";
+	img=new Image();
+	img.src=tid;
+	document.getElementById("logofilt").style.display="inline";
+	img.onload=function(){
+		origW=200;
+		origH=200;
+		valAumDim=0;
+	}
+	altimg=1;
+	document.getElementById("cameIdN").style.display="inline";
+	geom="";
+}
+
+function jgeo(tid){
+	x=document.getElementById("favcolor").value;
+	document.getElementById("penera").src="transpa.png";
+	document.getElementById("penera").style.backgroundColor="transparent";
+	document.getElementById("dan").style.display="inline";
+	document.getElementById("cameIdN").style.display="inline";
+	document.getElementById("figura").src=tid +".png";
+	document.getElementById("figura").style.backgroundColor=x;
+	geom=tid;
+	if(geom=="cirA" || geom=="cirF" || geom=="retA" || geom=="retF"){
+		altimg=0;
+		totrot=0;
+	}
+	if(tid=="chaA"){
+		document.getElementById("dan").style.display="none";
+		document.getElementById("divtexto").style.display="inline";
+		document.getElementById("cameIdN").style.display="inline";
+	}
+	if(tid=="line" || tid=="ponto"){
+		document.getElementById("dan").style.display="none";
+		document.getElementById("cameIdN").style.display="inline";
+		document.getElementById("can").style.cursor="pointer";
+	}
+	if(tid=="ponto"){dot_flag=true;}
+}
+
+// para teclas
+function checkKey(e){
+	e=e || window.event;
+	if(e.keyCode=='32'){}
+	else if(e.keyCode=='90'){x="transparent"}
+	else if(e.keyCode=='80'){aum();}//P
+	else if(e.keyCode=='107'){aum();}//+
+	else if(e.keyCode=='76'){dim();}//L
+	else if(e.keyCode=='109'){dim();}//-
+	else if(e.keyCode=='39'){aumretX();}//seta dir
+	else if(e.keyCode=='37'){dimretX();}//seta esq
+	else if(e.keyCode=='38'){aumaltY();}//seta cima
+	else if(e.keyCode=='40'){dimaltY();}//seta baixo
+	else if(e.keyCode=='68'){rodadir();}//D
+	else if(e.keyCode=='69'){rodaesq();}//E
+	//alert(e.keyCode);
+}
+
+document.onkeydown=checkKey;
+
+var w=window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+var h=window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
+</script>
+
+<!-- Para Fotos Preferidas -->
+<select id="escolhafoto" onchange="muda(this.value);" style="position:absolute;left:550px;top:558px;">
+<option value="esco">fotos prefs.</option>
+<script>
+	var pref="Beatles.jpg,Canvas.png,Falloxbow.jpg,Giants.jpg,Heron.jpg,Ladybird.jpg,Summer.jpg,Sunflower.jpg,Vivi_self.jpg,";
+	myArray=pref.split(",");
+	for(z=0;z<200;z++){
+		if(myArray[z]){
+			document.write("<option value="+z+">"+myArray[z]+"</option>");
+			Nry[z]="prefs/"+myArray[z];
+		}
+/*
+		const imgX = new Image();
+		imgX.onload = function() {
+		console.log(`Width: ${imgX.width}, Height: ${imgX.height}`);
+		}
+		imgX.src = Nry[z];
+		Wry[z]=imgX.width;Hry[z]=imgX.height;
+*/
+	}
+</script>
+
+</select>
+
+<script>
+	Wry[0]=200;Hry[0]=391;
+	Wry[1]=350;Hry[1]=350;
+	Wry[2]=350;Hry[2]=267;
+	Wry[3]=320;Hry[3]=240;
+	Wry[4]=320;Hry[4]=240;
+	Wry[5]=320;Hry[5]=240;
+	Wry[6]=320;Hry[6]=240;
+	Wry[7]=300;Hry[7]=200;
+	Wry[8]=320;Hry[8]=500;
+
+function muda(v){
+	document.getElementById("dan").style.display="inline";
+	img=new Image();
+	img.src=Nry[v];
+//document.getElementById("imatest").src=Nry[v];
+//alert(document.getElementById("imatest").width);
+	img.width=Number(Wry[v]);
+	img.height=Number(Hry[v]);
+
+//img.width=document.getElementById("imatest").width;
+//img.height=document.getElementById("imatest").height;
+	origW=img.width;
+	origH=img.height;
+	valAumDim=0;
+	document.getElementById("logofilt").style.display="inline";
+	img.onload=function(){
+	}
+	altimg=1;
+	totrot=0;
+	document.getElementById("cameIdN").style.display="inline";
+	geom="";
+	document.getElementById("escolhafoto").value="esco";
+	document.getElementById("cameIdN").focus();
+}
+</script>
+
+<!-- RaioX, RaioY, Largura e Altura -->
+<div style="position:absolute;left:550px;top:10px;width:400px;">
+<b>&nbsp;larg&nbsp;</b>&nbsp;<input id="inplarg" onkeypress='return isNumber(event)'></input>
+&nbsp;<button onclick="jresetLA();" style="width:65px;color:red;">iguais</button>
+&nbsp;<b>&nbsp;altu&nbsp;</b>&nbsp;<input id="inpaltu" onkeypress='return isNumber(event)'></input>
+</div>
+
+<!-- Para Cor de Fundo -->
+<div style="position:absolute;left:850px;top:2px;width:200px;padding:0px;">
+<b id="fundo" style="left:0px;top:-8px;">&nbsp;cor de tela&nbsp;</b>
+<input type="color" id="fundocor" name="fundocor" value="#ff0000" onchange="fucor(this);" style="position:relative;left:10px;top:-4px;width:20px;border:0px;padding:0px;"></input>
+<img id="fakefundo" src="cor.png" title="Para escolher cor&#013;de fundo de tela" style="position:relative;left:20px;top:2px;width:32px;"></img>
+<img id="corfundo" src="fill.png" onclick="erase();" style="position:relative;left:25px;top:0px;width:28px;background-image:url('quad_trans.png');"></img>
+</div>
+
+<!-- Xpos e Ypos -->
+<div style="position:absolute;left:17px;top:558px;font-size:9pt;">
+x<input id="xposC" value="" style="border:0px;font-size:9pt;width:30px;"></input>
+y<input id="yposC" value="" style="border:0px;font-size:9pt;width:25px;"></input>
+</div>
+
+<!-- Overlays -->
+<div style="position:absolute;left:100px;top:545px;">
+<img src="sal.png" onclick="gravaovl();" class="sal"></img>
+<img src="v1.png" onclick="abreovl(1);" class="sal"></img>
+<img src="v2.png" onclick="abreovl(2);" class="sal"></img>
+<img src="v3.png" onclick="abreovl(3);" class="sal"></img>
+<img src="r1.png" onclick="trazovl(1);" class="sal"></img>
+<img src="r2.png" onclick="trazovl(2);" class="sal"></img>
+<img src="r3.png" onclick="trazovl(3);" class="sal"></img>
+<img src="clo.png" onclick="fechaovl();" class="sal"></img>
+</div>
+
+<!-- Local e Tamanho de Imagens -->
+<img id="logoajuda" onclick="jajuda();" src="ajuda.png" title="Tela&#013;de&#013;Ajuda" style="position:absolute;left:60px;top:5px;height:40px;cursor:pointer;"></img>
+<img id="cameIdN" src="tools.png" onclick="fecha();" style="position:absolute;left:450px;top:5px;height:32px;display:none;cursor:pointer;"></img>
+
+<!-- Limpar -->
+<button id="clr" onclick="erase();" style="position:absolute;top:525px;left:10px;width:85px;color:red;">LIMPAR</button>
+
+<!-- Imagens de Arquivo -->
+<img id="fakebtn" src="hd1.png" title="Para buscar imagens no &#013;disco de seu computador" style="position:absolute;left:500px;top:550px;width:40px;cursor:pointer;"></img>
+<input hidden type="file" id="pic" name="pic" style="position:absolute;left:900px;top:50px;width:200px;"></input>
+<img src="" id="outimage" style="position:absolute;left:1200px;top:0px;"></img>
+<script type="text/javascript">
+
+	var fakecor=document.getElementById('fakecor');
+	var fileButtoncor=document.getElementById('favcolor');
+	fakecor.addEventListener('click',function(e){
+		fecha();
+		var clickEvent=new MouseEvent('click',{bubbles:true});
+		fileButtoncor.dispatchEvent(clickEvent);
+	});
+
+	var fakefundo=document.getElementById('fakefundo');
+	var fileButtonfundo=document.getElementById('fundocor');
+	fakefundo.addEventListener('click',function(e){
+		fecha();
+		var clickEvent=new MouseEvent('click',{bubbles:true});
+		fileButtonfundo.dispatchEvent(clickEvent);
+	});
+
+	var fakeButton=document.getElementById('fakebtn');
+	var fileButton=document.getElementById('pic');
+	fakeButton.addEventListener('click',function(e){
+		fecha();
+		var clickEvent=new MouseEvent('click',{bubbles:true});
+		fileButton.dispatchEvent(clickEvent);
+	});
+
+	document.getElementById("pic").onchange=function(evt){
+	var tgt=evt.target || window.event.srcElement,files=tgt.files;
+	if(FileReader && files &&files.length){
+		var fr=new FileReader();
+		fr.onload=function(){document.getElementById("outimage").src=fr.result;}
+		fr.readAsDataURL(files[0]);
+		fotoN=files[0].name;
+	}
+
+	document.getElementById("outimage").onload=function() {
+		fotoW=document.getElementById("outimage").width;
+		fotoH=document.getElementById("outimage").height;
+		bloha();
+	}
+}
+
+function bloha(){
+	fotoW=document.getElementById("outimage").width;
+	fotoH=document.getElementById("outimage").height;
+	document.getElementById("dan").style.display="inline";
+	img=new Image();
+	img.src=document.getElementById("outimage").src;
+	img.width=fotoW;
+	img.height=fotoH;
+	origW=img.width;
+	origH=img.height;
+	valAumDim=0;
+	document.getElementById("logofilt").style.display="inline";
+	img.onload=function(){
+	}
+	altimg=1;
+	document.getElementById("cameIdN").style.display="inline";
+}
+
+document.getElementById("escolhafoto").value="esco";
+document.getElementById("escolhagross").value="5";
+document.getElementById("inplarg").value=50;
+document.getElementById("inpaltu").value=50;
+document.getElementById("can").width=w-180;
+document.getElementById("dan").width=w-180;
+document.getElementById("ovl1").width=w-180;
+document.getElementById("ovl2").width=w-180;
+document.getElementById("ovl3").width=w-180;
+document.getElementById("divtexto").style.width=w-180+"px";
+document.getElementById("outimage").style.left=w-5+"px";
+document.getElementById("escolhafiguras").value="";
+
+danW=document.getElementById("dan").width;
+danH=document.getElementById("dan").height;
+
+function showCoords(event){
+	cliX=event.clientX;
+	cliY=event.clientY;
+	document.getElementById("xposC").value=cliX-100;
+	document.getElementById("yposC").value=cliY-40;
+	cornerX=cliX-100;
+	cornerY=cliY-43;
+	horizX=cornerX+lar/2;
+	vertiX=cornerY+alt/2;
+	var imgData=ctx.getImageData(cornerX,cornerY,1,1);
+	var ck=imgData.data[0].toString(16);if(ck.length==1){ck="0"+ck;}
+	pick="";
+	pick=pick+ck;
+	var ck=imgData.data[1].toString(16);if(ck.length==1){ck="0"+ck;}
+	pick=pick+ck;
+	var ck=imgData.data[2].toString(16);if(ck.length==1){ck="0"+ck;}
+	pick=pick+ck;
+	if(imgData.data[3]==0){pick="incolor";}
+	document.getElementById("spanpick").innerText=pick;
+	if(imgData.data[3]!=0){document.getElementById("spanpick").innerText=pick;}
+	lar=document.getElementById("inplarg").value;
+	alt=document.getElementById("inpaltu").value;
+	if(altimg==1){
+		dtx.clearRect(0,0,danW,danH);
+		dtx.save();
+		dtx.translate(cliX-100,cliY-43);
+		dtx.rotate(totrot/180*Math.PI);
+		dtx.filter=filtro;
+		dtx.drawImage(img,-(origW*1/2)*(1+valAumDim),-(origH*1/2)*(1+valAumDim),origW*(1+valAumDim),origH*(1+valAumDim));
+		dtx.restore();
+	}
+	if(geom=="cirA" || geom=="cirF"){
+		dtx.clearRect(0,0,danW,danH);
+		dtx.save();
+		dtx.beginPath();
+		jdtxponta();
+		dtx.strokeStyle=x;
+		dtx.lineWidth=y;
+		dtx.ellipse(cornerX,cornerY,lar/2,alt/2,totrot/180*Math.PI,0,Math.PI*2);
+		dtx.stroke();
+		if(geom=="cirF"){
+			dtx.fillStyle=x;
+			dtx.fill();
+			dtx.stroke();
+		}
+		dtx.restore();
+	}
+	if(geom=="retA" || geom=="retF"){
+		dtx.clearRect(0,0,danW,danH);
+		dtx.save();
+		dtx.beginPath();
+		jdtxponta();
+		dtx.translate(cornerX,cornerY);
+		dtx.rotate(totrot/180*Math.PI);
+		dtx.translate(-horizX,-vertiX);
+		dtx.strokeStyle=x;
+		dtx.lineWidth=y;
+		dtx.fillStyle=x;
+		dtx.strokeRect(cornerX,cornerY,lar,alt);
+		if(geom=="retF"){
+			dtx.fillRect(cornerX,cornerY,lar,alt);
+		}
+		dtx.restore();
+	}
+}
+
+function fontesize(){
+	document.getElementById("afonte").style.fontSize=document.getElementById("infontesize").value + "px";
+	document.getElementById("absafonte").style.fontSize=document.getElementById("infontesize").value + "px";
+	document.getElementById("numsize").innerText=document.getElementById("infontesize").value + "px";
+}
+
+function fontefamily(ff){
+	document.getElementById("afonte").style.fontFamily=ff.value;
+	document.getElementById("absafonte").style.fontFamily=ff.value;
+}
+
+function fonteweight(){
+	document.getElementById("afonte").style.fontWeight=document.getElementById("infonteweight").value;
+	document.getElementById("absafonte").style.fontWeight=document.getElementById("infonteweight").value;
+	document.getElementById("numweight").innerText=document.getElementById("infonteweight").value;
+}
+
+function alteratexto(){
+	document.getElementById("afonte").innerText=document.getElementById("otexto").value;
+	document.getElementById("absafonte").innerText=document.getElementById("otexto").value;
+}
+
+function fechadiv(){
+	document.getElementById("divtexto").style.display="none";
+	document.getElementById("can").style.backgroundImage="url('cinq2.png');";
+	ctx.globalCompositeOperation="source-over";
+}
+
+function fecha(){
+	img.src="transpa.png";
+	document.getElementById("divfilt").style.display="none";
+	document.getElementById("logofilt").style.display="none";
+	document.getElementById("can").style.backgroundImage="url('transpa.png');";
+	ctx.closePath();
+	x=document.getElementById("favcolor").value;
+	document.getElementById("dan").style.display="none";
+//	dot_flag=false;
+	altimg=0;
+	document.getElementById("cameIdN").style.display="none";
+	document.getElementById("escolhafoto").value="esco";
+	geom="";
+	totrot=0;
+	fig=0;
+	scale=1;
+	linXant=-1;
+	linYant=-1;
+	document.getElementById("divtexto").style.display="none";
+	document.getElementById("absafonte").style.display="none";
+	document.getElementById("imgpin").style.backgroundColor=x;
+	document.getElementById("figura").src="transpa.png";
+	document.getElementById("figura").style.backgroundColor="transparent";
+	document.getElementById("penera").src="pencil.png";
+	document.getElementById("penera").style.backgroundColor=x;
+	document.getElementById("can").style.cursor="pointer";
+}
+
+function abreovl(q){
+	document.getElementById("can").style.display="none";
+	switch(q){
+	case 1:{
+		document.getElementById("ovl2").style.display="none";
+		document.getElementById("ovl3").style.display="none";
+		document.getElementById("ovl1").style.display="inline";
+		break;
+		}
+	case 2:{
+		document.getElementById("ovl1").style.display="none";
+		document.getElementById("ovl3").style.display="none";
+		document.getElementById("ovl2").style.display="inline";
+		break;
+		}
+	case 3:{
+		document.getElementById("ovl1").style.display="none";
+		document.getElementById("ovl2").style.display="none";
+		document.getElementById("ovl3").style.display="inline";
+		break;
+		}
+	}
+}
+
+function trazovl(q){
+	var qW=document.getElementById("can").width;
+	var qH=document.getElementById("can").height;
+	var imageData;
+	switch(q){
+		case 1:imageData=ctx1.getImageData(0,0,qW,qH);break;
+		case 2:imageData=ctx2.getImageData(0,0,qW,qH);break;
+		case 3:imageData=ctx3.getImageData(0,0,qW,qH);break;
+	}
+	ctx.putImageData(imageData,0,0);
+	document.getElementById("ovl1").style.display="none";
+	document.getElementById("ovl2").style.display="none";
+	document.getElementById("ovl3").style.display="none";
+	document.getElementById("can").style.display="inline";
+}
+
+function toprint(){
+	ctx.globalCompositeOperation="source-over";
+	if(altimg==1){
+		ctx.save();
+		ctx.translate(cliX-100,cliY-43);
+		ctx.rotate(totrot/180*Math.PI);
+		ctx.filter=filtro;
+		ctx.drawImage(img,-(origW*1/2)*(1+valAumDim),-(origH*1/2)*(1+valAumDim),origW*(1+valAumDim),origH*(1+valAumDim));
+		ctx.restore();
+	}
+	if(geom=="cirA" || geom=="cirF"){
+		ctx.save();
+		ctx.beginPath();
+		jctxponta();
+		ctx.strokeStyle=x;
+		ctx.lineWidth=y;
+		ctx.ellipse(cornerX,cornerY,lar/2,alt/2,totrot/180*Math.PI,0,Math.PI*2);
+		ctx.stroke();
+		if(geom=="cirF"){
+			ctx.fillStyle=x;
+			ctx.fill();
+			ctx.stroke();
+		}
+		ctx.restore();
+	}
+	if(geom=="retA" || geom=="retF"){
+		ctx.save();
+		ctx.beginPath();
+		jctxponta();
+		ctx.translate(cornerX,cornerY);
+		ctx.rotate(totrot/180*Math.PI);
+		ctx.translate(-horizX,-vertiX);
+		ctx.strokeStyle=x;
+		ctx.lineWidth=y;
+		ctx.fillStyle=x;
+		ctx.strokeRect(cornerX,cornerY,lar,alt);
+		if(geom=="retF"){
+			ctx.fillRect(cornerX,cornerY,lar,alt);
+		}
+		ctx.restore();
+	}
+}
+
+function gravaovl(){
+	ctx.globalCompositeOperation="source-over";
+	var imageData;
+	var qW=document.getElementById("can").width;
+	var qH=document.getElementById("can").height;
+	imageData=ctx2.getImageData(0,0,qW,qH);
+	ctx3.putImageData(imageData,0,0);
+	imageData=ctx1.getImageData(0,0,qW,qH);
+	ctx2.putImageData(imageData,0,0);
+	imageData=ctx.getImageData(0,0,qW,qH);
+	ctx1.putImageData(imageData,0,0);
+}
+
+function jresetLA(){
+	document.getElementById("inpaltu").value=document.getElementById("inplarg").value;
+}
+
+function fechaovl(){
+	for(k=1;k<4;k++){
+		var strq="ovl"+k;
+		document.getElementById(strq).style.display="none";
+	}
+	document.getElementById("can").style.display="inline";
+}
+
+function aum(){valAumDim=valAumDim+.02;img.width=origW*(1+valAumDim);img.height=origH*(1+valAumDim);aumOUdim="aum";auxdim();}
+function dim(){
+	cornerX=cliX-100;
+	cornerY=cliY-43;
+	horizX=cornerX+lar/2;
+	vertiX=cornerY+alt/2;
+
+	aumOUdim="dim";
+	if(img.width>50 && img.height>50){
+		valAumDim=valAumDim-.02;
+		img.width=origW*(1+valAumDim);img.height=origH*(1+valAumDim);
+	}
+	auxdim();
+}
+
+function auxdim(){
+	cornerX=cliX-100;
+	cornerY=cliY-43;
+	horizX=cornerX+lar/2;
+	vertiX=cornerY+alt/2;
+
+	if(aumOUdim=="aum"){
+		lar=Number(document.getElementById("inplarg").value)+1;
+		alt=Number(document.getElementById("inpaltu").value)+1;
+	} else {
+		lar=Number(document.getElementById("inplarg").value)-1;
+		alt=Number(document.getElementById("inpaltu").value)-1;
+	}
+	if(lar<0){lar=0;}
+	if(alt<0){alt=0;}
+	document.getElementById("inplarg").value=lar;
+	document.getElementById("inpaltu").value=alt;
+
+	if(altimg==1){
+		dtx.clearRect(0,0,danW,danH);
+		dtx.save();
+		dtx.translate(cliX-100,cliY-43);
+		dtx.filter=filtro;
+		dtx.rotate(totrot/180*Math.PI);
+		dtx.drawImage(img,-(origW*1/2)*(1+valAumDim),-(origH*1/2)*(1+valAumDim),origW*(1+valAumDim),origH*(1+valAumDim));
+		dtx.restore();
+	}
+	if(geom=="cirA" || geom=="cirF"){
+		dtx.clearRect(0,0,danW,danH);
+		dtx.save();
+		dtx.beginPath();
+		jdtxponta();
+		dtx.strokeStyle=x;
+		dtx.lineWidth=y;
+		dtx.ellipse(cornerX,cornerY,lar/2,alt/2,totrot/180*Math.PI,0,Math.PI*2);
+		dtx.stroke();
+		if(geom=="cirF"){
+			dtx.fillStyle=x;
+			dtx.fill();
+			dtx.stroke();
+		}
+		dtx.restore();
+	}
+	if(geom=="retA" || geom=="retF"){
+		dtx.clearRect(0,0,danW,danH);
+		dtx.save();
+		dtx.beginPath();
+		jdtxponta();
+		dtx.translate(cornerX,cornerY);
+		dtx.rotate(totrot/180*Math.PI);
+		dtx.translate(-horizX,-vertiX);
+		dtx.strokeStyle=x;
+		dtx.lineWidth=y;
+		dtx.fillStyle=x;
+		dtx.strokeRect(cornerX,cornerY,lar,alt);
+		if(geom=="retF"){
+			dtx.fillRect(cornerX,cornerY,lar,alt);
+		}
+		dtx.restore();
+	}
+}
+
+function aumretX(){lar=Number(document.getElementById("inplarg").value)+1;aumdimret();}
+function dimretX(){lar=Number(document.getElementById("inplarg").value)-1;aumdimret();}
+function aumaltY(){alt=Number(document.getElementById("inpaltu").value)+1;aumdimret();}
+function dimaltY(){alt=Number(document.getElementById("inpaltu").value)-1;aumdimret();}
+function aumdimret(){
+if(lar<0){lar=0;}
+if(alt<0){alt=0;}
+	cornerX=cliX-100;
+	cornerY=cliY-43;
+	horizX=cornerX+lar/2;
+	vertiX=cornerY+alt/2;
+	document.getElementById("inplarg").value=lar;
+	document.getElementById("inpaltu").value=alt;
+	if(geom=="retA" || geom=="retF"){
+		dtx.clearRect(0,0,danW,danH);
+		dtx.save();
+		dtx.beginPath();
+		jdtxponta();
+		dtx.translate(cornerX,cornerY);
+		dtx.rotate(totrot/180*Math.PI);
+		dtx.translate(-horizX,-vertiX);
+		dtx.strokeStyle=x;
+		dtx.lineWidth=y;
+		dtx.fillStyle=x;
+		dtx.strokeRect(cornerX,cornerY,lar,alt);
+		if(geom=="retF"){
+			dtx.fillRect(cornerX,cornerY,lar,alt);
+		}
+		dtx.restore();
+	}
+	if(geom=="cirA" || geom=="cirF"){
+		dtx.clearRect(0,0,danW,danH);
+		dtx.save();
+		dtx.beginPath();
+		jdtxponta();
+		dtx.strokeStyle=x;
+		dtx.lineWidth=y;
+		dtx.ellipse(cornerX,cornerY,lar/2,alt/2,totrot/180*Math.PI,0,Math.PI*2);
+		dtx.stroke();
+		if(geom=="cirF"){
+			dtx.fillStyle=x;
+			dtx.fill();
+			dtx.stroke();
+		}
+		dtx.restore();
+	}
+}
+
+function rodadir(){totrot=totrot+1;auxroda();}
+function rodaesq(){totrot=totrot-1;auxroda();}
+function auxroda(){
+	cornerX=cliX-100;
+	cornerY=cliY-43;
+	horizX=cornerX+lar/2;
+	vertiX=cornerY+alt/2;
+	document.getElementById("inplarg").value=lar;
+	document.getElementById("inpaltu").value=alt;
+	if(altimg==1){
+		if(totrot>360){totrot=totrot-360;}
+		if(totrot<-360){totrot=totrot+360;}
+		dtx.clearRect(0,0,danW,danH);
+		dtx.save();
+		dtx.translate(cliX-100,cliY-43);
+	dtx.filter=filtro;
+		dtx.rotate(totrot/180*Math.PI);
+		dtx.drawImage(img,-(origW*1/2)*(1+valAumDim),-(origH*1/2)*(1+valAumDim),origW*(1+valAumDim),origH*(1+valAumDim));
+		dtx.restore();
+	}
+	if(geom=="retA" || geom=="retF"){
+		dtx.clearRect(0,0,danW,danH);
+		dtx.save();
+		dtx.beginPath();
+		jdtxponta();
+		dtx.translate(cornerX,cornerY);
+		dtx.rotate(totrot/180*Math.PI);
+		dtx.translate(-horizX,-vertiX);
+		dtx.strokeStyle=x;
+		dtx.lineWidth=y;
+		dtx.fillStyle=x;
+		dtx.strokeRect(cornerX,cornerY,lar,alt);
+		if(geom=="retF"){
+			dtx.fillRect(cornerX,cornerY,lar,alt);
+		}
+		dtx.restore();
+	}
+	if(geom=="cirA" || geom=="cirF"){
+		dtx.clearRect(0,0,danW,danH);
+		dtx.save();
+		dtx.beginPath();
+		jdtxponta();
+		dtx.strokeStyle=x;
+		dtx.lineWidth=y;
+		dtx.ellipse(cornerX,cornerY,lar/2,alt/2,totrot/180*Math.PI,0,Math.PI*2);
+		dtx.stroke();
+		if(geom=="cirF"){
+			dtx.fillStyle=x;
+			dtx.fill();
+			dtx.stroke();
+		}
+		dtx.restore();
+	}
+}
+
+function jdtxponta(){
+		if(ponta=="ret"){
+			dtx.lineJoin="miter";
+			dtx.lineCap="square";
+		} else {
+			dtx.lineJoin="round";
+			dtx.lineCap="round";
+		}
+}
+
+function jctxponta(){
+		if(ponta=="ret"){
+			ctx.lineJoin="miter";
+			ctx.lineCap="square";
+		} else {
+			ctx.lineJoin="round";
+			ctx.lineCap="round";
+		}
+}
+
+function jcentra(){
+	document.getElementById("logofilt").style.display="inline";
+	dtx.clearRect(0,0,danW,danH);
+	dtx.save();
+	dtx.translate(500,250);
+	dtx.rotate(totrot/180*Math.PI);
+	dtx.filter=filtro;
+	dtx.drawImage(img,-(origW*1/2)*(1+valAumDim),-(origH*1/2)*(1+valAumDim),origW*(1+valAumDim),origH*(1+valAumDim));
+	dtx.restore();
+}
+
+function jfi(){
+	var colore=document.getElementById("colore").value; //sepia
+	if(colore==0){
+		var gs=document.getElementById("gs").value;
+		var blur=document.getElementById("blur").value;
+		var br=document.getElementById("br").value;
+		var ct=document.getElementById("ct").value;
+		var huer=document.getElementById("huer").value;
+		var opacity=document.getElementById("opacity").value;
+		var invert=document.getElementById("invert").value;
+		var saturate=document.getElementById("saturate").value;
+		var sepia=document.getElementById("sepia").value; //sepia
+		filtro='grayscale('+gs+'%) blur('+blur+'px) brightness('+br+'%) contrast('+ct+'%) hue-rotate('+huer+'deg) opacity('+opacity+'%) invert('+invert+'%) saturate('+saturate+'%) sepia('+sepia+'%)';
+		jcentra();
+//	document.getElementById("imageContainer").style.webkitFilter= 'grayscale('+gs+'%) blur('+blur+'px) brightness('+br+'%) contrast('+ct+'%) hue-rotate('+huer+'deg) opacity('+opacity+'%) invert('+invert+'%) saturate('+saturate+'%) sepia('+sepia+'%)';
+	} else {
+		jficolore(colore);
+	}
+}
+
+function jficolore(lore){
+	filtro=ilt[lore];
+	jcentra();
+}
+
+function isNumber(evt) {
+	evt=(evt) ? evt : window.event;
+	var charCode=(evt.which) ? evt.which : evt.keyCode;
+	if (charCode>31 && (charCode<48 || charCode>57)){return false;}
+	if (charCode==13){return false;}
+	return true;
+}
+
+var ilt=new Array();
+
+ilt[1]="invert(10%) sepia(86%) saturate(3716%) hue-rotate(356deg) brightness(91%) contrast(117%)";//Maroon
+ilt[2]="invert(17%) sepia(30%) saturate(7033%) hue-rotate(349deg) brightness(95%) contrast(80%)";//Brown
+ilt[3]="invert(24%) sepia(96%) saturate(7384%) hue-rotate(358deg) brightness(111%) contrast(120%)";//Red
+ilt[4]="invert(50%) sepia(15%) saturate(1940%) hue-rotate(347deg) brightness(96%) contrast(88%)";//Copper
+ilt[5]="invert(62%) sepia(46%) saturate(6634%) hue-rotate(3deg) brightness(108%) contrast(102%)";//Orange
+ilt[6]="invert(53%) sepia(64%) saturate(6901%) hue-rotate(15deg) brightness(104%) contrast(101%)";//Spanish Orange
+ilt[7]="invert(68%) sepia(54%) saturate(3549%) hue-rotate(2deg) brightness(106%) contrast(102%)";//Orange Web
+ilt[8]="invert(78%) sepia(78%) saturate(1203%) hue-rotate(359deg) brightness(102%) contrast(103%)";//Gold
+ilt[9]="invert(89%) sepia(85%) saturate(4878%) hue-rotate(1deg) brightness(108%) contrast(101%)";//Yellow
+ilt[10]="invert(23%) sepia(62%) saturate(7331%) hue-rotate(119deg) brightness(95%) contrast(102%)";//Green
+ilt[11]="invert(54%) sepia(92%) saturate(2223%) hue-rotate(81deg) brightness(121%) contrast(122%)";//Lime
+ilt[12]="invert(80%) sepia(36%) saturate(2166%) hue-rotate(127deg) brightness(104%) contrast(106%)";//Cyan
+ilt[13]="invert(57%) sepia(84%) saturate(4776%) hue-rotate(195deg) brightness(104%) contrast(106%)";//DodgerBlue
+ilt[14]="invert(6%) sepia(100%) saturate(7448%) hue-rotate(245deg) brightness(129%) contrast(128%)";//Blue
+ilt[15]="invert(26%) sepia(73%) saturate(5904%) hue-rotate(316deg) brightness(102%) contrast(104%)";//DeepPink
+ilt[16]="invert(21%) sepia(84%) saturate(2887%) hue-rotate(305deg) brightness(81%) contrast(103%)";//MediumVioletRed
+ilt[17]="invert(14%) sepia(98%) saturate(6780%) hue-rotate(283deg) brightness(84%) contrast(117%)";//DarkViolet
+
+function jresfilt(){
+	document.getElementById("gs").value=0;
+	document.getElementById("blur").value=0;
+	document.getElementById("br").value=100;
+	document.getElementById("ct").value=100;
+	document.getElementById("huer").value=0;
+	document.getElementById("opacity").value=100;
+	document.getElementById("invert").value=0;
+	document.getElementById("saturate").value=100;
+	document.getElementById("sepia").value=0;
+	document.getElementById("colore").value=0;
+	filtro='grayscale(0%) blur(0px) brightness(100%) contrast(100%) hue-rotate(0deg) opacity(100%) invert(0%) saturate(100%) sepia(0%)';
+	jcentra();
+}
+
+// para a rodinha do mouse
+function zoom(event){
+	event.preventDefault();
+	scale += event.deltaY * -0.1;
+	if(scale>sca){sca=scale;if(ajuda=="none"){rodadir();};scrola(-1);}
+	if(scale<sca){sca=scale;if(ajuda=="none"){rodaesq();};scrola(1);}
+}
+let scale=1;
+const el=document.querySelector('body');
+el.onwheel=zoom;
+
+function jajuda(){
+	switch(ajuda){
+		case "inline":ajuda="none";break;
+		case "none":ajuda="inline";break;
+	}
+	document.getElementById("ajuda").style.display=ajuda;
+}
+
+document.getElementById("infontesize").value=60;
+document.getElementById("numsize").innerText="60px";
+document.getElementById("infonteweight").value=200;
+document.getElementById("numweight").innerText=200;
+document.getElementById("qualfonte").value="tipo";
+document.getElementById("afonte").style.color="red";
+document.getElementById("absafonte").style.color="red";
+
+</script>
+
+<div id="ajuda" style="position:absolute;top:50px;left:110px;width:1000px;height:470px;font-family:Arial;font-size:16pt;font-weight:bold;background-color:#f3f1d3;padding:8px;z-index:9;display:none;overflow:auto;">
+<center><strong  style="color:#909;"><i>Clique na interroga&ccedil;&atilde;o <img onclick="jajuda();" src="ajuda.png" width="40" style="cursor:pointer;"></img> para 
+fechar esta tela de ajuda.
+<br>
+Clique neste &iacute;cone sempre que quiser ver esta tela de ajuda.
+<br>
+Para rolar este texto de ajuda, use a rodinha do mouse.</strong></i>
+</center>
+<br><br>
+<strong>Pincel e Reta</strong>
+<br><br>
+Usando as ferramentas de pincel ou de retas, ao tocar na tela, 
+estar&aacute; desenhando diretamente em seu trabalho.
+<br>
+Assim, se tiver d&uacute;vidas de estragar seu trabalho feito at&eacute; ent&atilde;o, 
+fa&ccedil;a uma c&oacute;pia de seguran&ccedil;a, clicando em <img src="sal.png" width="30"></img>.
+<br>
+Cada vez que clicar em <img src="sal.png" width="30"></img>, o conte&uacute;do atual &eacute; passado para 
+a tela salvada <img src="v1.png" width="30"></img>, o conte&uacute;do de <img src="v1.png" width="30"></img> &eacute;
+passado para <img src="v2.png" width="30"></img>, o de <img src="v2.png" width="30"></img> &eacute; 
+passado para <img src="v3.png" width="30"></img>.
+<br>
+<br>
+Desta forma Voc&ecirc; poder&aacute; recuperar seu desenho. Voc&ecirc; ter&aacute; tr&ecirc;s chances de VOLTAR seus 
+desenhos anteriores, atrav&eacute;s dos &iacute;cones <img src="r1.png" width="30"></img>, 
+<img src="r2.png" width="30"></img> e <img src="r3.png" width="30"></img>.
+<br><br>
+<strong>Figuras, C&iacute;rculos, Ret&acirc;ngulos e Textos</strong>
+<br><br>
+Ao clicar em <img src="hd1.png" width="32"></img>, "fotos prefs.", "figuras", <img src="cirA_aju.png" width="20"></img>, 
+<img src="cirF_aju.png" width="20"></img>, 
+<img src="retA_aju.png" width="20"></img>, 
+<img src="retF_aju.png" width="20"></img>, 
+ ou em <img src="chaA_aju.png" width="20"></img>, Voc&ecirc; poder&aacute; modificar num rascunho as 
+possibilidades de: aumentar/diminuir tamanho, girar as fotos e os desenhos, escolher 
+tamanho, tipo de letra e cor de texto, antes de CLICAR para torn&aacute;-los parte de sua tela 
+de trabalho.
+<br>
+<br>
+As teclas +, -, e as 4 setas permitem alterar tamanho das figuras. A rodinha do mouse 
+permite girar as figuras.
+<br>
+<br>
+Da mesma forma, ao terminar, verifique se est&aacute; certo das mudan&ccedil;as, pois ao CLICAR na tela, 
+os desenhos passar&atilde;o para sua tela de trabalho.
+D&ecirc; uma salvada com <img src="sal.png" width="30"></img>, antes de clicar na tela.
+<br>
+<strong>Ao finalizar as mudan&ccedil;as de cada uma das op&ccedil;&otilde;es, CLIQUE em <img src="tools.png" height="32"></img> 
+para SAIR das modifica&ccedil;&otilde;es por rascunho.</strong>
+<br>
+Os &iacute;cones <img src="v1.png" width="30"></img>, <img src="v2.png" width="30"></img> e 
+<img src="v3.png" width="30"></img> servem para Voc&ecirc; VER as poss&iacute;veis telas de desfazer 
+eventuais erros. CUIDADO com os &iacute;cones <img src="r1.png" width="30"></img>, <img src="r2.png" width="30"></img> e 
+<img src="r3.png" width="30"></img>, pois qualquer clicada em um deles TRAR&Aacute; DE VOLTA uma das 
+telas que foram salvas anteriormente.
+<br> 
+Clique em <img src="clo.png" width="30"></img> para voltar &agrave; tela de trabalho!
+<br><br>
+<strong>Pegar uma cor de um ponto da Tela</strong>
+<br>
+Para "pegar" a cor de um local da tela, clique em <img src="picker1.png" width="30"></img>, e 
+clique sobre o local desejado... e pronto, a cor de desenhar estar&aacute; alterada. CUIDADO, funciona uma vez s&oacute;.
+<br>
+<br>Se clicar de novo na tela, Voc&ecirc; pintar&aacute; o desenho.
+<br> Precisar&aacute; clicar novamente em <img src="picker1.png" width="30"></img>, para nova pegada de cor.
+<br><br>
+<strong>Ent&atilde;o:</strong>
+<br>
+<img src="sal.png" width="40"></img> ... guarda a tela atual;
+<br>
+<img src="v1.png" width="30"></img> ... deixa VER a &uacute;ltima salvada;
+<br>
+<img src="v2.png" width="30"></img> ... deixa VER a pen&uacute;ltima salvada;
+<br>
+<img src="v3.png" width="30"></img> ... deixa VER a antepen&uacute;ltima salvada;
+<br>
+<img src="r1.png" width="30"></img> ... TRAZ a &uacute;ltima salvada;
+<br>
+<img src="r2.png" width="30"></img> ... TRAZ a pen&uacute;ltima salvada;
+<br>
+<img src="r3.png" width="30"></img> ... TRAZ a antepen&uacute;ltima salvada;
+<br>
+<img src="clo.png" width="30"></img> ... FECHA as telas vistas.
+<br><br>
+<strong><i>E se quiser salvar seu trabalho no computador, basta clicar o bot&atilde;o direito 
+do mouse, escolher um nome de arquivo e salvar sua imagem tipo PNG no computador!!!</i></strong>
+<br><br>
+<strong style="color:#009;">OBS.:
+<br>P (perto) e L (longe) tamb&eacute;m valem para aumentar e diminuir as figuras.
+<br>E (esquerda) e D (direita) tamb&eacute;m s&atilde;o teclas que giram as figuras.
+</strong>
+<br><br>
+<center>
+<span>Copyright &#169; Jos&eacute Roberto Lazzareschi 2020</span>
+</center>
+<br><br>
+</div>
+
+</div>
+
+<script>
+
+document.getElementById("ajuda").style.width=w-210+"px";
+document.getElementById("logoajuda").style.left=w-60+"px";
+document.getElementById("favcolor").value="#ff0000";
+var myvar=setInterval(bugga,200);
+
+var qtd=0;
+var opa=.1;
+function bugga(){
+	qtd++;
+	opa=opa+.05;
+	document.getElementById("bug").style.opacity=opa;
+	if(qtd>19){pronto();}
+}
+
+function pronto(){
+	clearInterval(myvar);
+	document.getElementById("bug").style.display="none";
+	document.getElementById("can").style.display="inline";
+	document.getElementById("todo").style.display="inline";
+}
+
+function scrola(ma){
+	if(ma==1){document.getElementById("ajuda").scrollTop += 30;}
+	if(ma==-1){document.getElementById("ajuda").scrollTop -= 30;}
+}
+
+</script>
+
+</body>
+</html>
