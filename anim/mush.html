@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>mushroom.html</title>
+<meta charset="utf-8">
+
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+<meta name="description" content="Mushroom">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+
+<style>
+@font-face {font-family:myq;src:url('../fonte/MysteryQuest-Regular.ttf');}
+body{overflow:hidden;margin:0px;background-color:#369;font-family:Monospace;}
+span{position:absolute;font-family:myq;font-size:20.5pt;font-weight:bold;}
+a{font-size:16pt;}
+</style>
+
+<script type="importmap">
+	{
+		"imports":{
+	"three":"https://unpkg.com/three@0.171.0/build/three.module.js",
+	"three/addons/":"https://unpkg.com/three@0.171.0/examples/jsm/"
+		}
+	}
+</script>
+
+</head>
+
+<body>
+
+<span style="left:10%;top:2%;width:80%;text-align:center;color:#ff0;">A Mushroom ... and for shure it's not poisonous! <br>SVGs on Three.js</span>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
+
+var renderer, scene, camera, loader, controls ;
+var steps, depth, bevelEnabled, bevelThickness, bevelSize, bevelOffset, bevelSegments;
+
+var iW=window.innerWidth;
+var iH=window.innerHeight;
+
+var geo=[];
+var luz=[];
+var mat=[];
+var mesh=[];
+
+var paths=[];
+var shapes=[];
+var dep=0.6;
+var cur=20;
+
+var gra=[];
+var grag=[];for(let z=1;z<100;z++){grag[z]=new THREE.Group();}
+
+var grall=new THREE.Group();
+
+var group1=new THREE.Group();
+var group2=new THREE.Group();
+
+var gro=[];for(let z=1;z<400;z++){gro[z]=new THREE.Group();}
+
+var gru1=new THREE.Group();
+var gru2=new THREE.Group();
+
+var sim=0;
+var k=0;
+var p=Math.PI;
+var ax;
+
+function init(){
+	camera=new THREE.PerspectiveCamera(70,iW/iH,1,1000,1);
+	camera.position.set(0,-60,250);
+	scene=new THREE.Scene();
+	scene.position.set(70,20,0);
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(iW,iH);
+	renderer.colorSpace=THREE.SRGBColorSpace;
+	document.body.appendChild(renderer.domElement);
+	window.addEventListener("resize",onWindowResize)
+	controls=new OrbitControls(camera,renderer.domElement);
+
+	let materials=[
+		new THREE.MeshStandardMaterial({color:'#fff'}),
+		new THREE.MeshStandardMaterial({color:'#ff8c00'})
+	];
+
+	luz[1]=new THREE.AmbientLight("#fff",1);scene.add(luz[1]);
+	luz[2]=new THREE.PointLight('#fff',6000);luz[2].position.set(-40,-60,0);scene.add(luz[2]);
+
+	loader=new SVGLoader();
+	loader.load('img/cogumelo.svg',function(data){
+		paths=data.paths;
+		shapes=SVGLoader.createShapes(paths[0]);
+		geo[1]=new THREE.ExtrudeGeometry(shapes[0],{depth:0.3,curveSegments:cur});
+		mesh[1]=new THREE.Mesh(geo[1],materials);
+		mesh[1].position.set(0,0,0);
+		mesh[1].rotation.set(p,0,0);
+	})
+
+	loader=new SVGLoader();
+	loader.load('img/cabinho.svg',function(data){
+		paths=data.paths;
+		shapes=SVGLoader.createShapes(paths[0]);
+		geo[2]=new THREE.ExtrudeGeometry(shapes[0],{depth:dep,curveSegments:cur});
+		mesh[2]=new THREE.Mesh(geo[2],new THREE.MeshStandardMaterial({color:'#eee'}));
+		mesh[2].position.set(0,0,0);
+		mesh[2].rotation.set(p,0,0);
+		mesh[2].scale.set(0.7,1,1);
+	})
+
+	geo[10]=new THREE.SphereGeometry(61,128,128,0,p);
+	mesh[10]=new THREE.Mesh(geo[10],new THREE.MeshStandardMaterial({color:'#ff8c00',side:THREE.DoubleSide})) ;
+	mesh[10].position.set(-100,0,0);
+	mesh[10].rotation.set(-p/2,0,0);
+	scene.add(mesh[10]);
+
+	let geo2=new THREE.BoxGeometry(88,88,5);
+	let mat2=new THREE.MeshStandardMaterial({color:'#840'});
+	let plane2=new THREE.Mesh(geo2,mat2);
+	plane2.rotation.set(-1.57,0,0);
+	plane2.position.set(-15,0,135);
+
+	let bx=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.05,0.05),new THREE.MeshBasicMaterial({color:'#630'}));
+
+	let geo3=new THREE.SphereGeometry(15,24,24,-0.2,0.2,p/2,p/2);
+	let mat3=new THREE.MeshStandardMaterial({color:'#0c0',side:THREE.DoubleSide}); 
+	gra[40]=new THREE.Mesh(geo3,mat3);
+	gra[40].scale.set(0.05,0.1,0.04);
+	gra[40].rotation.set(p,p,0);
+	gra[40].position.set(-0.7,0,0);
+	bx.add(gra[40]);
+	gra[0]=bx.clone();
+	gra[1]=gra[0].clone();gra[1].rotation.set(0,p,0);
+	for(let g=3;g<40;g++) {gra[0].scale.y=(1+Math.random());gra[0].rotation.y=Math.random()*1.6;gra[g]=gra[0].clone();gra[g].position.z=g;grag[1].add(gra[g]);}
+	for(let g=43;g<80;g++){gra[1].scale.y=(1+Math.random());gra[0].rotation.y=Math.random()*1.6;gra[g]=gra[1].clone();gra[g].position.z=g-39.9;gra[g].position.x=0.0;grag[1].add(gra[g]);}
+	for(let g=3;g<40;g++) {gra[0].scale.y=(1+Math.random());gra[0].rotation.y=Math.random()*1.6;gra[g]=gra[0].clone();gra[g].position.z=g;grag[2].add(gra[g]);}
+	for(let g=43;g<80;g++){gra[1].scale.y=(1+Math.random());gra[0].rotation.y=Math.random()*1.6;gra[g]=gra[1].clone();gra[g].position.z=g-39.9;gra[g].position.x=0.0;grag[2].add(gra[g]);}
+	for(let g=3;g<40;g++) {gra[0].scale.y=(1+Math.random());gra[0].rotation.y=Math.random()*1.6;gra[g]=gra[0].clone();gra[g].position.z=g;grag[3].add(gra[g]);}
+	for(let g=43;g<80;g++){gra[1].scale.y=(1+Math.random());gra[0].rotation.y=Math.random()*1.6;gra[g]=gra[1].clone();gra[g].position.z=g-39.9;gra[g].position.x=0.0;grag[3].add(gra[g]);}
+	for(let g=3;g<40;g++) {gra[0].scale.y=(1+Math.random());gra[0].rotation.y=Math.random()*1.6;gra[g]=gra[0].clone();gra[g].position.z=g;grag[3].add(gra[g]);}
+	for(let g=43;g<80;g++){gra[1].scale.y=(1+Math.random());gra[0].rotation.y=Math.random()*1.6;gra[g]=gra[1].clone();gra[g].position.z=g-39.9;gra[g].position.x=0.0;grag[4].add(gra[g]);}
+	for(let g=3;g<40;g++) {gra[0].scale.y=(1+Math.random());gra[0].rotation.y=Math.random()*1.6;gra[g]=gra[0].clone();gra[g].position.z=g;grag[3].add(gra[g]);}
+	for(let g=43;g<80;g++){gra[1].scale.y=(1+Math.random());gra[0].rotation.y=Math.random()*1.6;gra[g]=gra[1].clone();gra[g].position.z=g-39.9;gra[g].position.x=0.0;grag[5].add(gra[g]);}
+
+	var dist=-6;
+	for(let o=10;o<40;o++){
+		dist=dist+0.3;
+		if(o==10 || o==15 || o==20 || o==25 || o==30 || o==35){grag[o]=grag[1].clone();}
+		if(o==11 || o==16 || o==21 || o==26 || o==31 || o==36){grag[o]=grag[2].clone();}
+		if(o==12 || o==17 || o==22 || o==27 || o==32 || o==37){grag[o]=grag[3].clone();}
+		if(o==13 || o==18 || o==23 || o==28 || o==33 || o==38){grag[o]=grag[4].clone();}
+		if(o==14 || o==19 || o==24 || o==29 || o==34 || o==39){grag[o]=grag[5].clone();}
+		grag[o].position.set(dist,0,30);
+		grall.add(grag[o]);
+		grall.scale.set(10,9,2.5);
+	}
+	ax=new THREE.AxesHelper(0.001);
+	grall.position.set(0,0,8);
+	ax.add(grall);
+	ax.add(plane2);
+	ax.position.set(-87,-140,-135);
+	scene.add(ax);
+}
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	if(mesh[1] && mesh[2] && sim==0){
+		group1.add(mesh[1]);
+		group1.position.set(0,0,0);
+		k=0;
+		for(let z=0;z<180;z++){
+			k=k+p/90;
+			gro[z]=group1.clone();
+			gro[z].rotation.set(0,k,0);
+			gru1.add(gro[z]);
+		}
+		gru1.position.set(-100,0,0);
+
+		group2.add(mesh[2]);
+		group2.position.set(0,0,0);
+		k=0;
+		for(let z=0;z<360;z++){
+			k=k+2*p/360;
+			gro[z]=group2.clone();
+			gro[z].rotation.set(0,k,0);
+			gru2.add(gro[z]);
+		}
+		gru2.position.set(-100,-40,0);
+
+		sim=1;
+	}
+	if(sim==1){
+		scene.add(gru1);
+		scene.add(gru2);
+		sim=2;	
+	}
+
+	renderer.render(scene,camera);
+}
+
+init();
+animate();
+
+</script>
+</body>
+</html>
+
