@@ -1,0 +1,48 @@
+﻿<!Doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>maissom.html</title>
+
+<style type="text/css">
+@font-face {font-family:tipo;src:url('../fonte/MysteryQuest-Regular.ttf');}
+html,body{height:100VH;width:100VM;margin:0px;padding:0px;font-family:tipo;background-color:#bcc;}
+iframe{height:85VH;width:100VM;border:4px outset gold;}
+button{font-family:tipo;font-size:20.5pt;border:3px outset white;padding-left:8px;padding-right:8px;background-color:#fc0;color:#009;}
+button:hover{border:2px inset white;background-color:#606;color:#fff;}
+</style>
+</head>
+
+<body>
+<center>
+
+<button onclick="vaipara(1);">twosounds</button>&nbsp;
+<button onclick="vaipara(2);">onemp3</button>&nbsp;
+<button onclick="vaipara(3);">visu5</button>&nbsp;
+<button onclick="vaipara(4);">sobresom</button>&nbsp;
+<button onclick="vaipara(5);">horwood</button>&nbsp;
+<button type="button" title="Reiniciar" alt="Reiniciar" onclick="recarrega();">REINICIAR</button>
+<br>
+<br>
+<iframe id="ifra" src="twosounds.html" height="75%" width="89%"></iframe>
+
+<script>
+
+function recarrega(){
+	window.location="maissom.html";
+}
+
+function vaipara(onde){
+	if(onde==1){document.getElementById("ifra").src="twosounds.html";}
+	if(onde==2){document.getElementById("ifra").src="onemp3.html";}
+	if(onde==3){document.getElementById("ifra").src="visu5.html";}
+	if(onde==4){document.getElementById("ifra").src="sobresom.html";}
+	if(onde==5){document.getElementById("ifra").src="horwood.html";}
+}
+
+</script>
+
+</center>
+
+</body>
+</html>
