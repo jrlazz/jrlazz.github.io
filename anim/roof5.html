@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>roof5.html</title>
+<meta charset="utf-8">
+
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+<meta name="description" content="Roof5">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+
+<style>
+body{overflow:hidden;margin:0px;background-color:#048;font-family:Monospace;}
+span{position:absolute;font-size:41px;font-family:Monospace;}
+a{font-size:14pt;font-family:Monospace;}
+</style>
+
+<script type="importmap">
+	{
+		"imports":{
+	"three":"https://unpkg.com/three@0.181.0/build/three.module.js",
+	"three/addons/":"https://unpkg.com/three@0.181.0/examples/jsm/"
+		}
+	}
+</script>
+
+</head>
+
+<body>
+<span style="left:80%;top:5%;color:#ff0;">Roof5</span>
+<button style="position:absolute;left:80%;top:25%;width:120px;height:30px;background-color:#fc0;text-align:center;border:4px outset white;"><a id="code" href="roof5.txt" target="_blank" style="color:#024;text-decoration:none;">The Code</a></button>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+var renderer, scene, camera, controls ;
+
+var iW=window.innerWidth;
+var iH=window.innerHeight;
+
+var geo=[];
+var luz=[];
+var mat=[];
+var mesh=[];
+
+var axe=[];for(let z=1;z<100;z++){axe[z]=new THREE.AxesHelper(1);}
+
+var gro=[];for(let z=1;z<100;z++){gro[z]=new THREE.Group();}
+
+var sim=0;
+var p=Math.PI;
+
+function init(){
+	camera=new THREE.PerspectiveCamera(70,iW/iH,1,1000,1);
+	camera.position.set(-20,20,60);
+	scene=new THREE.Scene();
+	scene.position.set(10,10,0);
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(iW,iH);
+	renderer.colorSpace=THREE.SRGBColorSpace;
+	document.body.appendChild(renderer.domElement);
+	controls=new OrbitControls(camera,renderer.domElement);
+	luz[1]=new THREE.AmbientLight("#fff",1);scene.add(luz[1]);
+mat[30]=new THREE.MeshStandardMaterial({color:'#060'});
+mat[7]=new THREE.MeshStandardMaterial({color:'#f60',side:THREE.DoubleSide});
+mat[8]=new THREE.MeshStandardMaterial({color:'#d30',side:THREE.DoubleSide});
+
+mat[20]=new THREE.MeshStandardMaterial({color:'#cc0',wireframe:false});
+mat[21]=new THREE.MeshStandardMaterial({color:'#000',wireframe:true});
+
+const shape = new THREE.Shape();
+const shape2 = new THREE.Shape();
+
+shape.moveTo(- 24, - 6.2);
+shape.lineTo(+ 24, - 6.2);
+shape.lineTo(12   , + 6.2);
+shape.lineTo(-12   , + 6.2);
+
+shape2.moveTo(- 12, - 6.2);
+shape2.lineTo(+ 12, - 6.2);
+shape2.lineTo(0   , + 6.2);
+
+geo[1]= new THREE.ShapeGeometry(shape);
+mesh[1]=new THREE.Mesh(geo[1],mat[7]) 
+mesh[1].position.set(0,0,0);
+mesh[1].rotation.set(p/4,0,0);
+
+geo[10]= new THREE.ShapeGeometry(shape2);
+mesh[10]=new THREE.Mesh(geo[10],mat[8]) 
+mesh[10].position.set(0,0,0);
+mesh[10].rotation.set(p/4,0,0);
+
+axe[1].add(mesh[1]);
+
+mesh[2]=mesh[1].clone();
+axe[2].add(mesh[2]);
+axe[2].position.set(0,0,8.5);
+axe[2].rotation.set(-p/2,0,0);
+
+mesh[3]=mesh[10].clone();
+axe[3].add(mesh[3]);
+axe[3].scale.set(0.74,1.4,1);
+axe[3].position.set(18.0,0,4.3);
+axe[3].rotation.set(-p/2,0,p/2);
+
+mesh[4]=mesh[10].clone();
+axe[4].add(mesh[4]);
+axe[4].scale.set(0.74,1.4,1);
+axe[4].position.set(-18.0,0,4.3);
+axe[4].rotation.set(-p/2,0,-p/2);
+
+geo[20]=new THREE.BoxGeometry(48.3,15,17.5);
+mesh[20]=new THREE.Mesh(geo[20],mat[20]);
+mesh[20].position.set(0,-11.8,4.25);
+
+geo[21]=new THREE.BoxGeometry(48.3,15,17.5);
+mesh[21]=new THREE.Mesh(geo[21],mat[21]);
+mesh[21].position.set(0,-11.8,4.25);
+
+gro[1].add(axe[1]);
+gro[1].add(axe[2]);
+gro[1].add(axe[3]);
+gro[1].add(axe[4]);
+gro[1].add(mesh[20]);
+gro[1].add(mesh[21]);
+gro[1].position.set(-40,0,0);
+scene.add(gro[1]);
+
+gro[4]=gro[1].clone();
+gro[4].position.set(-4,0,-17.5);
+gro[4].scale.set(0.5,1,1);
+scene.add(gro[4]);
+
+gro[5]=gro[1].clone();
+gro[5].position.set(-12.5,0,17.5);
+gro[5].scale.set(0.15,1,1);
+scene.add(gro[5]);
+
+geo[30]=new THREE.BoxGeometry(100,1,100);
+mesh[30]=new THREE.Mesh(geo[30],mat[30]);
+mesh[30].position.set(-20,-20,0);
+scene.add(mesh[30]);
+
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	if(mesh[1] && sim==0){sim=1;}
+	renderer.render(scene,camera);
+}
+
+init();
+animate();
+
+</script>
+</body>
+</html>
+
