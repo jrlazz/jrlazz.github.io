@@ -71,6 +71,7 @@ function init(){
 	luz[1]=new THREE.AmbientLight("#fff",1);scene.add(luz[1]);
 
 mat[7]=new THREE.MeshStandardMaterial({color:'#f60',side:THREE.DoubleSide});
+mat[8]=new THREE.MeshStandardMaterial({color:'#d30',side:THREE.DoubleSide});
 mat[20]=new THREE.MeshStandardMaterial({color:'#ccc',wireframe:false});
 mat[21]=new THREE.MeshStandardMaterial({color:'#000',wireframe:true});
 var materials=[new THREE.MeshStandardMaterial({color:0xff0000,flatShading:true}),new THREE.MeshStandardMaterial({color:0x000ff,flatShading:true})];
@@ -85,6 +86,12 @@ mesh[1]=new THREE.Mesh(geo[1],mat[7])
 mesh[1].position.set(0,0,0);
 mesh[1].rotation.set(p/4,0,0);
 
+geo[10]= new THREE.ShapeGeometry(shape);
+mesh[10]=new THREE.Mesh(geo[10],mat[8]) 
+mesh[10].position.set(0,0,0);
+mesh[10].rotation.set(p/4,0,0);
+
+
 axe[1].add(mesh[1]);
 scene.add(axe[1]);
 
@@ -95,14 +102,14 @@ axe[2].rotation.set(-p/2,0,0);
 scene.add(axe[2]);
 
 
-mesh[3]=mesh[1].clone();
+mesh[3]=mesh[10].clone();
 axe[3].add(mesh[3]);
 axe[3].scale.set(0.74,1.4,1);
 axe[3].position.set(6.0,0,4.3);
 axe[3].rotation.set(-p/2,0,p/2);
 scene.add(axe[3]);
 
-mesh[4]=mesh[1].clone();
+mesh[4]=mesh[10].clone();
 axe[4].add(mesh[4]);
 axe[4].scale.set(0.74,1.4,1);
 axe[4].position.set(-6.0,0,4.3);
