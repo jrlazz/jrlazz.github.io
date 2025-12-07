@@ -70,9 +70,13 @@ const tex=new THREE.TextureLoader().load('img/blocos/256jan.png');
 tex.wrapS=THREE.RepeatWrapping;tex.wrapT=THREE.RepeatWrapping;
 tex.repeat.set(2,1);
 
-luz[1]=new THREE.AmbientLight("#fff",1);scene.add(luz[1]);
+const tex2=new THREE.TextureLoader().load('images/a_grass.jpg');
+tex2.wrapS=THREE.RepeatWrapping;tex2.wrapT=THREE.RepeatWrapping;
+tex2.repeat.set(6,6);
 
-mat[30]=new THREE.MeshStandardMaterial({color:'#060'});
+luz[1]=new THREE.AmbientLight("#fff",1.5);scene.add(luz[1]);
+
+mat[30]=new THREE.MeshStandardMaterial({color:'#ccc',map:tex2});
 mat[7]=new THREE.MeshStandardMaterial({color:'#f60',side:THREE.DoubleSide});
 mat[8]=new THREE.MeshStandardMaterial({color:'#d30',side:THREE.DoubleSide});
 
