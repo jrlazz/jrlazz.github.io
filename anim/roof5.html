@@ -65,13 +65,18 @@ function init(){
 	renderer.colorSpace=THREE.SRGBColorSpace;
 	document.body.appendChild(renderer.domElement);
 	controls=new OrbitControls(camera,renderer.domElement);
-	luz[1]=new THREE.AmbientLight("#fff",1);scene.add(luz[1]);
+
+const tex=new THREE.TextureLoader().load('img/blocos/256jan.png');
+tex.wrapS=THREE.RepeatWrapping;tex.wrapT=THREE.RepeatWrapping;
+tex.repeat.set(2,1);
+
+luz[1]=new THREE.AmbientLight("#fff",1);scene.add(luz[1]);
+
 mat[30]=new THREE.MeshStandardMaterial({color:'#060'});
 mat[7]=new THREE.MeshStandardMaterial({color:'#f60',side:THREE.DoubleSide});
 mat[8]=new THREE.MeshStandardMaterial({color:'#d30',side:THREE.DoubleSide});
 
-mat[20]=new THREE.MeshStandardMaterial({color:'#cc0',wireframe:false});
-mat[21]=new THREE.MeshStandardMaterial({color:'#000',wireframe:true});
+mat[20]=new THREE.MeshStandardMaterial({color:'#fff',wireframe:false,map:tex});
 
 const shape = new THREE.Shape();
 const shape2 = new THREE.Shape();
@@ -117,10 +122,6 @@ axe[4].rotation.set(-p/2,0,-p/2);
 geo[20]=new THREE.BoxGeometry(48.3,15,17.5);
 mesh[20]=new THREE.Mesh(geo[20],mat[20]);
 mesh[20].position.set(0,-11.8,4.25);
-
-geo[21]=new THREE.BoxGeometry(48.3,15,17.5);
-mesh[21]=new THREE.Mesh(geo[21],mat[21]);
-mesh[21].position.set(0,-11.8,4.25);
 
 gro[1].add(axe[1]);
 gro[1].add(axe[2]);
