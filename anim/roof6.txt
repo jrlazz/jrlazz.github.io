@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>roof6.html</title>
+<meta charset="utf-8">
+
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+<meta name="description" content="Roof6">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+
+<style>
+body{overflow:hidden;margin:0px;background-color:#048;font-family:Monospace;}
+span{position:absolute;font-size:41px;font-family:Monospace;}
+a{font-size:14pt;font-family:Monospace;}
+</style>
+
+<script type="importmap">
+	{
+		"imports":{
+	"three":"https://unpkg.com/three@0.181.0/build/three.module.js",
+	"three/addons/":"https://unpkg.com/three@0.181.0/examples/jsm/"
+		}
+	}
+</script>
+
+</head>
+
+<body>
+<span style="left:80%;top:5%;color:#ff0;">Roof6</span>
+<button style="position:absolute;left:80%;top:25%;width:120px;height:30px;background-color:#fc0;text-align:center;border:4px outset white;"><a id="code" href="roof6.txt" target="_blank" style="color:#024;text-decoration:none;">The Code</a></button>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+var renderer, scene, camera, controls, tex, tex2, shape ;
+var iW=window.innerWidth, iH=window.innerHeight;
+var geo=[], luz=[], mat=[], mesh=[], tri=[], vert=[];
+var gro=[];for(let z=1;z<100;z++){gro[z]=new THREE.Group();}
+var p=Math.PI;
+
+camera=new THREE.PerspectiveCamera(70,iW/iH,1,1000,1);
+camera.position.set(20,20,80);
+
+scene=new THREE.Scene();
+scene.position.set(10,15,0);
+
+renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setSize(iW,iH);
+renderer.colorSpace=THREE.SRGBColorSpace;
+
+document.body.appendChild(renderer.domElement);
+
+controls=new OrbitControls(camera,renderer.domElement);
+
+tex=new THREE.TextureLoader().load('img/blocos/256jan.png');
+tex.wrapS=THREE.RepeatWrapping;tex.wrapT=THREE.RepeatWrapping;
+tex.repeat.set(2,1);
+tex.colorSpace=THREE.SRGBColorSpace;
+tex2=new THREE.TextureLoader().load('images/a_grass.jpg');
+tex2.wrapS=THREE.RepeatWrapping;tex2.wrapT=THREE.RepeatWrapping;
+tex2.repeat.set(6,6);
+tex2.colorSpace=THREE.SRGBColorSpace;
+luz[1]=new THREE.AmbientLight("#fff",1.5);scene.add(luz[1]);
+
+mat[7]=new THREE.MeshStandardMaterial({color:'#f60',side:THREE.DoubleSide});
+mat[8]=new THREE.MeshStandardMaterial({color:'#d30',side:THREE.DoubleSide});
+mat[20]=new THREE.MeshStandardMaterial({color:'#fff',map:tex});
+mat[30]=new THREE.MeshStandardMaterial({color:'#fff',map:tex2});
+
+geo[30]=new THREE.BoxGeometry(100,1,100);
+mesh[30]=new THREE.Mesh(geo[30],mat[30]);
+mesh[30].position.set(-20,-20,0);
+scene.add(mesh[30]);
+
+vert[1]=new Float32Array([
+	-8.5, -6.5, 0,	8.5, -6.5, 0,	0,  6.5, 0.95
+]);
+
+vert[2]=new Float32Array([
+	-8.5, -6.5, 0,	8.5, -6.5, 0,	0,  6.5, -0.95
+]);
+
+shape=new THREE.Shape();
+shape.moveTo(-24,-6);
+shape.lineTo( 24,-6);
+shape.lineTo( 14, 6);
+shape.lineTo(-14, 6);
+
+geo[1]=new THREE.BufferGeometry();
+geo[1].setAttribute('position', new THREE.BufferAttribute(vert[1], 3));
+tri[1]=new THREE.Mesh(geo[1],mat[8]);
+tri[1].rotation.set(p/4,0,0);
+tri[1].position.set(0,0.3,0.2);
+
+geo[2]=new THREE.BufferGeometry();
+geo[2].setAttribute('position',new THREE.BufferAttribute(vert[2],3));
+tri[2]= new THREE.Mesh(geo[2],mat[8]);
+tri[2].rotation.set(-p/4,0,0);
+tri[2].position.set(0,0.3,38.8);
+
+gro[1].add(tri[1]);gro[1].add(tri[2]);
+gro[1].rotation.set(0,p/2,0);
+gro[1].position.set(-19.5,0,4.2);
+
+geo[3]= new THREE.ShapeGeometry(shape);
+tri[3]=new THREE.Mesh(geo[3],mat[7]) 
+tri[3].position.set(0,0,0);
+tri[3].rotation.set(p/4,0,0);
+tri[4]=tri[3].clone();
+tri[4].position.set(0,0,8.5);
+tri[4].rotation.set(-p/4,0,0);
+
+geo[20]=new THREE.BoxGeometry(48.0,15,17);
+mesh[20]=new THREE.Mesh(geo[20],mat[20]);
+mesh[20].position.set(0,-11.7,4.25);
+
+gro[3].add(tri[3]);gro[3].add(tri[4]);gro[3].add(mesh[20]);gro[3].add(gro[1]);
+gro[3].position.set(-10,0,0);
+scene.add(gro[3]);
+
+gro[4]=gro[3].clone();
+gro[4].scale.set(0.5,1,0.5);
+gro[4].rotation.set(0,p/2,0);
+gro[4].position.set(-40,0,25);
+scene.add(gro[4]);
+
+function animate(){
+	requestAnimationFrame(animate);
+	renderer.render(scene,camera);
+}
+
+//init();
+animate();
+
+</script>
+</body>
+</html>
+
