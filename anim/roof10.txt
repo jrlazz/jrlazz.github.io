@@ -12,7 +12,7 @@
 <meta name="twitter:image:height" content="47" />
 
 <style>
-body{overflow:hidden;margin:0px;background-color:#048;font-family:Monospace;}
+body{overflow:hidden;margin:0px;background-color:#012;font-family:Monospace;}
 span{position:absolute;font-size:20.5pt;font-family:Monospace;}
 a{font-size:14pt;font-family:Monospace;}
 </style>
@@ -38,8 +38,12 @@ a{font-size:14pt;font-family:Monospace;}
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-var renderer, scene, camera, controls, tex, tex2, shape, shape2;
+var renderer, scene, camera, controls, tex, tex2, shape, shape2, composer;
 
 var iW=window.innerWidth;
 var iH=window.innerHeight;
@@ -53,6 +57,13 @@ var bolamesh=[];
 var bolamat=[];
 
 var p=Math.PI;
+
+const params={
+	threshold: 0,
+	strength: 0.7,
+	radius: 0.5,
+	exposure: 1
+	};
 
 function init(){
 	camera=new THREE.PerspectiveCamera(70,iW/iH,1,1000,1);
@@ -74,7 +85,21 @@ function init(){
 
 	controls=new OrbitControls(camera,renderer.domElement);
 
-	luz[1]=new THREE.AmbientLight("#fff",1.5);scene.add(luz[1]);
+	const renderScene=new RenderPass(scene, camera);
+
+	const bloomPass=new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+	bloomPass.threshold=params.threshold;
+	bloomPass.strength=params.strength;
+	bloomPass.radius=params.radius;
+
+	const outputPass=new OutputPass();
+
+	composer=new EffectComposer(renderer);
+	composer.addPass(renderScene);
+	composer.addPass(bloomPass);
+	composer.addPass(outputPass);
+
+	luz[1]=new THREE.AmbientLight("#fff",1.0);scene.add(luz[1]);
 
 tex[1]=new THREE.TextureLoader().load('img/blocos/256lis.png');
 tex[1].wrapS=THREE.RepeatWrapping;tex[1].wrapT=THREE.RepeatWrapping;
@@ -98,12 +123,12 @@ tex[4].repeat.set(1,1);
 tex[4].rotation=p/4;
 tex[4].colorSpace=THREE.SRGBColorSpace;
 
-mat[1]=new THREE.MeshStandardMaterial({color:'#f60',side:THREE.DoubleSide});
-mat[2]=new THREE.MeshStandardMaterial({color:'#d30',side:THREE.DoubleSide});
-mat[3]=new THREE.MeshStandardMaterial({color:'#fff',map:tex[1]});
-mat[4]=new THREE.MeshStandardMaterial({color:'#fff',map:tex[2]});
-mat[5]=new THREE.MeshStandardMaterial({color:'#fff',map:tex[3]});
-mat[6]=new THREE.MeshStandardMaterial({color:'#fff',map:tex[4]});
+mat[1]=new THREE.MeshStandardMaterial({color:'#d30',side:THREE.DoubleSide});
+mat[2]=new THREE.MeshStandardMaterial({color:'#b00',side:THREE.DoubleSide});
+mat[3]=new THREE.MeshStandardMaterial({color:'#999',map:tex[1]});
+mat[4]=new THREE.MeshStandardMaterial({color:'#999',map:tex[2]});
+mat[5]=new THREE.MeshStandardMaterial({color:'#696',map:tex[3]});
+mat[6]=new THREE.MeshStandardMaterial({color:'#999',map:tex[4]});
 
 bolamat[1]=new THREE.MeshStandardMaterial({color:'#00f'});
 bolamat[2]=new THREE.MeshStandardMaterial({color:'#0f0'});
@@ -137,12 +162,12 @@ shape2=new THREE.Shape();
 
 shape.moveTo(-9,-6.2);
 shape.lineTo(+9,-6.2);
-shape.lineTo( 0,+6.2);
+shape.lineTo(0,+6.2);
 
 shape2.moveTo(-20.8,-6.2);
 shape2.lineTo(+20.8,-6.2);
-shape2.lineTo(  +12,+6.2);
-shape2.lineTo(  -12,+6.2);
+shape2.lineTo( +12,+6.2);
+shape2.lineTo( -12,+6.2);
 
 geo[1]=new THREE.ShapeGeometry(shape);
 mesh[1]=new THREE.Mesh(geo[1],mat[1]) 
@@ -186,8 +211,8 @@ shape2=new THREE.Shape();
 
 shape2.moveTo(-35.8,-6.2);
 shape2.lineTo(+35.8,-6.2);
-shape2.lineTo(  +27,+6.2);
-shape2.lineTo(  -27,+6.2);
+shape2.lineTo( +27,+6.2);
+shape2.lineTo( -27,+6.2);
 
 geo[1]=new THREE.ShapeGeometry(shape);
 mesh[1]=new THREE.Mesh(geo[1],mat[1]) 
@@ -232,7 +257,7 @@ shape2=new THREE.Shape();
 
 shape.moveTo(-4.5,-3.1);
 shape.lineTo(+4.5,-3.1);
-shape.lineTo(   0,+3.1);
+shape.lineTo(  0,+3.1);
 
 shape2.moveTo(-5.9,-3.1);
 shape2.lineTo(+5.9,-3.1);
@@ -284,11 +309,11 @@ shape2=new THREE.Shape();
 
 shape.moveTo(-4.0,-3);
 shape.lineTo(+4.0,-3);
-shape.lineTo( 0,+3);
+shape.lineTo(0,+3);
 
 shape2.moveTo(-4.0,-3);
 shape2.lineTo(+4.0,-3);
-shape2.lineTo( 0,+3);
+shape2.lineTo(0,+3);
 
 geo[1]=new THREE.ShapeGeometry(shape);
 mesh[1]=new THREE.Mesh(geo[1],mat[1]) 
@@ -360,7 +385,8 @@ function animate(){
 	}
 	
 	if(t>100){t=0;}
-	renderer.render(scene,camera);
+	//renderer.render(scene,camera);
+	composer.render();
 }
 
 init();
