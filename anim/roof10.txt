@@ -29,7 +29,7 @@ a{font-size:14pt;font-family:Monospace;}
 </head>
 
 <body>
-<span style="width:90%;top:8%;text-align:center;font-size:12pt;color:#ff0;">three blocks ... some different shapes (not so perfect angles)</span>
+<span style="width:90%;top:8%;text-align:center;font-size:12pt;color:#ff0;">four blocks ... some different shapes (not so perfect angles)</span>
 <span style="left:80%;top:5%;color:#ff0;">Roof10</span>
 <button style="position:absolute;left:80%;top:25%;width:120px;height:30px;background-color:#fc0;text-align:center;border:4px outset white;"><a id="code" href="roof10.txt" target="_blank" style="color:#024;text-decoration:none;">The Code</a></button>
 
@@ -76,10 +76,9 @@ tex[1].wrapS=THREE.RepeatWrapping;tex[1].wrapT=THREE.RepeatWrapping;
 tex[1].repeat.set(1,1);
 tex[1].colorSpace=THREE.SRGBColorSpace;
 
-tex[2]=new THREE.TextureLoader().load('img/blocos/256lis.png');
-tex[2].wrapS=THREE.RepeatWrapping;tex[2].wrapT=THREE.RepeatWrapping;
+tex[2]=tex[1].clone();
 tex[2].repeat.set(1,4);
-tex[2].rotation=p/2;
+tex[2].rotation=-p/2;
 tex[2].colorSpace=THREE.SRGBColorSpace;
 
 tex[3]=new THREE.TextureLoader().load('images/a_grass.jpg');
@@ -87,11 +86,17 @@ tex[3].wrapS=THREE.RepeatWrapping;tex[3].wrapT=THREE.RepeatWrapping;
 tex[3].repeat.set(6,6);
 tex[3].colorSpace=THREE.SRGBColorSpace;
 
+tex[4]=tex[1].clone();
+tex[4].repeat.set(1,1);
+tex[4].rotation=p/4;
+tex[4].colorSpace=THREE.SRGBColorSpace;
+
 mat[1]=new THREE.MeshStandardMaterial({color:'#f60',side:THREE.DoubleSide});
 mat[2]=new THREE.MeshStandardMaterial({color:'#d30',side:THREE.DoubleSide});
 mat[3]=new THREE.MeshStandardMaterial({color:'#fff',map:tex[1]});
 mat[4]=new THREE.MeshStandardMaterial({color:'#fff',map:tex[2]});
 mat[5]=new THREE.MeshStandardMaterial({color:'#fff',map:tex[3]});
+mat[6]=new THREE.MeshStandardMaterial({color:'#fff',map:tex[4]});
 
 geo[5]=new THREE.BoxGeometry(100,1,100);
 mesh[5]=new THREE.Mesh(geo[5],mat[5]);
@@ -234,6 +239,65 @@ mesh[4]=new THREE.Mesh(geo[4],mat[4]);
 mesh[4].position.set(0,-17,0);
 gro[5].add(axe[1]);gro[5].add(axe[2]);gro[5].add(gro[3]);gro[5].add(gro[4]);gro[5].add(mesh[4]);
 gro[5].position.set(-60,6,0);
+scene.add(gro[5]);
+
+
+
+
+
+
+// ******** fifth block
+
+// clearing vars
+geo=[];mesh=[];
+axe=[];for(let z=1;z<10;z++){axe[z]=new THREE.AxesHelper(3);}
+gro=[];for(let z=1;z<10;z++){gro[z]=new THREE.Group();}
+shape=new THREE.Shape();
+shape2=new THREE.Shape();
+
+shape.moveTo(-4.0,-3);
+shape.lineTo(+4.0,-3);
+shape.lineTo( 0,+3);
+
+shape2.moveTo(-4.0,-3);
+shape2.lineTo(+4.0,-3);
+shape2.lineTo( 0,+3);
+
+geo[1]=new THREE.ShapeGeometry(shape);
+mesh[1]=new THREE.Mesh(geo[1],mat[1]) 
+mesh[1].position.set(0,-3,0);
+	axe[1].add(mesh[1]);
+	axe[1].position.set(20,0,5);
+	axe[1].rotation.set(p/4.3,0,0);
+
+mesh[2]=mesh[1].clone();
+	axe[2].add(mesh[2]);
+	axe[2].position.set(20,0,5);
+	axe[2].rotation.set(-p/4.3,0,0);
+
+geo[11]=new THREE.ShapeGeometry(shape2);
+mesh[11]=new THREE.Mesh(geo[1],mat[2]);
+
+mesh[3]=mesh[11].clone();
+	axe[3].add(mesh[3]);
+	axe[3].rotation.set(p/4.3,0,0);
+gro[3].add(axe[3]);
+gro[3].position.set(22,-2.2,5)
+gro[3].rotation.set(0,-p/2,0);
+
+mesh[4]=mesh[11].clone();
+	axe[4].add(mesh[4]);
+	axe[4].rotation.set(-p/4.3,0,0);
+gro[4].add(axe[4]);
+gro[4].position.set(18,-2.1,5)
+gro[4].rotation.set(0,-p/2,0);
+
+geo[4]=new THREE.BoxGeometry(8,35,8);
+mesh[4]=new THREE.Mesh(geo[4],mat[6]);
+mesh[4].position.set(20,-22,5);
+
+gro[5].add(axe[1]);gro[5].add(axe[2]);gro[5].add(gro[3]);gro[5].add(gro[4]);gro[5].add(mesh[4]);
+gro[5].position.set(-10,15,10);
 scene.add(gro[5]);
 
 }
