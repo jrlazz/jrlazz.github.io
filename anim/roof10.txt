@@ -120,6 +120,7 @@ scene.add(mesh[5]);
 for(let z=1;z<7;z++){
 	bolageo[z]=new THREE.SphereGeometry(2);
 	bolamesh[z]=new THREE.Mesh(bolageo[z],bolamat[z]);
+	scene.add(bolamesh[z]);
 }
 bolamesh[1].position.set(-35,2,-2);
 bolamesh[2].position.set(-35,2,22);
@@ -347,10 +348,18 @@ function animate(){
 			bolamesh[z].material.color.set(cola);
 			bolamesh[z].material.emissive.set(cola);
 			bolamesh[z].material.emissiveIntensity=2.0;
-			scene.add(bolamesh[z])
+			//scene.add(bolamesh[z]);
 		}
 	}
-	if(t>50){t=0;}
+
+	if(t==75){
+		for(let z=1;z<7;z++){
+			bolamesh[z].material.emissiveIntensity=2*Math.random();
+			//scene.add(bolamesh[z])
+		}
+	}
+	
+	if(t>100){t=0;}
 	renderer.render(scene,camera);
 }
 
