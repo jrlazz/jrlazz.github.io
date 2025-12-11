@@ -13,7 +13,7 @@
 
 <style>
 body{overflow:hidden;margin:0px;background-color:#048;font-family:Monospace;}
-span{position:absolute;font-size:41px;font-family:Monospace;}
+span{position:absolute;font-size:20.5pt;font-family:Monospace;}
 a{font-size:14pt;font-family:Monospace;}
 </style>
 
@@ -30,8 +30,9 @@ a{font-size:14pt;font-family:Monospace;}
 
 <body>
 <span style="width:90%;top:8%;text-align:center;font-size:12pt;color:#ff0;">four blocks ... some different shapes (not so perfect angles)</span>
-<span style="left:80%;top:5%;color:#ff0;">Roof10</span>
-<button style="position:absolute;left:80%;top:25%;width:120px;height:30px;background-color:#fc0;text-align:center;border:4px outset white;"><a id="code" href="roof10.txt" target="_blank" style="color:#024;text-decoration:none;">The Code</a></button>
+<span style="left:75%;top:5%;color:#ff0;text-align:center;"><i style="color:#0ff;">Christmas</i> <i style="color:#0f0;">Roofs</i><br>Roof10<br><br>
+<button style="height:30px;background-color:#fc0;text-align:center;border:3px outset white;"><a id="code" href="roof10.txt" target="_blank" style="color:#024;text-decoration:none;">The Code</a></button>
+</span>
 
 <script type="module">
 
@@ -46,6 +47,10 @@ var iH=window.innerHeight;
 var geo=[], luz=[], mat=[], tex=[], mesh=[];
 var axe=[];for(let z=1;z<10;z++){axe[z]=new THREE.AxesHelper(0.1);}
 var gro=[];for(let z=1;z<10;z++){gro[z]=new THREE.Group();}
+
+var bolageo=[];
+var bolamesh=[];
+var bolamat=[];
 
 var p=Math.PI;
 
@@ -76,7 +81,8 @@ tex[1].wrapS=THREE.RepeatWrapping;tex[1].wrapT=THREE.RepeatWrapping;
 tex[1].repeat.set(1,1);
 tex[1].colorSpace=THREE.SRGBColorSpace;
 
-tex[2]=tex[1].clone();
+tex[2]=new THREE.TextureLoader().load('img/blocos/256lis.png');
+tex[2].wrapS=THREE.RepeatWrapping;tex[2].wrapT=THREE.RepeatWrapping;
 tex[2].repeat.set(1,4);
 tex[2].rotation=-p/2;
 tex[2].colorSpace=THREE.SRGBColorSpace;
@@ -86,7 +92,8 @@ tex[3].wrapS=THREE.RepeatWrapping;tex[3].wrapT=THREE.RepeatWrapping;
 tex[3].repeat.set(6,6);
 tex[3].colorSpace=THREE.SRGBColorSpace;
 
-tex[4]=tex[1].clone();
+tex[4]=new THREE.TextureLoader().load('img/blocos/256lis.png');
+tex[4].wrapS=THREE.RepeatWrapping;tex[4].wrapT=THREE.RepeatWrapping;
 tex[4].repeat.set(1,1);
 tex[4].rotation=p/4;
 tex[4].colorSpace=THREE.SRGBColorSpace;
@@ -98,10 +105,29 @@ mat[4]=new THREE.MeshStandardMaterial({color:'#fff',map:tex[2]});
 mat[5]=new THREE.MeshStandardMaterial({color:'#fff',map:tex[3]});
 mat[6]=new THREE.MeshStandardMaterial({color:'#fff',map:tex[4]});
 
+bolamat[1]=new THREE.MeshStandardMaterial({color:'#00f'});
+bolamat[2]=new THREE.MeshStandardMaterial({color:'#0f0'});
+bolamat[3]=new THREE.MeshStandardMaterial({color:'#0ff'});
+bolamat[4]=new THREE.MeshStandardMaterial({color:'#ff0'});
+bolamat[5]=new THREE.MeshStandardMaterial({color:'#f0f'});
+bolamat[6]=new THREE.MeshStandardMaterial({color:'#fff'});
+
 geo[5]=new THREE.BoxGeometry(100,1,100);
 mesh[5]=new THREE.Mesh(geo[5],mat[5]);
 mesh[5].position.set(-20,-24.4,0);
 scene.add(mesh[5]);
+
+for(let z=1;z<7;z++){
+	bolageo[z]=new THREE.SphereGeometry(2);
+	bolamesh[z]=new THREE.Mesh(bolageo[z],bolamat[z]);
+}
+bolamesh[1].position.set(-35,2,-2);
+bolamesh[2].position.set(-35,2,22);
+bolamesh[3].position.set(-60,8,0);
+bolamesh[4].position.set(7,2,-19.5);
+bolamesh[5].position.set(-47,2,-19.5);
+bolamesh[6].position.set(10,16.7,15);
+
 
 // ******** first block
 
@@ -223,12 +249,12 @@ mesh[2]=mesh[1].clone();
 	axe[2].position.set(0,0,1.5);
 	axe[2].rotation.set(-p/4.0,0,0);
 
+
 geo[3]=new THREE.ShapeGeometry(shape2);
 mesh[3]=new THREE.Mesh(geo[3],mat[2]) 
 mesh[3].position.set(0,-3.1,0);
 	axe[3].add(mesh[3]);
 	axe[3].rotation.set(p/4,0,0);
-
 	gro[3].add(axe[3]);
 	gro[3].rotation.set(0,p/2,0);
 	gro[4]=gro[3].clone();
@@ -302,8 +328,29 @@ scene.add(gro[5]);
 
 }
 
+let cola,colb,t=0;
+
+function getRGBColor(){
+	const R=Math.floor(Math.random()*256);
+	const G=Math.floor(Math.random()*256);
+	const B=Math.floor(Math.random()*256);
+	cola="rgb("+R+","+G+","+B+")";
+	colb="rgb("+(255-R)+","+(255-G)+","+(255-B)+")";
+}
+
 function animate(){
 	requestAnimationFrame(animate);
+	t++;
+	if(t==50){
+		for(let z=1;z<7;z++){
+			getRGBColor();
+			bolamesh[z].material.color.set(cola);
+			bolamesh[z].material.emissive.set(cola);
+			bolamesh[z].material.emissiveIntensity=2.0;
+			scene.add(bolamesh[z])
+		}
+	}
+	if(t>50){t=0;}
 	renderer.render(scene,camera);
 }
 
