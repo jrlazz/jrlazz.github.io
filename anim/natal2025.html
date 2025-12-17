@@ -14,7 +14,7 @@
 <style>
 @font-face {font-family:myq;src:url('../fonte/MysteryQuest-Regular.ttf');}
 body {margin:0; overflow:hidden; background:#222; color:#ff0; font-family:myq;}
-span {position:absolute; left:10px; top:10px; font-size:20.5pt;}
+span {position:absolute; left:10px; top:10px; font-size:41pt;}
 </style>
 
 <script type="importmap">
@@ -30,9 +30,11 @@ span {position:absolute; left:10px; top:10px; font-size:20.5pt;}
 
 <body>
 
-<span style="position:absolute; left:10px; top:10px; font-size:20.5pt;>
-<span style="color:#0ff;">Chris</span><span style="left:74px;color:#0ff;">tmas</span> <span style="left:140px;color:#f0f;">Tree</span>
-<span id="clo" style="width:99%;top:10%;text-align:center;">Please wait a moment...</span>
+<span>
+<i style="color:#0ff;">Ch</i><i style="color:#f00;">ri</i><i style="color:#cf0;">st</i><i style="color:#f0f;">ma</i><i style="color:#99f;">s</i>
+ <i style="color:#f90;">Tr</i><i style="color:#0f0;">ee</i>
+</span>
+<span id="clo" style="width:99%;top:40%;text-align:center;">Please wait a moment...</span>
 
 <script type="module">
 
@@ -112,45 +114,37 @@ function init(){
 
 	window.addEventListener('resize',onWindowResize);
 
-	lig[1]=new THREE.AmbientLight('#fff',0.0);
-	//scene.add(lig[1]);
+	lig[1]=new THREE.AmbientLight('#fff',0.1);scene.add(lig[1]);
+	lig[2]=new THREE.PointLight('#fff',100000);lig[2].position.set(80,100,200);scene.add(lig[2]);
+	lig[3]=new THREE.PointLight('#0ff',100000);lig[3].position.set(-80,100,200);scene.add(lig[3]);
 
-	lig[2]=new THREE.PointLight('#fff',100000);
-	lig[2].position.set(80,100,200);
-	scene.add(lig[2]);
-
-	lig[3]=new THREE.PointLight('#0ff',100000);
-	lig[3].position.set(-80,100,200);
-	scene.add(lig[3]);
-
-tex=new THREE.TextureLoader().load('images/a_grass.jpg');
-tex.wrapS=THREE.RepeatWrapping;tex.wrapT=THREE.RepeatWrapping;
-tex.repeat.set(1,2);
-tex.colorSpace=THREE.SRGBColorSpace;
-piso=new THREE.Mesh(new THREE.CircleGeometry(200),new THREE.MeshStandardMaterial({color:'#696',map:tex,side:THREE.DoubleSide}));
-piso.position.set(0,-130,0);
-piso.rotation.x=p/2;
+	tex=new THREE.TextureLoader().load('images/a_grass.jpg');
+	tex.colorSpace=THREE.SRGBColorSpace;
+	piso=new THREE.Mesh(new THREE.CircleGeometry(150),new THREE.MeshStandardMaterial({color:'#696',map:tex,side:THREE.DoubleSide}));
+	piso.position.set(0,-130,0);
+	piso.rotation.x=p/2;
 
 	geo=new THREE.SphereGeometry(12,64,64);
-	for(let i=1;i<25;i++){
+	for(let i=1;i<35;i++){
 		sig=-sig;
 		color=new THREE.Color();color.setHSL(Math.random(),0.7,Math.random()*0.2+0.05);
-		mat=new THREE.MeshStandardMaterial({color:color,roughness:0.1,metalness:0.5});
+		mat=new THREE.MeshStandardMaterial({color:color,roughness:0.1,metalness:0.7});
 		Sp[i]=new THREE.Mesh(geo,mat);
-		Sp[i].position.x=Math.random()*150*sig;
+		Sp[i].position.x=Math.random()*130*sig;
 		Sp[i].position.y=-50+Math.random()*250;
 		Sp[i].position.z=Math.random()*150*sig;
 	}
 	Sp[0]=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:'#fff',roughness:0.1,metalness:0.5}));
-	Sp[0].position.set(0,230,0);
+	Sp[0].scale.set(2,1.6,2);
+	Sp[0].position.set(0,234,0);
 
-cyl=new THREE.Mesh(new THREE.CylinderGeometry(2,8,360),new THREE.MeshStandardMaterial({color:'#640'}));
+cyl=new THREE.Mesh(new THREE.CylinderGeometry(2,7,360),new THREE.MeshStandardMaterial({color:'#640'}));
 cyl.position.set(0,50,0);
 scene.add(cyl);
 
 box[1]=new THREE.Mesh(new THREE.BoxGeometry(0.1,0.1,0.1),new THREE.MeshStandardMaterial({color:'#000'}));
 
-ball=new THREE.Mesh(new THREE.SphereGeometry(15,16,16,0,0.7,0,p),new THREE.MeshStandardMaterial({color:'#096',side:THREE.DoubleSide}));
+ball=new THREE.Mesh(new THREE.SphereGeometry(12,16,16,0,0.7,0,p),new THREE.MeshStandardMaterial({color:'#096',side:THREE.DoubleSide}));
 ball.rotation.set(0.10,0,p/1.7);
 ball.position.set(19,0,0);
 ball.scale.set(1.9,3,1);
@@ -202,7 +196,7 @@ group[3].rotation.set(0,0,p/2);
 		spline.getPoint(t,point);
 		positions.push(point.x,point.y,point.z);
 	}
-	matLine=new LineMaterial({color:'#960',linewidth:5,});
+	matLine=new LineMaterial({color:'#960',linewidth:4,});
 	lineGeometry=new LineGeometry();
 	lineGeometry.setPositions(positions);
 	line=new Line2(lineGeometry,matLine);
@@ -307,40 +301,29 @@ function animate(){
 	bloomComposer.render();
 	scene.traverse(restoreMaterial);
 
-	t++;
+	t=t+0.5;
 
-	bloomPass.strength=t/100;
+	bloomPass.strength=t/80;
 
 	if(t==2){
-		
 		color.setHSL(Math.random(),0.7,Math.random()*0.2+0.05);
 		scene.remove(Sp[0]);
 		Sp[0]=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:color,roughness:0.1,metalness:0.5}));
-		Sp[0].position.set(0,230,0);
+		Sp[0].position.set(0,234,0);
+		Sp[0].scale.set(2,1.6,2);
 		scene.add(Sp[0]);
+		bloomPass.strength=0.7;
 	}
-
-	if(t==50){
-		//cyl.layers.toggle(B_L);
-		
-
-		for(let k=0;k<25;k++){Sp[k].layers.toggle(B_L);}
-	}
-	if(t==100){
-		//cyl.layers.toggle(B_L);
-		for(let k=0;k<25;k++){Sp[k].layers.toggle(B_L);}
-	}
-	//if(t==150){mesh[1].layers.enable(B_L);cyl.layers.toggle(B_L);}
-	if(t==110){t=0;bloomPass.strength=0;}
-
+	if(t==50){for(let k=0;k<35;k++){Sp[k].layers.toggle(B_L);}}
+	if(t==100){for(let k=0;k<35;k++){Sp[k].layers.toggle(B_L);}}
+	if(t==110){t=0;bloomPass.strength=0}
 	if(g[12]){g[12].rotation.y +=0.01;}
-	if(controls){controls.update();}
 
+	if(controls){controls.update();}
 	finalComposer.render();
 }
 
 init();
-
 animate();
 
 </script>
