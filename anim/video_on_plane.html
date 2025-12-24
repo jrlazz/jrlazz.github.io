@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>video_on_plane.html</title>
+<meta charset="utf-8">
+
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+<meta name="description" content="Christmas Time is Here">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+
+
+<style>
+@font-face {font-family:myq;src:url('../fonte/MysteryQuest-Regular.ttf');}
+body {margin:0; overflow:hidden; background:#000; color:#ff0; font-family:myq;}
+span {position:absolute; width:99%; top:10px; text-align:center; font-size:20.5px;}
+button {position:absolute; left:10px; top:10px; background-color:#000; font-family:myq; font-size:20.5px; border-radius:10%;}
+input {position:absolute; left:100px; top:10px; background-color:#000; font-family:myq; font-size:20.5px; border-radius:10%; width:100px;}
+</style>
+
+<script type="importmap">
+{
+	"imports": {
+		"three": "https://cdn.jsdelivr.net/npm/three@0.181.0/build/three.module.js",
+		"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.181.0/examples/jsm/"
+ }
+}
+</script>
+
+</head>
+
+<body>
+
+<span>... Remember "Christmas Time is Here" ...</span>
+
+<button style="color:#0f0;" id="btnPlay">Play</button>
+<button style="color:#f00;;display:none;" id="btnPause">Pause</button>
+<input type="range" id="volume"  min="0" max="1" value=".3" step="0.01" autocomplete="off"></input>
+
+<video id="video" crossOrigin="anonymous" playsinline style="display:none">
+	<source src="mp4/christmastimeisheresong.mp4" type='video/mp4'>
+</video>
+
+<script type="module">
+console.clear();
+
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
+let video=document.getElementById( 'video' );
+let videoTex=new THREE.VideoTexture( video );
+let vol=document.getElementById( 'volume' );
+
+vol.onclick=function VOL(){video.volume=vol.value;}
+
+let scene=new THREE.Scene();
+let camera=new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 1, 1000);
+camera.position.set(0,0,25);
+let renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setSize(innerWidth, innerHeight);
+renderer.setClearColor('#000',0);
+document.body.appendChild(renderer.domElement);
+
+let tex=new THREE.TextureLoader().load('img/CharlieBrown_2.jpg');
+
+let controls=new OrbitControls(camera, renderer.domElement);
+
+btnPlay.addEventListener("click", event => {
+	btnPlay.style.display="none";
+	btnPause.style.display="";
+	video.play();
+	m.map=videoTex;
+	m.needsUpdate=true;
+	scene.remove(oo);
+})
+
+btnPause.addEventListener("click", event => {
+	btnPause.style.display="none";
+	btnPlay.style.display="";
+	video.pause();
+	m.map=videoTex;
+	m.needsUpdate=true;
+})
+
+let g=new THREE.PlaneGeometry(32,24);
+let m=new THREE.MeshBasicMaterial({side:THREE.DoubleSide});
+let o=new THREE.Mesh(g, m);
+scene.add(o);
+
+let gg=new THREE.PlaneGeometry(32,24);
+let mm=new THREE.MeshStandardMaterial({color:'#fff',map:tex,side:THREE.DoubleSide});
+let oo=new THREE.Mesh(gg, mm);
+scene.add(oo);
+
+scene.add(new THREE.AmbientLight('#fff',1));
+
+video.pause();
+
+window.addEventListener("resize",onWindowResize);
+
+function animate(){
+	requestAnimationFrame( animate );
+	renderer.render(scene, camera);
+}
+
+function onWindowResize(){
+	camera.aspect=innerWidth / innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(innerWidth, innerHeight);
+}
+
+animate();
+
+</script>
+</body>
+</html>
+
