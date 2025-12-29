@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>garage_threejs.html</title>
+<meta charset="utf-8">
+
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+<meta name="description" content="garage_threejs.html">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+
+<style>
+@font-face {font-family:myq;src:url('../fonte/MysteryQuest-Regular.ttf');}
+body {margin:0; overflow:hidden; background:#069; color:#ff0; font-family:myq;}
+span {position:absolute; width:99%; top:10px; text-align:center; font-size:20.5px;}
+</style>
+
+<script type="importmap">
+	{
+	"imports":{
+	"three":"https://unpkg.com/three@0.181.0/build/three.module.js",
+	"three/addons/":"https://unpkg.com/three@0.181.0/examples/jsm/"
+	}
+	}
+</script>
+
+</head>
+
+<body>
+
+<span style="color:#0f0;">A small garage to store the Discourse Logo</span>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { FontLoader} from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+
+var renderer,scene,camera,loader,materials,amb,point,textgeo1,textMesh1,textgeo2,textMesh2,logo;
+
+var altera=0;
+
+var k=0;
+
+var rot=new Array();
+rot[1]=0;
+
+var w=0;
+
+var p=Math.PI;
+
+var PDi,tex,placa;
+var BD=[];
+var cyl=[];
+var esf=[];
+
+var par=[];
+var gpar=[];
+var mpar=[];
+
+var gpiso=[];
+var mpiso=[];
+var piso=[];
+
+var rota=0;
+
+var tudo=new THREE.Group();
+var group=new THREE.Group();
+var groupJ=new THREE.Group();
+var groupB=new THREE.Group();
+var groupC=new THREE.Group();
+var groupSol=new THREE.Group();
+
+var barra=[];
+
+var bolinha;
+var bevelEnabled=true,font=undefined;
+
+function init(){
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.toneMapping=THREE.ReinhardToneMapping;
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.colorSpace=THREE.SRGBColorSpace;
+	renderer.setClearColor('#034',1);
+
+	document.body.appendChild(renderer.domElement);
+
+	scene=new THREE.Scene();
+	scene.position.set(-15,0,0);
+
+	camera=new THREE.PerspectiveCamera(50,window.innerWidth/window.innerHeight,1,1000,1);
+	camera.position.set(20,20,30);
+
+	amb=new THREE.AmbientLight("#fff",2);
+	scene.add(amb);
+
+	new OrbitControls(camera,renderer.domElement);
+
+	rota=new THREE.AxesHelper(10);
+	rota.position.set(0,0,0);
+
+	gpar[1]=new THREE.BoxGeometry(0.5,8,8);
+	mpar[1]=new THREE.MeshStandardMaterial({color:'#999'});
+	par[1]=new THREE.Mesh(gpar[1],mpar[1]);
+	par[1].position.set(11.75,4,-4);
+	scene.add(par[1]);
+
+	par[2]=new THREE.Mesh(gpar[1],mpar[1]);
+	par[2].position.set(3.25,4,-4);
+	scene.add(par[2]);
+
+	gpar[3]=new THREE.BoxGeometry(2,9,9);
+	mpar[3]=new THREE.MeshStandardMaterial({color:'#666'});
+	par[3]=new THREE.Mesh(gpar[3],mpar[3]);
+	par[3].position.set(7.5,9,-4);
+	par[3].rotation.set(0,0,p/2);
+	scene.add(par[3]);
+
+	gpar[4]=new THREE.BoxGeometry(0.5,8,8);
+	mpar[4]=new THREE.MeshStandardMaterial({color:'#666'});
+	par[4]=new THREE.Mesh(gpar[4],mpar[4]);
+	par[4].position.set(7.5,4,-7.7);
+	par[4].rotation.set(0,p/2,0);
+	scene.add(par[4]);
+
+	gpar[5]=new THREE.BoxGeometry(0.2,8,0.2);
+	mpar[5]=new THREE.MeshStandardMaterial({color:'#000'});
+	par[5]=new THREE.Mesh(gpar[5],mpar[5]);
+	par[5].position.set(3.5,4,-1);
+	par[5].rotation.set(0,p/2,0);
+	scene.add(par[5]);
+
+	par[6]=par[5].clone();
+	par[6].position.set(11.5,4,-1);
+	scene.add(par[6]);
+
+	loader=new FontLoader();
+	loader.load('fonte/Cascadia_Regular.json',function(response){
+	font=response;
+	createText1();
+	createText2();
+	});
+
+	materials=[new THREE.MeshStandardMaterial({color:'#cc0'}),new THREE.MeshStandardMaterial({color:'#900'})];
+
+
+function createText1() {
+	textgeo1=new TextGeometry("three.js",{
+	font:font,size:1.2,height:0.1,curveSegments:4,bevelThickness:0.1,bevelSize:0.05});
+        textgeo1.center();
+	textMesh1=new THREE.Mesh(textgeo1,materials);
+	textMesh1.rotation.y=Math.PI*2;
+	textMesh1.position.set(7.5,9,-1.5);
+	textMesh1.scale.set(1,1,0.1);
+	scene.add(textMesh1);
+}
+
+function createText2() {
+	textgeo2=new TextGeometry("Three.js Street",{
+	font:font,size:3,height:1,curveSegments:4,bevelThickness:0.1,bevelSize:0.05});
+	textMesh2=new THREE.Mesh(textgeo2,materials);
+	textMesh2.rotation.set(-p/2,0,0);
+	textMesh2.position.set(-5,0,11);
+	textMesh2.scale.set(1,1,0.01);
+	scene.add(textMesh2);
+}
+
+	gpiso[1]=new THREE.BoxGeometry(100,20,2);
+	mpiso[1]=new THREE.MeshStandardMaterial({color:'#984'});
+	piso[1]=new THREE.Mesh(gpiso[1],mpiso[1]);
+	piso[1].position.set(0,-0.5,-6);
+	piso[1].rotation.x=1.57;
+	scene.add(piso[1]);
+
+	gpiso[2]=new THREE.BoxGeometry(100,12,1);
+	mpiso[2]=new THREE.MeshStandardMaterial({color:'#666'});
+	piso[2]=new THREE.Mesh(gpiso[2],mpiso[2]);
+	piso[2].position.set(0,-1,10);
+	piso[2].rotation.x=1.57;
+	scene.add(piso[2]);
+
+	gpiso[3]=new THREE.BoxGeometry(8,1.5,1.5);
+	mpiso[3]=new THREE.MeshStandardMaterial({color:'#873'});
+	piso[3]=new THREE.Mesh(gpiso[3],mpiso[3]);
+	piso[3].position.set(8,-0.6,4);
+	piso[3].rotation.set(-p/4,0,0);
+	scene.add(piso[3]);
+
+	bolinha=new THREE.Mesh(new THREE.SphereGeometry(0.01,3,3),new THREE.MeshStandardMaterial({color:"#fff"}));
+	bolinha.position.set(0,5,60);
+
+	point=new THREE.PointLight("#fff",10000);
+	bolinha.add(point);
+
+	tex=new THREE.TextureLoader().load('img/borda16.png');
+	tex.wrapS=THREE.RepeatWrapping;tex.wrapT=THREE.RepeatWrapping;
+	tex.repeat.set(20,1);
+	var tex2=new THREE.TextureLoader().load('img/three_white.png');
+
+	logo=new THREE.Mesh(new THREE.PlaneGeometry(6,6),new THREE.MeshStandardMaterial({map:tex2,color:'#fff',transparent:true,side:THREE.DoubleSide}));
+	logo.position.set(7.5,4,-2);
+	scene.add(logo);
+
+	placa=new THREE.Mesh(new THREE.BoxGeometry(40,5,0.2),new THREE.MeshStandardMaterial({map:tex,color:'#999',side:THREE.DoubleSide}));
+
+	PDi=new THREE.Mesh(new THREE.SphereGeometry(0.1,16,16),new THREE.MeshStandardMaterial({color:'#f00'}));
+	placa.position.set(20,-2.5,0);
+	placa.rotation.set(0,0,0);
+	PDi.add(placa);
+
+	cyl[1]=new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.3,40,16),new THREE.MeshStandardMaterial({color:'#040'}));
+	cyl[1].rotation.set(0,p/2,0);
+	cyl[1].position.set(0,-20,0);
+
+	esf[1]=new THREE.Mesh(new THREE.SphereGeometry(0.3,16,16),new THREE.MeshStandardMaterial({color:'#f40'}));
+	esf[1].rotation.set(0,0,p/2);
+	esf[1].position.set(0,0,0);
+	esf[1].add(cyl[1]);
+
+	cyl[2]=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,40,16),new THREE.MeshStandardMaterial({color:'#c00'}));
+	cyl[2].rotation.set(0,0,p/2);
+	cyl[2].position.set(-2,-5,0);
+	cyl[3]=cyl[2].clone();
+	cyl[3].position.set(-2,-5,-40);
+
+	render();
+
+	window.addEventListener('resize',onResize,false);
+
+// inet end
+}
+
+function onResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+function animate(){
+	requestAnimationFrame(animate);
+	render();
+}
+
+function render(){
+	renderer.render(scene,camera);
+
+	groupJ.rotation.y +=p/180;
+
+	if(altera==0){setTimeout(function(){alterando();},400);}
+
+	w++;
+
+	if(w==5){
+		if(rota.rotation.x>=p/4){rot[1]=1;groupC.position.z=6.8;group.position.x=10.2;}//scene.remove(group);	document.getElementById("spanid").innerText="1";}
+		if(rota.rotation.x<=-p/4){rot[1]=0;groupB.position.z=-3.0;group.position.x=-9.0;}//scene.add(group);	document.getElementById("spanid").innerText="0";}
+		if(PDi && BD[2]){
+			if(rot[1]==0){
+				rota.rotation.x +=p/90;
+				groupB.rotation.x -=p/90;
+				groupC.rotation.x -=p/90;
+				BD[2].rotation.x +=p/45;
+				BD[3].rotation.x +=p/45;
+				BD[4].rotation.x -=p/45;
+				BD[12].rotation.x +=p/45;
+				BD[13].rotation.x +=p/45;
+				BD[14].rotation.x -=p/45;
+				groupB.position.z +=0.342*Math.cos(groupB.rotation.x);
+				groupC.position.z -=0.342*Math.cos(groupB.rotation.x);
+				group.position.x +=0.67*Math.cos(groupB.rotation.x);
+			}else{
+				rota.rotation.x -=p/90;
+				groupC.rotation.x +=p/90;
+				groupB.rotation.x +=p/90;
+				BD[2].rotation.x -=p/45;
+				BD[3].rotation.x -=p/45;
+				BD[4].rotation.x +=p/45;
+				BD[12].rotation.x -=p/45;
+				BD[13].rotation.x -=p/45;
+				BD[14].rotation.x +=p/45;
+				groupC.position.z +=0.356*Math.cos(groupB.rotation.x);
+				groupB.position.z -=0.356*Math.cos(groupB.rotation.x);
+				group.position.x -=0.67*Math.cos(groupB.rotation.x);
+			}
+		}
+		w=0;
+	}
+}
+
+function alterando(){
+
+	groupJ.add(bolinha);
+
+	esf[1].position.y=-5;
+	esf[2]=esf[1].clone();
+	esf[2].position.y=0;
+	PDi.add(esf[1]);
+	PDi.add(esf[2]);
+	BD[1]=PDi.clone();
+	BD[2]=PDi.clone();
+	BD[3]=PDi.clone();
+	BD[4]=PDi.clone();
+
+	BD[1].position.set(0,0,0);
+	BD[2].position.set(0,-5,0);
+	BD[2].rotation.set(p/2,0,0);
+	BD[3].position.set(0,0,0);
+	BD[3].rotation.set(p+p/2,0,0);
+		BD[4].position.set(0,-5,0);
+		BD[4].rotation.set(2*p-p/2,0,0);
+	BD[3].add(BD[4]);
+
+	groupB.add(BD[1]);
+	groupB.add(BD[2]);
+	groupB.add(BD[3]);
+		groupB.position.set(0,-10,0);
+		groupB.rotation.set(p/4,0,0);
+
+// ********
+
+	esf[1].position.y=-5;
+	esf[2]=esf[1].clone();
+	esf[2].position.y=0;
+	PDi.add(esf[1]);
+	PDi.add(esf[2]);
+	BD[11]=PDi.clone();
+	BD[12]=PDi.clone();
+	BD[13]=PDi.clone();
+	BD[14]=PDi.clone();
+
+	BD[11].position.set(0,0,0);
+	BD[12].position.set(0,-5,0);
+	BD[12].rotation.set(p/2,0,0);
+	BD[13].position.set(0,0,0);
+	BD[13].rotation.set(p+p/2,0,0);
+		BD[14].position.set(0,-5,0);
+		BD[14].rotation.set(2*p-p/2,0,0);
+	BD[13].add(BD[14]);
+
+	groupC.add(BD[11]);
+	groupC.add(BD[12]);
+	groupC.add(BD[13]);
+		groupC.position.set(0,-10,14);
+		groupC.rotation.set(p/4,0,0);
+
+	group.add(groupB);
+	group.add(groupC);
+
+	group.position.set(-3.0,5,0);
+	group.rotation.set(p/2,p/2,p/2);
+
+	tudo.add(group);
+	tudo.scale.setScalar(0.2);
+	tudo.rotation.set(0,p/2,p/2);
+	tudo.position.set(3.5,4.4,-4);
+	scene.add(tudo);
+
+
+	while(rota.rotation.x<=p/4){
+		rota.rotation.x +=p/90;
+		groupB.rotation.x -=p/90;
+		groupC.rotation.x -=p/90;
+		BD[2].rotation.x +=p/45;
+		BD[3].rotation.x +=p/45;
+		BD[4].rotation.x -=p/45;
+		BD[12].rotation.x +=p/45;
+		BD[13].rotation.x +=p/45;
+		BD[14].rotation.x -=p/45;
+		groupB.position.z +=0.342*Math.cos(groupB.rotation.x);
+		groupC.position.z -=0.342*Math.cos(groupB.rotation.x);
+		group.position.x +=0.67*Math.cos(groupB.rotation.x);
+	}
+	scene.add(groupJ);
+	altera++;
+	animate();
+}
+
+init();
+
+</script>
+</body>
+</html>
