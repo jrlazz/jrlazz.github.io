@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>altf11_5.html</title>
+<meta charset="utf-8" />
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+<meta name="description" content="With js to toggle FullScreen">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+<style type="text/css">
+body {margin:0;padding:0;overflow:hidden;background-color:#036;color:#ff0;font-family:Lucida Console;}
+</style>
+
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.156.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.156.0/examples/jsm/"}}</script>
+
+</head>
+
+<body>
+
+<button onclick="toggleFullScreen();" style="position:absolute;left:10px;top:10px;font-size:20.5px;color:gold;background-color:#060;border-radius:0%;border:3px outset gold;box-shadow: 3px 3px #666;">Toggle Full Screen</button>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+var scene,camera,renderer,controls,delta;
+var cube;
+var face=[];
+var geo,tex,logo;
+var passo=0.02;
+var clock=new THREE.Clock();
+var si=1;
+var p=Math.PI;
+var t=0;
+var tt=0;
+
+var df11=document.getElementById("f11");
+
+scene=new THREE.Scene();
+camera=new THREE.PerspectiveCamera(25,window.innerWidth/window.innerHeight,0.1,1000,1);
+camera.position.set(9,3,3);
+renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setClearColor('#024',0);
+renderer.setSize(window.innerWidth,window.innerHeight);	
+document.body.appendChild(renderer.domElement); 
+
+for(let z=1;z<6;z++){face[z]=new THREE.Mesh(new THREE.PlaneGeometry(si,si,si), new THREE.MeshBasicMaterial({color:0xffffff*Math.random(),side:THREE.DoubleSide}));}
+geo=new THREE.PlaneGeometry(si,si,si);
+geo.translate(0,-0.5,0);
+face[6]=new THREE.Mesh(geo, new THREE.MeshNormalMaterial({side:THREE.DoubleSide}));
+
+face[2].material.transparent=true;
+face[2].material.opacity=0.7;
+face[2].position.z=si;
+	face[3].position.x=si/2;
+	face[3].rotation.y=p/2;
+	face[3].position.z=si/2;
+face[4].material.transparent=true;
+face[4].material.opacity=0.7;
+face[4].position.x=-si/2;
+face[4].rotation.y=p/2;
+face[4].position.z=si/2;
+	face[5].position.z=si/2;
+	face[5].position.y=si/2;
+	face[5].rotation.x=p/2;
+face[6].position.y=-si/2;
+face[6].rotation.x=-p/2;
+cube=new THREE.Object3D();
+for(let z=1;z<7;z++){cube.add(face[z]);}
+cube.rotation.set(p,p/1.2,p/20);
+cube.name="Cube";
+scene.add(cube);
+
+tex=new THREE.TextureLoader().load('img/three_fff.png');
+logo=new THREE.Mesh(new THREE.PlaneGeometry(0.6,0.6),new THREE.MeshBasicMaterial({map:tex,color:'#fff',transparent:true,side:THREE.DoubleSide}));
+logo.position.set(0.3,0,0.42);
+logo.rotation.x=p/2;
+scene.add(logo);
+
+controls=new OrbitControls(camera,renderer.domElement);
+
+window.addEventListener('resize',function(){
+	camera.aspect=window.innerWidth/window.innerHeight
+	camera.updateProjectionMatrix()
+	renderer.setSize(window.innerWidth,window.innerHeight)
+})
+
+function animate(){
+	requestAnimationFrame(animate);
+	t++;if(t<51){delta=clock.getDelta();passo=delta;}
+	if(t>51){
+		t=52;
+		face[6].rotation.x += passo;
+		if(face[6].rotation.x>p/2){passo=-passo;}
+		if(face[6].rotation.x<-p/2){passo=-passo;}
+		logo.rotation.x -=passo;
+		logo.rotation.y -=passo;
+		logo.rotation.z -=passo;
+	}
+
+	tt++;
+	if(tt>delta*10000){
+		for(let z=1;z<6;z++){face[z].material.color.set(0xffffff*Math.random());tt=0;}
+	}
+	renderer.render(scene,camera);
+}
+
+animate();
+
+</script>
+<script>
+function toggleFullScreen(){
+	if(!document.fullscreenElement){
+		if(document.documentElement.requestFullscreen){
+      			document.documentElement.requestFullscreen();
+    		}else if(document.documentElement.mozRequestFullScreen){ // Firefox
+      			document.documentElement.mozRequestFullScreen();
+    		}else if(document.documentElement.webkitRequestFullscreen){ // Chrome, Safari & Opera
+      			document.documentElement.webkitRequestFullscreen();
+    		}else if(document.documentElement.msRequestFullscreen){ // IE/Edge
+      			document.documentElement.msRequestFullscreen();
+    		}
+	}else{
+		if(document.exitFullscreen){
+			document.exitFullscreen();
+		}else if(document.mozCancelFullScreen){ // Firefox
+			document.mozCancelFullScreen();
+		}else if(document.webkitExitFullscreen){ // Chrome, Safari & Opera
+			document.webkitExitFullscreen();
+		}else if(document.msExitFullscreen){ // IE/Edge
+			document.msExitFullscreen();
+		}
+	}
+}
+// A simple box that opens and closes
+</script>
+</body>
+</html>
