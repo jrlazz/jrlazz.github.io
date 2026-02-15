@@ -17,7 +17,7 @@ body{margin:0;overflow:hidden;background:#035;font-family:monospace;}
 	color:#ff0;background-color:rgba(0,60,100,1);
 	padding:10px;border:1px solid #ff0;
 }
-button{position:absolute;font-size:14pt;padding:4px;}
+button{position:absolute;font-size:32pt;padding:8px;}
 </style>
 
 </head>
@@ -25,16 +25,16 @@ button{position:absolute;font-size:14pt;padding:4px;}
 <body>
 
 <button id="but" onclick="toggleFullScreen();" style="
-position:absolute;left:90#;top:10px;width:36px;
-font-size:21.5px;font-weight:bold;color:gold;
+position:absolute;left:90#;top:10px;width:80px;
+font-size:41px;font-weight:bold;color:gold;
 background-color:#060;border:3px outset #0c0;
 box-shadow:3px 3px 6px #aaccaa;">T</button>
 
 <button id="walk" style="left:10px;">WALK</B>
-<button id="spir" style="left:90px;">SPIR</B>
-<button id="orga" style="left:170px;">SPIR</B>
-<button id="shok" style="left:260px;">SPIR</B>
-<button id="start" style="left:350px;">START</B>
+<button id="spir" style="left:160px;">SPIR</B>
+<button id="orga" style="left:310px;">SPIR</B>
+<button id="shok" style="left:460px;">SPIR</B>
+<button id="start" style="left:610px;">START</B>
 
 <script type="importmap">
 {
@@ -187,7 +187,7 @@ window.addEventListener("resize",()=>{
 	renderer.setSize(window.innerWidth,window.innerHeight);
 });
 
-document.getElementById("but").style.left=window.innerWidth-50+"px";
+document.getElementById("but").style.left=window.innerWidth-90+"px";
 </script>
 
 <script>
