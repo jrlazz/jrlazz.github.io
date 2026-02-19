@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>shader_ch.html</title>
+
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+<meta name="description" content="Shader ch">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+
+<style>
+body{margin:0px;overflow:hidden;background:#035;font-family:monospace;}
+button{position:absolute;top:50px;font-size:41px;padding:5px;font-weight:bold;font-family:monospace;width:150px;z-index:0;}
+}
+</style>
+
+</head>
+
+<body>
+
+<button id="start">START</B>
+<button id="walk">WALK</B>
+<button id="spir">SPIR</B>
+<button id="orga">ORGA</B>
+<button id="shok">SHOCK</B>
+<!--<button id="blur">BLUR</B>-->
+<button id="simp">SIMP</B>
+<button id="poin">MOVE</B>
+<button id="lava">LAVA</B>
+
+<button onclick="toggleFullScreen();" id="but" style="position:absolute;left:0%;width:80px;top:30px;color:gold;background-color:#060;border:3px outset #0c0;
+box-shadow:3px 3px 6px #aaccaa;">T</button>
+
+
+<script type="importmap">
+{
+	"imports": {
+		"three": "https://unpkg.com/three@0.182.0/build/three.module.js",
+		"three/addons/": "https://unpkg.com/three@0.182.0/examples/jsm/"
+	}
+}
+</script>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+
+document.getElementById("walk").onclick=()=>{para1();uniforms.mode.value=0;}
+document.getElementById("spir").onclick=()=>{para1();uniforms.mode.value=1;}
+document.getElementById("orga").onclick=()=>{para1();uniforms.mode.value=2;}
+document.getElementById("shok").onclick=()=>{para1();uniforms.mode.value=3;}
+document.getElementById("start").onclick=()=>{para1();uniforms.mode.value=5;}
+//document.getElementById("blur").onclick=()=>{uniforms.glow.value=1.0-uniforms.glow.value;}
+document.getElementById("simp").onclick=function(){scene.add(tar);para2();}
+document.getElementById("poin").onclick=function(){scene.add(tar);para3();}
+document.getElementById("lava").onclick=function(){lavasim=1;para4();}
+
+var loader, mesh, lavamesh;
+var lavasim=0;
+
+const clock=new THREE.Clock();
+
+// SCENE
+const scene=new THREE.Scene();
+
+// CAMERA
+const camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,0.1,1000);
+camera.position.set(0,2,3);
+scene.position.set(0,-1,0);
+
+// RENDERER
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setSize(window.innerWidth,window.innerHeight);
+renderer.setClearColor('#035',1);
+
+document.body.appendChild(renderer.domElement);
+
+//container=document.createElement( 'div' );
+//document.body.appendChild( container );
+//container.appendChild(renderer.domElement);
+
+// CONTROLS
+new OrbitControls(camera,renderer.domElement);
+
+// LIGHT
+scene.add(new THREE.AmbientLight('#fff',3));
+
+// UNIFORMS
+const uniforms={
+	iTime:{value:0},
+	mode:{value:5},
+	layerSize:{value:18.0},
+	speed:{value:6.0},
+	glow:{value:0.0},
+	brightness:{value:1.8}
+};
+
+// MATERIAL
+const material1=new THREE.ShaderMaterial({
+
+uniforms:uniforms,
+
+vertexShader:`
+	varying vec3 vPos;
+	void main(){
+		vPos=position;
+		gl_Position=
+		projectionMatrix*
+		modelViewMatrix*
+		vec4(position,1.0);
+	}
+	`,
+
+fragmentShader:`
+	uniform float iTime;
+	uniform int mode;
+	uniform float layerSize;
+	uniform float speed;
+	uniform float glow;
+	uniform float brightness;
+
+	varying vec3 vPos;
+
+	// wave functions
+	float walking(){ return sin(vPos.y*layerSize+iTime*speed); }
+	float spiral(){ float angle=atan(vPos.x,vPos.z); return sin(angle*10.0+vPos.y*8.0+iTime*speed); }
+	float organic(){ return sin(vPos.y*layerSize+iTime*speed)+sin(vPos.x*8.0+iTime*speed*0.6)*0.3; }
+	float shock(){ return sin(length(vPos.xy)*15.0-iTime*speed*1.2); }
+	float simp(){ return sin(length(vPos.xy)*1.0-iTime*10.0); }
+
+	void main(){
+
+	vec3 color=vec3(0.15);
+
+	if(mode==5){
+		const int bands=7;
+		for(int i=0;i<bands;i++){
+			float fi=float(i);
+			float wave=sin(vPos.y*6.0+iTime*6.0+fi);
+			float stripe=smoothstep(0.9,1.2,wave);
+			vec3 bandColor=vec3(
+				0.5+0.5*sin(iTime*0.7 + fi),
+				0.5+0.5*sin(iTime*1.1 + 2.0 + fi),
+				0.5+0.5*sin(iTime*1.3 + 4.0 + fi)
+			);
+			bandColor*=1.8;
+        		color+=stripe*bandColor;
+    		}
+	}else{
+    		// other modes
+		float wave;
+		if(mode==0){wave=walking();}
+		if(mode==1){wave=spiral();}
+		if(mode==2){wave=organic();}
+		if(mode==3){wave=shock();}
+
+			float stripe=smoothstep(0.85,1.02,wave);
+			vec3 bandColor=vec3(
+				0.5+0.5*sin(iTime*0.7),
+				0.5+0.5*sin(iTime*1.1+2.0),
+				0.5+0.5*sin(iTime*1.3+4.0)
+			);
+			bandColor*=brightness;
+			color+=stripe*bandColor;
+	}
+
+	if(glow>0.5){
+		float halo=smoothstep(0.7,1.0,sin(vPos.y*layerSize+iTime*speed));
+		color+=halo*0.6*color;
+	}
+
+	gl_FragColor=vec4(color,1.0);
+}
+`,
+transparent:true
+});
+
+// ******** simple_002h.html
+
+const material2=new THREE.ShaderMaterial({
+uniforms:{ iTime:{value:0}},
+vertexShader:`
+void main(){
+	gl_Position=projectionMatrix * modelViewMatrix * vec4(position,1.0);
+}
+`
+,
+fragmentShader:`
+uniform float iTime;
+void main(){
+	vec4 color;
+	color.r=0.3+0.3*sin(iTime*3.0);
+	color.g=0.3+0.3*sin(iTime*6.0+2.0);
+	color.b=0.3+0.3*sin(iTime*9.0+4.0);
+	color.a=0.4+0.4*sin(iTime);
+	gl_FragColor=vec4(color);
+}
+`,
+//blending:THREE.CustomBlending
+transparent:true
+});
+
+// ******** shader_points.html
+const material3 = new THREE.ShaderMaterial({
+uniforms:{
+	iTime:{value:0}
+},
+
+vertexShader:`
+	varying vec3 vPos;
+	void main() {
+	vPos = position;   // send position to fragment shader
+	gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+	}
+	`
+,
+
+fragmentShader:`
+	uniform float iTime;
+	varying vec3 vPos;
+	// simple pseudo-random function
+	float random(vec3 p){
+		return fract(sin(dot(p ,vec3(2.2,2.2*sin(iTime),1.2))) * 2.4);
+	}
+	void main(){
+		float r = random(vPos);
+		float g = random(vPos * 2.0);
+		float b = random(vPos * 3.0);
+		gl_FragColor = vec4(r,g,b,0.5+abs(sin(iTime)/2.0));
+	}
+	`
+	,
+	transparent:true
+});
+
+// GEOMETRIES
+mesh=new THREE.Mesh(new THREE.SphereGeometry(0.7,64,64),material1);
+mesh.rotation.x=Math.PI/2;
+mesh.position.set(-0.75,0,0);
+//scene.add(mesh);
+
+const box=new THREE.Mesh(new THREE.BoxGeometry(1,1,1),material1);
+box.position.set(0.75,0,0);
+//scene.add(box);
+
+	const tex=new THREE.TextureLoader().load("images/made1.jpg");
+	tex.wrapS=THREE.RepeatWrapping;tex.wrapT=THREE.RepeatWrapping;
+	//tex.repeat=new THREE.Vector2(0.01,0.01);
+	tex.repeat.set(0.1,0.1);
+	tex.colorSpace=THREE.SRGBColorSpace;
+
+const tar=new THREE.Mesh(new THREE.BoxGeometry(3,0.5,0.1),new THREE.MeshStandardMaterial({color:'#fcc',map:tex}));
+tar.position.set(0,0,-1);
+//scene.add(tar);
+
+
+loader=new GLTFLoader();
+loader.load("mesh/sphere_Hofk.gltf", function(gltf){
+
+lavamesh=gltf.scene;
+
+lavamesh.traverse(function(child){
+	if(child.isMesh){
+		child.material=new THREE.ShaderMaterial({
+			uniforms:{
+				iTime:{ value:0 }
+			},
+			vertexShader:`
+				uniform float iTime;
+				varying vec3 vPos;
+				varying vec3 vNormal;
+				void main(){
+					vec3 pos=position;
+					// Animated surface displacement
+					float wave =
+					sin(pos.x * 6.0 + iTime * 2.0) *
+					sin(pos.y * 6.0 + iTime * 2.0) *
+					0.15;
+					pos += normal * wave;
+					vPos=normalize(pos);
+					vNormal=normalize(normalMatrix * normal);
+					gl_Position=projectionMatrix * modelViewMatrix * vec4(pos,1.0);
+				}
+				`,
+				fragmentShader:`
+				uniform float iTime;
+				varying vec3 vPos;
+				varying vec3 vNormal;
+
+				// -------------------- HASH --------------------
+				void hash(vec3 p, out float result){
+					p = fract(p * 0.3183099 + 0.1);
+					p *= 17.0;
+					result = fract(p.x * p.y * p.z * (p.x + p.y + p.z));
+				}
+
+				// -------------------- 3D NOISE --------------------
+				void noise(vec3 p, out float result){
+					vec3 i = floor(p);
+					vec3 f = fract(p);
+
+					f = f * f * (3.0 - 2.0 * f);
+
+					float h000; hash(i + vec3(0,0,0), h000);
+					float h100; hash(i + vec3(1,0,0), h100);
+					float h010; hash(i + vec3(0,1,0), h010);
+					float h110; hash(i + vec3(1,1,0), h110);
+
+					float h001; hash(i + vec3(0,0,1), h001);
+					float h101; hash(i + vec3(1,0,1), h101);
+					float h011; hash(i + vec3(0,1,1), h011);
+					float h111; hash(i + vec3(1,1,1), h111);
+
+					float nx00 = mix(h000, h100, f.x);
+					float nx10 = mix(h010, h110, f.x);
+					float nx01 = mix(h001, h101, f.x);
+					float nx11 = mix(h011, h111, f.x);
+
+					float nxy0 = mix(nx00, nx10, f.y);
+					float nxy1 = mix(nx01, nx11, f.y);
+
+					result = mix(nxy0, nxy1, f.z);
+				}
+
+				// -------------------- FBM --------------------
+				void fbm(vec3 p, out float result){
+					result = 0.0;
+					float a = 0.5;
+					for(int i = 0; i < 5; i++){
+						float n;
+						noise(p, n);
+						result += a * n;
+						p *= 2.0;
+						a *= 0.5;
+					}
+				}
+
+				// -------------------- MAIN --------------------
+				void main(){
+					vec3 p = vPos * 3.0;
+
+					// Domain warp
+					float flow;
+					fbm(p + iTime * 0.5, flow);
+					p += flow * 2.0;
+					float n;
+					fbm(p - iTime * 0.2, n);
+
+					// Crack shaping
+					float cracks = smoothstep(0.55, 0.65, n);
+
+					// Lava colors
+					vec3 hotCore = vec3(1.5, 0.6, 0.05);
+					vec3 midLava = vec3(1.0, 0.25, 0.02);
+					vec3 darkRock = vec3(0.03, 0.02, 0.015);
+					vec3 lavaColor = mix(midLava, hotCore, pow(n,3.0));
+					vec3 baseColor = mix(darkRock, lavaColor, cracks);
+
+					// Emission
+					float emission = pow(cracks, 4.0) * 2.0;
+					baseColor += lavaColor * emission;
+
+					// Rim light
+					float rim = 1.0 - max(dot(normalize(vNormal), vec3(0.0,0.0,1.0)), 0.0);
+					rim = pow(rim, 2.5);
+					vec3 rimColor = vec3(1.0, 0.4, 0.1);
+					vec3 finalColor = baseColor + rimColor * rim * 0.5;
+					gl_FragColor = vec4(finalColor,1.0);
+				}
+					`
+			});
+		}
+	});
+	lavamesh.scale.set(1,1,1);
+	//scene.add(lavamesh);
+});
+
+function para1(){
+	scene.add(mesh);
+	scene.add(box);
+	scene.remove(tar);
+	mesh.material=material1;
+	box.material=material1;
+	if(lavasim=1){scene.remove(lavamesh);}
+}
+
+function para2(){
+	scene.add(mesh);
+	scene.add(box);
+	mesh.material=material2;
+	box.material=material2;
+	if(lavasim=1){scene.remove(lavamesh);}
+}
+
+function para3(){
+	scene.add(mesh);
+	scene.add(box);
+	//scene.add(tar);
+	mesh.material=material3;
+	box.material=material3;
+	if(lavasim=1){scene.remove(lavamesh);}
+}
+
+function para4(){
+	scene.add(lavamesh);
+	scene.remove(mesh);
+	scene.remove(box);
+	scene.remove(tar);
+}
+
+
+// ANIMATE
+function animate(){
+	requestAnimationFrame(animate);
+	uniforms.iTime.value=clock.getElapsedTime();
+	material2.uniforms.iTime.value=clock.getElapsedTime();
+	material3.uniforms.iTime.value=clock.getElapsedTime();
+	let t=clock.getElapsedTime();
+	if(lavamesh){
+		lavamesh.traverse(function(child){
+			if(child.isMesh && child.material.uniforms){
+				child.material.uniforms.iTime.value=t;
+			}
+		});
+	}
+	renderer.render(scene,camera);
+}
+
+animate();
+
+// RESIZE
+window.addEventListener("resize",()=>{
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+});
+
+document.getElementById("but").style.left=window.innerWidth-90+"px";
+
+</script>
+
+<script>
+
+function toggleFullScreen(){
+    if(!document.fullscreenElement){
+        document.documentElement.requestFullscreen();
+    }else{
+        document.exitFullscreen();
+    }
+}
+	let d=30;
+	let list=document.querySelectorAll("button");
+	//list.length
+	for(let z=0;z<5;z++){
+		list[z].style.top=40+"px";
+		list[z].style.left=d+"px";
+		d=d+180;
+	}
+	d=30;
+	for(let z=5;z<8;z++){
+		list[z].style.top=120+"px";
+		list[z].style.left=d+"px";
+		d=d+180;
+	}
+
+</script>
+
+
+</body>
+</html>
