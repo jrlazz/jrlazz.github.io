@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>shader_ch.html</title>
+<title>shader_cj.html</title>
 
 <link rel="icon" type="image/png" href="../img/github-mark.png">
 <meta name="description" content="Shader ch">
@@ -61,6 +61,7 @@ document.getElementById("lava").onclick=function(){lavasim=1;para4();}
 
 var loader, mesh, lavamesh;
 var lavasim=0;
+var initi=0;
 
 const clock=new THREE.Clock();
 
@@ -416,6 +417,7 @@ function para4(){
 // ANIMATE
 function animate(){
 	requestAnimationFrame(animate);
+	initi++;if(initi==120){para1();}
 	uniforms.iTime.value=clock.getElapsedTime();
 	material2.uniforms.iTime.value=clock.getElapsedTime();
 	material3.uniforms.iTime.value=clock.getElapsedTime();
