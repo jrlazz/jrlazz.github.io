@@ -31,7 +31,7 @@ button{position:absolute;top:50px;font-size:41px;padding:5px;font-weight:bold;fo
 <button id="poin">MOVE</B>
 <button id="lava">LAVA</B>
 
-<button onclick="toggleFullScreen();" id="but" style="position:absolute;left:0%;width:80px;top:30px;color:gold;background-color:#060;border:3px outset #0c0;
+<button onclick="toggleFullScreen();" id="but" style="position:absolute;left:0%;top:30px;color:gold;background-color:#060;border:3px outset #0c0;
 box-shadow:3px 3px 6px #aaccaa;">T</button>
 
 
@@ -439,7 +439,7 @@ window.addEventListener("resize",()=>{
 	renderer.setSize(window.innerWidth,window.innerHeight);
 });
 
-document.getElementById("but").style.left=window.innerWidth-90+"px";
+//document.getElementById("but").style.left=window.innerWidth-90+"px";
 
 </script>
 
@@ -455,14 +455,20 @@ function toggleFullScreen(){
 	let d=30;
 	let list=document.querySelectorAll("button");
 	//list.length
-	for(let z=0;z<5;z++){
+	for(let z=0;z<4;z++){
 		list[z].style.top=40+"px";
 		list[z].style.left=d+"px";
 		d=d+180;
 	}
 	d=30;
-	for(let z=5;z<8;z++){
+	for(let z=4;z<8;z++){
 		list[z].style.top=120+"px";
+		list[z].style.left=d+"px";
+		d=d+180;
+	}
+	d=30;
+	for(let z=8;z<9;z++){
+		list[z].style.top=200+"px";
 		list[z].style.left=d+"px";
 		d=d+180;
 	}
