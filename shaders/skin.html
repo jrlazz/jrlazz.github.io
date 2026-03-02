@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Steve_living_room.html</title>
+
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+<meta name="description" content="Shader with GPT ... Steve's living room">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+
+<style>
+body { margin:0px; background:#006; overflow:hidden;}
+button{position:absolute;font-size:20.5pt;padding:2px;font-weight:bold;font-family:monospace;width:50px;z-index:0;cursor:pointer;}
+div{position:absolute;left:50px;top:50px;padding:4px;font-size:10.25pt;background-color:#023;color:#0f0;height:200px;border:4px outset gold;overflow:auto;cursor:pointer;}
+</style>
+</head>
+
+<body>
+
+<button onclick="toggleFullScreen();" id="but" style="left:-1000px;top:10px;color:gold;background-color:#060;border:3px outset #0c0;box-shadow:3px 3px 6px #aaccaa;">T</button>
+<button id="but2"style="left:-1000px;top:60px;color:gold;background-color:#060;border:3px outset #0c0;box-shadow:3px 3px 6px #aaccaa;font-size:10.25pt;width:100px;">Shader code</button>
+<div id="divtext" style="display:none;"></div>
+<span style="position:absolute;left:10px;top:10px;font-family:monospace;font-size:20.5px;color:#0ff">... Steve,sitting in his living room: Forgive me Vi,I can't do this!</span>
+
+<script type="importmap">
+{
+	"imports": {
+		"three": "https://unpkg.com/three@0.182.0/build/three.module.js",
+		"three/addons/": "https://unpkg.com/three@0.182.0/examples/jsm/"
+	}
+}
+</script>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+
+var scene,camera,renderer,controls;
+
+var altera=0;
+
+var rot=[];rot[1]=0;
+
+var CA2,TR2,BDs2,BDi2,BEs2,BEi2,PDs2,PDi2,PEs2,PEi2;
+var r=new THREE.Group();
+var rCA=new THREE.Group();
+var rTR=new THREE.Group();
+var rBD=new THREE.Group();
+var rBE=new THREE.Group();
+var rPD=new THREE.Group();
+var rPE=new THREE.Group();
+
+var CA3,TR3,BDs3,BDi3,BEs3,BEi3,PDs3,PDi3,PEs3,PEi3;
+var s=new THREE.Group();
+var sCA=new THREE.Group();
+var sTR=new THREE.Group();
+var sBD=new THREE.Group();
+var sBE=new THREE.Group();
+var sPD=new THREE.Group();
+var sPE=new THREE.Group();
+
+var gC=new THREE.Group();
+
+var mtls=[];
+var objs=[];
+var models=[];
+
+var g=[];
+var mat=[];
+var m=[];
+var t=[];
+var pi=Math.PI;
+var head=0.01;
+var tim=0;
+var text;
+
+var gg;
+var fireLight,SteveLight;
+var chairSeat,chairBack,chairMaterial,woodMaterial,armL,armR;
+var ddiv=document.getElementById("divtext")
+
+function init(){
+
+document.getElementById("but2").onclick=()=>{
+	if(ddiv.style.display=="none"){
+		ddiv.style.display="";
+	}else{
+		ddiv.style.display="none";
+	}
+}
+
+scene=new THREE.Scene();
+
+camera=new THREE.PerspectiveCamera(80,innerWidth/innerHeight,0.1,1000);
+camera.position.set(0,0,35);
+
+renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setSize(window.innerWidth,window.innerHeight);
+renderer.setClearColor('#006',1);
+renderer.setPixelRatio(window.devicePixelRatio);
+document.body.appendChild(renderer.domElement);
+
+controls=new OrbitControls(camera,renderer.domElement);
+
+scene.add(new THREE.AmbientLight('#fff',1.2));
+
+fireLight=new THREE.PointLight(0xff6622,3000);
+fireLight.position.set(0,10,20);
+scene.add(fireLight);
+
+SteveLight=new THREE.PointLight('#fff',2000);
+SteveLight.position.set(-15,15,20);
+scene.add(SteveLight);
+
+mtls[1]='models/S_head.mtl';	objs[1]='models/S_head.obj';
+mtls[2]='models/S_torso.mtl';	objs[2]='models/S_torso.obj';
+mtls[3]='models/S_arm.mtl';	objs[3]='models/S_arm.obj';
+mtls[4]='models/S_leg.mtl';	objs[4]='models/S_leg.obj';
+mtls[5]='models/V_head.mtl';	objs[5]='models/V_head.obj';
+mtls[6]='models/V_torso.mtl';	objs[6]='models/V_torso.obj';
+mtls[7]='models/V_arm.mtl';	objs[7]='models/V_arm.obj';
+mtls[8]='models/V_leg.mtl';	objs[8]='models/V_leg.obj';
+
+for(let z=1;z<9;z++){
+	new MTLLoader().load(mtls[z],function(mat){mat.preload();new OBJLoader().setMaterials(mat).load(objs[z],function(object){models[z]=object;});});
+}
+
+mat[1]=new THREE.ShaderMaterial({
+    transparent:true,
+    depthWrite:false,
+    blending:THREE.AdditiveBlending,
+    uniforms:{time:{value:0}},
+    vertexShader: `
+        varying vec2 vUv;
+        void main(){
+            vUv=uv;
+            gl_Position=projectionMatrix * modelViewMatrix * vec4(position,1.0);
+        }
+    `,
+    fragmentShader: `
+        uniform float time;
+        varying vec2 vUv;
+
+        float hash(vec2 p){
+            p=fract(p*vec2(123.34,456.21));
+            p+=dot(p,p+45.32);
+            return fract(p.x*p.y);
+        }
+        float noise(vec2 p){
+            vec2 i=floor(p);
+            vec2 f=fract(p);
+            float a=hash(i);
+            float b=hash(i+vec2(1.0,0.0));
+            float c=hash(i+vec2(0.0,1.0));
+            float d=hash(i+vec2(1.0,1.0));
+            vec2 u=f*f*(3.0-2.0*f);
+            return mix(a,b,u.x)+(c-a)*u.y*(1.0-u.x)+(d-b)*u.x*u.y;
+        }
+        float fbm(vec2 p){
+            float v=0.0;
+            float a=0.5;
+            for(int i=0;i<5;i++){
+                v+=a*noise(p);
+                p*=2.0;
+                a*=0.5;
+            }
+            return v;
+        }
+        void main(){
+            vec2 uv=vUv;
+            uv.y*=2.0;
+            vec2 p=uv;
+            p.x*=3.0;
+            p.y-=time*1.5;
+            vec2 warp;
+            warp.x=fbm(p+vec2(0.0,time*0.4));
+            warp.y=fbm(p+vec2(5.2,time*0.3));
+            p+=warp*0.7;
+            float n=fbm(p*1.8);
+            float pulse=sin(time*8.0+uv.y*10.0)*0.05;
+            n+=pulse;
+            float flame=smoothstep(0.4,0.75,n);
+            float core=smoothstep(0.65,0.9,n);
+            float topFade=exp(-uv.y*3.0);
+            float wobble=sin(time*3.0+uv.y*6.0)*0.05;
+            float edge=smoothstep(0.0,0.15+wobble,vUv.x)*smoothstep(1.0,0.85-wobble,vUv.x);
+            float alpha=flame*topFade*edge;
+            vec3 deepRed=vec3(0.9,0.1,0.0);
+            vec3 redOrange=vec3(1.0,0.3,0.0);
+            vec3 amber=vec3(1.0,0.6,0.2);
+            float h=clamp(uv.y,0.0,1.0);
+            vec3 color=mix(deepRed,redOrange,h);
+            color=mix(color,amber,smoothstep(0.2,0.7,h));
+            color+=vec3(1.0,0.9,0.6)*core*0.8;
+            gl_FragColor=vec4(color,alpha);
+        }
+    `
+});
+
+//const properties = Object.keys(mat[1]);
+//console.log(properties);
+
+text="mat[1]=new THREE.ShaderMaterial({\ntransparent:true,\ndepthWrite:false,\nblending:THREE.AdditiveBlending,\n"+
+	"uniforms:{time:{value:0}},\n"+ 
+	"vertextShader:`\n"+mat[1].vertexShader + " `,\n" + 
+	"fragmentShader:`\n" + mat[1].fragmentShader + " `,\n});\n"+
+	"g[1]=new THREE.PlaneGeometry(12,12);\nm[1]=new THREE.Mesh(g[1],mat[1]);"
+
+//alert(text);
+
+
+g[1]=new THREE.PlaneGeometry(12,12);
+m[1]=new THREE.Mesh(g[1],mat[1]);
+m[1].position.y=3.25;
+
+g[2]=new THREE.PlaneGeometry(13,6);
+m[2]=new THREE.Mesh(g[2],new THREE.MeshStandardMaterial({color:'#333',side:THREE.DoubleSide,wireframe:false}));
+m[2].position.set(0,0,-0.1);
+scene.add(m[2]);
+
+t[1]=new THREE.TextureLoader().load("img/brickwall.jpg");
+	t[1].wrapS=THREE.RepeatWrapping;t[1].wrapT=THREE.RepeatWrapping;
+	t[1].repeat.set(0.2,2);
+t[2]=new THREE.TextureLoader().load("img/brickwall.jpg");
+	t[2].wrapS=THREE.RepeatWrapping;t[2].wrapT=THREE.RepeatWrapping;
+	t[2].rotation=pi/2;
+	t[2].repeat.set(1,0.6);
+t[3]=new THREE.TextureLoader().load("images/made1.jpg");
+	t[3].wrapS=THREE.RepeatWrapping;t[3].wrapT=THREE.RepeatWrapping;
+	t[3].repeat.set(2,0.8);
+t[4]=new THREE.TextureLoader().load("img/lighthouse.jpg");
+t[6]=new THREE.TextureLoader().load("img/lighthouseL.jpg");
+t[7]=new THREE.TextureLoader().load("img/lighthouseR.jpg");
+	
+for(let z=1;z<8;z++){if(t[z]){t[z].colorSpace=THREE.SRGBColorSpace;}}
+
+function fbox(a,b,c){gg=new THREE.BoxGeometry(a,b,c);}
+
+fbox(18,16,1);
+m[3]=new THREE.Mesh(gg,new THREE.MeshStandardMaterial({color:'#fc9',side:THREE.DoubleSide,map:t[1],wireframe:false}));
+m[3].position.set(0,0,-1);
+
+m[4]=m[3].clone();
+m[4].scale.set(0.2,1.03,3)
+m[4].position.set(-8.2,0,0.5);
+scene.add(m[4]);
+
+m[5]=m[4].clone();
+m[5].position.set(8.2,0,0.5);
+scene.add(m[5]);
+
+m[6]=m[3].clone();
+m[6].material=m[1].material.clone();
+m[6].material=new THREE.MeshStandardMaterial({color:'#fc9',side:THREE.DoubleSide,map:t[2]})
+m[6].scale.set(0.3,1,1.5)
+m[6].rotation.set(0,0,pi/2)
+m[6].position.set(0,-5.5,-0.2);
+scene.add(m[6]);
+
+m[7]=m[6].clone();
+m[7].position.set(0,5.5,-0.2);
+scene.add(m[7]);
+
+fbox(20,16.5,0.45);
+m[8]=new THREE.Mesh(gg,new THREE.MeshStandardMaterial({color:'#640'}));
+m[8].position.set(0,0,-1.2);
+scene.add(m[8]);
+
+fbox(60,28,0.45);
+m[9]=new THREE.Mesh(gg,new THREE.MeshStandardMaterial({color:'#ccc',map:t[3]}));
+m[9].rotation.set(pi/2,0,0);
+m[9].position.set(0,-8.5,12.5);
+scene.add(m[9]);
+
+m[10]=new THREE.Mesh(gg,new THREE.MeshStandardMaterial({color:'#ccc',map:t[4]}));
+m[10].position.set(0,5.3,-1.3);
+scene.add(m[10]);
+
+g[13]=new THREE.CylinderGeometry(0.4,0.4,1);
+m[13]=new THREE.Mesh(g[13],new THREE.MeshStandardMaterial({color:'#630'}));
+m[13].position.set(0,0.5,0);
+
+fbox(27.8,28,0.45);
+m[14]=new THREE.Mesh(gg,new THREE.MeshStandardMaterial({color:'#ccc',map:t[6]}));
+m[14].position.set(-30,5.3,12.7);
+m[14].rotation.y=pi/2;
+scene.add(m[14]);
+
+m[15]=new THREE.Mesh(gg,new THREE.MeshStandardMaterial({color:'#ccc',map:t[7]}));
+m[15].position.set(30,5.3,12.7);
+m[15].rotation.y=-pi/2;
+scene.add(m[15]);
+
+fbox(2,0.5,1);
+m[16]=new THREE.Mesh(gg,new THREE.MeshStandardMaterial({color:'#0c0'}));
+m[16].position.set(0.5,-2.5,0);
+
+chairMaterial=new THREE.MeshStandardMaterial({color:'#2d4b3b'});
+woodMaterial=new THREE.MeshStandardMaterial({color:'#766e5e'});
+
+fbox(6,3,2);
+//gg.translate(3,0,0);
+chairSeat=new THREE.Mesh(gg,chairMaterial);
+chairSeat.position.set(10,-4,5);
+chairBack=new THREE.Mesh(new THREE.BoxGeometry(6,5,1.5),chairMaterial);
+chairBack.position.set(10,-2.5,3.5);
+
+fbox(1,4,3.25);
+armL=new THREE.Mesh(gg,woodMaterial);
+armL.position.set(7.3,-3.5,4.5);
+armR=armL.clone();
+armR.position.set(12.6,-3.5,4.5);
+gC.add(chairSeat);
+gC.add(chairBack);
+gC.add(armL);
+gC.add(armR);
+gC.rotation.y=pi/2;
+gC.position.set(-20,-3,19.75);
+
+} // init end
+
+function animate(t){
+	requestAnimationFrame(animate);
+	mat[1].uniforms.time.value=t * 0.001;
+	if(altera==0 && m[1] && models[8] && m[16]){alterando();}
+	if(altera==1){tim++;}
+	if(tim==50){scene.add(m[1]);}
+	if(tim>50 && PDi2){
+		rCA.rotation.y +=head;
+		if(rCA.rotation.y>0.8){head=-head};
+		if(rCA.rotation.y<-0){head=-head};
+
+		sCA.rotation.y +=head;
+			rBD.rotation.z +=head*2;
+			BDi2.rotation.z +=head*2;
+		rBE.rotation.z +=head*2;
+		BEi2.rotation.z +=head*2;
+			rTR.rotation.z +=head*2;
+			rTR.rotation.y +=0.01;
+		rPD.rotation.z +=head*2;
+		PDi2.rotation.z -=head*2;
+			rPE.rotation.z -=head*2;
+			PEi2.rotation.z -=head*2;
+		PDi3.rotation.z +=head;
+		PEi3.rotation.z +=head;
+			//if(chairSeat){chairSeat.rotation.y +=0.1;}
+
+	}
+	fireLight.intensity=100 + Math.sin(t * 0.005) * 1000;
+
+	controls.update();
+	renderer.render(scene,camera);
+}
+
+function alterando(){
+
+// r group ********
+
+	CA2=models[1].clone();
+	CA2.rotation.y=pi/2;
+	CA2.position.set(0,1.75,0);
+
+	TR2=models[2].clone();
+	TR2.rotation.y=pi/2;
+	TR2.position.set(0,0.575,0);
+
+	BDs2=models[3].clone();
+	BDi2=models[4].clone();
+	BDs2.position.set(0,0,1.675);
+	BDi2.position.set(0,-2.0,1.675);
+
+	BEs2=models[3].clone();
+	BEi2=models[4].clone();
+	BEs2.position.set(0,0,-1.675);
+	BEi2.position.set(0,-2.0,-1.675);
+
+	rBD.add(BDs2);rBD.add(BDi2);
+	rBE.add(BEs2);rBE.add(BEi2);
+
+	PDs2=models[3].clone();
+	PDi2=models[4].clone();
+	PDs2.position.set(0,0,0.675);
+	PDi2.position.set(0,-2.5,0.675);
+	PDi2.add(m[16].clone());
+
+	PEs2=models[3].clone();
+	PEi2=models[4].clone();
+	PEs2.position.set(0,0,-0.675);
+	PEi2.position.set(0,-2.0,-0.675);
+	PEi2.add(m[16].clone());
+
+	rPD.add(PDs2);rPD.add(PDi2);
+	rPE.add(PEs2);rPE.add(PEi2);
+	rPD.position.set(0,-3,0);
+	rPE.position.set(0,-3,0);
+
+	PDi2.rotation.z=-pi/4;
+
+	rCA.add(CA2);
+
+	rTR.add(m[13].clone());
+	rTR.add(rBD);
+	rTR.add(rBE)
+	rTR.add(rPD);
+	rTR.add(rPE);
+	rTR.add(rCA);
+	rTR.add(TR2);
+	r.add(rTR);
+	r.position.set(10,0,10)
+	r.rotation.y =-pi/2;
+		scene.add(r);
+		scene.add(gC);
+
+// s group ********
+
+	CA3=models[5].clone();
+	CA3.rotation.y=pi/2;
+	CA3.position.set(0,1.75,0);
+
+	TR3=models[6].clone();
+	TR3.rotation.y=pi/2;
+	TR3.position.set(0,0.575,0);
+
+	BDs3=models[7].clone();
+	BDi3=models[8].clone();
+	BDs3.position.set(0,0,1.675);
+	BDi3.position.set(0,-2,1.675);
+
+	BEs3=models[7].clone();
+	BEi3=models[8].clone();
+	BEs3.position.set(0,0,-1.675);
+	BEi3.position.set(0,-2,-1.675);
+
+	sBD.add(BDs3);sBD.add(BDi3);
+	sBE.add(BEs3);sBE.add(BEi3);
+
+	PDs3=models[7].clone();
+	PDi3=models[8].clone();
+	PDs3.position.set(0,0,0.675);
+	PDi3.position.set(0,-2.5,0.675);
+	PDi3.add(m[16].clone());
+
+	PEs3=models[7].clone();
+	PEi3=models[8].clone();
+	PEs3.position.set(0,0,-0.675);
+	PEi3.position.set(0,-2.5,-0.675);
+	PEi3.add(m[16].clone());
+
+	sPD.add(PDs3);sPD.add(PDi3);
+	sPE.add(PEs3);sPE.add(PEi3);
+	sPD.position.set(0,-3,0);
+	sPE.position.set(0,-3,0);
+
+	sCA.add(CA3);
+
+	sTR.add(m[13].clone());
+	sTR.add(sBD);
+	sTR.add(sBE)
+	sTR.add(sPD);
+	sTR.add(sPE);
+	sTR.add(sCA);
+	sTR.add(TR3);
+	s.add(sTR);
+	s.position.set(-15,-2,10);
+
+	sPD.rotation.z=pi/2;
+	PDi3.rotation.z=-pi/2.5;
+	sPE.rotation.z=pi/2;
+	PEi3.rotation.z=-pi/2.5;
+	BDi3.rotation.z=pi/2;
+	BEi3.rotation.z=pi/2;
+
+		scene.add(s);
+
+	altera=1;
+}
+
+window.addEventListener("resize",() => {
+	camera.aspect=innerWidth/innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(innerWidth,innerHeight);
+});
+
+init();
+animate();
+
+document.getElementById("but").style.left=window.innerWidth-85+"px";
+document.getElementById("but2").style.left=window.innerWidth-110+"px";
+document.getElementById("divtext").innerText=text;
+
+//https://www.google.com/search?q=how+to+get+the+contentt+of+%5Bobject+Object%5D+in+three.js&client=firefox-b-d&hs=nWRp&sca_esv=0108a123375dd053&biw=1269&bih=516&ei=YqakaYLCCvar1sQPk5bC2Q0&ved=0ahUKEwiC-73eyf-SAxX2lZUCHROLMNsQ4dUDCBE&oq=how+to+get+the+contentt+of+%5Bobject+Object%5D+in+three.js&gs_lp=Egxnd3Mtd2l6LXNlcnAiNmhvdyB0byBnZXQgdGhlIGNvbnRlbnR0IG9mIFtvYmplY3QgT2JqZWN0XSBpbiB0aHJlZS5qczIEECEYCkjTK1CzDViyGXABeACQAQCYAZIBoAHCB6oBAzAuN7gBDMgBAPgBAZgCCKAClgjCAggQABiwAxjvBcICBRAAGO8FmAMAiAYBkAYFkgcDMS43oAfxILIHAzAuN7gHhAjCBwUyLTYuMsgHLoAIAA&sclient=gws-wiz-serp
+
+</script>
+
+<script>
+function toggleFullScreen(){
+	if(!document.fullscreenElement){
+		if(document.documentElement.requestFullscreen){
+      			document.documentElement.requestFullscreen();
+    		}else if(document.documentElement.mozRequestFullScreen){ // Firefox
+      			document.documentElement.mozRequestFullScreen();
+    		}else if(document.documentElement.webkitRequestFullscreen){ // Chrome,Safari & Opera
+      			document.documentElement.webkitRequestFullscreen();
+    		}else if(document.documentElement.msRequestFullscreen){ // IE/Edge
+      			document.documentElement.msRequestFullscreen();
+    		}
+	}else{
+		if(document.exitFullscreen){
+			document.exitFullscreen();
+		}else if(document.mozCancelFullScreen){ // Firefox
+			document.mozCancelFullScreen();
+		}else if(document.webkitExitFullscreen){ // Chrome,Safari & Opera
+			document.webkitExitFullscreen();
+		}else if(document.msExitFullscreen){ // IE/Edge
+			document.msExitFullscreen();
+		}
+	}
+}
+</script>
+
+</body>
+</html>
