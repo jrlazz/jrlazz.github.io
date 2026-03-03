@@ -23,7 +23,6 @@ div{position:absolute;left:50px;top:50px;padding:4px;font-size:10.25pt;backgroun
 <button onclick="toggleFullScreen();" id="but" style="left:-1000px;top:10px;color:gold;background-color:#060;border:3px outset #0c0;box-shadow:3px 3px 6px #aaccaa;">T</button>
 <button id="but2"style="left:-1000px;top:60px;color:gold;background-color:#060;border:3px outset #0c0;box-shadow:3px 3px 6px #aaccaa;font-size:10.25pt;width:100px;">Shader code</button>
 <div id="divtext" style="display:none;"></div>
-<span style="position:absolute;left:10px;top:10px;font-family:monospace;font-size:20.5px;color:#0ff">... Steve in his living room: Forgive me Vi,I can't do this!</span>
 
 <script type="importmap">
 {
@@ -39,8 +38,10 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
-var scene,camera,renderer,controls;
+var scene,camera,renderer,controls,loader;
 
 var altera=0;
 
@@ -82,7 +83,9 @@ var text;
 var gg;
 var fireLight,SteveLight;
 var chairSeat,chairBack,chairMaterial,woodMaterial,armL,armR;
-var ddiv=document.getElementById("divtext")
+var ddiv=document.getElementById("divtext");
+var texto="... Steve in his living room: Forgive me Vi,I can't do this!";
+var height=1,size=12,depth=2,hover=30,curveS=1,bevT=0.1,bevS=0.1,bevelEnabled=false,font=undefined;
 
 function init(){
 
@@ -109,8 +112,8 @@ controls=new OrbitControls(camera,renderer.domElement);
 
 scene.add(new THREE.AmbientLight('#fff',1.2));
 
-fireLight=new THREE.PointLight(0xff6622,3000);
-fireLight.position.set(0,10,20);
+fireLight=new THREE.PointLight('#f62',2000);
+fireLight.position.set(0,0,20);
 scene.add(fireLight);
 
 SteveLight=new THREE.PointLight('#fff',2000);
@@ -322,6 +325,27 @@ gC.add(armR);
 gC.rotation.y=pi/2;
 gC.position.set(-20,-3,19.75);
 
+loader=new FontLoader();
+loader.load('../fonte/Cascadia_Regular.json',function(response){font=response;createText();});
+mat[17]=[new THREE.MeshPhongMaterial({color:'#ff0',flatShading:true}),new THREE.MeshPhongMaterial({color:'#00f'})];
+function createText(){
+	g[17]=new TextGeometry(texto,{
+	font:font,size:12,height:1,depth:2,
+	curveSegments:curveS,
+	bevelThickness:0.1,bevelSize:0.1,bevelEnabled:false
+});
+        g[17].center();
+	//g[17].computeBoundingBox();
+	m[17]=new THREE.Mesh(g[17],mat[17]);
+	m[17].position.set(0,12,15);
+	m[17].scale.set(0.1,0.1,0.1);
+	scene.add(m[17]);
+}
+
+
+
+
+
 } // init end
 
 function animate(t){
@@ -351,8 +375,7 @@ function animate(t){
 			//if(chairSeat){chairSeat.rotation.y +=0.1;}
 
 	}
-	fireLight.intensity=100 + Math.sin(t * 0.005) * 1000;
-
+	fireLight.intensity=100+Math.sin(t*0.005)*500;
 	controls.update();
 	renderer.render(scene,camera);
 }
