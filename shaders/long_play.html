@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>long_play.html</title>
+
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+<meta name="description" content="... long_play ...">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+
+<style>
+body { margin:0px; background:#048; overflow:hidden;}
+button{position:absolute;font-size:20.5pt;padding:2px;font-weight:bold;font-family:monospace;width:50px;z-index:0;cursor:pointer;}
+</style>
+</head>
+
+<body>
+<button onclick="toggleFullScreen();" id="but" style="left:-1000px;top:10px;color:gold;background-color:#060;border:3px outset #0c0;box-shadow:3px 3px 6px #aaccaa;">T</button>
+<audio id="au" loop="false" style="position:absolute;left:10px;top:60px;">
+ <source src="../anim/mp3/Unforgettable.mp3" type="audio/mpeg">
+</audio>
+<script type="importmap">
+{
+	"imports": {
+		"three": "https://unpkg.com/three@0.182.0/build/three.module.js",
+		"three/addons/": "https://unpkg.com/three@0.182.0/examples/jsm/"
+	}
+}
+</script>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { LineGeometry } from "three/addons/lines/LineGeometry.js";
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+
+var scene,camera,renderer,controls,loader,text, font;
+
+var amb,point;
+var gg,mm,ss,tt,bb,tela;
+var r=new THREE.Group();
+var gbraco=new THREE.Group();
+
+var ax=new THREE.AxesHelper(0.001);
+var cha=[];
+var p=Math.PI;
+var raycaster=new THREE.Raycaster();
+var mouse=new THREE.Vector2();
+var selected;
+var intersects=[];
+var alvos=[];
+var onoff=new THREE.Group();
+var geo=[];
+var tex=[];
+var sim=0;
+var ligado=0;
+var audio;
+var clock=new THREE.Clock();
+var cor;
+var bri;
+var dife=0.005;
+
+function init(){
+
+	scene=new THREE.Scene();
+
+	camera=new THREE.PerspectiveCamera(80,innerWidth/innerHeight,0.1,1000);
+	camera.position.set(-10,15,25);
+	scene.position.set(0,12,0);
+	
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.setClearColor('#048',1);
+	renderer.setPixelRatio(window.devicePixelRatio);
+	document.body.appendChild(renderer.domElement);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+
+	window.addEventListener("click",onClick);
+	window.addEventListener("mousemove",onMove);
+
+	amb=new THREE.AmbientLight('#fff',1);scene.add(amb);
+	point=new THREE.PointLight('#fff',10000);point.position.set(30,20,30);scene.add(point);
+
+	tt=new THREE.TextureLoader().load("images/made1.jpg");
+	tt.wrapS=THREE.RepeatWrapping;tt.wrapT=THREE.RepeatWrapping;
+	tt.repeat.set(10,1);
+	matc(200,1,200,'#000');
+	ss=new THREE.Mesh(gg,new THREE.MeshStandardMaterial({color:'#666',map:tt}));
+	ss.position.set(0,-32,0);
+	scene.add(ss);
+
+	// rack
+	matc(20,5,20,'#020');
+	ss=new THREE.Mesh(gg,mm);
+	ss.position.set(0,-3.5,0);
+	scene.add(ss);
+
+	matc(19,0.3,19,'#999');
+	ss=new THREE.Mesh(gg,mm);
+
+	ss.position.set(0,-6.2,0);
+	scene.add(ss);
+
+	matc(20,5,20,'#020');
+	ss=new THREE.Mesh(gg,mm);
+	ss.position.set(0,-9,0);
+	scene.add(ss);
+
+	matc(19,0.3,19,'#999');
+	ss=new THREE.Mesh(gg,mm);
+	ss.position.set(0,-12,0);
+	scene.add(ss);
+	
+	matc(20,20,20,'#020');
+	ss=new THREE.Mesh(gg,mm);
+	ss.position.set(0,-22,0);
+	scene.add(ss);
+
+	tela=new THREE.TextureLoader().load("img/tela.jpg");
+	tela.wrapS=THREE.RepeatWrapping;tela.wrapT=THREE.RepeatWrapping;
+
+	matc(19,19,1,'#000');
+	ss=new THREE.Mesh(gg,new THREE.MeshStandardMaterial({color:'#999',map:tela}));
+	ss.position.set(0,-22,9.6);
+	scene.add(ss);
+
+	//base
+	bb=new THREE.TextureLoader().load("img/bw_801.png");
+	bb.wrapS=THREE.RepeatWrapping;bb.wrapT=THREE.RepeatWrapping;
+	bb.repeat.set(10,1);
+	cyli(8.0,8.2,0.8,128,'#000');
+	mm=new THREE.MeshStandardMaterial({color:'#444',map:bb});
+	ss=new THREE.Mesh(gg,mm);
+	ss.position.set(0,-0.5,0);
+	r.add(ss);
+
+	//braco
+	cyli(0.3,0.3,10,32,'#000');
+	gg.translate(0,5,0);
+	bri=new THREE.MeshStandardMaterial({color:'#fff',metalness:0.8,roughness:0.2});
+	ss=new THREE.Mesh(gg,bri);
+	ss.rotation.set(p/1.9,0,0.05);
+	gbraco.add(ss);
+
+	gg=new THREE.CylinderGeometry(0.5,0.5,3,32);
+	ss=new THREE.Mesh(gg,bri);
+	ss.position.set(-0.75,-1,0);
+	gbraco.add(ss);
+
+	gg=new THREE.CylinderGeometry(1,1,0.5,32);
+	ss=new THREE.Mesh(gg,bri);
+	ss.rotation.set(p/2,0,p/2);
+	ss.position.set(0,0,0);
+	gbraco.add(ss);
+
+	matc(1,0.6,1.5,'#000');
+	ss=new THREE.Mesh(gg,mm);
+	ss.position.set(-0.5,-0.75,10);
+	gbraco.add(ss);
+
+	gbraco.position.set(8,1,-8);
+	gbraco.rotation.y=-0.04;
+	scene.add(gbraco);
+
+	//eixo
+	cyli(0.2,0.2,3,32,'#666');
+	ss=new THREE.Mesh(gg,bri);
+	ss.position.set(0,0,0);
+	scene.add(ss);
+
+	//label
+	tt=new THREE.TextureLoader().load("img/NatKingCole_label.jpg");
+	cyli(3.5,3.5,0.1,64,'#000');
+	mm=new THREE.MeshStandardMaterial({color:'#ccc',map:tt});
+	ss=new THREE.Mesh(gg,mm);
+	r.add(ss);
+
+	//trilhas
+	cyli(8,8,0.05,128,'#933');
+	ss=new THREE.Mesh(gg,mm);
+	ss.position.set(0,-0.1,0);
+	scene.add(ss);
+
+	tt=new THREE.TextureLoader().load("img/gradient250.jpg");
+	tt.wrapS=THREE.RepeatWrapping;tt.wrapT=THREE.RepeatWrapping;
+	tt.repeat.set(2,1);
+
+	gg=new THREE.SphereGeometry(7.95,256,64,0,p*2,1.5,0.01);
+	mm=new THREE.MeshBasicMaterial({color:'#666',map:tt,side:THREE.DoubleSide});
+	ss=new THREE.Mesh(gg,mm);
+	ss.position.set(0,-1,0);
+	for(let z=40;z<100;z++){
+		let f=z/100;
+		let d=ss.clone();
+		d.scale.set(f,1,f);
+		d.position.set(0,-0.525,0);
+		r.add(d);
+	}
+	scene.add(r);
+
+	//texts
+	loader=new FontLoader();
+	loader.load('../fonte/Cascadia_Regular.json',function(response){font=response;createText();});
+	function createText(){
+		mm=[new THREE.MeshStandardMaterial({color:'#fc0'}),new THREE.MeshStandardMaterial({color:'#259'})];
+		gg=new TextGeometry("Unforgettable",{font:font,size:1.5,depth:1,curveSegments:12,bevelThickness:0.1,bevelSize:0.1,bevelEnabled:false});
+		gg.center();
+		tex[3]=new THREE.Mesh(gg,mm);
+		tex[3].position.set(0,-9,9.8);
+			gg=new TextGeometry("Let's remember... click ON",{font:font,size:2,depth:1,curveSegments:12,bevelThickness:0.1,bevelSize:0.1,bevelEnabled:false});
+			gg.center();
+			tex[4]=new THREE.Mesh(gg,mm);
+			tex[4].position.set(0,4,0);
+		gg=new TextGeometry("OFF",{font:font,size:3.5,depth:1,curveSegments:12,bevelThickness:0.1,bevelSize:0.1,bevelEnabled:false});
+		gg.center();
+		mm=[new THREE.MeshStandardMaterial({color:'#fff'}),new THREE.MeshStandardMaterial({color:'#fff'})];
+		tex[1]=new THREE.Mesh(gg,mm);
+		tex[1].rotation.set(-p/2,-p/2,p/2);
+		tex[1].position.set(0,0,6);
+			gg=new TextGeometry("ON",{font:font,size:3.5,depth:1,curveSegments:12,bevelThickness:0.1,bevelSize:0.1,bevelEnabled:false});
+			gg.center();
+			mm=[new THREE.MeshStandardMaterial({color:'#000'}),new THREE.MeshStandardMaterial({color:'#000'})];
+			tex[2]=new THREE.Mesh(gg,mm);
+			tex[2].rotation.set(2*p,-p/2,0);
+			tex[2].position.set(0,0,6);
+	}
+
+	// onoff
+	matc(25,14,11,'#259');
+	cha[0]=new THREE.Mesh(gg,mm);
+	cha[0].position.set(5.75,-8,0);
+
+	matc(0,0,0,'#000');
+	cha[1]=new THREE.Mesh(new THREE.CylinderGeometry(12,12,10,16,16,false,0,p/2),mm);
+	cha[1].rotation.set(-p/2,-p/2,-p);
+	cha[1].position.set(0,10,0);
+
+	cha[11]=new THREE.Mesh(new THREE.PlaneGeometry(10,12),mm);
+	cha[11].rotation.set(-p/2,-p/2,0);
+	cha[11].position.set(0,0,6);
+	cha[11].name="cha11";
+	alvos.push(cha[11]);
+	cha[1].position.set(6,1,0);
+	cha[1].add(cha[11]);
+	cha[1].name="cha1";
+	alvos.push(cha[1]);
+
+	matc(0,0,0,'#f00');
+	cha[2]=new THREE.Mesh(new THREE.CylinderGeometry(12,12,10,16,16,false,0,p/2),mm);
+	cha[2].rotation.set(p/2,p/2,p);
+	cha[2].position.set(11.5,0,0);
+	cha[2].name="cha2";
+	alvos.push(cha[2]);
+
+	cha[22]=new THREE.Mesh(new THREE.PlaneGeometry(10,12),mm);
+	cha[22].rotation.set(-p/2,-p/2,0);
+	cha[22].position.set(0,0,6);
+	cha[22].name="cha22";
+	alvos.push(cha[22]);
+
+	cha[2].position.set(6,1,0);
+	cha[2].add(cha[22]);
+	cha[2].name="cha2";
+	alvos.push(cha[2]);
+
+	cha[22]=new THREE.Mesh(new THREE.CylinderGeometry(2,2,10,32,32),mm);
+	cha[22].rotation.set(p/2,0,0);
+	cha[22].position.set(15.3,-0.7,0);
+	cha[3]=new THREE.Mesh(new THREE.BoxGeometry(0.01,0.01,0.01),mm);
+	cha[3].add(cha[1]);cha[3].add(cha[2]);
+
+	cha[3].position.set(-6,0,0);
+	ax.add(cha[3]);
+	ax.position.set(6,1,0);
+
+	onoff.add(ax);onoff.add(cha[0]);
+	onoff.position.set(-5,-3.5,10.5);
+	onoff.rotation.set(p/2,0,0);
+	onoff.scale.setScalar(0.25);
+
+	audio=document.getElementById('au');
+
+} // init end
+
+function cyli(r1,r2,r3,r4,cor){gg=new THREE.CylinderGeometry(r1,r2,r3,r4);;mm=new THREE.MeshStandardMaterial({color:cor});}
+function matc(a,b,c,cor){gg=new THREE.BoxGeometry(a,b,c);mm=new THREE.MeshStandardMaterial({color:cor});}
+
+function animate(t){
+	requestAnimationFrame(animate);
+	const delta=clock.getDelta();
+	if(sim==0){
+		desliga();
+		sim=1;
+	}
+	if(tex[3] && sim==1){
+		cha[1].add(tex[1]);
+		cha[2].add(tex[2]);
+		scene.add(tex[3]);
+		sim=2;
+	}
+	if(sim==2){scene.add(onoff);sim=3;}
+	if(sim==3 && ligado==1){r.rotation.y -=delta;}
+
+	if(ligado==1){gbraco.rotation.y -=delta/1000;}
+
+	if(tex[4] && ligado==0){
+		scene.add(tex[4]);
+		tex[4].rotation.y +=dife;
+		if(tex[4].rotation.y>0.3){dife=-dife;}
+		if(tex[4].rotation.y<-0.3){dife=-dife;}
+	}
+
+	if(tex[4] && ligado==1){scene.remove(tex[4]);tex[4].rotation.y=0;}
+
+	function isAudioPlaying(audio){return(audio.currentTime>0 && !audio.paused && !audio.ended && audio.readyState>2);}
+	let elapsedTime=audio.currentTime;
+	if(elapsedTime>191){audio.currentTime=0;gbraco.rotation.y=-0.04;}// 125.574125
+
+	controls.update();
+	renderer.render(scene,camera);
+}
+
+function onClick(event){
+	raycaster.setFromCamera(mouse,camera);
+	intersects=raycaster.intersectObjects(alvos,false);
+	if (intersects.length>0){
+		selected=intersects[0].object;
+		if(selected.name=="cha1" || selected.name=="cha11"){desliga();ligado=0;au.pause();}
+		if(selected.name=="cha2" || selected.name=="cha22"){liga();ligado=1;au.play();}
+	}
+}
+
+function onMove(event){
+	document.body.style.cursor='default';
+	mouse.x=event.clientX/window.innerWidth*2-1;
+	mouse.y=-(event.clientY/window.innerHeight)*2+1;
+	raycaster.setFromCamera(mouse,camera);
+	intersects=raycaster.intersectObjects(alvos,false);
+	if (intersects.length>0){document.body.style.cursor='pointer';}
+}
+
+function liga(){ax.rotation.z =-0.2;}
+
+function desliga(){ax.rotation.z =0.2;}
+
+window.addEventListener("resize",() => {
+	camera.aspect=innerWidth/innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(innerWidth,innerHeight);
+});
+
+init();
+animate();
+
+document.getElementById("but").style.left=window.innerWidth-85+"px";
+
+</script>
+
+<script>
+function toggleFullScreen(){
+	if(!document.fullscreenElement){
+		if(document.documentElement.requestFullscreen){
+      			document.documentElement.requestFullscreen();
+    		}else if(document.documentElement.mozRequestFullScreen){ // Firefox
+      			document.documentElement.mozRequestFullScreen();
+    		}else if(document.documentElement.webkitRequestFullscreen){ // Chrome,Safari & Opera
+      			document.documentElement.webkitRequestFullscreen();
+    		}else if(document.documentElement.msRequestFullscreen){ // IE/Edge
+      			document.documentElement.msRequestFullscreen();
+    		}
+	}else{
+		if(document.exitFullscreen){
+			document.exitFullscreen();
+		}else if(document.mozCancelFullScreen){ // Firefox
+			document.mozCancelFullScreen();
+		}else if(document.webkitExitFullscreen){ // Chrome,Safari & Opera
+			document.webkitExitFullscreen();
+		}else if(document.msExitFullscreen){ // IE/Edge
+			document.msExitFullscreen();
+		}
+	}
+}
+</script>
+
+</body>
+</html>
