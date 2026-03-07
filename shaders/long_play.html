@@ -13,13 +13,12 @@
 
 <style>
 body { margin:0px; background:#048; overflow:hidden;}
-button{position:absolute;font-size:20.5pt;padding:2px;font-weight:bold;font-family:monospace;width:50px;z-index:0;cursor:pointer;}
 img{position:absolute;padding:2px;width:41px;height:41px;z-index:0;cursor:pointer;}
 </style>
 </head>
 
 <body>
-<img src="img/expand.png" onclick="toggleFullScreen();" id="but" style="left:-1000px;top:10px;color:gold;background-color:#040;border:3px outset #0c0;box-shadow:2px 2px 4px #99bb99;"></img>
+<img src="img/expand.png" onclick="toggleFullScreen();" id="but" style="left:-1000px;top:10px;color:gold;background-color:#050;border:3px outset #090;box-shadow:3px 3px 3px #242;"></img>
 <audio id="au" loop="false" style="position:absolute;left:10px;top:60px;">
  <source src="../anim/mp3/Unforgettable.mp3" type="audio/mpeg">
 </audio>
@@ -317,8 +316,6 @@ function animate(t){
 	if(sim==2){scene.add(onoff);sim=3;}
 	if(sim==3 && ligado==1){gbraco.rotation.x=0;gbraco.rotation.y=-0.04;sim=4;}
 
-
-
 	if(ligado==1){gbraco.rotation.y -=delta/1000;r.rotation.y -=delta;}
 
 	if(tex[4] && ligado==0){
@@ -332,7 +329,7 @@ function animate(t){
 
 	function isAudioPlaying(audio){return(audio.currentTime>0 && !audio.paused && !audio.ended && audio.readyState>2);}
 	let elapsedTime=audio.currentTime;
-	if(elapsedTime>196.5){gbraco.rotation.x=-0.2;}
+	if(elapsedTime>196.5){gbraco.rotation.x=-0.2;gbraco.rotation.y=-0.04;}
 	if(elapsedTime>197.8){audio.currentTime=0;gbraco.rotation.x=0;gbraco.rotation.y=-0.04;}
 	controls.update();
 	renderer.render(scene,camera);
