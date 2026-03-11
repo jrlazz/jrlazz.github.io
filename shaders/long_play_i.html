@@ -65,6 +65,8 @@ var clock=new THREE.Clock();
 var cor;
 var bri;
 var dife=0.005;
+var playing;
+var canplay=0;
 
 function init(){
 
@@ -303,9 +305,8 @@ gbraco.rotation.x=-0.2;
 
 /*
 let playing = false;
-
-button.onclick = () => {
-
+function checkit(){
+//button.onclick = () => {
     if(!playing){
         audio.load();
         audio.play();
@@ -314,8 +315,8 @@ button.onclick = () => {
         audio.pause();
         playing = false;
     }
-
-};
+//};
+}
 */
 
 } // init end
@@ -326,7 +327,14 @@ function matc(a,b,c,cor){gg=new THREE.BoxGeometry(a,b,c);mm=new THREE.MeshStanda
 function animate(t){
 	requestAnimationFrame(animate);
 	const delta=clock.getDelta();
-	if(sim==0){
+
+audio.oncanplaythrough = () => {
+	//console.log('Audio is loaded and ready to play');
+	//alert("jjj");
+	canplay=1;
+};
+
+	if(sim==0 && canplay==1){
 		desliga();
 		sim=1;
 	}
@@ -365,6 +373,22 @@ function onClick(event){
 		selected=intersects[0].object;
 		if(selected.name=="cha1" || selected.name=="cha11"){desliga();ligado=0;au.pause();}
 		if(selected.name=="cha2" || selected.name=="cha22"){liga();ligado=1;au.play();}
+/*
+		if(selected.name=="cha1" || selected.name=="cha11"){desliga();}//checkit();}
+		if(selected.name=="cha2" || selected.name=="cha22"){liga();}//checkit();}
+//playing = false;
+function checkit(){
+    if(!playing){
+        audio.load();
+        audio.play();
+        playing = true;
+    }else{
+        audio.pause();
+        playing = false;
+    }
+}
+*/
+
 	}
 }
 
@@ -407,6 +431,27 @@ function onTouchStart(event){
 			audio.play();
 		}
 
+/*
+		if(selected.name=="cha1"||selected.name=="cha11"){
+			desliga();//checkit();
+		}
+
+		if(selected.name=="cha2"||selected.name=="cha22"){
+			liga();//checkit();
+		}
+
+//playing = false;
+function checkit(){
+    if(!playing){
+        audio.load();
+        audio.play();
+        playing = true;
+    }else{
+        audio.pause();
+        playing = false;
+    }
+}
+*/
 	}
 
 }
