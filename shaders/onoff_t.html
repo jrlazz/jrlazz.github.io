@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>onoff_t.html</title>
+
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+<meta name="description" content="... long_play ...">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+
+<style>
+body { margin:0px; background:#048; overflow:hidden;}
+img{position:absolute;padding:2px;width:41px;height:41px;z-index:0;cursor:pointer;}
+</style>
+</head>
+
+<body>
+aaa
+<img src="img/expand.png" onclick="toggleFullScreen();" id="but" style="left:-1000px;top:10px;color:gold;background-color:#050;border:3px outset #090;box-shadow:3px 3px 3px #242;"></img>
+<audio id="au" loop="false" style="position:absolute;left:10px;top:60px;">
+ <source src="../anim/mp3/Unforgettable.mp3" type="audio/mpeg">
+</audio>
+<script type="importmap">
+{
+	"imports": {
+		"three": "https://unpkg.com/three@0.182.0/build/three.module.js",
+		"three/addons/": "https://unpkg.com/three@0.182.0/examples/jsm/"
+	}
+}
+</script>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { LineGeometry } from "three/addons/lines/LineGeometry.js";
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
+
+var scene,camera,renderer,controls,loader,text, font;
+
+var amb,point=[];
+var gg,mm,ss,tt,bb,tela;
+var r=new THREE.Group();
+var gbraco=new THREE.Group();
+
+var ax=new THREE.AxesHelper(0.001);
+var cha=[];
+var p=Math.PI;
+var raycaster=new THREE.Raycaster();
+var mouse=new THREE.Vector2();
+var selected;
+var intersects=[];
+var alvos=[];
+var onoff=new THREE.Group();
+var geo=[];
+var tex=[];
+var sim=0;
+var ligado=0;
+var audio;
+var clock=new THREE.Clock();
+var cor;
+var bri;
+var dife=0.005;
+var angu=0.005;
+
+var ga=new THREE.Group();
+var gb=new THREE.Group();
+var gt=new THREE.Group();
+var chi=[];
+var gm=[];
+var tocadisco=new THREE.Group();
+var wood;
+var pedra;
+
+var xa=new THREE.AxesHelper(0.1);
+
+
+var lig=[], extrudeSettings, loader, loader2, path=[], material, shapes=[], shape, geometry;
+var meshb;
+
+
+
+function init(){
+
+	scene=new THREE.Scene();
+
+	camera=new THREE.PerspectiveCamera(80,innerWidth/innerHeight,0.1,1000);
+	camera.position.set(0,10,80);
+	//scene.position.set(-40,4,0);
+	
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.setClearColor('#048',1);
+	renderer.setPixelRatio(window.devicePixelRatio);
+	document.body.appendChild(renderer.domElement);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+
+	//window.addEventListener("click",onClick);
+	//window.addEventListener("mousemove",onMove);
+
+	window.addEventListener("touchstart",onTouchStart,{passive:false});
+	window.addEventListener("touchmove",onTouchMove,{passive:false});
+
+
+	amb=new THREE.AmbientLight('#fff',4);scene.add(amb);
+	point[1]=new THREE.PointLight('#fff',15000);point[1].position.set(130,20,20);scene.add(point[1]);
+	point[2]=new THREE.PointLight('#fff',15000);point[2].position.set(-40,60,50);scene.add(point[2]);
+	point[3]=new THREE.PointLight('#fff',15000);point[3].position.set(0,60,-70);scene.add(point[3]);
+
+
+	//texts
+	loader=new FontLoader();
+	loader.load('../fonte/Cascadia_Regular.json',function(response){font=response;createText();});
+	function createText(){
+		mm=[new THREE.MeshStandardMaterial({color:'#fc0'}),new THREE.MeshStandardMaterial({color:'#259'})];
+		gg=new TextGeometry("OFF",{font:font,size:3.5,depth:1,curveSegments:12,bevelThickness:0.1,bevelSize:0.1,bevelEnabled:false});
+		gg.center();
+		mm=[new THREE.MeshStandardMaterial({color:'#fff'}),new THREE.MeshStandardMaterial({color:'#fff'})];
+		tex[1]=new THREE.Mesh(gg,mm);
+			gg=new TextGeometry("ON",{font:font,size:3.5,depth:1,curveSegments:12,bevelThickness:0.1,bevelSize:0.1,bevelEnabled:false});
+			gg.center();
+			mm=[new THREE.MeshStandardMaterial({color:'#000'}),new THREE.MeshStandardMaterial({color:'#000'})];
+			tex[2]=new THREE.Mesh(gg,mm);
+	}
+
+let m1=new THREE.MeshStandardMaterial({color:'#069',transparent:false,opacity:0.7})
+let m2=new THREE.MeshStandardMaterial({color:'#609',transparent:false,opacity:0.7})
+
+// **************** Extruded base
+	tt=new THREE.TextureLoader().load("images/made_703.jpg");
+	tt.wrapS=THREE.RepeatWrapping;tt.wrapT=THREE.RepeatWrapping;
+	tt.repeat.set(0.05,0.1);
+	gm=[m1,m2]; // Index 0 for caps, Index 1 for sides
+	let extrudeSettings={steps:1,depth:16,bevelEnabled:false,bevelThickness:0.1,bevelSize:0.1,bevelOffset:0,bevelSegments:1};
+	loader=new SVGLoader();
+	loader.load('img/switch.svg',function(data){
+		const paths=data.paths;
+		for(let i=0;i<paths.length;i++){
+			path=paths[i];
+			shapes=SVGLoader.createShapes(path);
+			for(let j=0;j< shapes.length;j++){
+				shape=shapes[j];
+				gg=new THREE.ExtrudeGeometry(shape,extrudeSettings);
+				if(j==0){meshb=new THREE.Mesh(gg,gm);}
+			}
+		}
+		meshb.position.set(2,0,1);
+		meshb.scale.set(1,1,1.5);
+		//meshb.rotation.set(p/2,0,0);
+		//scene.add(meshb);
+	});
+
+matc(46,15,2,'#000')
+gg.translate(23,0,0);
+ss=new THREE.Mesh(gg,mm);
+ss.rotation.set(0,-p/6,0);
+chi[1]=ss.clone();
+chi[1].name="chi1";
+alvos.push(chi[1]);
+ga.add(chi[1]);
+//scene.add(ga);
+
+matc(46,15,2,'#f00')
+gg.translate(23,0,0);
+ss=new THREE.Mesh(gg,mm);
+ss.rotation.set(0,p+p/6,0);
+chi[2]=ss.clone();
+chi[2].name="chi2";
+alvos.push(chi[2]);
+ga.add(chi[2]);
+
+
+
+ga.rotation.set(p/2,p,0);
+ga.position.set(0,0,8);
+
+
+
+	audio=document.getElementById('au');
+	//audio.currentTime=180;
+
+} // init end
+
+function cyli(r1,r2,r3,r4,cor){gg=new THREE.CylinderGeometry(r1,r2,r3,r4);;mm=new THREE.MeshStandardMaterial({color:cor});}
+function matc(a,b,c,cor){gg=new THREE.BoxGeometry(a,b,c);mm=new THREE.MeshStandardMaterial({color:cor});}
+function plan(a,b,cor){gg=new THREE.PlaneGeometry(a,b);mm=new THREE.MeshStandardMaterial({color:cor,side:THREE.DoubleSide});}
+
+function animate(t){
+	requestAnimationFrame(animate);
+	const delta=clock.getDelta();
+
+//ga.rotation.y -=-0.05;
+//xa.rotation.x -=-0.05;
+//gt.rotation.x -=-0.05;
+	if(sim==0){
+		desliga();
+		sim=1;
+	}
+	if(tex[1] && tex[2] && meshb && sim==1){
+		ss=tex[2].clone()
+		ss.scale.setScalar(3);
+		ss.position.set(-20,0,14);
+		ss.rotation.set(0,p/6,p);
+		ga.add(ss);
+		ss=tex[1].clone();
+		ss.scale.setScalar(3);
+		ss.position.set(20,0,14);
+		ss.rotation.set(0,-(2*p)-p/6,p);
+		ga.add(ss);
+		meshb.add(ga);
+		meshb.rotation.set(p/2,0,0);
+		scene.add(meshb);
+		sim=2;
+	}
+
+	if(sim==2 && ligado==1){gbraco.rotation.x=0;gbraco.rotation.y=-0.04;sim=3;}
+
+	if(ligado==1){gbraco.rotation.y -=delta/1000;r.rotation.y -=delta;}
+
+	function isAudioPlaying(audio){return(audio.currentTime>0 && !audio.paused && !audio.ended && audio.readyState>2);}
+	let elapsedTime=audio.currentTime;
+	if(elapsedTime>196.5){gbraco.rotation.x=-0.2;gbraco.rotation.y=-0.04;}
+	if(elapsedTime>197.8){audio.currentTime=0;gbraco.rotation.x=0;gbraco.rotation.y=-0.04;}
+	controls.update();
+	renderer.render(scene,camera);
+}
+
+function onClick(event){
+	raycaster.setFromCamera(mouse,camera);
+	intersects=raycaster.intersectObjects(alvos,false);
+	if (intersects.length>0){
+		selected=intersects[0].object;
+		if(selected.name=="chi1"){desliga();ligado=0;audio.pause();}
+		if(selected.name=="chi2"){liga();ligado=1;audio.play();}
+	}
+}
+
+function onMove(event){
+	document.body.style.cursor='default';
+	mouse.x=event.clientX/window.innerWidth*2-1;
+	mouse.y=-(event.clientY/window.innerHeight)*2+1;
+	raycaster.setFromCamera(mouse,camera);
+	intersects=raycaster.intersectObjects(alvos,false);
+	if (intersects.length>0){document.body.style.cursor='pointer';}
+}
+
+
+function onTouchStart(event){
+	event.preventDefault();
+	const touch = event.touches[0];
+	mouse.x = touch.clientX / window.innerWidth * 2 - 1;
+	mouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
+	raycaster.setFromCamera(mouse,camera);
+	intersects = raycaster.intersectObjects(alvos,false);
+	if(intersects.length>0){
+		selected = intersects[0].object;
+		if(selected.name=="chi1"){desliga();ligado=0;audio.pause();}
+		if(selected.name=="chi2"){liga();ligado=1;audio.play();}
+	}
+}
+
+function onTouchMove(event){
+	const touch = event.touches[0];
+	mouse.x = touch.clientX / window.innerWidth * 2 - 1;
+	mouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
+}
+
+
+function liga(){if(meshb){meshb.rotation.z =-0.2;}}
+
+function desliga(){if(meshb){meshb.rotation.z =0.2;}}
+
+window.addEventListener("resize",() => {
+	camera.aspect=innerWidth/innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(innerWidth,innerHeight);
+});
+
+init();
+animate();
+
+document.getElementById("but").style.left=window.innerWidth-61+"px";
+
+</script>
+
+<script>
+function toggleFullScreen(){
+	if(!document.fullscreenElement){
+		if(document.documentElement.requestFullscreen){
+      			document.documentElement.requestFullscreen();
+    		}else if(document.documentElement.mozRequestFullScreen){ // Firefox
+      			document.documentElement.mozRequestFullScreen();
+    		}else if(document.documentElement.webkitRequestFullscreen){ // Chrome,Safari & Opera
+      			document.documentElement.webkitRequestFullscreen();
+    		}else if(document.documentElement.msRequestFullscreen){ // IE/Edge
+      			document.documentElement.msRequestFullscreen();
+    		}
+	}else{
+		if(document.exitFullscreen){
+			document.exitFullscreen();
+		}else if(document.mozCancelFullScreen){ // Firefox
+			document.mozCancelFullScreen();
+		}else if(document.webkitExitFullscreen){ // Chrome,Safari & Opera
+			document.webkitExitFullscreen();
+		}else if(document.msExitFullscreen){ // IE/Edge
+			document.msExitFullscreen();
+		}
+	}
+}
+</script>
+
+</body>
+</html>
