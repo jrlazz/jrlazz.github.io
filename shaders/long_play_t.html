@@ -405,9 +405,18 @@ function onMove(event){
 
 function onTouchStart(event){
 
-	event.preventDefault();
+    event.preventDefault();
 
-	const touch = event.touches[0];
+    if(!audioUnlocked){
+        audio.play().then(()=>{
+            audio.pause();
+            audio.currentTime = 0;
+            audioUnlocked = true;
+        }).catch(()=>{});
+    }
+
+    const touch = event.touches[0];
+
 
 	mouse.x = touch.clientX / window.innerWidth * 2 - 1;
 	mouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
@@ -426,20 +435,9 @@ if(selected.name=="cha1"||selected.name=="cha11"){
 }
 
 if(selected.name=="cha2"||selected.name=="cha22"){
-
     liga();
     ligado = 1;
-
-    if(!audioUnlocked){
-        audio.play().then(()=>{
-            audio.pause();
-            audio.currentTime = 0;
-            audioUnlocked = true;
-            audio.play();
-        });
-    }else{
-        audio.play();
-    }
+    audio.play();
 }
 	}
 
