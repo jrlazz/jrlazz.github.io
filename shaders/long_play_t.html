@@ -87,8 +87,8 @@ function init(){
 	//window.addEventListener("click",onClick);
 	//window.addEventListener("mousemove",onMove);
 	/* MOBILE SUPPORT */
-	window.addEventListener("touchstart",onTouchStart,{passive:false});
-	window.addEventListener("touchmove",onTouchMove,{passive:false});
+	//window.addEventListener("touchstart",onTouchStart,{passive:false});
+	//window.addEventListener("touchmove",onTouchMove,{passive:false});
 
 	amb=new THREE.AmbientLight('#fff',1);scene.add(amb);
 	point=new THREE.PointLight('#fff',10000);point.position.set(30,20,30);scene.add(point);
@@ -299,25 +299,26 @@ gbraco.rotation.x=-0.2;
 	onoff.rotation.set(p/2,0,0);
 	onoff.scale.setScalar(0.25);
 
-	audio=document.getElementById('au');
-	audio.load();
-	//audio.currentTime=180;
+audio = document.getElementById('au');
+audio.load();
+//audio.currentTime = 180;
 
-/*
-let playing = false;
-function checkit(){
-//button.onclick = () => {
-    if(!playing){
-        audio.load();
-        audio.play();
-        playing = true;
-    }else{
+let audioUnlocked = false;
+
+function unlockAudio(){
+
+    if(audioUnlocked) return;
+
+    audio.play().then(()=>{
         audio.pause();
-        playing = false;
-    }
-//};
+        audio.currentTime = 0;
+        audioUnlocked = true;
+    }).catch(()=>{});
+
 }
-*/
+
+document.addEventListener("touchstart", unlockAudio, {once:true});
+document.addEventListener("click", unlockAudio, {once:true});
 
 } // init end
 
@@ -406,14 +407,6 @@ function onMove(event){
 function onTouchStart(event){
 
     event.preventDefault();
-
-    if(!audioUnlocked){
-        audio.play().then(()=>{
-            audio.pause();
-            audio.currentTime = 0;
-            audioUnlocked = true;
-        }).catch(()=>{});
-    }
 
     const touch = event.touches[0];
 
