@@ -378,13 +378,15 @@ function onTouchStart(event){
 		selected = intersects[0].object;
 
 		if(selected.name=="cha1"||selected.name=="cha11"){
+			desliga();au.pause();
 			ligado=0;
-			audio.pause();
+			//audio.pause();
 		}
 
 		if(selected.name=="cha2"||selected.name=="cha22"){
+			liga();au.play();
 			ligado=1;
-			audio.play();
+			//audio.play();
 		}
 
 	}
