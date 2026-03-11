@@ -372,7 +372,7 @@ audio.oncanplaythrough = () => {
 
 function onTouchStart(event){
 
-    event.preventDefault();
+/* event.preventDefault();
 
     if(!audioUnlocked){
         audio.play().then(()=>{
@@ -381,7 +381,7 @@ function onTouchStart(event){
             audioUnlocked = true;
         }).catch(()=>{});
     }
-
+*/
     const touch = event.touches[0];
 
 
