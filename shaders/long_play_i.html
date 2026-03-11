@@ -298,7 +298,26 @@ gbraco.rotation.x=-0.2;
 	onoff.scale.setScalar(0.25);
 
 	audio=document.getElementById('au');
+	audio.load();
 	//audio.currentTime=180;
+/*
+
+let playing = false;
+
+button.onclick = () => {
+
+    if (!playing) {
+        audio.currentTime = 0;
+        audio.play();
+        playing = true;
+    } else {
+        audio.pause();
+        playing = false;
+    }
+
+};
+
+*/
 
 } // init end
 
