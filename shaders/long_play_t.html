@@ -419,39 +419,28 @@ function onTouchStart(event){
 
 		selected = intersects[0].object;
 
-		if(selected.name=="cha1"||selected.name=="cha11"){
-			desliga();//au.pause();
-			ligado=0;
-			audio.pause();
-		}
+if(selected.name=="cha1"||selected.name=="cha11"){
+    desliga();
+    ligado = 0;
+    audio.pause();
+}
 
-		if(selected.name=="cha2"||selected.name=="cha22"){
-			liga();//au.play();
-			ligado=1;
-			audio.play();
-		}
+if(selected.name=="cha2"||selected.name=="cha22"){
 
-/*
-		if(selected.name=="cha1"||selected.name=="cha11"){
-			desliga();//checkit();
-		}
+    liga();
+    ligado = 1;
 
-		if(selected.name=="cha2"||selected.name=="cha22"){
-			liga();//checkit();
-		}
-
-//playing = false;
-function checkit(){
-    if(!playing){
-        audio.load();
-        audio.play();
-        playing = true;
+    if(!audioUnlocked){
+        audio.play().then(()=>{
+            audio.pause();
+            audio.currentTime = 0;
+            audioUnlocked = true;
+            audio.play();
+        });
     }else{
-        audio.pause();
-        playing = false;
+        audio.play();
     }
 }
-*/
 	}
 
 }
