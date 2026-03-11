@@ -367,46 +367,20 @@ audio.oncanplaythrough = () => {
 	renderer.render(scene,camera);
 }
 
-function onClick(event){
-	raycaster.setFromCamera(mouse,camera);
-	intersects=raycaster.intersectObjects(alvos,false);
-	if (intersects.length>0){
-		selected=intersects[0].object;
-		if(selected.name=="cha1" || selected.name=="cha11"){desliga();ligado=0;au.pause();}
-		if(selected.name=="cha2" || selected.name=="cha22"){liga();ligado=1;au.play();}
-/*
-		if(selected.name=="cha1" || selected.name=="cha11"){desliga();}//checkit();}
-		if(selected.name=="cha2" || selected.name=="cha22"){liga();}//checkit();}
-//playing = false;
-function checkit(){
-    if(!playing){
-        audio.load();
-        audio.play();
-        playing = true;
-    }else{
-        audio.pause();
-        playing = false;
-    }
-}
-*/
-
-	}
-}
-
-function onMove(event){
-	document.body.style.cursor='default';
-	mouse.x=event.clientX/window.innerWidth*2-1;
-	mouse.y=-(event.clientY/window.innerHeight)*2+1;
-	raycaster.setFromCamera(mouse,camera);
-	intersects=raycaster.intersectObjects(alvos,false);
-	if (intersects.length>0){document.body.style.cursor='pointer';}
-}
 
 /* TOUCH EVENTS FOR IPHONE */
 
 function onTouchStart(event){
 
     event.preventDefault();
+
+    if(!audioUnlocked){
+        audio.play().then(()=>{
+            audio.pause();
+            audio.currentTime = 0;
+            audioUnlocked = true;
+        }).catch(()=>{});
+    }
 
     const touch = event.touches[0];
 
