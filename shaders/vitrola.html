@@ -96,6 +96,8 @@ var meshb;
 
 var dsp=document.getElementById("sp");
 
+const isApple=/iPad|iPhone|iPod|Mac/.test(navigator.userAgent) && !window.MSStream;
+
 function init(){
 
 	scene=new THREE.Scene();
@@ -114,6 +116,10 @@ function init(){
 
 	window.addEventListener("click",onClick);
 	window.addEventListener("mousemove",onMove);
+	if(isApple){
+		window.addEventListener("touchstart",onTouchStart,{passive:false});
+		window.addEventListener("touchmove",onTouchMove,{passive:false});
+	}
 
 	amb=new THREE.AmbientLight('#fff',4);scene.add(amb);
 	point[1]=new THREE.PointLight('#fff',15000);point[1].position.set(130,20,20);scene.add(point[1]);
@@ -510,6 +516,29 @@ function onMove(event){
 	raycaster.setFromCamera(mouse,camera);
 	intersects=raycaster.intersectObjects(alvos,false);
 	if (intersects.length>0){document.body.style.cursor='pointer';}
+}
+
+
+function onTouchStart(event){
+	event.preventDefault();
+	const touch=event.touches[0];
+	mouse.x=touch.clientX/window.innerWidth * 2 - 1;
+	mouse.y=-(touch.clientY/window.innerHeight) * 2 + 1;
+	raycaster.setFromCamera(mouse,camera);
+	intersects=raycaster.intersectObjects(alvos,false);
+	if(intersects.length>0){
+		selected=intersects[0].object;
+		if(selected.name=="AudioScreen"){
+			if(ligado==0){liga();ligado=1;audio.play();return}
+			if(ligado==1){desliga();ligado=0;audio.pause();}
+		}
+	}
+}
+
+function onTouchMove(event){
+	const touch=event.touches[0];
+	mouse.x=touch.clientX/window.innerWidth * 2 - 1;
+	mouse.y=-(touch.clientY/window.innerHeight) * 2 + 1;
 }
 
 function liga(){ax.rotation.z =-0.2;}
