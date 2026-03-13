@@ -20,7 +20,7 @@ span{position:absolute;left:10px;top:10px;z-index:0;font-size:20.5px;color:#0ff;
 
 <body>
 <span id="sp"></span>
-<img src="img/expand.png" onclick="toggleFullScreen();" id="but" style="left:-1000px;top:40px;color:gold;background-color:#050;border:3px outset #090;box-shadow:3px 3px 3px #242;"></img>
+<!--<img src="img/expand.png" onclick="toggleFullScreen();" id="but" style="left:-1000px;top:40px;color:gold;background-color:#050;border:3px outset #090;box-shadow:3px 3px 3px #242;"></img>-->
 <audio id="au" loop="false" style="position:absolute;left:10px;top:60px;">
 <source src="../anim/mp3/Laura.mp3" type="audio/mpeg">
 </audio>
@@ -476,22 +476,20 @@ function animate(t){
 		scene.remove(tex[21]);scene.add(tex[3]);
 	}
 
-	dsp.innerText=eT.toFixed(3);
+	dsp.innerText=eT.toFixed(2);
 
-	if(eT>20.5 && eT<21){scene.remove(tex[3]);scene.add(tex[10]);}
-	if(eT>34.5 && eT<35){scene.remove(tex[10]);scene.add(tex[11]);}
-	if(eT>50.3 && eT<51){scene.remove(tex[11]);scene.add(tex[12]);}
-	if(eT>61.2 && eT<62){scene.remove(tex[12]);scene.add(tex[13]);}
-
-	if(eT>73.2 && eT<74){scene.remove(tex[13]);scene.add(tex[14]);}
-	if(eT>81.3 && eT<82){scene.remove(tex[14]);scene.add(tex[15]);}
-	if(eT>91.2 && eT<92){scene.remove(tex[15]);scene.add(tex[16]);}
-	if(eT>104.9 && eT<106){scene.remove(tex[16]);scene.add(tex[17]);}
-	if(eT>116.4 && eT<117){scene.remove(tex[17]);scene.add(tex[18]);}
-
-	if(eT>154.2 && eT<155){scene.remove(tex[18]);scene.add(tex[19]);}
-	if(eT>165.5 && eT<166){scene.remove(tex[19]);scene.add(tex[20]);}
-	if(eT>170.5 && eT<171){scene.remove(tex[20]);scene.add(tex[21]);}
+	if(eT>20 && eT<21){  scene.remove(tex[ 3]);scene.add(tex[10]);}
+	if(eT>34 && eT<35){  scene.remove(tex[10]);scene.add(tex[11]);}
+	if(eT>50 && eT<51){  for(let z=10;z<12;z++){scene.remove(tex[z]);};scene.add(tex[12]);}
+	if(eT>61 && eT<62){  for(let z=10;z<13;z++){scene.remove(tex[z]);};scene.add(tex[13]);}
+	if(eT>73 && eT<74){  for(let z=10;z<14;z++){scene.remove(tex[z]);};scene.add(tex[14]);}
+	if(eT>81 && eT<82){  for(let z=10;z<15;z++){scene.remove(tex[z]);};scene.add(tex[15]);}
+	if(eT>91 && eT<92){  for(let z=10;z<16;z++){scene.remove(tex[z]);};scene.add(tex[16]);}
+	if(eT>104 && eT<105){for(let z=10;z<17;z++){scene.remove(tex[z]);};scene.add(tex[17]);}
+	if(eT>116 && eT<117){for(let z=10;z<18;z++){scene.remove(tex[z]);};scene.add(tex[18]);}
+	if(eT>154 && eT<155){for(let z=10;z<19;z++){scene.remove(tex[z]);};scene.add(tex[19]);}
+	if(eT>165 && eT<166){for(let z=10;z<20;z++){scene.remove(tex[z]);};scene.add(tex[20]);}
+	if(eT>170 && eT<171){for(let z=10;z<21;z++){scene.remove(tex[z]);};scene.add(tex[21]);}
 
 	controls.update();
 	renderer.render(scene,camera);
@@ -504,7 +502,7 @@ function onClick(event){
 		selected=intersects[0].object;
 		if(selected.name=="AudioScreen"){
 			if(ligado==0){liga();ligado=1;audio.play();return}
-			if(ligado==1){desliga();ligado=0;audio.pause();}
+			if(ligado==1){desliga();ligado=0;audio.pause();for(let z=10;z<21;z++){scene.remove(tex[z]);};}
 		}
 	}
 }
@@ -530,7 +528,7 @@ function onTouchStart(event){
 		selected=intersects[0].object;
 		if(selected.name=="AudioScreen"){
 			if(ligado==0){liga();ligado=1;audio.play();return}
-			if(ligado==1){desliga();ligado=0;audio.pause();}
+			if(ligado==1){desliga();ligado=0;audio.pause();for(let z=10;z<21;z++){scene.remove(tex[z]);};}
 		}
 	}
 }
@@ -563,7 +561,7 @@ window.addEventListener("resize",() => {
 init();
 animate();
 
-document.getElementById("but").style.left=window.innerWidth-81+"px";
+//document.getElementById("but").style.left=window.innerWidth-81+"px";
 
 </script>
 
