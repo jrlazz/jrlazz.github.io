@@ -478,23 +478,30 @@ function animate(t){
 
 	dsp.innerText=eT.toFixed(3);
 
-	if(eT>20.5 && eT<20.6){scene.remove(tex[3]);scene.add(tex[10]);}
-	if(eT>34.5 && eT<34.6){scene.remove(tex[10]);scene.add(tex[11]);}
-	if(eT>50.3 && eT<50.4){scene.remove(tex[11]);scene.add(tex[12]);}
-	if(eT>61.2 && eT<61.3){scene.remove(tex[12]);scene.add(tex[13]);}
+	if(eT>20.5 && eT<20.6){scene.remove(tex[3]);limpa();scene.add(tex[10]);}
+	if(eT>34.5 && eT<34.6){limpa();scene.add(tex[11]);}
+	if(eT>50.3 && eT<50.4){limpa();scene.add(tex[12]);}
+	if(eT>61.2 && eT<61.3){limpa();scene.add(tex[13]);}
 
 	if(eT>73.2 && eT<73.3){scene.remove(tex[13]);scene.add(tex[14]);}
-	if(eT>81.3 && eT<81.4){scene.remove(tex[14]);scene.add(tex[15]);}
-	if(eT>91.2 && eT<91.3){scene.remove(tex[15]);scene.add(tex[16]);}
-	if(eT>104.9 && eT<105){scene.remove(tex[16]);scene.add(tex[17]);}
-	if(eT>116.4 && eT<116.5){scene.remove(tex[17]);scene.add(tex[18]);}
+	if(eT>81.3 && eT<81.4){limpa();scene.add(tex[15]);}
+	if(eT>91.2 && eT<91.3){limpa();scene.add(tex[16]);}
+	if(eT>104.9 && eT<105){limpa();scene.add(tex[17]);}
+	if(eT>116.4 && eT<116.5)limpa();scene.add(tex[18]);}
 
-	if(eT>154.2 && eT<154.3){scene.remove(tex[18]);scene.add(tex[19]);}
-	if(eT>165.5 && eT<165.6){scene.remove(tex[19]);scene.add(tex[20]);}
-	if(eT>170.5 && eT<170.6){scene.remove(tex[20]);scene.add(tex[21]);}
+	if(eT>154.2 && eT<154.3){limpa();scene.add(tex[19]);}
+	if(eT>165.5 && eT<165.6){limpa();scene.add(tex[20]);}
+	if(eT>170.5 && eT<170.6){limpa();scene.add(tex[21]);}
 
 	controls.update();
 	renderer.render(scene,camera);
+
+function limpa(){
+	for(let z=10;z<22;z++){
+		scene.remove(tex[z]);
+	}
+}
+
 }
 
 function onClick(event){
