@@ -12,9 +12,9 @@
 <meta name="twitter:image:height" content="47" />
 
 <style>
-body{margin:0px;background:#048;overflow:hidden;}
+body{margin:0px;background:#048;overflow:hidden;font-family:monospace;}
 img{position:absolute;padding:2px;width:41px;height:41px;z-index:0;cursor:pointer;}
-span{position:absolute;left:10px;top:10px;z-index:0;font-size:12pt;color:#0ff;}
+span{position:absolute;left:10px;top:10px;z-index:0;font-size:20.5px;color:#0ff;}
 </style>
 </head>
 
@@ -476,7 +476,7 @@ function animate(t){
 		scene.remove(tex[21]);scene.add(tex[3]);
 	}
 
-	//dsp.innerText=eT.toFixed(3);
+	dsp.innerText=eT.toFixed(3);
 
 	if(eT>20.5 && eT<20.6){scene.remove(tex[3]);scene.add(tex[10]);}
 	if(eT>34.5 && eT<34.6){scene.remove(tex[10]);scene.add(tex[11]);}
