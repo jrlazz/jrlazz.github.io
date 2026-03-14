@@ -11,6 +11,8 @@
 <meta name="twitter:image:width" content="19" />
 <meta name="twitter:image:height" content="47" />
 
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
 body { margin:0px; background:#048; overflow:hidden;}
 img{position:absolute;padding:2px;width:41px;height:41px;z-index:0;cursor:pointer;}
@@ -63,6 +65,10 @@ var clock=new THREE.Clock();
 var cor;
 var bri;
 var dife=0.005;
+var playing;
+var canplay=0;
+
+const isApple=/iPad|iPhone|iPod|Mac/.test(navigator.userAgent) && !window.MSStream;
 
 function init(){
 
@@ -82,7 +88,10 @@ function init(){
 
 	window.addEventListener("click",onClick);
 	window.addEventListener("mousemove",onMove);
-
+	if(isApple){
+		window.addEventListener("touchstart",onTouchStart,{passive:false});
+		window.addEventListener("touchmove",onTouchMove,{passive:false});
+	}
 	amb=new THREE.AmbientLight('#fff',1);scene.add(amb);
 	point=new THREE.PointLight('#fff',10000);point.position.set(30,20,30);scene.add(point);
 
@@ -293,6 +302,7 @@ gbraco.rotation.x=-0.2;
 	onoff.scale.setScalar(0.25);
 
 	audio=document.getElementById('au');
+	audio.load();
 	//audio.currentTime=180;
 
 } // init end
@@ -303,7 +313,14 @@ function matc(a,b,c,cor){gg=new THREE.BoxGeometry(a,b,c);mm=new THREE.MeshStanda
 function animate(t){
 	requestAnimationFrame(animate);
 	const delta=clock.getDelta();
-	if(sim==0){
+
+audio.oncanplaythrough = () => {
+	//console.log('Audio is loaded and ready to play');
+	//alert("jjj");
+	canplay=1;
+};
+
+	if(sim==0 && canplay==1){
 		desliga();
 		sim=1;
 	}
@@ -352,6 +369,34 @@ function onMove(event){
 	raycaster.setFromCamera(mouse,camera);
 	intersects=raycaster.intersectObjects(alvos,false);
 	if (intersects.length>0){document.body.style.cursor='pointer';}
+}
+
+function onTouchStart(event){
+	event.preventDefault();
+	const touch = event.touches[0];
+	mouse.x = touch.clientX / window.innerWidth * 2 - 1;
+	mouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
+	raycaster.setFromCamera(mouse,camera);
+	intersects = raycaster.intersectObjects(alvos,false);
+	if(intersects.length>0){
+		selected = intersects[0].object;
+		if(selected.name=="cha1"||selected.name=="cha11"){
+			desliga();
+			ligado=0;
+			audio.pause();
+		}
+		if(selected.name=="cha2"||selected.name=="cha22"){
+			liga();
+			ligado=1;
+			audio.play();
+		}
+	}
+}
+
+function onTouchMove(event){
+	const touch = event.touches[0];
+	mouse.x = touch.clientX / window.innerWidth * 2 - 1;
+	mouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
 }
 
 function liga(){ax.rotation.z =-0.2;}
