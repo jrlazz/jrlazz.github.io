@@ -16,10 +16,12 @@
 <style>
 body { margin:0px; background:#048; overflow:hidden;}
 img{position:absolute;padding:2px;width:41px;height:41px;z-index:0;cursor:pointer;}
+span{position:absolute;left:10px;top:10px;z-index:0;font-size:20.5px;color:#0ff;}
 </style>
 </head>
 
 <body>
+<span id="sp">...</span>
 <img src="img/expand.png" onclick="toggleFullScreen();" id="but" style="left:-1000px;top:10px;color:gold;background-color:#050;border:3px outset #090;box-shadow:3px 3px 3px #242;"></img>
 <audio id="au" loop="false" style="position:absolute;left:10px;top:60px;">
  <source src="../anim/mp3/Unforgettable.mp3" type="audio/mpeg">
@@ -67,6 +69,25 @@ var bri;
 var dife=0.005;
 var playing;
 var canplay=0;
+
+var letra=[];
+letra[10]="Unforgettable ... That's what you are";
+letra[11]="Unforgettable ... Though near or far";
+letra[12]="Like a song of love that clings to me";
+letra[13]="How the thoughts of you does things to me";
+letra[14]="Never before has someone been more";
+letra[15]="Unforgettable... In every way";
+letra[16]="And forevermore ... That's how you'll stay";
+letra[17]="That's why, darling, it's incredible";
+letra[18]="That someone so unforgettable";
+letra[19]="Thinks that I am unforgettable, too";
+letra[20]="Unforgettable ... In every way";
+letra[21]="And forevermore, that's how you'll stay";
+letra[22]="That's why, darling, it's incredible";
+letra[23]="That someone so unforgettable";
+letra[24]="Thinks that I am unforgettable, too";
+
+var dsp=document.getElementById("sp");
 
 const isApple=/iPad|iPhone|iPod|Mac/.test(navigator.userAgent) && !window.MSStream;
 
@@ -246,6 +267,13 @@ gbraco.rotation.x=-0.2;
 			tex[2]=new THREE.Mesh(gg,mm);
 			tex[2].rotation.set(2*p,-p/2,0);
 			tex[2].position.set(0,0,6);
+
+		mm=[new THREE.MeshStandardMaterial({color:'#0f0'}),new THREE.MeshStandardMaterial({color:'#606'})];
+		for(let z=10;z<25;z++){
+			gg=new TextGeometry(letra[z],{font:font,size:2,depth:1,curveSegments:12,bevelThickness:0.1,bevelSize:0.1,bevelEnabled:false});gg.center();
+			tex[z]=new THREE.Mesh(gg,mm);
+			tex[z].position.set(0,-27,20);
+		}
 	}
 
 	// onoff
@@ -303,7 +331,7 @@ gbraco.rotation.x=-0.2;
 
 	audio=document.getElementById('au');
 	audio.load();
-	//audio.currentTime=180;
+	audio.currentTime=170;
 
 } // init end
 
@@ -345,9 +373,35 @@ audio.oncanplaythrough = () => {
 	if(tex[4] && ligado==1){scene.remove(tex[4]);tex[4].rotation.y=0;}
 
 	function isAudioPlaying(audio){return(audio.currentTime>0 && !audio.paused && !audio.ended && audio.readyState>2);}
-	let elapsedTime=audio.currentTime;
-	if(elapsedTime>196.5){gbraco.rotation.x=-0.2;gbraco.rotation.y=-0.04;}
-	if(elapsedTime>197.8){audio.currentTime=0;gbraco.rotation.x=0;gbraco.rotation.y=-0.04;}
+	let eT=audio.currentTime;
+
+	if(eT>207){gbraco.rotation.x=-0.2;gbraco.rotation.y=-0.04;}
+	if(eT>208){
+		audio.currentTime=0;
+		gbraco.rotation.x=0;
+		gbraco.rotation.y=-0.04;
+		scene.remove(tex[24]);
+		//scene.add(tex[3]);
+	}
+
+	dsp.innerText=eT.toFixed(2);
+
+	if(eT>14 && eT<15){  scene.add(tex[10]);}
+	if(eT>26 && eT<27){  scene.remove(tex[10]);scene.add(tex[11]);}
+	if(eT>38 && eT<39){  for(let z=10;z<12;z++){scene.remove(tex[z]);};scene.add(tex[12]);}
+	if(eT>45 && eT<46){  for(let z=10;z<13;z++){scene.remove(tex[z]);};scene.add(tex[13]);}
+	if(eT>50 && eT<51){  for(let z=10;z<14;z++){scene.remove(tex[z]);};scene.add(tex[14]);}
+	if(eT>61 && eT<62){  for(let z=10;z<15;z++){scene.remove(tex[z]);};scene.add(tex[15]);}
+	if(eT>72 && eT<73){  for(let z=10;z<16;z++){scene.remove(tex[z]);};scene.add(tex[16]);}
+	if(eT>84 && eT<85){for(let z=10;z<17;z++){scene.remove(tex[z]);};scene.add(tex[17]);}
+	if(eT>91 && eT<92){for(let z=10;z<18;z++){scene.remove(tex[z]);};scene.add(tex[18]);}
+	if(eT>96 && eT<97){for(let z=10;z<19;z++){scene.remove(tex[z]);};scene.add(tex[19]);}
+	if(eT>151 && eT<152){for(let z=10;z<20;z++){scene.remove(tex[z]);};scene.add(tex[20]);}
+	if(eT>162 && eT<163){for(let z=10;z<21;z++){scene.remove(tex[z]);};scene.add(tex[21]);}
+	if(eT>174 && eT<175){for(let z=10;z<22;z++){scene.remove(tex[z]);};scene.add(tex[22]);}
+	if(eT>181 && eT<182){for(let z=10;z<23;z++){scene.remove(tex[z]);};scene.add(tex[23]);}
+	if(eT>186 && eT<187){for(let z=10;z<24;z++){scene.remove(tex[z]);};scene.add(tex[24]);}
+
 	controls.update();
 	renderer.render(scene,camera);
 }
