@@ -257,12 +257,10 @@ function init(){
 
 	controls=new OrbitControls(camera,renderer.domElement);
 
-	//window.addEventListener("click",onClick);
-	//window.addEventListener("mousemove",onMove);
-	//if(isApple){
+	window.addEventListener("click",onClick);
+	if(isApple){
 		window.addEventListener("touchstart",onTouchStart,{passive:false});
-		//window.addEventListener("touchmove",onTouchMove,{passive:false});
-	//}
+	}
 
 	amb=new THREE.AmbientLight('#fff',3);scene.add(amb);
 	point[1]=new THREE.PointLight('#fc9',10000);point[1].position.set(127,110,35);scene.add(point[1]);
