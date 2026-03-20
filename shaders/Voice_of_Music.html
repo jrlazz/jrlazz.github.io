@@ -14,8 +14,10 @@
 <style>
 @font-face {font-family:myq;src:url('../fonte/MysteryQuest-Regular.ttf');}
 body{margin:0px;background:#048;overflow:hidden;font-family:myq;}
-span{position:absolute;left:10px;top:10px;z-index:0;font-size:20.5pt;color:#fc0;}
-img{position:absolute;left:45px;top:40px;width:60px;height:60px;}
+span{font-size:41pt;color:#fc0;width:400px;}
+img{width:100px;height:100px;}
+td{text-align:center;}
+table{position:absolute;left:10px;top:10px;z-index:0;}
 </style>
 
 <script type="importmap">
@@ -30,8 +32,10 @@ img{position:absolute;left:45px;top:40px;width:60px;height:60px;}
 </head>
 
 <body>
-<span id="sp">Voice of Music</span>
-<img src="img/VofM.png"></img>
+<table>
+<tr><td><span id="sp">Voice of Music</span></td></tr>
+<tr><td><img src="img/VofM.png"></td></tr>
+</table>
 <audio id="au" loop="false" style="position:absolute;left:10px;top:60px;">
 	<source src="../anim/mp3/Laura.mp3" type="audio/mpeg">
 </audio>
