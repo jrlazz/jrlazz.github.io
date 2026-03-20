@@ -12,8 +12,10 @@
 <meta name="twitter:image:height" content="47" />
 
 <style>
-body{margin:0px;background:#048;overflow:hidden;font-family:monospace;}
-span{position:absolute;left:10px;top:10px;z-index:0;font-size:20.5px;color:#0ff;display:none;}
+@font-face {font-family:myq;src:url('../fonte/MysteryQuest-Regular.ttf');}
+body{margin:0px;background:#048;overflow:hidden;font-family:myq;}
+span{position:absolute;left:10px;top:10px;z-index:0;font-size:20.5pt;color:#fc0;}
+img{position:absolute;left:45px;top:40px;width:60px;height:60px;}
 </style>
 
 <script type="importmap">
@@ -28,7 +30,8 @@ span{position:absolute;left:10px;top:10px;z-index:0;font-size:20.5px;color:#0ff;
 </head>
 
 <body>
-<span id="sp">2</span>
+<span id="sp">Voice of Music</span>
+<img src="images/VofM.png"></img>
 <audio id="au" loop="false" style="position:absolute;left:10px;top:60px;">
 	<source src="../anim/mp3/Laura.mp3" type="audio/mpeg">
 </audio>
@@ -88,7 +91,7 @@ var wood,bri;
 
 var dsp=document.getElementById("sp");
 var bM, bM2;
-var w=0,ww=0;
+var w=0,ww=0,www=0;
 var tela;
 var sprite1,sprite2;
 
@@ -98,7 +101,7 @@ function init(){
 
 	scene=new THREE.Scene();
 
-	camera=new THREE.PerspectiveCamera(80,innerWidth/innerHeight,0.1,1000);
+	camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,1000);
 	camera.position.set(-70,60,100);
 	
 	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
@@ -112,10 +115,10 @@ function init(){
 	window.addEventListener("click",onClick);
 	if(isApple){window.addEventListener("touchstart",onTouchStart,{passive:false});}
 
-	amb=new THREE.AmbientLight('#fff',2);scene.add(amb);
-	point[1]=new THREE.PointLight('#fc9',10000);point[1].position.set(0,80,0);scene.add(point[1]);
+	amb=new THREE.AmbientLight('#fff',1);scene.add(amb);
+	point[1]=new THREE.PointLight('#fc9',    100);point[1].position.set(0,80,0);scene.add(point[1]);
 	//point[2]=new THREE.PointLight('#fff',15000);point[2].position.set(-40,60,50);scene.add(point[2]);
-	//point[3]=new THREE.PointLight('#fff',15000);point[3].position.set(0,60,-20);scene.add(point[3]);
+	point[3]=new THREE.PointLight('#fff',    100);point[3].position.set(0,0,60);scene.add(point[3]);
 	point[4]=new THREE.PointLight('#fc9', 2000);point[4].position.set(-15,-2,0);scene.add(point[4]);
 	matc(1,1,1,'#fc9');
 	s=new THREE.Mesh(g,m);
@@ -177,7 +180,7 @@ scene.add(xi[1]);
 		s.position.set(6,0,0);// lateral
 		xi[2].add(s);
 	matc(21,32,1,0x666666);
-	s=new THREE.Mesh(g,m);
+	s=new THREE.Mesh(g,corr);
 	s.rotation.x=p/2;
 	s.position.set(-4,6.5,0);//cima
 	xi[2].add(s);
@@ -356,6 +359,10 @@ function matc(a,b,c,cor){g=new THREE.BoxGeometry(a,b,c);m=new THREE.MeshStandard
 function animate(t){
 	requestAnimationFrame(animate);
 	const delta=clock.getDelta();
+www++;
+
+if(www<100){point[1].intensity=www*100;point[3].intensity=www*150;}
+if(www>100){www=1000;}
 
 	if(ww>359){ww=0;}
 
@@ -396,7 +403,7 @@ function animate(t){
 		ww=0;
 	}
 
-	dsp.innerText=eT.toFixed(2);
+	//dsp.innerText=eT.toFixed(2);
 
 	if(eT>20 && eT<21){  scene.remove(tex[ 3]);scene.add(tex[10]);}
 	if(eT>34 && eT<35){  scene.remove(tex[10]);scene.add(tex[11]);}
