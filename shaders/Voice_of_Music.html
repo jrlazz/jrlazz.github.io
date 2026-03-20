@@ -46,7 +46,7 @@ import CSG from "../js/new_csg.js";
 var scene,camera,renderer,controls,loader,text,font;
 
 var amb,point=[];
-var g,m,s,tt,bb,tela;
+var g,m,s,tt;
 var r=new THREE.Group();
 var gbraco=new THREE.Group();
 
@@ -78,24 +78,18 @@ var audio;
 var clock=new THREE.Clock();
 var cor;
 
-var dife=0.005;
-var angu=0.005;
+var dife=0.01;
+var angu=0.01;
 
 var xi=[];for(let z=1;z<10;z++){xi[z]=new THREE.Group();}
 var axe=[];for(let z=1;z<10;z++){axe[z]=new THREE.AxesHelper(52);}
 var tocadisco=new THREE.Group();
 var wood,bri;
 
-var rot=0;
-
-var lig=[],loader,path=[],material,shapes=[],shape,geometry;
-
-var meshb,meshc,meshd;
-
 var dsp=document.getElementById("sp");
 var bM, bM2;
 var w=0,ww=0;
-var atela;
+var tela;
 var sprite1,sprite2;
 
 const isApple=/iPad|iPhone|iPod|Mac/.test(navigator.userAgent) && !window.MSStream;
@@ -206,7 +200,7 @@ scene.add(xi[1]);
 		axe[2].position.set(-21,-2,0);
 
 
-	//moldura
+// **************** moldura
 	matc(13,25,0.5,0xcccccc);
 	s=new THREE.Mesh(g,m);
 	s.rotation.x=p/2;
@@ -226,10 +220,9 @@ scene.add(xi[1]);
 	// tela alto falante
 	tt=new THREE.TextureLoader().load("images/telaY.jpg");
 	tt.wrapS=THREE.RepeatWrapping;tt.wrapT=THREE.RepeatWrapping;
-	tt.repeat.set(1,1);
+	tt.repeat.setScalar(0.5);
 	matc(12,24,0.5,'#002');
-	s=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:'#ccc',map:tt}));
-	atela=s.clone();
+	tela=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:'#888',map:tt}));
 
 // ALVOS
 	//s.name="AudioScreen";
@@ -327,7 +320,7 @@ scene.add(xi[1]);
 	tocadisco.position.set(0,-58,0);
 	scene.add(tocadisco);
 
-	//textos
+// **************** textos
 	loader=new FontLoader();
 	loader.load('../fonte/Cascadia_Regular.json',function(response){font=response;createText();});
 	function createText(){
@@ -347,20 +340,14 @@ scene.add(xi[1]);
 		}
 	}
 
-
-
+// **************** sprites
 	tt=new THREE.TextureLoader().load("img/music.png");
-	//tt.wrapS=THREE.RepeatWrapping;tt.wrapT=THREE.RepeatWrapping;
-	//tt.repeat.set(2,1);
-
-const material = new THREE.SpriteMaterial( { map: tt,rotation: Math.PI / 4 } );
-sprite1 = new THREE.Sprite( material );
-    sprite1.scale.setScalar(20); 
-    sprite1.position.set(-50,9,0); 
-//scene.add(sprite1);
-sprite2=sprite1.clone()
-    sprite2.position.set(50,9,0); 
-//scene.add( sprite2 );
+	m=new THREE.SpriteMaterial({map:tt,rotation:Math.PI/4});
+	sprite1=new THREE.Sprite(m);
+	sprite1.scale.setScalar(20); 
+	sprite1.position.set(-50,9,0); 
+	sprite2=sprite1.clone()
+	sprite2.position.set(50,9,0); 
 
 
 
@@ -390,7 +377,7 @@ function animate(t){
 
 	if(gbraco && sim==0){desliga();sim=1;}
 
-	if(bM && bM2 && atela && xi[1] && axe[1] && axe[2] && w==0){apply();w=1;}
+	if(bM && bM2 && tela && xi[1] && axe[1] && axe[2] && w==0){apply();w=1;}
 
 	//axe[1].rotation.z -=angu;
 	//axe[2].rotation.z -=angu;
@@ -398,16 +385,13 @@ function animate(t){
 
 
 	if(axe[1].rotation.z>-p/2){
-		axe[1].rotation.z -=angu; //  sprite1.position.copy(axe[1].position); 
-		axe[2].rotation.z -=angu;   // sprite.position.set(-50, 2, 0); 
+		axe[1].rotation.z -=angu*2; //  sprite1.position.copy(axe[1].position); 
+		axe[2].rotation.z -=angu*2;   // sprite.position.set(-50, 2, 0); 
 		//angu=-angu;
 	}
 
     if(sprite1){sprite1.material.rotation=0.05*ww;}
 
-//	rot +=angu;
-//	if(rot>0.33){angu=-angu;}
-//	if(rot<-0.55){angu=-angu;}
 
 	if(tex[3] && sim==1){scene.add(tex[3]);sim=2;}
 
@@ -458,7 +442,7 @@ function animate(t){
 		rM.geometry.computeVertexNormals();
 		rM.updateMatrix();rM.updateMatrixWorld();
 		scene.remove(bM);scene.remove(bM2);
-		rM.add(atela);
+		rM.add(tela);
 		rM.position.set(-10.5,12.8,0);
 		axe[1].add(rM.clone());
 //		axe[1].rotation.z=-p/3;
@@ -523,7 +507,7 @@ function liga(){ax.rotation.z =-0.2;}
 function desliga(){ax.rotation.z =0.2;}
 
 window.addEventListener("resize",() => {
-	camera.aspect = innerWidth/innerHeight;
+	camera.aspect=innerWidth/innerHeight;
 	camera.updateProjectionMatrix();
 	renderer.setSize(innerWidth,innerHeight);
 	renderer.setPixelRatio(window.devicePixelRatio);
