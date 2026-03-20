@@ -14,7 +14,6 @@
 <style>
 body{margin:0px;background:#048;overflow:hidden;font-family:monospace;}
 span{position:absolute;left:10px;top:10px;z-index:0;font-size:20.5px;color:#0ff;display:none;}
-img{position:absolute;left:20px;top:20px;width:200px;heigth:200px;transform:rotate(0deg);}
 </style>
 
 <script type="importmap">
@@ -29,7 +28,6 @@ img{position:absolute;left:20px;top:20px;width:200px;heigth:200px;transform:rota
 </head>
 
 <body>
-<img id="im" src="img/music.png"></img>
 <span id="sp">2</span>
 <audio id="au" loop="false" style="position:absolute;left:10px;top:60px;">
 	<source src="../anim/mp3/Laura.mp3" type="audio/mpeg">
@@ -74,145 +72,6 @@ letra[19]="She gave your very first kiss to you";
 letra[20]="That was Laura,";
 letra[21]="but she's only a dream";
 
-/*
-letra[10]="I call your name
-letra[11]="But you're not there
-letra[12]="Was I to blame?
-letra[13]="For being unfair?
-letra[14]="Oh, I can't sleep at night
-letra[15]="Since you've been gone
-letra[16]="I never weep at night
-letra[17]="I can't go on
-letra[18]="Don't you know I can't take it?
-letra[19]="I don't know who can
-letra[20]="I'm not gonna make it
-letra[21]="I'm not that kind of man
-letra[22]="Oh, I can't sleep at night
-letra[23]="But just the same
-I never weep at night
-I call your name
-Ow!
-Don't you know I can't take it?
-I don't know who can
-I'm not gonna make it
-I'm not that kind of man
-Oh, I can't sleep at night
-But just the same
-I never weep at night
-I call your name
-I call your name
-I call your name
-Whoo!
-I call your name
-
-
-
-
-Oh yeah, alright
-Are you going to be in my dreams tonight?
-Love you, love you
-Love you, love you
-Love you, love you
-Love you, love you
-Love you, love you
-Love you, love you
-Love you, love you
-Love you, love you
-Love you, love you
-Love you, love you
-Love you, love you
-Love you, love you
-And in the end
-The love you take
-Is equal to the love you make
-
-
-
-
-Right, take two
-Okay
-You say you want a revolution
-Well, you know
-We all want to change the world
-You tell me that it's evolution
-Well, you know
-We all wanna change the world
-When you talk about destruction
-Don't you know that you can count me out, in?
-Don't you know it's gonna be alright? (Oh, shoo-be-do-wop)
-Don't you know it's gonna be alright? (Oh, shoo-be-do-wop)
-Don't you know it's gonna be alright? (Oh, shoo-be-do-wop)
-You say you got a real solution
-Well, you know
-We'd all love to see the plan
-You ask me for a contribution
-Well, you know
-We all doing what we can
-If you want money for people with minds that hate
-All I can tell is, brother, you have to wait
-Don't you know it's gonna be alright? (Oh, shoo-be-do-wop)
-Don't you know it's gonna be alright? (Oh, shoo-be-do-wop)
-Don't you know it's gonna be alright? (Oh, shoo-be-do-wop)
-You say you'll change the constitution
-Well, you know
-We'd all love to change your head (ah, shoo-be-do-wop)
-You tell me it's the institution
-Well, you know
-You better free your mind instead (ah, shoo-be-do-wop)
-If you go carrying pictures of chairman Mao
-You ain't gonna make it with anyone anyhow
-Don't you know it's gonna be alright? (Oh, shoo-be-do-wop)
-Don't you know it's gonna be alright? (Oh, shoo-be-do-wop)
-Don't you know it's gonna be alright? (Oh, shoo-be-do-wop)
-All, all, all, all (ah, shoo-be-do-wop)
-All, all, all, alright (ah, shoo-be-do-wop)
-Alright, alright (ah, shoo-be-do-wop)
-Alright, alright (ah, shoo-be-do-wop)
-Alright, alright (ah, shoo-be-do-wop)
-Alright, alright (ah, shoo-be-do-wop)
-Alright (ah, shoo-be-do-wop)
-Alright, alright (ah, shoo-be-do-wop)
-Alright, alright (ah, shoo-be-do-wop)
-
-letra[10]="Let me take you down";
-letra[10]="'Cause I'm going to strawberry fields";
-letra[10]="Nothing is real";
-letra[10]="And nothing to get hung about";
-letra[10]="Strawberry fields forever";
-letra[10]="Living is easy with eyes closed";
-letra[10]="Misunderstanding all you see";
-letra[10]="It's getting hard to be someone, but it all works out";
-letra[10]="It doesn't matter much to me";
-letra[10]="Let me take you down";
-letra[10]="'Cause I'm going to strawberry fields";
-letra[10]="Nothing is real";
-letra[10]="And nothing to get hung about";
-letra[10]="Strawberry fields forever";
-letra[10]="No one I think is in my tree";
-letra[10]="I mean, it must be high or low";
-letra[10]="That is, you can't, you know, tune in, but it's alright";
-letra[10]="That is, I think it's not too bad";
-letra[10]="Let me take you down";
-letra[10]="'Cause I'm going to strawberry fields";
-letra[10]="Nothing is real";
-letra[10]="And nothing to get hung about";
-letra[10]="Strawberry fields forever";
-letra[10]="Always, no sometimes, think it's me";
-letra[10]="But you know, I know when it's a dream";
-letra[10]="I think I know, I mean a yes";
-letra[10]="But it's all wrong";
-letra[10]="That is, I think I disagree";
-letra[10]="Let me take you down";
-letra[10]="'Cause I'm going to strawberry fields";
-letra[10]="Nothing is real";
-letra[10]="And nothing to get hung about";
-letra[10]="Strawberry fields forever";
-letra[10]="Strawberry fields forever";
-letra[10]="Strawberry fields forever";
-
-
-*/
-
 var sim=0;
 var ligado=0;
 var audio;
@@ -233,11 +92,11 @@ var lig=[],loader,path=[],material,shapes=[],shape,geometry;
 
 var meshb,meshc,meshd;
 
-var dim=document.getElementById("im");
 var dsp=document.getElementById("sp");
 var bM, bM2;
 var w=0,ww=0;
 var atela;
+var sprite1,sprite2;
 
 const isApple=/iPad|iPhone|iPod|Mac/.test(navigator.userAgent) && !window.MSStream;
 
@@ -488,6 +347,29 @@ scene.add(xi[1]);
 		}
 	}
 
+
+
+	tt=new THREE.TextureLoader().load("img/music.png");
+	//tt.wrapS=THREE.RepeatWrapping;tt.wrapT=THREE.RepeatWrapping;
+	//tt.repeat.set(2,1);
+
+const material = new THREE.SpriteMaterial( { map: tt,rotation: Math.PI / 4 } );
+sprite1 = new THREE.Sprite( material );
+    sprite1.scale.setScalar(20); 
+    sprite1.position.set(-50,9,0); 
+//scene.add(sprite1);
+sprite2=sprite1.clone()
+    sprite2.position.set(50,9,0); 
+//scene.add( sprite2 );
+
+
+
+
+
+
+
+
+
 // **************** audio
 	audio=document.getElementById('au');
 	audio.load();
@@ -503,7 +385,7 @@ function animate(t){
 	requestAnimationFrame(animate);
 	const delta=clock.getDelta();
 	//ww++;
-	dim.style.transform="rotate("+ww+"deg)";
+
 	if(ww>359){ww=0;}
 
 	if(gbraco && sim==0){desliga();sim=1;}
@@ -513,12 +395,16 @@ function animate(t){
 	//axe[1].rotation.z -=angu;
 	//axe[2].rotation.z -=angu;
 
+
+
 	if(axe[1].rotation.z>-p/2){
-		axe[1].rotation.z -=angu;
-		axe[2].rotation.z -=angu;
+		axe[1].rotation.z -=angu; //  sprite1.position.copy(axe[1].position); 
+		axe[2].rotation.z -=angu;   // sprite.position.set(-50, 2, 0); 
 		//angu=-angu;
 	}
-	
+
+    if(sprite1){sprite1.material.rotation=0.05*ww;}
+
 //	rot +=angu;
 //	if(rot>0.33){angu=-angu;}
 //	if(rot<-0.55){angu=-angu;}
@@ -528,7 +414,7 @@ function animate(t){
 	if(sim==2 && gbraco){gbraco.rotation.x=-0.2;gbraco.rotation.y=-0.04;sim=3;}
 	if(sim==3 && ligado==1){gbraco.rotation.x=0;gbraco.rotation.y=-0.04;sim=4;}
 
-	if(ligado==1){ww++;gbraco.rotation.y -=delta/1000;r.rotation.y -=delta;}
+	if(ligado==1){ww++;gbraco.rotation.y -=delta/1000;r.rotation.y -=delta;scene.add(sprite1);scene.add(sprite2);}
 
 	if(tex[4] && ligado==0){
 		scene.add(tex[4]);
