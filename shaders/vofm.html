@@ -338,11 +338,11 @@ scene.add(xi[1]);
 			tex[z]=new THREE.Mesh(g,m);
 			tex[z].position.set(0,-20,30);
 		}
-		m=[new THREE.MeshStandardMaterial({color:'#f0f'}),new THREE.MeshStandardMaterial({color:'#ff0'})];
-		g=new TextGeometry("Volume... ",{font:font,size:8,depth:1,curveSegments:12,bevelEnabled:false});
+		m=[new THREE.MeshStandardMaterial({color:'#ff0'}),new THREE.MeshStandardMaterial({color:'#259'})];
+		g=new TextGeometry("Volume",{font:font,size:4,depth:1,curveSegments:12,bevelEnabled:false});
 		g.center();
 		tex[1]=new THREE.Mesh(g,m);
-		tex[1].position.set(-80,50,0);
+		tex[1].position.set(0,70,0);
 		scene.add(tex[1]);
 	}
 
@@ -356,11 +356,11 @@ scene.add(xi[1]);
 	sprite2.position.set(50,9,0); 
 
 // **************** vols
-	g=new THREE.SphereGeometry(5,64);
+	g=new THREE.SphereGeometry(3,64);
 	for(let z=0;z<11;z++){
 		v[z]=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:'#090'}));
 		v[z].name="v"+z;
-		v[z].position.set(-50+12*z,50,0);
+		v[z].position.set(-60+12*z,60,0);
 		scene.add(v[z]);
 	}
 v[3].material.color.set('#0f0');
