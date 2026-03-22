@@ -548,7 +548,7 @@ for(let i=0;i<nodeList.length;i++){
 		var touch = event.targetTouches[0];
 		ax=event.target.id;
 		document.getElementById("spana").innerText=ax + " " + parseInt(touch.pageX);
-		document.getElementById("spanb").innerText=ax + " " + parseInt(event.target.style.height)/2;
+		//document.getElementById("spanb").innerText=ax + " " + parseInt(event.target.style.height)/2;
 		adjust();
 		event.preventDefault();
 	}, false);
