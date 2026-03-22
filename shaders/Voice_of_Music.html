@@ -58,7 +58,8 @@ table{position:absolute;left:10px;top:10px;z-index:0;}
 <tr><td style="text-align:right;"><span id="spansliderb">?</span></td><td>		<input id="inpb" class="slidera" onchange="volb();" type="range" min=0 max=1 value=0.5 step=0.1 style="width:400px;" autocomplete="off"></td></tr>
 </table>
 
-
+<span id="spana" style="left:200px;"></span>
+<span id="spanb" style="left:400px;"></span>
 
 <audio id="au" loop="false" style="position:absolute;left:10px;top:60px;">
 	<source src="../anim/mp3/Laura.mp3" type="audio/mpeg">
@@ -254,6 +255,8 @@ scene.add(xi[1]);
 	tt.repeat.setScalar(0.5);
 	matc(12,24,0.5,'#002');
 	tela=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:'#888',map:tt}));
+	tela.name="tela";
+	//alvos.push(tela);
 
 // ALVOS
 	//s.name="AudioScreen";
@@ -328,6 +331,7 @@ scene.add(xi[1]);
 		s.position.set(0,-0.85,0);// rodaa do disco
 		r.add(s);
 
+
 	tt=new THREE.TextureLoader().load("img/gradient250.jpg");
 	tt.wrapS=THREE.RepeatWrapping;tt.wrapT=THREE.RepeatWrapping;
 	tt.repeat.set(2,1);
@@ -348,6 +352,7 @@ scene.add(xi[1]);
 	tocadisco.add(r);
 	tocadisco.position.set(0,-58,0);
 	scene.add(tocadisco);
+
 
 // **************** textos
 	loader=new FontLoader();
@@ -376,7 +381,9 @@ scene.add(xi[1]);
 	sprite1.scale.setScalar(20); 
 	sprite1.position.set(-50,9,0); 
 	sprite2=sprite1.clone()
-	sprite2.position.set(50,9,0); 
+	sprite2.position.set(50,9,0);
+	sprite2.name="sprite2";
+alert(sprite2.id);
 
 // **************** audio
 	audio=document.getElementById('au');
@@ -487,6 +494,8 @@ function ray(){
 	intersects=raycaster.intersectObjects(scene.children,true);
 	if (intersects.length>0){
 		selected=intersects[0].object;
+alert(selected.id);
+alert(selected.name);
 		if(ligado==0){liga();ligado=1;audio.play();return}
 		if(ligado==1){desliga();ligado=0;audio.pause();for(let z=10;z<21;z++){scene.remove(tex[z]);};}
 	}
