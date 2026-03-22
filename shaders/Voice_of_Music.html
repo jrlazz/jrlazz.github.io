@@ -496,8 +496,8 @@ function ray(){
 		selected=intersects[0].object;
 alert(selected.id);
 alert(selected.name);
-alert(selected);
-//alert('Intersection point:', selected.point?.x, selected.point?.y, selected.point?.z);
+//alert(selected);
+//alert('Intersection point:', selected.object.point.x, selected.object.point.y, selected.object.point.z);
 
 		if(ligado==0){liga();ligado=1;audio.play();return}
 		if(ligado==1){desliga();ligado=0;audio.pause();for(let z=10;z<21;z++){scene.remove(tex[z]);};}
@@ -532,7 +532,7 @@ var nodeList=document.getElementsByClassName('slidera');
 
 for(let i=0;i<nodeList.length;i++){
 	var obj = nodeList[i];
-
+/*
 	obj.addEventListener('touchmove',function(event){
 		var touch = event.targetTouches[0];
 		event.target.style.left=touch.pageX-parseInt(event.target.style.width)/2 + 'px';
@@ -543,7 +543,7 @@ for(let i=0;i<nodeList.length;i++){
 		adjustmove();
 		event.preventDefault();
     	}, false);
-
+*/
 	obj.addEventListener('touchstart',function(event){
 		var touch = event.targetTouches[0];
 		ax=event.target.id;
