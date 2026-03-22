@@ -59,7 +59,7 @@ table{position:absolute;left:10px;top:10px;z-index:0;}
 </table>
 
 <span id="spana" style="position:absolute;left:200px;top:100px;"></span>
-<span id="spanb" style="position:absolute;left:400px;top:200px;"></span>
+//<span id="spanb" style="position:absolute;left:400px;top:200px;"></span>
 
 <audio id="au" loop="false" style="position:absolute;left:10px;top:60px;">
 	<source src="../anim/mp3/Laura.mp3" type="audio/mpeg">
@@ -539,7 +539,7 @@ for(let i=0;i<nodeList.length;i++){
 		event.target.style.top= touch.pageY-parseInt(event.target.style.height)/2 + 'px';
 		ax=event.target.id;
 		document.getElementById("spana").innerText=ax;// + " " + parseInt(touch.pageX);
-		document.getElementById("spanb").innerText=ax;// + " " + parseInt(event.target.style.height)/2;
+		//document.getElementById("spanb").innerText=ax;// + " " + parseInt(event.target.style.height)/2;
 		adjustmove();
 		event.preventDefault();
     	}, false);
