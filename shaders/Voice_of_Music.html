@@ -26,25 +26,11 @@ table{position:absolute;left:10px;top:10px;z-index:0;}
 }
 .slidera::-webkit-slider-thumb { border-radius:100%;
   -webkit-appearance:none; appearance:none;
-  width:20px; height:20px; background:#f00; cursor:pointer;
+  width:40px; height:40px; background:#f00; cursor:pointer;
 }
 .slidera::-moz-range-thumb { border-radius:100%;
-  width:20px; height:20px; background:#f00; cursor: pointer;
+  width:40px; height:40px; background:#f00; cursor: pointer;
 }
-
-.sliderb {
-  -webkit-appearance: none;
-  width:100%; height:15px; background:#999; outline:none; opacity:0.7;
-  -webkit-transition: .2s; transition: opacity .2s;
-}
-.sliderb::-webkit-slider-thumb { border-radius:100%;
-  -webkit-appearance:none; appearance:none;
-  width:20px; height:20px; background:#0c0; cursor:pointer;
-}
-.sliderb::-moz-range-thumb { border-radius:100%;
-  width:20px; height:20px; background:#0c0; cursor:pointer;
-}
-
 
 </style>
 
@@ -67,9 +53,9 @@ table{position:absolute;left:10px;top:10px;z-index:0;}
 
 
 
-<table style="left:20px;top:160px;width:200px;z-index:0;">
-<tr><td style="text-align:right;width:80px;"><span id="spanslidera">?</span></td><td><input id="inpa" class="slidera" onchange="vola();" type="range" min=0 max=1 value=0.5 step=0.1 style="width:150px;" autocomplete="off"></td></tr>
-<tr><td style="text-align:right;"><span id="spansliderb">?</span></td><td><input id="inpb" class="slidera" onchange="volb();" type="range" min=0 max="1" value=0.5 step=0.1 style="width:150px;" autocomplete="off"></td></tr>
+<table style="left:20px;top:180px;width:500px;z-index:0;">
+<tr><td style="text-align:right;width:80px;"><span id="spanslidera">?</span></td><td>	<input id="inpa" class="slidera" onchange="vola();" type="range" min=0 max=1 value=0.5 step=0.1 style="width:400px;" autocomplete="off"></td></tr>
+<tr><td style="text-align:right;"><span id="spansliderb">?</span></td><td>		<input id="inpb" class="slidera" onchange="volb();" type="range" min=0 max=1 value=0.5 step=0.1 style="width:400px;" autocomplete="off"></td></tr>
 </table>
 
 
