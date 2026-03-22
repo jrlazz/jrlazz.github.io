@@ -58,8 +58,8 @@ table{position:absolute;left:10px;top:10px;z-index:0;}
 <tr><td style="text-align:right;"><span id="spansliderb">?</span></td><td>		<input id="inpb" class="slidera" onchange="volb();" type="range" min=0 max=1 value=0.5 step=0.1 style="width:400px;" autocomplete="off"></td></tr>
 </table>
 
-<span id="spana" style="left:200px;top:100px;"></span>
-<span id="spanb" style="left:400px;top:200px;"></span>
+<span id="spana" style="position:absolute;left:200px;top:100px;"></span>
+<span id="spanb" style="position:absolute;left:400px;top:200px;"></span>
 
 <audio id="au" loop="false" style="position:absolute;left:10px;top:60px;">
 	<source src="../anim/mp3/Laura.mp3" type="audio/mpeg">
@@ -496,6 +496,9 @@ function ray(){
 		selected=intersects[0].object;
 alert(selected.id);
 alert(selected.name);
+alert(selected);
+//alert('Intersection point:', selected.point?.x, selected.point?.y, selected.point?.z);
+
 		if(ligado==0){liga();ligado=1;audio.play();return}
 		if(ligado==1){desliga();ligado=0;audio.pause();for(let z=10;z<21;z++){scene.remove(tex[z]);};}
 	}
