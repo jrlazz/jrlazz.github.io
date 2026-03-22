@@ -538,8 +538,8 @@ for(let i=0;i<nodeList.length;i++){
 		event.target.style.left=touch.pageX-parseInt(event.target.style.width)/2 + 'px';
 		event.target.style.top= touch.pageY-parseInt(event.target.style.height)/2 + 'px';
 		ax=event.target.id;
-		document.getElementById("spana").innerText=ax + " " + parseInt(touch.pageX);
-		document.getElementById("spanb").innerText=ax + " " + parseInt(event.target.style.height)/2;
+		document.getElementById("spana").innerText=ax;// + " " + parseInt(touch.pageX);
+		document.getElementById("spanb").innerText=ax;// + " " + parseInt(event.target.style.height)/2;
 		adjustmove();
 		event.preventDefault();
     	}, false);
