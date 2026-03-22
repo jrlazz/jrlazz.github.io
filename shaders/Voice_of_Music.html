@@ -534,7 +534,7 @@ var nodeList=document.getElementsByClassName('slidera');
 
 for(let i=0;i<nodeList.length;i++){
 	var obj = nodeList[i];
-
+/*
 	obj.addEventListener('touchmove',function(event){
 		var touch = event.targetTouches[0];
 		event.target.style.left=touch.pageX-parseInt(event.target.style.width)/2 + 'px';
@@ -545,7 +545,7 @@ for(let i=0;i<nodeList.length;i++){
 		adjustmove();
 		event.preventDefault();
     	}, true);
-/*
+
 	obj.addEventListener('touchstart',function(event){
 		var touch = event.targetTouches[0];
 		ax=event.target.id;
