@@ -116,8 +116,10 @@ function init(){
 
 	controls=new OrbitControls(camera,renderer.domElement);
 
-	window.addEventListener("click",onClick);
-	if(isApple){window.addEventListener("touchstart",onTouchStart,{passive:false});}
+	//window.addEventListener("click",onClick);
+	//if(isApple){
+	window.addEventListener("touchstart",onTouchStart,{passive:false});
+	//}
 
 	amb=new THREE.AmbientLight('#fff',1);scene.add(amb);
 	point[1]=new THREE.PointLight('#fc9',    100);point[1].position.set(0,80,0);scene.add(point[1]);
