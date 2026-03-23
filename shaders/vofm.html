@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>vofm_mobile.html</title>
+<title>vofm.html</title>
 
 <link rel="icon" type="image/png" href="../img/github-mark.png">
 <meta name="description" content="... long_play ...">
@@ -99,7 +99,17 @@ var tela;
 var sprite1,sprite2;
 var v=[];
 
-const isApple=/iPad|iPhone|iPod|Mac/.test(navigator.userAgent) && !window.MSStream;
+function isIOSDevice() {
+  // Check user agent for classic iPhone, iPad, iPod strings
+  const userAgentCheck = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+  // Check for newer iPads that report as Mac but have touch capability (maxTouchPoints > 1)
+  const iPadCheck = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+
+  // The combination provides a robust check for iOS devices
+  return userAgentCheck || iPadCheck;
+}
+
 
 function init(){
 
@@ -117,9 +127,10 @@ function init(){
 	controls=new OrbitControls(camera,renderer.domElement);
 
 	window.addEventListener("click",onClick);
-	//if(isApple){
-	window.addEventListener("touchstart",onTouchStart,{passive:false});
-	//}
+
+	if (isIOSDevice()){
+		window.addEventListener("touchstart",onTouchStart,{passive:false});
+	}
 
 	amb=new THREE.AmbientLight('#fff',1);scene.add(amb);
 	point[1]=new THREE.PointLight('#fc9',    100);point[1].position.set(0,80,0);scene.add(point[1]);
