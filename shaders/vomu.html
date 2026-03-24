@@ -488,12 +488,14 @@ document.addEventListener('pointerdown', (event) => {
 		// Handle mouse-specific logic
 		//alert('Mouse click');
 		document.body.style.cursor='default';
+		dsp.style.color="#ff0";
 		mouse.x=event.clientX/window.innerWidth*2-1;
 		mouse.y=-(event.clientY/window.innerHeight)*2+1;
 		ray();
   	} else if (event.pointerType === 'touch') {
 		// Handle touch-specific logic
 		//alert('Touch interaction');
+		dsp.style.color="#0f0";
 		event.preventDefault();
 		const touch=event.touches[0];
 		mouse.x=touch.clientX/window.innerWidth * 2 - 1;
@@ -506,6 +508,7 @@ document.addEventListener('pointerdown', (event) => {
 		//alert(`Pen input with pressure: ${event.pressure}`);
 		event.preventDefault();
 		const touch=event.touches[0];
+		dsp.style.color="#fc0";
 		mouse.x=touch.clientX/window.innerWidth * 2 - 1;
 		mouse.y=-(touch.clientY/window.innerHeight) * 2 + 1;
 		raycaster.setFromCamera(mouse,camera);
