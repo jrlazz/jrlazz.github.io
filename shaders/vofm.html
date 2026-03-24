@@ -2,19 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>vofm_touch.html</title>
+<title>vofm.html</title>
 
 <link rel="icon" type="image/png" href="../img/github-mark.png">
-<meta name="description" content="... long_play ...">
+<meta name="description" content="Voice of Music">
 <meta name="twitter:image" content="img/ag_baboy_right.png" />
 <meta name="twitter:image:type" content="png" />
 <meta name="twitter:image:width" content="19" />
 <meta name="twitter:image:height" content="47" />
 
 <style>
-@font-face {font-family:myq;src:url('../fonte/MysteryQuest-Regular.ttf');}
 body{margin:0px;background:#048;overflow:hidden;font-family:myq;}
-span{font-size:41pt;color:#fc0;width:400px;}
 img{position:absolute;left:10px;top:10px;width:100px;height:100px;z-index:0;}
 </style>
 
@@ -42,7 +40,6 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { Reflector } from "three/addons/objects/Reflector.js";
 //import CSG from "https://cdn.jsdelivr.net/gh/manthrax/THREE-CSGMesh/three-csg.js"
-//import CSG from "../js/three-csg.js";
 import CSG from "../js/new_csg.js";
 
 var scene,camera,renderer,controls,loader,text,font;
@@ -79,7 +76,7 @@ var audio;
 var clock=new THREE.Clock();
 var cor;
 
-var dife=0.01;
+var dife=0.005;
 var angu=0.01;
 
 var xi=[];for(let z=1;z<10;z++){xi[z]=new THREE.Group();}
@@ -355,7 +352,7 @@ scene.add(xi[1]);
 	tt=new THREE.TextureLoader().load("img/music.png");
 	m=new THREE.SpriteMaterial({map:tt,rotation:Math.PI/4});
 	sprite1=new THREE.Sprite(m);
-	sprite1.scale.setScalar(20); 
+	sprite1.scale.setScalar(15); 
 	sprite1.position.set(-50,9,0); 
 	sprite2=sprite1.clone()
 	sprite2.position.set(50,9,0); 
@@ -385,10 +382,9 @@ function matc(a,b,c,cor){g=new THREE.BoxGeometry(a,b,c);m=new THREE.MeshStandard
 function animate(t){
 	requestAnimationFrame(animate);
 	const delta=clock.getDelta();
-www++;
-
-if(www<100){point[1].intensity=www*100;point[3].intensity=www*150;}
-if(www>100){www=1000;}
+	www++;
+	if(www<100){point[1].intensity=www*100;point[3].intensity=www*150;}
+	if(www>100){www=1000;}
 
 	if(ww>359){ww=0;}
 
@@ -397,12 +393,11 @@ if(www>100){www=1000;}
 	if(bM && bM2 && tela && xi[1] && axe[1] && axe[2] && w==0){apply();w=1;}
 
 	if(axe[1].rotation.z>-p/2){
-		axe[1].rotation.z -=angu*2; //  sprite1.position.copy(axe[1].position); 
-		axe[2].rotation.z -=angu*2;   // sprite.position.set(-50, 2, 0); 
-		//angu=-angu;
+		axe[1].rotation.z -=angu*2;
+		axe[2].rotation.z -=angu*2;
 	}
 
-	if(sprite1){sprite1.material.rotation=0.05*ww;}
+	if(sprite1){sprite1.material.rotation=-0.05*ww;}
 
 	if(tex[3] && sim==1){scene.add(tex[3]);sim=2;}
 
@@ -414,8 +409,8 @@ if(www>100){www=1000;}
 	if(tex[4] && ligado==0){
 		scene.add(tex[4]);
 		tex[4].rotation.y +=dife;
-		if(tex[4].rotation.y>0.0){dife=-dife;}
-		if(tex[4].rotation.y<-0.9){dife=-dife;}
+		if(tex[4].rotation.y>0.5){dife=-dife;}
+		if(tex[4].rotation.y<-0.5){dife=-dife;}
 	}
 
 	if(tex[4] && ligado==1){scene.remove(tex[4]);tex[4].rotation.y=0;}
@@ -458,14 +453,11 @@ if(www>100){www=1000;}
 		rM.add(tela);
 		rM.position.set(-10.5,12.8,0);
 		axe[1].add(rM.clone());
-//		axe[1].rotation.z=-p/3;
 		scene.add(axe[1]);
 			axe[2].add(rM.clone());
 			axe[2].rotation.y=-p;
-//			axe[2].rotation.z=-p/3;
 			scene.add(axe[2]);
 	}
-
 	controls.update();
 	renderer.render(scene,camera);
 }
