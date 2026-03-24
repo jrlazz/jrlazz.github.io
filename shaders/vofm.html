@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>vofm.html</title>
+<title>vofm_touch.html</title>
 
 <link rel="icon" type="image/png" href="../img/github-mark.png">
 <meta name="description" content="... long_play ...">
@@ -15,9 +15,7 @@
 @font-face {font-family:myq;src:url('../fonte/MysteryQuest-Regular.ttf');}
 body{margin:0px;background:#048;overflow:hidden;font-family:myq;}
 span{font-size:41pt;color:#fc0;width:400px;}
-img{width:100px;height:100px;}
-td{text-align:center;}
-table{position:absolute;left:10px;top:10px;z-index:0;}
+img{position:absolute;left:10px;top:10px;width:100px;height:100px;z-index:0;}
 </style>
 
 <script type="importmap">
@@ -32,10 +30,7 @@ table{position:absolute;left:10px;top:10px;z-index:0;}
 </head>
 
 <body>
-<table>
-<!-- <tr><td><span id="sp">Voice of Music</span></td></tr> -->
-<tr><td><img src="img/VofM.png"></td></tr>
-</table>
+<img src="img/VofM.png"></img>
 <audio id="au" loop="false" style="position:absolute;left:10px;top:60px;">
 	<source src="../anim/mp3/Laura.mp3" type="audio/mpeg">
 </audio>
@@ -100,23 +95,20 @@ var sprite1,sprite2;
 var v=[];
 
 function isIOSDevice() {
-  // Check user agent for classic iPhone, iPad, iPod strings
-  const userAgentCheck = /iPad|iPhone|iPod/.test(navigator.userAgent);
-
-  // Check for newer iPads that report as Mac but have touch capability (maxTouchPoints > 1)
-  const iPadCheck = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
-
-  // The combination provides a robust check for iOS devices
-  return userAgentCheck || iPadCheck;
+	// Check user agent for classic iPhone, iPad, iPod strings
+	var userAgentCheck = /iPad|iPhone|iPod/.test(navigator.userAgent);
+	// Check for newer iPads that report as Mac but have touch capability (maxTouchPoints > 1)
+	var iPadCheck = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+	// The combination provides a robust check for iOS devices
+	return userAgentCheck || iPadCheck;
 }
-
 
 function init(){
 
 	scene=new THREE.Scene();
 
 	camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,1000);
-	camera.position.set(0,60,160);
+	camera.position.set(0,60,140);
 	
 	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
 	renderer.setSize(window.innerWidth,window.innerHeight);
@@ -369,7 +361,7 @@ scene.add(xi[1]);
 	sprite2.position.set(50,9,0); 
 
 // **************** vols
-	g=new THREE.SphereGeometry(3,64);
+	g=new THREE.BoxGeometry(8,6,3);
 	for(let z=0;z<11;z++){
 		v[z]=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:'#090'}));
 		v[z].name="v"+z;
@@ -451,6 +443,8 @@ if(www>100){www=1000;}
 	if(eT>154 && eT<155){for(let z=10;z<19;z++){scene.remove(tex[z]);};scene.add(tex[19]);}
 	if(eT>165 && eT<166){for(let z=10;z<20;z++){scene.remove(tex[z]);};scene.add(tex[20]);}
 	if(eT>170 && eT<171){for(let z=10;z<21;z++){scene.remove(tex[z]);};scene.add(tex[21]);}
+
+//subtract, union and intersect
 
 	function apply(){
 		m=CSG;g=bM.geometry;
