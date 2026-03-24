@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>vofm.html</title>
+<title>vomu.html</title>
 
 <link rel="icon" type="image/png" href="../img/github-mark.png">
 <meta name="description" content="Voice of Music">
@@ -483,6 +483,8 @@ function ray(){
 	}
 }
 
+/*
+
 document.addEventListener('pointerdown', (event) => {
 	if (event.pointerType === 'mouse') {
 		// Handle mouse-specific logic
@@ -514,6 +516,24 @@ document.addEventListener('pointerdown', (event) => {
 		raycaster.setFromCamera(mouse,camera);
 		ray();
 	}
+});
+
+*/
+
+document.addEventListener('pointerdown', (event) => {
+
+    event.preventDefault(); // OK here
+
+    // universal (works for mouse, touch, pen)
+    mouse.x = event.clientX / window.innerWidth * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    // optional visual feedback
+    if (event.pointerType === 'mouse') dsp.style.color = "#ff0";
+    if (event.pointerType === 'touch') dsp.style.color = "#0f0";
+    if (event.pointerType === 'pen')   dsp.style.color = "#fc0";
+
+    ray(); //
 });
 
 function liga(){ax.rotation.z =-0.2;}
