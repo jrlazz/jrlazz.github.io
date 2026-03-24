@@ -498,8 +498,8 @@ document.addEventListener('pointerdown', (event) => {
 		dsp.style.color="#0f0";
 		event.preventDefault();
 		const touch=event.touches[0];
-		mouse.x=touch.clientX/window.innerWidth * 2 - 1;
-		mouse.y=-(touch.clientY/window.innerHeight) * 2 + 1;
+		mouse.x=event.clientX/window.innerWidth * 2 - 1;
+		mouse.y=-(event.clientY/window.innerHeight) * 2 + 1;
 		raycaster.setFromCamera(mouse,camera);
 		ray();
 	} else if (event.pointerType === 'pen') {
@@ -507,10 +507,10 @@ document.addEventListener('pointerdown', (event) => {
 		//console.log
 		//alert(`Pen input with pressure: ${event.pressure}`);
 		event.preventDefault();
-		const touch=event.touches[0];
+		const event=event.touches[0];
 		dsp.style.color="#fc0";
-		mouse.x=touch.clientX/window.innerWidth * 2 - 1;
-		mouse.y=-(touch.clientY/window.innerHeight) * 2 + 1;
+		mouse.x=event.clientX/window.innerWidth * 2 - 1;
+		mouse.y=-(event.clientY/window.innerHeight) * 2 + 1;
 		raycaster.setFromCamera(mouse,camera);
 		ray();
 	}
