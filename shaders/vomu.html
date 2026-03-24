@@ -14,6 +14,7 @@
 <style>
 body{margin:0px;background:#048;overflow:hidden;font-family:monospace;}
 img{position:absolute;left:10px;top:10px;width:100px;height:100px;z-index:0;}
+span{position:absolute;left:10px;top:200px;font-size:41px;color:#0ff;z-index:0;}
 </style>
 
 <script type="importmap">
@@ -28,6 +29,7 @@ img{position:absolute;left:10px;top:10px;width:100px;height:100px;z-index:0;}
 </head>
 
 <body>
+<span id="sp">Vol.:0.3</span>
 <img src="img/VofM.png"></img>
 <audio id="au" loop="false" style="position:absolute;left:10px;top:60px;">
 	<source src="../anim/mp3/Laura.mp3" type="audio/mpeg">
@@ -84,7 +86,8 @@ var axe=[];for(let z=1;z<10;z++){axe[z]=new THREE.AxesHelper(0.01);}
 var tocadisco=new THREE.Group();
 var wood,bri;
 
-var bM,bM2,rM;
+var dsp=document.getElementById("sp");
+var bM, bM2;
 var w=0,ww=0,www=0;
 var tela;
 var sprite1,sprite2;
@@ -114,11 +117,10 @@ function init(){
 
 	controls=new OrbitControls(camera,renderer.domElement);
 
-	window.addEventListener("click",onClick);
-
-	if (isIOSDevice()){
-		window.addEventListener("touchstart",onTouchStart,{passive:false});
-	}
+	//window.addEventListener("click",onClick);
+	//if (isIOSDevice()){
+	//	window.addEventListener("touchstart",onTouchStart,{passive:false});
+	//}
 
 	amb=new THREE.AmbientLight('#fff',1);scene.add(amb);
 	point[1]=new THREE.PointLight('#fc9',    100);point[1].position.set(0,80,0);scene.add(point[1]);
@@ -445,7 +447,7 @@ function animate(t){
 		let bCSG=CSG.fromMesh(bM,0);
 		let bCSG2=CSG.fromMesh(bM2,0);
 		bCSG=bCSG.subtract(bCSG2);
-		rM=CSG.toMesh(bCSG,bM.matrix,[bM.material,bM2.material]);
+		const rM=CSG.toMesh(bCSG,bM.matrix,[bM.material,bM2.material]);
 		rM.geometry.computeVertexNormals();
 		rM.updateMatrix();rM.updateMatrixWorld();
 		scene.remove(bM);scene.remove(bM2);
@@ -461,13 +463,6 @@ function animate(t){
 	renderer.render(scene,camera);
 }
 
-function onClick(event){
-	document.body.style.cursor='default';
-	mouse.x=event.clientX/window.innerWidth*2-1;
-	mouse.y=-(event.clientY/window.innerHeight)*2+1;
-	ray();
-}
-
 function ray(){
 	raycaster.setFromCamera(mouse,camera);
 	intersects=raycaster.intersectObjects(scene.children,true);
@@ -481,20 +476,42 @@ function ray(){
 			for(let z=1;z<11;z++){v[z].material.color.set('#090');}
 			const q=Number(selected.name.substring(1));
 			audio.volume=selected.name.substring(1)/10;
+			dsp.innerText="Vol.:"+audio.volume;
 			v[q].material.color.set('#0f0');
 			if(q==0){v[q].material.color.set('#f00');}
 		}
 	}
 }
 
-function onTouchStart(event){
-	event.preventDefault();
-	const touch=event.touches[0];
-	mouse.x=touch.clientX/window.innerWidth * 2 - 1;
-	mouse.y=-(touch.clientY/window.innerHeight) * 2 + 1;
-	raycaster.setFromCamera(mouse,camera);
-	ray();
-}
+document.addEventListener('pointerdown', (event) => {
+	if (event.pointerType === 'mouse') {
+		// Handle mouse-specific logic
+		//alert('Mouse click');
+		document.body.style.cursor='default';
+		mouse.x=event.clientX/window.innerWidth*2-1;
+		mouse.y=-(event.clientY/window.innerHeight)*2+1;
+		ray();
+  	} else if (event.pointerType === 'touch') {
+		// Handle touch-specific logic
+		//alert('Touch interaction');
+		event.preventDefault();
+		const touch=event.touches[0];
+		mouse.x=touch.clientX/window.innerWidth * 2 - 1;
+		mouse.y=-(touch.clientY/window.innerHeight) * 2 + 1;
+		raycaster.setFromCamera(mouse,camera);
+		ray();
+	} else if (event.pointerType === 'pen') {
+		// Handle pen-specific logic, potentially using pressure or tilt properties
+		//console.log
+		//alert(`Pen input with pressure: ${event.pressure}`);
+		event.preventDefault();
+		const touch=event.touches[0];
+		mouse.x=touch.clientX/window.innerWidth * 2 - 1;
+		mouse.y=-(touch.clientY/window.innerHeight) * 2 + 1;
+		raycaster.setFromCamera(mouse,camera);
+		ray();
+	}
+});
 
 function liga(){ax.rotation.z =-0.2;}
 
