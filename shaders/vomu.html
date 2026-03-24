@@ -29,7 +29,7 @@ span{position:absolute;left:10px;top:200px;font-size:41px;color:#0ff;z-index:0;}
 </head>
 
 <body>
-<span id="sp">Vol.:0.3</span>
+<span id="sp">?Vol.:0.3</span>
 <img src="img/VofM.png"></img>
 <audio id="au" loop="false" style="position:absolute;left:10px;top:60px;">
 	<source src="../anim/mp3/Laura.mp3" type="audio/mpeg">
@@ -497,7 +497,7 @@ document.addEventListener('pointerdown', (event) => {
 		//alert('Touch interaction');
 		dsp.style.color="#0f0";
 		event.preventDefault();
-		const touch=event.touches[0];
+		const event=event.touches[0];
 		mouse.x=event.clientX/window.innerWidth * 2 - 1;
 		mouse.y=-(event.clientY/window.innerHeight) * 2 + 1;
 		raycaster.setFromCamera(mouse,camera);
