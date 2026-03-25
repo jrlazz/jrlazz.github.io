@@ -13,7 +13,10 @@
 
 <style>
 body{margin:0px;background:#048;overflow:hidden;font-family:monospace;}
-img{position:absolute;left:10px;top:10px;width:100px;height:100px;z-index:0;}
+img{width:100px;height:100px;}
+span{font-size:41px;color:#0ff;}
+table{position:absolute;left:5px;top:5px;width:200px;z-index:0;}
+td{text-align:center;}
 </style>
 
 <script type="importmap">
@@ -28,7 +31,10 @@ img{position:absolute;left:10px;top:10px;width:100px;height:100px;z-index:0;}
 </head>
 
 <body>
-<img src="img/VofM.png"></img>
+<table>
+<tr><td><img src="img/VofM.png"></img></img></td></tr>
+<tr><td><span id="sp">Vol 0.3</span></td></tr>
+</table>
 <audio id="au" loop="false" style="position:absolute;left:10px;top:60px;">
 	<source src="../anim/mp3/Laura.mp3" type="audio/mpeg">
 </audio>
@@ -57,16 +63,16 @@ var selected;
 var intersects=[];
 var tex=[];
 var letra=[];
-letra[10]="Laura is the face in the misty light";
-letra[11]="Footsteps that you hear down the hall";
-letra[12]="The laugh that floats on a summer night";
-letra[13]="That you can never quite recall";
+letra[10]="Laura is the face\nin the misty light";
+letra[11]="Footsteps that you hear\n    down the hall";
+letra[12]="The laugh that floats\n  on a summer night";
+letra[13]="That you can never\n   quite recall";
 letra[14]="And you see Laura";
-letra[15]="on a train that is passing through";
-letra[16]="Those eyes, how familiar they seem";
-letra[17]="She gave your very first kiss to you";
-letra[18]="That was Laura, but she's only a dream";
-letra[19]="She gave your very first kiss to you";
+letra[15]="     on a train\nthat is passing through";
+letra[16]="     Those eyes,\nhow familiar they seem";
+letra[17]="She gave your very\nfirst kiss to you";
+letra[18]="   That was Laura,\nbut she's only a dream";
+letra[19]="She gave your very\nfirst kiss to you";
 letra[20]="That was Laura,";
 letra[21]="but she's only a dream";
 
@@ -84,6 +90,7 @@ var axe=[];for(let z=1;z<10;z++){axe[z]=new THREE.AxesHelper(0.01);}
 var tocadisco=new THREE.Group();
 var wood,bri;
 
+var dsp=document.getElementById("sp");
 var bM,bM2,rM;
 var w=0,ww=0,www=0;
 var tela;
@@ -114,10 +121,10 @@ function init(){
 
 	controls=new OrbitControls(camera,renderer.domElement);
 
-	window.addEventListener("click",onClick);
-
 	if (isIOSDevice()){
 		window.addEventListener("touchstart",onTouchStart,{passive:false});
+	}else{
+		window.addEventListener("click",onClick);
 	}
 
 	amb=new THREE.AmbientLight('#fff',1);scene.add(amb);
@@ -326,7 +333,7 @@ scene.add(xi[1]);
 	loader.load('../fonte/Cascadia_Regular.json',function(response){font=response;createText();});
 	function createText(){
 		m=[new THREE.MeshStandardMaterial({color:'#fc0'}),new THREE.MeshStandardMaterial({color:'#259'})];
-		g=new TextGeometry("Voice of Music",{font:font,size:4,depth:1,curveSegments:12,bevelEnabled:false});
+		g=new TextGeometry("Voice of Music",{font:font,size:5,depth:2,curveSegments:12,bevelEnabled:false});
 		g.center();
 		tex[3]=new THREE.Mesh(g,m);
 		tex[3].position.set(0,-20,20);
@@ -335,12 +342,12 @@ scene.add(xi[1]);
 			tex[4]=new THREE.Mesh(g,m);
 			tex[4].position.set(0,40,10);
 		for(let z=10;z<22;z++){
-			g=new TextGeometry(letra[z],{font:font,size:4,depth:1,curveSegments:12,bevelEnabled:false});g.center();
+			g=new TextGeometry(letra[z],{font:font,size:5,depth:2,curveSegments:12,bevelEnabled:false});g.center();
 			tex[z]=new THREE.Mesh(g,m);
 			tex[z].position.set(0,-20,30);
 		}
-		m=[new THREE.MeshStandardMaterial({color:'#ff0'}),new THREE.MeshStandardMaterial({color:'#259'})];
-		g=new TextGeometry("... Volume ...",{font:font,size:4,depth:1,curveSegments:12,bevelEnabled:false});
+		m=[new THREE.MeshStandardMaterial({color:'#0f0'}),new THREE.MeshStandardMaterial({color:'#cc0'})];
+		g=new TextGeometry("Volume",{font:font,size:4,depth:2,curveSegments:12,bevelEnabled:false});
 		g.center();
 		tex[1]=new THREE.Mesh(g,m);
 		tex[1].position.set(0,70,0);
@@ -481,6 +488,7 @@ function ray(){
 			for(let z=1;z<11;z++){v[z].material.color.set('#090');}
 			const q=Number(selected.name.substring(1));
 			audio.volume=selected.name.substring(1)/10;
+			dsp.innerText="Vol "+Number(audio.volume).toFixed(1);
 			v[q].material.color.set('#0f0');
 			if(q==0){v[q].material.color.set('#f00');}
 		}
