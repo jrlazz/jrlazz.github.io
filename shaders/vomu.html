@@ -13,8 +13,10 @@
 
 <style>
 body{margin:0px;background:#048;overflow:hidden;font-family:monospace;}
-img{position:absolute;left:10px;top:10px;width:100px;height:100px;z-index:0;}
-span{position:absolute;left:10px;top:200px;font-size:41px;color:#0ff;z-index:0;}
+img{width:100px;height:100px;}
+span{font-size:41px;color:#0ff;}
+table{position:absolute;left:5px;top:5px;width:200px;z-index:0;}
+td{text-align:center;}
 </style>
 
 <script type="importmap">
@@ -29,8 +31,10 @@ span{position:absolute;left:10px;top:200px;font-size:41px;color:#0ff;z-index:0;}
 </head>
 
 <body>
-<span id="sp">?Vol.:0.3</span>
-<img src="img/VofM.png"></img>
+<table>
+<tr><td><img src="img/VofM.png"></img></img></td></tr>
+<tr><td><span id="sp">Vol 0.3</span></td></tr>
+
 <audio id="au" loop="false" style="position:absolute;left:10px;top:60px;">
 	<source src="../anim/mp3/Laura.mp3" type="audio/mpeg">
 </audio>
@@ -476,64 +480,23 @@ function ray(){
 			for(let z=1;z<11;z++){v[z].material.color.set('#090');}
 			const q=Number(selected.name.substring(1));
 			audio.volume=selected.name.substring(1)/10;
-			dsp.innerText="Vol.:"+audio.volume;
+			dsp.innerText="Vol "+Number(audio.volume).toFixed(1);
 			v[q].material.color.set('#0f0');
 			if(q==0){v[q].material.color.set('#f00');}
 		}
 	}
 }
 
-/*
-
-document.addEventListener('pointerdown', (event) => {
-	if (event.pointerType === 'mouse') {
-		// Handle mouse-specific logic
-		//alert('Mouse click');
-		document.body.style.cursor='default';
-		dsp.style.color="#ff0";
-		mouse.x=event.clientX/window.innerWidth*2-1;
-		mouse.y=-(event.clientY/window.innerHeight)*2+1;
-		ray();
-  	} else if (event.pointerType === 'touch') {
-		// Handle touch-specific logic
-		//alert('Touch interaction');
-		dsp.style.color="#0f0";
-		event.preventDefault();
-		const event=event.touches[0];
-		mouse.x=event.clientX/window.innerWidth * 2 - 1;
-		mouse.y=-(event.clientY/window.innerHeight) * 2 + 1;
-		raycaster.setFromCamera(mouse,camera);
-		ray();
-	} else if (event.pointerType === 'pen') {
-		// Handle pen-specific logic, potentially using pressure or tilt properties
-		//console.log
-		//alert(`Pen input with pressure: ${event.pressure}`);
-		event.preventDefault();
-		const event=event.touches[0];
-		dsp.style.color="#fc0";
-		mouse.x=event.clientX/window.innerWidth * 2 - 1;
-		mouse.y=-(event.clientY/window.innerHeight) * 2 + 1;
-		raycaster.setFromCamera(mouse,camera);
-		ray();
-	}
-});
-
-*/
-
-document.addEventListener('pointerdown', (event) => {
-
-    event.preventDefault(); // OK here
-
-    // universal (works for mouse, touch, pen)
-    mouse.x = event.clientX / window.innerWidth * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-    // optional visual feedback
-    if (event.pointerType === 'mouse') dsp.style.color = "#ff0";
-    if (event.pointerType === 'touch') dsp.style.color = "#0f0";
-    if (event.pointerType === 'pen')   dsp.style.color = "#fc0";
-
-    ray(); //
+document.addEventListener('pointerdown',(event) => {
+	event.preventDefault(); // OK here
+	// universal (works for mouse, touch, pen)
+	mouse.x=event.clientX / window.innerWidth * 2 - 1;
+	mouse.y=-(event.clientY / window.innerHeight) * 2 + 1;
+	// optional visual feedback
+	if(event.pointerType === 'mouse') dsp.style.color="#ff0";
+	if(event.pointerType === 'touch') dsp.style.color="#0f0";
+	if(event.pointerType === 'pen')   dsp.style.color="#f0f";
+	ray();
 });
 
 function liga(){ax.rotation.z =-0.2;}
