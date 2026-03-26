@@ -34,7 +34,7 @@ td{text-align:center;}
 <table>
 <tr><td><img src="img/VofM.png"></img></img></td></tr>
 <tr><td><span id="sp">Vol 0.3</span></td></tr>
-
+</table>
 <audio id="au" loop="false" style="position:absolute;left:10px;top:60px;">
 	<source src="../anim/mp3/Laura.mp3" type="audio/mpeg">
 </audio>
@@ -78,7 +78,23 @@ letra[21]="but she's only a dream";
 
 var sim=0;
 var ligado=0;
+
 var audio;
+var audioUnlocked = false;
+
+function unlockAudio() {
+	if (audioUnlocked) return;
+
+	audio.play().then(() => {
+		audio.pause();
+		audio.currentTime = 0;
+		audioUnlocked = true;
+		console.log("Audio unlocked");
+	}).catch(() => {
+		console.log("Unlock failed");
+	});
+}
+
 var clock=new THREE.Clock();
 var cor;
 
@@ -91,7 +107,7 @@ var tocadisco=new THREE.Group();
 var wood,bri;
 
 var dsp=document.getElementById("sp");
-var bM, bM2;
+var bM,bM2,rM;
 var w=0,ww=0,www=0;
 var tela;
 var sprite1,sprite2;
@@ -473,7 +489,13 @@ function ray(){
 	if (intersects.length>0){
 		selected=intersects[0].object;
 		if(selected.name.substring(0,1)!="v"){
-			if(ligado==0){liga();ligado=1;audio.play();return}
+			if(ligado==0){
+				liga();
+				ligado=1;
+				//audio.play();
+				if(audioUnlocked) audio.play();
+				return
+			}
 			if(ligado==1){desliga();ligado=0;audio.pause();for(let z=10;z<21;z++){scene.remove(tex[z]);};}
 		}else{
 			v[0].material.color.set('#900');
@@ -488,11 +510,10 @@ function ray(){
 }
 
 document.addEventListener('pointerdown',(event) => {
-	event.preventDefault(); // OK here
-	// universal (works for mouse, touch, pen)
+	unlockAudio(); 
+	event.preventDefault();
 	mouse.x=event.clientX / window.innerWidth * 2 - 1;
 	mouse.y=-(event.clientY / window.innerHeight) * 2 + 1;
-	// optional visual feedback
 	if(event.pointerType === 'mouse') dsp.style.color="#ff0";
 	if(event.pointerType === 'touch') dsp.style.color="#0f0";
 	if(event.pointerType === 'pen')   dsp.style.color="#f0f";
