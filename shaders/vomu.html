@@ -142,6 +142,17 @@ function init(){
 	//	window.addEventListener("touchstart",onTouchStart,{passive:false});
 	//}
 
+renderer.domElement.addEventListener("pointerdown", (event) => {
+	unlockAudio(); 
+	event.preventDefault();
+	mouse.x=event.clientX / window.innerWidth * 2 - 1;
+	mouse.y=-(event.clientY / window.innerHeight) * 2 + 1;
+	if(event.pointerType === 'mouse') dsp.style.color="#ff0";
+	if(event.pointerType === 'touch') dsp.style.color="#0f0";
+	if(event.pointerType === 'pen')   dsp.style.color="#f0f";
+	ray();
+});
+
 	amb=new THREE.AmbientLight('#fff',1);scene.add(amb);
 	point[1]=new THREE.PointLight('#fc9',    100);point[1].position.set(0,80,0);scene.add(point[1]);
 	//point[2]=new THREE.PointLight('#fff',15000);point[2].position.set(-40,60,50);scene.add(point[2]);
@@ -508,7 +519,7 @@ function ray(){
 		}
 	}
 }
-
+/*
 document.addEventListener('pointerdown',(event) => {
 	unlockAudio(); 
 	event.preventDefault();
@@ -519,7 +530,7 @@ document.addEventListener('pointerdown',(event) => {
 	if(event.pointerType === 'pen')   dsp.style.color="#f0f";
 	ray();
 });
-
+*/
 function liga(){ax.rotation.z =-0.2;}
 
 function desliga(){ax.rotation.z =0.2;}
