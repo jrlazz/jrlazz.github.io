@@ -80,7 +80,7 @@ var sim=0;
 var ligado=0;
 
 var audio;
-var audioUnlocked = false;
+var audioUnlocked=false;
 
 function unlockAudio() {
 	if (audioUnlocked) return;
@@ -493,8 +493,8 @@ function ray(){
 				liga();
 				ligado=1;
 				//audio.play();
-				if(audioUnlocked) audio.play();
-				return
+				if(audioUnlocked){audio.play();};
+				return;
 			}
 			if(ligado==1){desliga();ligado=0;audio.pause();for(let z=10;z<21;z++){scene.remove(tex[z]);};}
 		}else{
