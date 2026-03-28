@@ -491,6 +491,7 @@ function onClick(event){
 }
 
 function ray(){
+	diP.style.display="none";
 	raycaster.setFromCamera(mouse,camera);
 	intersects=raycaster.intersectObjects(scene.children,true);
 	if (intersects.length>0){
