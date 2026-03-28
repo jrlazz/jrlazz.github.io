@@ -39,7 +39,7 @@ td{text-align:center;}
 	<source src="../anim/mp3/Laura.mp3" type="audio/mpeg">
 </audio>
 <center>
-<img id="iP" src="img/ios.png" style="left:0px;top:0px;width:100px;height:100px;display:''"></img>
+<img id="iP" src="img/ios.png" style="left:0px;top:0px;width:100px;height:100px;display:none"></img>
 </center>
 
 <script type="module">
@@ -110,6 +110,9 @@ function isIOSDevice() {
 	return userAgentCheck || iPadCheck;
 }
 
+var isMobile=navigator.userAgent.match(/(mobi)/i) ? true : false;
+
+
 var iW=window.innerWidth;
 var iH=window.innerHeight;
 
@@ -129,8 +132,10 @@ function init(){
 
 	controls=new OrbitControls(camera,renderer.domElement);
 
-	if (isIOSDevice()){
+	//if isIOSDevice()){
+	if(isMobile){
 		window.addEventListener("touchstart",onTouchStart,{passive:false});
+		diP.style.display="";
 	}else{
 		window.addEventListener("click",onClick);
 	}
