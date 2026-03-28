@@ -38,13 +38,15 @@ td{text-align:center;}
 <audio id="au" loop="false" style="position:absolute;left:10px;top:60px;">
 	<source src="../anim/mp3/Laura.mp3" type="audio/mpeg">
 </audio>
+<center>
+<img id="iP" src="img/mobile.png" style="left:0px;top:0px;width:1px;height:1px;display:"></img>
+</center>
 
 <script type="module">
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
-import { Reflector } from "three/addons/objects/Reflector.js";
 //import CSG from "https://cdn.jsdelivr.net/gh/manthrax/THREE-CSGMesh/three-csg.js"
 import CSG from "../js/new_csg.js";
 
@@ -63,38 +65,22 @@ var selected;
 var intersects=[];
 var tex=[];
 var letra=[];
-letra[10]="Laura is the face in the misty light";
-letra[11]="Footsteps that you hear down the hall";
-letra[12]="The laugh that floats on a summer night";
-letra[13]="That you can never quite recall";
+letra[10]="Laura is the face\nin the misty light";
+letra[11]="Footsteps that you hear\n    down the hall";
+letra[12]="The laugh that floats\n  on a summer night";
+letra[13]="That you can never\n   quite recall";
 letra[14]="And you see Laura";
-letra[15]="on a train that is passing through";
-letra[16]="Those eyes, how familiar they seem";
-letra[17]="She gave your very first kiss to you";
-letra[18]="That was Laura, but she's only a dream";
-letra[19]="She gave your very first kiss to you";
+letra[15]="     on a train\nthat is passing through";
+letra[16]="     Those eyes,\nhow familiar they seem";
+letra[17]="She gave your very\nfirst kiss to you";
+letra[18]="   That was Laura,\nbut she's only a dream";
+letra[19]="She gave your very\nfirst kiss to you";
 letra[20]="That was Laura,";
 letra[21]="but she's only a dream";
 
 var sim=0;
 var ligado=0;
-
 var audio;
-var audioUnlocked=false;
-
-function unlockAudio() {
-	if (audioUnlocked) return;
-
-	audio.play().then(() => {
-		audio.pause();
-		audio.currentTime = 0;
-		audioUnlocked = true;
-		console.log("Audio unlocked");
-	}).catch(() => {
-		console.log("Unlock failed");
-	});
-}
-
 var clock=new THREE.Clock();
 var cor;
 
@@ -107,27 +93,28 @@ var tocadisco=new THREE.Group();
 var wood,bri;
 
 var dsp=document.getElementById("sp");
+var diP=document.getElementById("iP");
+
 var bM,bM2,rM;
 var w=0,ww=0,www=0;
 var tela;
 var sprite1,sprite2;
 var v=[];
 
-function isIOSDevice() {
-	// Check user agent for classic iPhone, iPad, iPod strings
-	var userAgentCheck = /iPad|iPhone|iPod/.test(navigator.userAgent);
-	// Check for newer iPads that report as Mac but have touch capability (maxTouchPoints > 1)
-	var iPadCheck = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
-	// The combination provides a robust check for iOS devices
-	return userAgentCheck || iPadCheck;
-}
+var isMobile=navigator.userAgent.match(/(mobi)/i) ? true : false;
+
+var iW=window.innerWidth;
+var iH=window.innerHeight;
 
 function init(){
+
+	//diP.onclick=function Cli(){diP.style.display="none";}
 
 	scene=new THREE.Scene();
 
 	camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,1000);
-	camera.position.set(0,60,150);
+	camera.position.set(0,60,160);
+	scene.position.set(3000,0,0);
 	
 	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
 	renderer.setSize(window.innerWidth,window.innerHeight);
@@ -137,21 +124,13 @@ function init(){
 
 	controls=new OrbitControls(camera,renderer.domElement);
 
-	//window.addEventListener("click",onClick);
-	//if (isIOSDevice()){
-	//	window.addEventListener("touchstart",onTouchStart,{passive:false});
-	//}
-
-renderer.domElement.addEventListener("pointerdown", (event) => {
-	unlockAudio(); 
-	event.preventDefault();
-	mouse.x=event.clientX / window.innerWidth * 2 - 1;
-	mouse.y=-(event.clientY / window.innerHeight) * 2 + 1;
-	if(event.pointerType === 'mouse') dsp.style.color="#ff0";
-	if(event.pointerType === 'touch') dsp.style.color="#0f0";
-	if(event.pointerType === 'pen')   dsp.style.color="#f0f";
-	ray();
-});
+	if(isMobile){
+		window.addEventListener("touchstart",onTouchStart,{passive:false});
+	}else{
+		window.addEventListener("click",onClick);
+		diP.style.display="none";
+		scene.position.set(0,0,0);
+	}
 
 	amb=new THREE.AmbientLight('#fff',1);scene.add(amb);
 	point[1]=new THREE.PointLight('#fc9',    100);point[1].position.set(0,80,0);scene.add(point[1]);
@@ -359,7 +338,7 @@ scene.add(xi[1]);
 	loader.load('../fonte/Cascadia_Regular.json',function(response){font=response;createText();});
 	function createText(){
 		m=[new THREE.MeshStandardMaterial({color:'#fc0'}),new THREE.MeshStandardMaterial({color:'#259'})];
-		g=new TextGeometry("Voice of Music",{font:font,size:4,depth:1,curveSegments:12,bevelEnabled:false});
+		g=new TextGeometry("Voice of Music",{font:font,size:5,depth:2,curveSegments:12,bevelEnabled:false});
 		g.center();
 		tex[3]=new THREE.Mesh(g,m);
 		tex[3].position.set(0,-20,20);
@@ -368,12 +347,12 @@ scene.add(xi[1]);
 			tex[4]=new THREE.Mesh(g,m);
 			tex[4].position.set(0,40,10);
 		for(let z=10;z<22;z++){
-			g=new TextGeometry(letra[z],{font:font,size:4,depth:1,curveSegments:12,bevelEnabled:false});g.center();
+			g=new TextGeometry(letra[z],{font:font,size:4.5,depth:2,curveSegments:12,bevelEnabled:false});g.center();
 			tex[z]=new THREE.Mesh(g,m);
 			tex[z].position.set(0,-20,30);
 		}
-		m=[new THREE.MeshStandardMaterial({color:'#ff0'}),new THREE.MeshStandardMaterial({color:'#259'})];
-		g=new TextGeometry("... Volume ...",{font:font,size:4,depth:1,curveSegments:12,bevelEnabled:false});
+		m=[new THREE.MeshStandardMaterial({color:'#0f0'}),new THREE.MeshStandardMaterial({color:'#cc0'})];
+		g=new TextGeometry("Volume",{font:font,size:4,depth:2,curveSegments:12,bevelEnabled:false});
 		g.center();
 		tex[1]=new THREE.Mesh(g,m);
 		tex[1].position.set(0,70,0);
@@ -456,8 +435,6 @@ function animate(t){
 		ww=0;
 	}
 
-	//dsp.innerText=eT.toFixed(2);
-
 	if(eT>20 && eT<21){  scene.remove(tex[ 3]);scene.add(tex[10]);}
 	if(eT>34 && eT<35){  scene.remove(tex[10]);scene.add(tex[11]);}
 	if(eT>50 && eT<51){  for(let z=10;z<12;z++){scene.remove(tex[z]);};scene.add(tex[12]);}
@@ -471,14 +448,12 @@ function animate(t){
 	if(eT>165 && eT<166){for(let z=10;z<20;z++){scene.remove(tex[z]);};scene.add(tex[20]);}
 	if(eT>170 && eT<171){for(let z=10;z<21;z++){scene.remove(tex[z]);};scene.add(tex[21]);}
 
-//subtract, union and intersect
-
 	function apply(){
 		m=CSG;g=bM.geometry;
 		let bCSG=CSG.fromMesh(bM,0);
 		let bCSG2=CSG.fromMesh(bM2,0);
 		bCSG=bCSG.subtract(bCSG2);
-		const rM=CSG.toMesh(bCSG,bM.matrix,[bM.material,bM2.material]);
+		rM=CSG.toMesh(bCSG,bM.matrix,[bM.material,bM2.material]);
 		rM.geometry.computeVertexNormals();
 		rM.updateMatrix();rM.updateMatrixWorld();
 		scene.remove(bM);scene.remove(bM2);
@@ -494,19 +469,21 @@ function animate(t){
 	renderer.render(scene,camera);
 }
 
+function onClick(event){
+	document.body.style.cursor='default';
+	mouse.x=event.clientX/window.innerWidth*2-1;
+	mouse.y=-(event.clientY/window.innerHeight)*2+1;
+	ray();
+}
+
 function ray(){
+	diP.style.display="none";
 	raycaster.setFromCamera(mouse,camera);
 	intersects=raycaster.intersectObjects(scene.children,true);
 	if (intersects.length>0){
 		selected=intersects[0].object;
 		if(selected.name.substring(0,1)!="v"){
-			if(ligado==0){
-				liga();
-				ligado=1;
-				//audio.play();
-				if(audioUnlocked){audio.play();};
-				return;
-			}
+			if(ligado==0){liga();ligado=1;audio.play();return}
 			if(ligado==1){desliga();ligado=0;audio.pause();for(let z=10;z<21;z++){scene.remove(tex[z]);};}
 		}else{
 			v[0].material.color.set('#900');
@@ -519,18 +496,17 @@ function ray(){
 		}
 	}
 }
-/*
-document.addEventListener('pointerdown',(event) => {
-	unlockAudio(); 
+
+function onTouchStart(event){
+	scene.position.set(0,0,0);
 	event.preventDefault();
-	mouse.x=event.clientX / window.innerWidth * 2 - 1;
-	mouse.y=-(event.clientY / window.innerHeight) * 2 + 1;
-	if(event.pointerType === 'mouse') dsp.style.color="#ff0";
-	if(event.pointerType === 'touch') dsp.style.color="#0f0";
-	if(event.pointerType === 'pen')   dsp.style.color="#f0f";
+	const touch=event.touches[0];
+	mouse.x=touch.clientX/window.innerWidth * 2 - 1;
+	mouse.y=-(touch.clientY/window.innerHeight) * 2 + 1;
+	raycaster.setFromCamera(mouse,camera);
 	ray();
-});
-*/
+}
+
 function liga(){ax.rotation.z =-0.2;}
 
 function desliga(){ax.rotation.z =0.2;}
@@ -544,6 +520,20 @@ window.addEventListener("resize",() => {
 
 init();
 animate();
+
+if(iW<iH){
+	diP.style.width=iW+"px";diP.style.height=iW+"px";
+}else{
+	diP.style.width=iH+"px";diP.style.height=iH+"px";
+}
+screen.orientation.addEventListener('change', function(e) {
+	const orientationType = screen.orientation.type;
+	if(iW<iH){
+		diP.style.width=iW+"px";diP.style.height=iW+"px";
+	}else{
+		diP.style.width=iH+"px";diP.style.height=iH+"px";
+	}
+});
 
 </script>
 </body>
