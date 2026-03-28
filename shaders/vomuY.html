@@ -119,6 +119,7 @@ var iH=window.innerHeight;
 function init(){
 
 	diP.onclick=function LIMP(){diP.style.display="none";}
+	diP.onTouch=function LIMP(){diP.style.display="none";}
 	scene=new THREE.Scene();
 
 	camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,1000);
@@ -540,14 +541,14 @@ if(iW<iH){
 screen.orientation.addEventListener('change', function(e) {
 	// Get the current orientation type (e.g., "portrait-primary", "landscape-secondary")
 		const orientationType = screen.orientation.type;
-		alert('Orientation changed to:', orientationType);
+		//alert('Orientation changed to:', orientationType);
 		if(iW<iH){dios.style.width=iW;dios.style.height=iW;}
 	if (orientationType.startsWith('portrait')) {
 		// Code to run when in portrait mode
-		alert('Device is in Portrait mode');
+		//alert('Device is in Portrait mode');
 	} else if (orientationType.startsWith('landscape')) {
 		// Code to run when in landscape mode
-		alert('Device is in Landscape mode');
+		//alert('Device is in Landscape mode');
 	}
 });
 
