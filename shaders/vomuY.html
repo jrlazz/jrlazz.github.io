@@ -39,7 +39,7 @@ td{text-align:center;}
 	<source src="../anim/mp3/Laura.mp3" type="audio/mpeg">
 </audio>
 <center>
-<img id="iP" src="img/ios.png" style="left:0px;top:0px;width:100px;height:100px;display:"></img>
+<img id="iP" src="img/mobile.png" style="left:0px;top:0px;width:1px;height:1px;display:"></img>
 </center>
 
 <script type="module">
@@ -118,13 +118,14 @@ var iH=window.innerHeight;
 
 function init(){
 
-	diP.onclick=function Cli(){diP.style.display="none";}
+	//diP.onclick=function Cli(){diP.style.display="none";}
 	//diP.onTouch=function Tou(){diP.style.display="none";}
 
 	scene=new THREE.Scene();
 
 	camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,1000);
 	camera.position.set(0,60,160);
+	scene.position.set(1000,0,0);
 	
 	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
 	renderer.setSize(window.innerWidth,window.innerHeight);
@@ -140,6 +141,7 @@ function init(){
 	}else{
 		window.addEventListener("click",onClick);
 		diP.style.display="none";
+		scene.position.set(0,0,0);
 	}
 
 	amb=new THREE.AmbientLight('#fff',1);scene.add(amb);
@@ -492,6 +494,7 @@ function onClick(event){
 
 function ray(){
 	diP.style.display="none";
+	scene.position.set(0,0,0);
 	raycaster.setFromCamera(mouse,camera);
 	intersects=raycaster.intersectObjects(scene.children,true);
 	if (intersects.length>0){
