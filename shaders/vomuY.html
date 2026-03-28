@@ -39,7 +39,7 @@ td{text-align:center;}
 	<source src="../anim/mp3/Laura.mp3" type="audio/mpeg">
 </audio>
 <center>
-<img id="iP" src="img/ios.png" style="left:0px;top:0px;width:100px;height:100px;display:none"></img>
+<img id="iP" src="img/ios.png" style="left:0px;top:0px;width:100px;height:100px;display:"></img>
 </center>
 
 <script type="module">
@@ -118,8 +118,9 @@ var iH=window.innerHeight;
 
 function init(){
 
-	diP.onclick=function LIMP(){diP.style.display="none";}
-	diP.onTouch=function LIMP(){diP.style.display="none";}
+	diP.onClick=function Cli(){diP.style.display="none";}
+	diP.onTouch=function Tou(){diP.style.display="none";}
+
 	scene=new THREE.Scene();
 
 	camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,1000);
@@ -136,9 +137,9 @@ function init(){
 	//if isIOSDevice()){
 	if(isMobile){
 		window.addEventListener("touchstart",onTouchStart,{passive:false});
-		diP.style.display="";
 	}else{
 		window.addEventListener("click",onClick);
+		diP.style.display="none";
 	}
 
 	amb=new THREE.AmbientLight('#fff',1);scene.add(amb);
