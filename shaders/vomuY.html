@@ -140,7 +140,7 @@ function init(){
 		window.addEventListener("touchstart",onTouchStart,{passive:false});
 	}else{
 		window.addEventListener("click",onClick);
-		diP.style.display="none";
+		//diP.style.display="none";
 		scene.position.set(0,0,0);
 	}
 
@@ -494,7 +494,6 @@ function onClick(event){
 
 function ray(){
 	diP.style.display="none";
-	scene.position.set(0,0,0);
 	raycaster.setFromCamera(mouse,camera);
 	intersects=raycaster.intersectObjects(scene.children,true);
 	if (intersects.length>0){
@@ -515,6 +514,7 @@ function ray(){
 }
 
 function onTouchStart(event){
+	scene.position.set(0,0,0);
 	event.preventDefault();
 	const touch=event.touches[0];
 	mouse.x=touch.clientX/window.innerWidth * 2 - 1;
