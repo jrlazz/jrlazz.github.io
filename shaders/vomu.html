@@ -502,6 +502,11 @@ function onTouchStart(event){
 
 function myTifun(){
 	scene.position.set(0,0,0);
+	myTiclear();
+}
+
+function myTiclear(){
+	clearTimeout(myTi);
 }
 
 function liga(){ax.rotation.z =-0.2;}
