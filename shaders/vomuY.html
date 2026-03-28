@@ -543,7 +543,11 @@ screen.orientation.addEventListener('change', function(e) {
 	// Get the current orientation type (e.g., "portrait-primary", "landscape-secondary")
 		const orientationType = screen.orientation.type;
 		//alert('Orientation changed to:', orientationType);
-		if(iW<iH){dios.style.width=iW;dios.style.height=iW;}
+		if(iW<iH){
+			diP.style.width=iW+"px";diP.style.height=iW+"px";
+		}else{
+			diP.style.width=iH+"px";diP.style.height=iH+"px";
+		}
 	if (orientationType.startsWith('portrait')) {
 		// Code to run when in portrait mode
 		//alert('Device is in Portrait mode');
