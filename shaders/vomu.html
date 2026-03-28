@@ -31,10 +31,10 @@ td{text-align:center;}
 
 <body>
 <table>
-<tr><td><img src="img/VofM.png"></img></img></td></tr>
+<tr><td><img src="img/VofM.png"></img></td></tr>
 <tr><td><span id="sp">Vol 0.3</span></td></tr>
 </table>
-<audio id="au" loop="false" style="position:absolute;left:10px;top:60px;">
+<audio id="au" style="position:absolute;left:10px;top:60px;">
 	<source src="../anim/mp3/Laura.mp3" type="audio/mpeg">
 </audio>
 <center>
@@ -100,7 +100,7 @@ var tela;
 var sprite1,sprite2;
 var v=[];
 
-var isMobile=navigator.userAgent.match(/(mobi)/i) ? true : false;
+var isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 
 var iW=window.innerWidth;
 var iH=window.innerHeight;
@@ -268,7 +268,6 @@ scene.add(xi[1]);
 	gbraco.add(s);// eixo da roda do braco
 
 		gbraco.position.set(14,51,-14);
-		gbraco.rotation.y=-0.04;
 		gbraco.rotation.y=-0.3;
 
 	matc(40,2,30,'#777');
@@ -375,7 +374,7 @@ scene.add(xi[1]);
 
 // **************** audio
 	audio=document.getElementById('au');
-	audio.load();
+	//audio.load();
 	audio.volume=0.3;
 	//audio.currentTime=180;
 
@@ -409,7 +408,12 @@ function animate(t){
 	if(sim==2 && gbraco){gbraco.rotation.x=-0.2;gbraco.rotation.y=-0.04;sim=3;}
 	if(sim==3 && ligado==1){gbraco.rotation.x=0;gbraco.rotation.y=-0.04;sim=4;}
 
-	if(ligado==1){ww++;gbraco.rotation.y -=delta/1000;r.rotation.y -=delta;scene.add(sprite1);scene.add(sprite2);}
+	if(ligado==1){ww++;gbraco.rotation.y -=delta/1000;r.rotation.y -=delta;}
+
+	if(ligado==1 && !sprite1.parent){
+		scene.add(sprite1);
+		scene.add(sprite2);
+	}
 
 	if(tex[4] && ligado==0){
 		scene.add(tex[4]);
@@ -430,17 +434,21 @@ function animate(t){
 	}
 
 	if(eT>20 && eT<21){  scene.remove(tex[ 3]);scene.add(tex[10]);}
-	if(eT>34 && eT<35){  scene.remove(tex[10]);scene.add(tex[11]);}
-	if(eT>50 && eT<51){  for(let z=10;z<12;z++){scene.remove(tex[z]);};scene.add(tex[12]);}
-	if(eT>61 && eT<62){  for(let z=10;z<13;z++){scene.remove(tex[z]);};scene.add(tex[13]);}
-	if(eT>73 && eT<74){  for(let z=10;z<14;z++){scene.remove(tex[z]);};scene.add(tex[14]);}
-	if(eT>81 && eT<82){  for(let z=10;z<15;z++){scene.remove(tex[z]);};scene.add(tex[15]);}
-	if(eT>91 && eT<92){  for(let z=10;z<16;z++){scene.remove(tex[z]);};scene.add(tex[16]);}
-	if(eT>104 && eT<105){for(let z=10;z<17;z++){scene.remove(tex[z]);};scene.add(tex[17]);}
-	if(eT>116 && eT<117){for(let z=10;z<18;z++){scene.remove(tex[z]);};scene.add(tex[18]);}
-	if(eT>154 && eT<155){for(let z=10;z<19;z++){scene.remove(tex[z]);};scene.add(tex[19]);}
-	if(eT>165 && eT<166){for(let z=10;z<20;z++){scene.remove(tex[z]);};scene.add(tex[20]);}
-	if(eT>170 && eT<171){for(let z=10;z<21;z++){scene.remove(tex[z]);};scene.add(tex[21]);}
+	if(eT>34 && eT<35){  remo();scene.add(tex[11]);}
+	if(eT>50 && eT<51){  remo();scene.add(tex[12]);}
+	if(eT>61 && eT<62){  remo();scene.add(tex[13]);}
+	if(eT>73 && eT<74){  remo();scene.add(tex[14]);}
+	if(eT>81 && eT<82){  remo();scene.add(tex[15]);}
+	if(eT>91 && eT<92){  remo();scene.add(tex[16]);}
+	if(eT>104 && eT<105){remo();scene.add(tex[17]);}
+	if(eT>116 && eT<117){remo();scene.add(tex[18]);}
+	if(eT>154 && eT<155){remo();scene.add(tex[19]);}
+	if(eT>165 && eT<166){remo();scene.add(tex[20]);}
+	if(eT>170 && eT<171){remo();scene.add(tex[21]);}
+
+	function remo(){
+		for(let z=10;z<22;z++){scene.remove(tex[z]);}
+	}
 
 	function apply(){
 		m=CSG;g=bM.geometry;
@@ -496,7 +504,7 @@ function onTouchStart(event){
 	const touch=event.touches[0];
 	mouse.x=touch.clientX/window.innerWidth * 2 - 1;
 	mouse.y=-(touch.clientY/window.innerHeight) * 2 + 1;
-	myTi=setTimeout(myTifun(),200);
+	myTi=setTimeout(myTifun,200);
 	ray();
 }
 
@@ -509,7 +517,11 @@ function myTiclear(){
 	clearTimeout(myTi);
 }
 
-function liga(){ax.rotation.z =-0.2;}
+function liga(){
+	ax.rotation.z=-0.2;
+	if(audio.paused){audio.play().catch(()=>{});}
+}
+
 function desliga(){ax.rotation.z =0.2;}
 
 window.addEventListener("resize",() => {
