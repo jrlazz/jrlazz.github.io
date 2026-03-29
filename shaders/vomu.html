@@ -77,6 +77,23 @@ letra[19]="She gave your very\nfirst kiss to you";
 letra[20]="That was Laura,";
 letra[21]="but she's only a dream";
 
+const lyricsTimeline=[
+	{t: 20,i:10,first:true},
+	{t: 34,i:11 },
+	{t: 50,i:12 },
+	{t: 61,i:13 },
+	{t: 73,i:14 },
+	{t: 81,i:15 },
+	{t: 91,i:16 },
+	{t:104,i:17 },
+	{t:116,i:18 },
+	{t:154,i:19 },
+		{ t: 165, i: 20 },
+	{ t: 170, i: 21 }
+];
+var lastLyric=-1;
+
+
 var sim=0;
 var ligado=0;
 var audio;
@@ -100,12 +117,16 @@ var tela;
 var sprite1,sprite2;
 var v=[];
 
-var isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+var isMobile=/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 
 var iW=window.innerWidth;
 var iH=window.innerHeight;
 
 var myTi;
+
+var touchStartTime=0;
+var startX=0;
+var startY=0;
 
 function init(){
 
@@ -126,7 +147,8 @@ function init(){
 	controls=new OrbitControls(camera,renderer.domElement);
 
 	if(isMobile){
-		window.addEventListener("touchstart",onTouchStart,{passive:false});
+		window.addEventListener("touchstart",onTouchStart,{passive:true});
+		window.addEventListener("touchend",onTouchEnd,{passive:true});
 	}else{
 		window.addEventListener("click",onClick);
 		diP.style.display="none";
@@ -384,6 +406,23 @@ function cyli(r1,r2,r3,r4,cor){g=new THREE.CylinderGeometry(r1,r2,r3,r4);;m=new 
 function matc(a,b,c,cor){g=new THREE.BoxGeometry(a,b,c);m=new THREE.MeshStandardMaterial({color:cor});}
 
 function animate(t){
+/*
+	const lyricsTimeline=[
+		{ t: 20, i: 10, first: true },
+		{ t: 34, i: 11 },
+		{ t: 50, i: 12 },
+		{ t: 61, i: 13 },
+		{ t: 73, i: 14 },
+		{ t: 81, i: 15 },
+		{ t: 91, i: 16 },
+		{ t: 104, i: 17 },
+		{ t: 116, i: 18 },
+		{ t: 154, i: 19 },
+		{ t: 165, i: 20 },
+		{ t: 170, i: 21 }
+	];
+	let lastLyric=-1;
+*/
 	requestAnimationFrame(animate);
 	const delta=clock.getDelta();
 	www++;
@@ -428,11 +467,14 @@ function animate(t){
 	let eT=audio.currentTime;
 	if(eT>186.6){gbraco.rotation.x=-0.2;gbraco.rotation.y=-0.04;}
 	if(eT>187.8){
-		audio.currentTime=0;gbraco.rotation.x=0;gbraco.rotation.y=-0.04;
+		audio.currentTime=0;
+		lastLyric=-1;
+		gbraco.rotation.x=0;
+		gbraco.rotation.y=-0.04;
 		scene.remove(tex[21]);scene.add(tex[3]);
 		ww=0;
 	}
-
+/*
 	if(eT>20 && eT<21){  scene.remove(tex[ 3]);scene.add(tex[10]);}
 	if(eT>34 && eT<35){  remo();scene.add(tex[11]);}
 	if(eT>50 && eT<51){  remo();scene.add(tex[12]);}
@@ -445,6 +487,20 @@ function animate(t){
 	if(eT>154 && eT<155){remo();scene.add(tex[19]);}
 	if(eT>165 && eT<166){remo();scene.add(tex[20]);}
 	if(eT>170 && eT<171){remo();scene.add(tex[21]);}
+*/
+
+
+	for(let k=0;k<lyricsTimeline.length;k++){
+  		if(eT >= lyricsTimeline[k].t && lastLyric !== k){
+			if(lyricsTimeline[k].first){
+				scene.remove(tex[3]);
+			} else {
+				remo();
+			}
+			scene.add(tex[lyricsTimeline[k].i]);
+			lastLyric=k;
+  		}
+	}
 
 	function remo(){
 		for(let z=10;z<22;z++){scene.remove(tex[z]);}
@@ -484,7 +540,8 @@ function ray(){
 	intersects=raycaster.intersectObjects(scene.children,true);
 	if (intersects.length>0){
 		selected=intersects[0].object;
-		if(selected.name.substring(0,1)!="v"){
+		//if(selected.name.substring(0,1)!="v"){
+		if(!selected.name || selected.name[0] !== "v"){
 			if(ligado==0){liga();ligado=1;audio.play();return}
 			if(ligado==1){desliga();ligado=0;audio.pause();for(let z=10;z<21;z++){scene.remove(tex[z]);};}
 		}else{
@@ -499,6 +556,7 @@ function ray(){
 	}
 }
 
+/*
 function onTouchStart(event){
 	event.preventDefault();
 	const touch=event.touches[0];
@@ -506,6 +564,27 @@ function onTouchStart(event){
 	mouse.y=-(touch.clientY/window.innerHeight) * 2 + 1;
 	myTi=setTimeout(myTifun,200);
 	ray();
+}
+*/
+
+function onTouchStart(event){
+	const touch=event.touches[0];
+	startX=touch.clientX;
+	startY=touch.clientY;
+	touchStartTime=Date.now();
+}
+
+function onTouchEnd(event){
+	const touch=event.changedTouches[0];
+	const dx=Math.abs(touch.clientX-startX);
+	const dy=Math.abs(touch.clientY-startY);
+	const dt=Date.now()-touchStartTime;
+	// only real tap
+	if(dx < 10 && dy < 10 && dt < 200){
+		mouse.x=touch.clientX / window.innerWidth * 2 - 1;
+		mouse.y=-(touch.clientY / window.innerHeight) * 2 + 1;
+		ray();
+	}
 }
 
 function myTifun(){
@@ -540,7 +619,7 @@ if(iW<iH){
 	diP.style.width=iH+"px";diP.style.height=iH+"px";
 }
 screen.orientation.addEventListener('change', function(e) {
-	const orientationType = screen.orientation.type;
+	const orientationType=screen.orientation.type;
 	if(iW<iH){
 		diP.style.width=iW+"px";diP.style.height=iW+"px";
 	}else{
