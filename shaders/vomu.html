@@ -586,6 +586,7 @@ function onTouchEnd(event){
 	if(dx < 10 && dy < 10 && dt < 200){
 		mouse.x=touch.clientX / window.innerWidth * 2 - 1;
 		mouse.y=-(touch.clientY / window.innerHeight) * 2 + 1;
+		scene.position.set(0,0,0);
 		ray();
 	}
 }
