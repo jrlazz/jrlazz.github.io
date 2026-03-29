@@ -78,7 +78,6 @@ letra[20]="That was Laura,";
 letra[21]="but she's only a dream";
 letra[22]="Voice of Music";
 
-
 const lyricsTimeline=[
 	{t: 20,i:10,first:true},
 	{t: 34,i:11},
@@ -96,6 +95,7 @@ const lyricsTimeline=[
 ];
 var lastLyric=-1;
 
+//alert(lyricsTimeline[0].t + " " + lyricsTimeline[0].i + " " + lyricsTimeline[0].first);
 
 var sim=0;
 var ligado=0;
@@ -431,14 +431,20 @@ function animate(t){
 	if(tex[3] && sim==1){scene.add(tex[3]);sim=2;}
 
 	if(sim==2 && gbraco){gbraco.rotation.x=-0.2;gbraco.rotation.y=-0.04;sim=3;}
-	if(sim==3 && ligado==1){gbraco.rotation.x=0;gbraco.rotation.y=-0.04;sim=4;}
+	if(sim==3 && ligado==1){
+		gbraco.rotation.x=0;
+		gbraco.rotation.y=-0.04;
+		scene.add(sprite1);
+		scene.add(sprite2);
+		sim=4;
+	}
 
 	if(ligado==1){ww++;gbraco.rotation.y -=delta/1000;r.rotation.y -=delta;}
 
-	if(ligado==1 && !sprite1.parent){
-		scene.add(sprite1);
-		scene.add(sprite2);
-	}
+	//if(ligado==1 && !sprite1.parent){
+	//	scene.add(sprite1);
+	//	scene.add(sprite2);
+	//}
 
 	if(tex[4] && ligado==0){
 		scene.add(tex[4]);
@@ -460,11 +466,13 @@ function animate(t){
 		ww=0;
 	}
 
-	if(eT>15 && eT<15.5){scene.remove(tex[3]);remo();}
+	if(eT>9 && eT<9.5){scene.remove(tex[3]);remo();}
 
 	//dsp.innerText=eT;
 
 	for(let k=0;k<lyricsTimeline.length;k++){
+
+/*
   		if(eT >= lyricsTimeline[k].t && lastLyric !== k){
 			if(lyricsTimeline[k].first){
 				//scene.remove(tex[3]);
@@ -472,14 +480,15 @@ function animate(t){
 				//scene.remove(tex[3]);
 				remo();
 			}
+*/
+  		if(eT>lyricsTimeline[k].t && eT<(lyricsTimeline[k].t+0.5) && lastLyric !== k){
+			if(!lyricsTimeline[k].first){remo();}
 			scene.add(tex[lyricsTimeline[k].i]);
 			lastLyric=k;
   		}
 	}
 
-	function remo(){
-		for(let z=10;z<23;z++){scene.remove(tex[z]);}
-	}
+	function remo(){for(let z=10;z<23;z++){scene.remove(tex[z]);}}
 
 	function apply(){
 		m=CSG;g=bM.geometry;
@@ -549,15 +558,6 @@ function onTouchEnd(event){
 		scene.position.set(0,0,0);
 		ray();
 	}
-}
-
-function myTifun(){
-	scene.position.set(0,0,0);
-	myTiclear();
-}
-
-function myTiclear(){
-	clearTimeout(myTi);
 }
 
 function liga(){
