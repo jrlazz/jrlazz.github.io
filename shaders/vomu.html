@@ -13,7 +13,7 @@
 
 <style>
 body{margin:0px;background:#048;overflow:hidden;font-family:monospace;}
-span{font-size:41px;color:#0ff;}
+span{position:relative;font-size:41px;color:#0f0;top:-13px;}
 table{position:absolute;left:5px;top:5px;width:200px;z-index:0;}
 td{text-align:center;}
 </style>
@@ -31,8 +31,9 @@ td{text-align:center;}
 
 <body>
 <table>
-<tr><td><img src="img/VofM.png"></img></td></tr>
-<tr><td><span id="sp">Vol 0.3</span></td></tr>
+<tr><td colspan="2"><img src="img/VofM.png"></img></td></tr>
+<tr><td colspan="2"><span style="font-size:10.25pt;color:#ff0;">Voice of Music</span></td></tr>
+<tr><td><img src="img/speaker.png" style="width:50px;"></td<td><span id="sp"> 0.2</span></td></tr>
 </table>
 <audio id="au" style="position:absolute;left:10px;top:60px;">
 	<source src="../anim/mp3/Laura.mp3" type="audio/mpeg">
@@ -166,87 +167,91 @@ function init(){
 	s.position.set(-15,-2,0);
 	scene.add(s);
 
-// 32x42x24 disco 12 pol... 30.48
-
-// **************** piso
-	tt=new THREE.TextureLoader().load("images/tacos_03.jpg");
-	tt.wrapS=THREE.RepeatWrapping;tt.wrapT=THREE.RepeatWrapping;
-	tt.repeat.set(15,7.5);
-	matc(400,1,200,'#000');
-	s=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:'#430',map:tt,transparent:false,opacity:0.7}));
-	s.position.set(-57.5,-37.5,60);
-	//scene.add(s);
-
 	tt=new THREE.TextureLoader().load("images/reve2.jpg");
 	let corr=new THREE.MeshStandardMaterial({color:'#999',map:tt});
 
-	tt=new THREE.TextureLoader().load("images/made_703.jpg");
-	tt.rotation=p/2; 
-	tt.wrapS=THREE.RepeatWrapping;tt.wrapT=THREE.RepeatWrapping;
-	tt.repeat.set(2,0.5);
-	wood=new THREE.MeshStandardMaterial({color:'#850',map:tt,metalness:0.5,roughness:0.2,transparent:false,opacity:0.1});
-
-// ****************
+// **************** player
 	matc(42,32,2,'#064');
 	s=new THREE.Mesh(g,corr);
 	s.rotation.x=p/2;
-	s.position.set(0,-15,0);// base
+	s.position.set(0,-15,0);
 	xi[1].add(s);
 		matc(32,12,1,'#f64');
 		s=new THREE.Mesh(g,corr);
 		s.rotation.y=p/2;
-		s.position.set(-20.5,-8,0);// base lateral E
+		s.position.set(-20.5,-8,0);
 		xi[1].add(s);
 	s=s.clone();
 	s.rotation.y=p/2;
-	s.position.set(20.5,-8,0);// base lateral D
+	s.position.set(20.5,-8,0);
 	xi[1].add(s);
 		matc(40,12,1,'#c64');
 		s=new THREE.Mesh(g,corr);
 		s.rotation.y=p;
-		s.position.set(0,-8,-15.5);// base lateral D
+		s.position.set(0,-8,-15.5);
 		xi[1].add(s);
 	s=s.clone();
 	s.rotation.y=p;
-	s.position.set(0,-8,15.5);// base lateral D
+	s.position.set(0,-8,15.5);
 	xi[1].add(s);
-
-scene.add(xi[1]);
-
-		matc(32,12,1,0xcc66cc);
+	scene.add(xi[1]);
+		matc(32,12,1,'#60c');
 		s=new THREE.Mesh(g,corr);
 		s.rotation.y=p/2;
-		s.position.set(6,0,0);// lateral
+		s.position.set(6,0,0);
 		xi[2].add(s);
-	matc(21,32,1,0x666666);
+	matc(21,32,1,'#666');
 	s=new THREE.Mesh(g,corr);
 	s.rotation.x=p/2;
-	s.position.set(-4,6.5,0);//cima
+	s.position.set(-4,6.5,0);
 	xi[2].add(s);
-		matc(12,20,1,0x6600cc);
+		matc(12,20,1,'#60c');
 		s=new THREE.Mesh(g,corr);
 		s.rotation.z=p/2;
-		s.position.set(-4.5,0,-15.5);//esquerda
+		s.position.set(-4.5,0,-15.5);
 		xi[2].add(s);
 	s=s.clone();
-	s.position.set(-4.5,0,15.5);//direita
+	s.position.set(-4.5,0,15.5);
 	xi[2].add(s);
 	xi[2].position.set(-6.5,6,0);
-
 	axe[1].add(xi[2]);
 	axe[1].position.set(21,-2,0);
 		axe[2]=axe[1].clone();
 		axe[2].position.set(-21,-2,0);
 
+// **************** handle
+	cyli(1,1,6,32,'#555');
+	s=new THREE.Mesh(g,m);
+	s.rotation.z=p/2;
+	s.position.set(0,0,0);
+	xi[3].add(s);	
+		s=s.clone()
+		s.rotation.y=p/2;
+		s.scale.set(1,2,1);
+		s.position.set(-3,0,-6);
+		xi[3].add(s);
+		s=s.clone()
+		s.position.set(3,0,-6);
+		xi[3].add(s);
+	g=new THREE.SphereGeometry(1,32);
+	s=new THREE.Mesh(g,m);
+	s.position.set(-3,0,0);
+	xi[3].add(s);
+	s=s.clone();
+	s.position.set(3,0,0);
+	xi[3].add(s);
+		xi[3].position.set(0,-12,19);
+		scene.add(xi[3]);
+
 // **************** moldura
-	matc(13,25,0.5,0xcccccc);
+	matc(13,25,0.5,'#ccc');
 	s=new THREE.Mesh(g,m);
 	s.rotation.x=p/2;
 	s.position.set(0,-1,0);
 	bM=s.clone();
 	scene.add(bM);
 	bM.updateMatrix();bM.updateMatrixWorld();
-		matc(12,24,0.5,0x33cc99);
+		matc(12,24,0.5,'#369');
 		s=new THREE.Mesh(g,corr);
 		s.rotation.x=p/2;
 		s.position.set(0,-1,0);
@@ -254,15 +259,15 @@ scene.add(xi[1]);
 		scene.add(bM2);
 		bM2.updateMatrix();bM2.updateMatrixWorld();
 
-	// tela alto falante
+// **************** speaker screen
 	tt=new THREE.TextureLoader().load("images/telaY.jpg");
 	tt.wrapS=THREE.RepeatWrapping;tt.wrapT=THREE.RepeatWrapping;
 	tt.repeat.setScalar(0.5);
 	matc(12,24,0.5,'#002');
 	tela=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:'#888',map:tt}));
 
-// **************** toca discos ... braco ... e base
-	// braco
+// **************** player
+	// arm
 	cyli(0.3,0.3,15,32,'#000');
 	g.translate(0,7.5,0);
 	bri=new THREE.MeshStandardMaterial({color:'#fff',metalness:0.8,roughness:0.2});
@@ -302,8 +307,8 @@ scene.add(xi[1]);
 	tocadisco.add(s);
 	tocadisco.add(gbraco);
 
-	//eixo
-	cyli(0.2,0.2,3,32,0x666666);
+	// axis
+	cyli(0.2,0.2,3,32,'#666');
 	s=new THREE.Mesh(g,bri);
 	s.position.set(0,0,0);
 	r.add(s);
@@ -315,7 +320,7 @@ scene.add(xi[1]);
 	s=new THREE.Mesh(g,m);
 	r.add(s);
 
-// **************** disk
+	// disk
 	cyli(13,13,0.1,64,'#333');
 	s=new THREE.Mesh(g,m);
 	s.position.set(0,-0.05,0);
@@ -350,7 +355,7 @@ scene.add(xi[1]);
 	tocadisco.position.set(0,-58,0);
 	scene.add(tocadisco);
 
-// **************** textos
+// **************** texts
 	loader=new FontLoader();
 	loader.load('../fonte/Cascadia_Regular.json',function(response){font=response;createText();});
 	function createText(){
@@ -385,7 +390,7 @@ scene.add(xi[1]);
 	sprite2=sprite1.clone()
 	sprite2.position.set(50,9,0); 
 
-// **************** vols
+// **************** volumes
 	g=new THREE.BoxGeometry(8.1,6,3);
 	for(let z=0;z<11;z++){
 		v[z]=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:'#090'}));
@@ -393,13 +398,13 @@ scene.add(xi[1]);
 		v[z].position.set(-40+8*z,60,0);
 		scene.add(v[z]);
 	}
-	v[3].material.color.set('#0f0');
+	v[2].material.color.set('#0f0');
 	v[0].material.color.set('#900')
 
 // **************** audio
 	audio=document.getElementById('au');
 	//audio.load();
-	audio.volume=0.3;
+	audio.volume=0.2;
 	//audio.currentTime=180;
 
 } // init end
@@ -513,9 +518,10 @@ function ray(){
 			for(let z=1;z<11;z++){v[z].material.color.set('#090');}
 			const q=Number(selected.name.substring(1));
 			audio.volume=selected.name.substring(1)/10;
-			dsp.innerText="Vol "+Number(audio.volume).toFixed(1);
+			dsp.innerText=" "+Number(audio.volume).toFixed(1);
+			dsp.style.color="#0f0";
 			v[q].material.color.set('#0f0');
-			if(q==0){v[q].material.color.set('#f00');}
+			if(q==0){v[q].material.color.set('#f00');dsp.style.color="#f00";}
 		}
 	}
 }
