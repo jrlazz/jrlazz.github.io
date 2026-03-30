@@ -64,39 +64,25 @@ var mouse=new THREE.Vector2();
 var selected;
 var intersects=[];
 var tex=[];
-var letra=[];
-letra[10]="Laura is the face\nin the misty light";
-letra[11]="Footsteps that you hear\n    down the hall";
-letra[12]="The laugh that floats\n  on a summer night";
-letra[13]="That you can never\n   quite recall";
-letra[14]="And you see Laura";
-letra[15]="     on a train\nthat is passing through";
-letra[16]="     Those eyes,\nhow familiar they seem";
-letra[17]="She gave your very\nfirst kiss to you";
-letra[18]="   That was Laura,\nbut she's only a dream";
-letra[19]="She gave your very\nfirst kiss to you";
-letra[20]="That was Laura,";
-letra[21]="but she's only a dream";
-letra[22]="Frank Sinatra ... Laura";
-
-const lyricsTimeline=[
-	{t: 20,i:10,first:true},
-	{t: 34,i:11},
-	{t: 50,i:12},
-	{t: 61,i:13},
-	{t: 73,i:14},
-	{t: 81,i:15},
-	{t: 91,i:16},
-	{t:104,i:17},
-	{t:116,i:18},
-	{t:154,i:19},
-	{t:165,i:20},
-	{t:170,i:21},
-	{t:185,i:22}
+const lyrics=[
+	{t:  5,i: 0,s:"Frank Sinatra ... Laura"},
+	{t: 20,i: 1,s:"Laura is the face\nin the misty light"},
+	{t: 34,i: 2,s:"Footsteps that you hear\n    down the hall"},
+	{t: 50,i: 3,s:"The laugh that floats\n  on a summer night"},
+	{t: 61,i: 4,s:"That you can never\n   quite recall"},
+	{t: 73,i: 5,s:"And you see Laura"},
+	{t: 81,i: 6,s:"     on a train\nthat is passing through"},
+	{t: 91,i: 7,s:"     Those eyes,\nhow familiar they seem"},
+	{t:104,i: 8,s:"She gave your very\nfirst kiss to you"},
+	{t:116,i: 9,s:"   That was Laura,\nbut she's only a dream"},
+	{t:154,i:10,s:"She gave your very\nfirst kiss to you"},
+	{t:165,i:11,s:"That was Laura,"},
+	{t:170,i:12,s:"but she's only a dream"},
+	{t:185,i:13,s:"Frank Sinatra ... Laura"},
 ];
 var lastLyric=-1;
 
-//alert(lyricsTimeline[0].t + " " + lyricsTimeline[0].i + " " + lyricsTimeline[0].first);
+//alert(lyrics[1].t + " " + lyrics[1].i + " " + lyrics[1].s);
 
 var sim=0;
 var ligado=0;
@@ -359,26 +345,22 @@ function init(){
 	loader=new FontLoader();
 	loader.load('../fonte/Cascadia_Regular.json',function(response){font=response;createText();});
 	function createText(){
-		m=[new THREE.MeshStandardMaterial({color:'#fc0'}),new THREE.MeshStandardMaterial({color:'#259'})];
-		g=new TextGeometry("Frank Sinatra ... Laura",{font:font,size:5,depth:2,curveSegments:12,bevelEnabled:false});
-		g.center();
-		tex[3]=new THREE.Mesh(g,m);
-		tex[3].position.set(0,-20,20);
-			g=new TextGeometry("Tap on player to start,\n    pause or resume",{font:font,size:4,depth:1,curveSegments:12,bevelEnabled:false});
-			g.center();
-			tex[4]=new THREE.Mesh(g,m);
-			tex[4].position.set(0,35,10);
-		for(let z=10;z<23;z++){
-			g=new TextGeometry(letra[z],{font:font,size:4.5,depth:2,curveSegments:12,bevelEnabled:false});g.center();
-			tex[z]=new THREE.Mesh(g,m);
-			tex[z].position.set(0,-20,30);
-		}
 		m=[new THREE.MeshStandardMaterial({color:'#0f0'}),new THREE.MeshStandardMaterial({color:'#cc0'})];
 		g=new TextGeometry("Volume",{font:font,size:4,depth:2,curveSegments:12,bevelEnabled:false});
 		g.center();
-		tex[1]=new THREE.Mesh(g,m);
-		tex[1].position.set(0,60,0);
-		scene.add(tex[1]);
+		tex[40]=new THREE.Mesh(g,m);
+		tex[40].position.set(0,60,0);
+		scene.add(tex[40]);
+		m=[new THREE.MeshStandardMaterial({color:'#fc0'}),new THREE.MeshStandardMaterial({color:'#259'})];
+			g=new TextGeometry("Tap on player to start,\n    pause or resume",{font:font,size:4,depth:1,curveSegments:12,bevelEnabled:false});
+			g.center();
+			tex[41]=new THREE.Mesh(g,m);
+			tex[41].position.set(0,35,10);
+		for(let z=0;z<lyrics.length;z++){
+			g=new TextGeometry(lyrics[z].s,{font:font,size:4.5,depth:2,curveSegments:12,bevelEnabled:false});g.center();
+			tex[z]=new THREE.Mesh(g,m);
+			tex[z].position.set(0,-20,30);
+		}
 	}
 
 // **************** sprites
@@ -428,28 +410,25 @@ function animate(t){
 	if(axe[1].rotation.z>-p/2){axe[1].rotation.z -=delta/5;axe[2].rotation.z -=delta/5;}
 
 	if(sprite1){sprite1.material.rotation=-0.05*ww;}
-
-	if(tex[3] && sim==1){scene.add(tex[3]);sim=2;}
-
-	if(sim==2 && gbraco){gbraco.rotation.x=-0.2;gbraco.rotation.y=-0.04;sim=3;}
-	if(sim==3 && ligado==1){
+	if(sim==1 && gbraco){gbraco.rotation.x=-0.2;gbraco.rotation.y=-0.04;sim=2;}
+	if(sim==2 && ligado==1){
 		gbraco.rotation.x=0;
 		gbraco.rotation.y=-0.04;
 		scene.add(sprite1);
 		scene.add(sprite2);
-		sim=4;
+		sim=3;
 	}
 
 	if(ligado==1){ww=ww+delta*20;gbraco.rotation.y -=delta/1000;r.rotation.y -=delta;}
 
-	if(tex[4] && ligado==0){
-		scene.add(tex[4]);
-		tex[4].rotation.y +=dife;
-		if(tex[4].rotation.y>0.5){dife=-dife;}
-		if(tex[4].rotation.y<-0.5){dife=-dife;}
+	if(tex[41] && ligado==0){
+		scene.add(tex[41]);
+		tex[41].rotation.y +=dife;
+		if(tex[41].rotation.y>0.5){dife=-dife;}
+		if(tex[41].rotation.y<-0.5){dife=-dife;}
 	}
 
-	if(tex[4] && ligado==1){scene.remove(tex[4]);tex[4].rotation.y=0;}
+	if(tex[41] && ligado==1){scene.remove(tex[41]);tex[41].rotation.y=0;}
 
 	function isAudioPlaying(audio){return(audio.currentTime>0 && !audio.paused && !audio.ended && audio.readyState>2);}
 	let eT=audio.currentTime;
@@ -462,19 +441,22 @@ function animate(t){
 		ww=0;
 	}
 
-	if(eT>15 && eT<15.5){scene.remove(tex[3]);remo();}
+	if(eT>15 && eT<15.5){remo();}
 
 	//dsp.innerText=eT.toFixed(2);
 
-	for(let k=0;k<lyricsTimeline.length;k++){
-  		if(eT>lyricsTimeline[k].t && eT<(lyricsTimeline[k].t+0.5) && lastLyric !== k){
+	for(let k=0;k<lyrics.length;k++){
+  		if(eT>lyrics[k].t && eT<(lyrics[k].t+0.5) && lastLyric !== k){
 			remo();
-			scene.add(tex[lyricsTimeline[k].i]);
+			scene.add(tex[lyrics[k].i]);
+			//alert(lyrics[k].s);
 			lastLyric=k;
   		}
 	}
 
-	function remo(){for(let z=10;z<23;z++){scene.remove(tex[z]);}}
+	//if(tex[3]){alert(lyrics[3].s)}
+
+	function remo(){for(let z=0;z<lyrics.length;z++){scene.remove(tex[z]);}}
 
 	function apply(){
 		m=CSG;g=bM.geometry;
