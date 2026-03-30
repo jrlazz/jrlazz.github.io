@@ -468,7 +468,7 @@ function animate(t){
 
 	for(let k=0;k<lyricsTimeline.length;k++){
   		if(eT>lyricsTimeline[k].t && eT<(lyricsTimeline[k].t+0.5) && lastLyric !== k){
-			if(!lyricsTimeline[k].first){remo();}
+			remo();
 			scene.add(tex[lyricsTimeline[k].i]);
 			lastLyric=k;
   		}
