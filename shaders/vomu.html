@@ -76,9 +76,8 @@ letra[18]="   That was Laura,\nbut she's only a dream";
 letra[19]="She gave your very\nfirst kiss to you";
 letra[20]="That was Laura,";
 letra[21]="but she's only a dream";
-//letra[22]="Voice of Music";
+letra[22]="Frank Sinatra ... Laura";
 
-/*
 const lyricsTimeline=[
 	{t: 20,i:10,first:true},
 	{t: 34,i:11},
@@ -92,10 +91,11 @@ const lyricsTimeline=[
 	{t:154,i:19},
 	{t:165,i:20},
 	{t:170,i:21},
-	{t:180,i:22}
+	{t:185,i:22}
 ];
 var lastLyric=-1;
-*/
+
+//alert(lyricsTimeline[0].t + " " + lyricsTimeline[0].i + " " + lyricsTimeline[0].first);
 
 var sim=0;
 var ligado=0;
@@ -104,7 +104,6 @@ var clock=new THREE.Clock();
 var cor;
 
 var dife=0.02;
-var angu=0.01;
 
 var xi=[];for(let z=1;z<10;z++){xi[z]=new THREE.Group();}
 var axe=[];for(let z=1;z<10;z++){axe[z]=new THREE.AxesHelper(0.01);}
@@ -356,7 +355,7 @@ scene.add(xi[1]);
 	loader.load('../fonte/Cascadia_Regular.json',function(response){font=response;createText();});
 	function createText(){
 		m=[new THREE.MeshStandardMaterial({color:'#fc0'}),new THREE.MeshStandardMaterial({color:'#259'})];
-		g=new TextGeometry("Voice of Music",{font:font,size:5,depth:2,curveSegments:12,bevelEnabled:false});
+		g=new TextGeometry("Frank Sinatra ... Laura",{font:font,size:5,depth:2,curveSegments:12,bevelEnabled:false});
 		g.center();
 		tex[3]=new THREE.Mesh(g,m);
 		tex[3].position.set(0,-20,20);
@@ -364,7 +363,7 @@ scene.add(xi[1]);
 			g.center();
 			tex[4]=new THREE.Mesh(g,m);
 			tex[4].position.set(0,40,10);
-		for(let z=10;z<22;z++){
+		for(let z=10;z<23;z++){
 			g=new TextGeometry(letra[z],{font:font,size:4.5,depth:2,curveSegments:12,bevelEnabled:false});g.center();
 			tex[z]=new THREE.Mesh(g,m);
 			tex[z].position.set(0,-20,30);
@@ -409,23 +408,6 @@ function cyli(r1,r2,r3,r4,cor){g=new THREE.CylinderGeometry(r1,r2,r3,r4);;m=new 
 function matc(a,b,c,cor){g=new THREE.BoxGeometry(a,b,c);m=new THREE.MeshStandardMaterial({color:cor});}
 
 function animate(t){
-/*
-	const lyricsTimeline=[
-		{ t: 20, i: 10, first: true },
-		{ t: 34, i: 11 },
-		{ t: 50, i: 12 },
-		{ t: 61, i: 13 },
-		{ t: 73, i: 14 },
-		{ t: 81, i: 15 },
-		{ t: 91, i: 16 },
-		{ t: 104, i: 17 },
-		{ t: 116, i: 18 },
-		{ t: 154, i: 19 },
-		{ t: 165, i: 20 },
-		{ t: 170, i: 21 }
-	];
-	let lastLyric=-1;
-*/
 	requestAnimationFrame(animate);
 	const delta=clock.getDelta();
 	www++;
@@ -438,24 +420,22 @@ function animate(t){
 
 	if(bM && bM2 && tela && xi[1] && axe[1] && axe[2] && w==0){apply();w=1;}
 
-	if(axe[1].rotation.z>-p/2){
-		axe[1].rotation.z -=angu*2;
-		axe[2].rotation.z -=angu*2;
-	}
+	if(axe[1].rotation.z>-p/2){axe[1].rotation.z -=delta/5;axe[2].rotation.z -=delta/5;}
 
 	if(sprite1){sprite1.material.rotation=-0.05*ww;}
 
 	if(tex[3] && sim==1){scene.add(tex[3]);sim=2;}
 
 	if(sim==2 && gbraco){gbraco.rotation.x=-0.2;gbraco.rotation.y=-0.04;sim=3;}
-	if(sim==3 && ligado==1){gbraco.rotation.x=0;gbraco.rotation.y=-0.04;sim=4;}
-
-	if(ligado==1){ww++;gbraco.rotation.y -=delta/1000;r.rotation.y -=delta;}
-
-	if(ligado==1 && !sprite1.parent){
+	if(sim==3 && ligado==1){
+		gbraco.rotation.x=0;
+		gbraco.rotation.y=-0.04;
 		scene.add(sprite1);
 		scene.add(sprite2);
+		sim=4;
 	}
+
+	if(ligado==1){ww=ww+delta*20;gbraco.rotation.y -=delta/1000;r.rotation.y -=delta;}
 
 	if(tex[4] && ligado==0){
 		scene.add(tex[4]);
@@ -471,43 +451,25 @@ function animate(t){
 	if(eT>186.6){gbraco.rotation.x=-0.2;gbraco.rotation.y=-0.04;}
 	if(eT>187.8){
 		audio.currentTime=0;
-		//lastLyric=-1;
+		lastLyric=-1;
 		gbraco.rotation.x=0;
 		gbraco.rotation.y=-0.04;
-		remo();scene.add(tex[3]);
 		ww=0;
 	}
 
-	if(eT>20 && eT<21){  scene.remove(tex[ 3]);scene.add(tex[10]);}
-	if(eT>34 && eT<35){  remo();scene.add(tex[11]);}
-	if(eT>50 && eT<51){  remo();scene.add(tex[12]);}
-	if(eT>61 && eT<62){  remo();scene.add(tex[13]);}
-	if(eT>73 && eT<74){  remo();scene.add(tex[14]);}
-	if(eT>81 && eT<82){  remo();scene.add(tex[15]);}
-	if(eT>91 && eT<92){  remo();scene.add(tex[16]);}
-	if(eT>104 && eT<105){remo();scene.add(tex[17]);}
-	if(eT>116 && eT<117){remo();scene.add(tex[18]);}
-	if(eT>154 && eT<155){remo();scene.add(tex[19]);}
-	if(eT>165 && eT<166){remo();scene.add(tex[20]);}
-	if(eT>170 && eT<171){remo();scene.add(tex[21]);}
+	if(eT>15 && eT<15.5){scene.remove(tex[3]);remo();}
 
+	//dsp.innerText=eT.toFixed(2);
 
-/*
 	for(let k=0;k<lyricsTimeline.length;k++){
-  		if(eT >= lyricsTimeline[k].t && lastLyric !== k){
-			if(lyricsTimeline[k].first){
-				scene.remove(tex[3]);
-			} else {
-				remo();
-			}
+  		if(eT>lyricsTimeline[k].t && eT<(lyricsTimeline[k].t+0.5) && lastLyric !== k){
+			if(!lyricsTimeline[k].first){remo();}
 			scene.add(tex[lyricsTimeline[k].i]);
 			lastLyric=k;
   		}
 	}
-*/
-	function remo(){
-		for(let z=10;z<22;z++){scene.remove(tex[z]);}
-	}
+
+	function remo(){for(let z=10;z<23;z++){scene.remove(tex[z]);}}
 
 	function apply(){
 		m=CSG;g=bM.geometry;
@@ -543,7 +505,6 @@ function ray(){
 	intersects=raycaster.intersectObjects(scene.children,true);
 	if (intersects.length>0){
 		selected=intersects[0].object;
-		//if(selected.name.substring(0,1)!="v"){
 		if(!selected.name || selected.name[0] !== "v"){
 			if(ligado==0){liga();ligado=1;audio.play();return}
 			if(ligado==1){desliga();ligado=0;audio.pause();for(let z=10;z<21;z++){scene.remove(tex[z]);};}
@@ -558,17 +519,6 @@ function ray(){
 		}
 	}
 }
-
-/*
-function onTouchStart(event){
-	event.preventDefault();
-	const touch=event.touches[0];
-	mouse.x=touch.clientX/window.innerWidth * 2 - 1;
-	mouse.y=-(touch.clientY/window.innerHeight) * 2 + 1;
-	myTi=setTimeout(myTifun,200);
-	ray();
-}
-*/
 
 function onTouchStart(event){
 	const touch=event.touches[0];
@@ -589,15 +539,6 @@ function onTouchEnd(event){
 		scene.position.set(0,0,0);
 		ray();
 	}
-}
-
-function myTifun(){
-	scene.position.set(0,0,0);
-	myTiclear();
-}
-
-function myTiclear(){
-	clearTimeout(myTi);
 }
 
 function liga(){
