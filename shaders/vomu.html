@@ -21,8 +21,8 @@ td{text-align:center;}
 <script type="importmap">
 {
 	"imports": {
-		"three": "https://unpkg.com/three@0.182.0/build/three.module.js",
-		"three/addons/": "https://unpkg.com/three@0.182.0/examples/jsm/"
+		"three": "https://unpkg.com/three@0.183.0/build/three.module.js",
+		"three/addons/": "https://unpkg.com/three@0.183.0/examples/jsm/"
 	}
 }
 </script>
@@ -87,7 +87,7 @@ var lastLyric=-1;
 var sim=0;
 var ligado=0;
 var audio;
-var clock=new THREE.Clock();
+var clock=new THREE.Timer();
 var cor;
 
 var dife=0.02;
@@ -394,8 +394,9 @@ function init(){
 function cyli(r1,r2,r3,r4,cor){g=new THREE.CylinderGeometry(r1,r2,r3,r4);;m=new THREE.MeshStandardMaterial({color:cor});}
 function matc(a,b,c,cor){g=new THREE.BoxGeometry(a,b,c);m=new THREE.MeshStandardMaterial({color:cor});}
 
-function animate(t){
+function animate(){
 	requestAnimationFrame(animate);
+	clock.update();
 	const delta=clock.getDelta();
 	www++;
 	if(www<100){point[1].intensity=www*100;point[3].intensity=www*150;}
