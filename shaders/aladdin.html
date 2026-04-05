@@ -297,6 +297,29 @@ function init() {
 	s.position.set(0,55,0);
 	scene.add(s)
 
+// **************** extras
+	s=new THREE.Mesh(new THREE.CylinderGeometry(3,3,8),cin);
+	s.position.set(0,21,0);
+	scene.add(s);
+		s=s.clone();
+		s.scale.setScalar(0.6);
+		s.rotation.x=0.1;
+		s.position.set(0,17,12.5);
+		scene.add(s);
+
+	g=new THREE.CylinderGeometry(0.3,0.3,5);
+	g.translate(0,0,2.5);
+	s=new THREE.Mesh(g,cin);
+	s.rotation.x=p/2;
+	s.position.set(0,26,-5);
+	scene.add(s);
+
+	g=new THREE.CylinderGeometry(1,1,0.5);
+	s=new THREE.Mesh(g,cin);
+	s.rotation.x=p/2;
+	s.position.set(0,23.6,-7.5);
+	scene.add(s);
+
 // **************** gui
 	gui=new GUI();
 	gui.add(params,'exposure',0,2,0.01);
