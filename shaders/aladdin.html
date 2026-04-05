@@ -44,7 +44,7 @@ span{position:absolute;left:10px;top:10px;color:#f0f;font-size:20.5pt;}
 const params={
 	metalness: 1.0,
 	roughness: 0.0,
-	exposure: 1.4,
+	exposure: 1.7,
 };
 
 var scene,camera,renderer,controls,loader,gui;
@@ -193,7 +193,7 @@ function init() {
 
 // **************** rings
 	g=new THREE.SphereGeometry(5,64,64,0,2*p,0.95,1.1);
-	s=new THREE.Mesh(g,new THREE.MeshStandardMaterial({ roughness: params.roughness,metalness: params.metalness }));
+	s=new THREE.Mesh(g,new THREE.MeshStandardMaterial({roughness:params.roughness,metalness:params.metalness}));
 	s.scale.set(1,0.4,1);
 	s.position.set(0,19.5,0);
 	scene.add(s);
@@ -201,14 +201,10 @@ function init() {
 		s.scale.set(1.05,0.25,1.05);
 		s.position.set(0,26.8,0);
 		scene.add(s);
-
-s=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:'#000',side:THREE.DoubleSide}));
+	s=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:'#000',side:THREE.DoubleSide}));
 	s.scale.set(0.8,0.08,0.8);
 	s.position.set(0,26.5,0);
 	scene.add(s);
-
-
-
 
 // **************** camisa
 	g=new THREE.TorusGeometry(6,1,64,64);
@@ -218,78 +214,72 @@ s=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:'#000',side:THREE.Doubl
 	s.position.set(-40,0,0);
 	gr[8].add(s);
 
-for(let z=1;z<22;z++){
-	s=gr[8].clone();
-	s.rotation.y=z/3.35;
-	s.rotation.z=0.5;
-	s.position.set(0,10,0);
-	gr[9].add(s);
-}
+	for(let z=1;z<22;z++){
+		s=gr[8].clone();
+		s.rotation.y=z/3.35;
+		s.rotation.z=0.5;
+		s.position.set(0,10,0);
+		gr[9].add(s);
+	}
 
-for(let z=1;z<22;z++){
-	s=gr[8].clone();
-	s.rotation.y=z/3.35+0.75;
-	s.scale.setScalar(1.2);
-	s.rotation.z=0.5;
-	s.position.set(0,25,0);
-	gr[9].add(s);
-}
+	for(let z=1;z<22;z++){
+		s=gr[8].clone();
+		s.rotation.y=z/3.35+0.75;
+		s.scale.setScalar(1.2);
+		s.rotation.z=0.5;
+		s.position.set(0,25,0);
+		gr[9].add(s);
+	}
 
-for(let z=1;z<22;z++){
-	s=gr[8].clone();
-	s.rotation.y=z/3.35;
-	s.scale.setScalar(1.4);
-	s.rotation.z=0.5;
-	s.position.set(0,42,0);
-	gr[9].add(s);
-}
+	for(let z=1;z<22;z++){
+		s=gr[8].clone();
+		s.rotation.y=z/3.35;
+		s.scale.setScalar(1.4);
+		s.rotation.z=0.5;
+		s.position.set(0,42,0);
+		gr[9].add(s);
+	}
 
-for(let z=1;z<22;z++){
-	s=gr[8].clone();
-	s.rotation.y=z/3.35+0.75;
-	s.scale.setScalar(1.6);
-	s.rotation.z=0.5;
-	s.position.set(0,60,0);
-	gr[9].add(s);
-}
+	for(let z=1;z<22;z++){
+		s=gr[8].clone();
+		s.rotation.y=z/3.35+0.75;
+		s.scale.setScalar(1.6);
+		s.rotation.z=0.5;
+		s.position.set(0,60,0);
+		gr[9].add(s);
+	}
 
-for(let z=1;z<22;z++){
-	s=gr[8].clone();
-	s.rotation.y=z/3.35;
-	s.scale.setScalar(1.8);
-	s.rotation.z=0.5;
-	s.position.set(0,80,0);
-	gr[9].add(s);
-}
+	for(let z=1;z<22;z++){
+		s=gr[8].clone();
+		s.rotation.y=z/3.35;
+		s.scale.setScalar(1.8);
+		s.rotation.z=0.5;
+		s.position.set(0,80,0);
+		gr[9].add(s);
+	}
 
-
-s=new THREE.Mesh(new THREE.CylinderGeometry(2,2,140),new THREE.MeshStandardMaterial({color:'#000'}));
-s.rotation.x=p/2;
-		s.scale.set(1,0.45,1)
-s.position.set(0,-15,0);
-gr[9].add(s);
-	s=s.clone();
-	s.rotation.z=p/2;
-		s.scale.set(1,1,1)
+	s=new THREE.Mesh(new THREE.CylinderGeometry(2,2,140),new THREE.MeshStandardMaterial({color:'#000'}));
+	s.rotation.x=p/2;
+	s.scale.set(1,0.45,1)
+	s.position.set(0,-15,0);
 	gr[9].add(s);
 		s=s.clone();
-		s.rotation.y=p/2;
-		s.scale.set(1,0.6,1)
-		s.position.set(-70,28,0);
+		s.rotation.z=p/2;
+		s.scale.set(1,1,1)
 		gr[9].add(s);
 			s=s.clone();
-			//s.scale.set(1,0.6,1)
-			s.position.set(70,28,0);
+			s.rotation.y=p/2;
+			s.scale.set(1,0.6,1)
+			s.position.set(-70,28,0);
 			gr[9].add(s);
+				s=s.clone();
+				s.position.set(70,28,0);
+				gr[9].add(s);
 
-gr[9].scale.set(0.05,0.07,0.05);
-gr[9].rotation.x=p;
-gr[9].position.set(0,31,0);
-//scene.add(gr[9]);
-
-
-
-
+	gr[9].scale.set(0.05,0.07,0.05);
+	gr[9].rotation.x=p;
+	gr[9].position.set(0,31,0);
+	//scene.add(gr[9]);
 
 // **************** bulbo
 	g=new THREE.LatheGeometry(new THREE.Path().moveTo(0.5,-1.5).bezierCurveTo(0.75,-1,0.75,-1,0.5,1.5).getSpacedPoints(20),32);
