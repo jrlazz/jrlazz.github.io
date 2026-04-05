@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>aladdin.html</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,user-scalable=no,minimum-scale=1.0,maximum-scale=1.0">
+
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+<meta name="description" content="... long_play ...">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+
+<style>
+@font-face {font-family:myq;src:url('../fonte/MysteryQuest-Regular.ttf');}
+body{margin:0px;background:#000;overflow:hidden;font-family:myq;}
+span{position:absolute;left:10px;top:10px;color:#f0f;font-size:20.5pt;}
+</style>
+
+
+<script type="importmap">
+{
+	"imports": {
+		"three": "https://unpkg.com/three@0.182.0/build/three.module.js",
+		"three/addons/": "https://unpkg.com/three@0.182.0/examples/jsm/"
+	}
+}
+</script>
+
+
+</head>
+<body>
+
+<span id="sp1" style="left:11px;top:11px;color:#ff0;">Aladdin Lamp is beeing created</span>
+<span id="sp2">Aladdin Lamp is beeing created</span>
+
+<script type="module">
+	import * as THREE from 'three';
+	import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+	import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+	import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
+
+const params={
+	metalness: 1.0,
+	roughness: 0.0,
+	exposure: 1.4,
+};
+
+var scene,camera,renderer,controls,loader,gui;
+var amb,g,m,s,texture;
+var p=Math.PI;
+var gr=[];for(let z=1;z<10;z++){gr[z]=new THREE.Group();}
+var lig=[],extrudeSettings,loader,path=[],material,shapes=[],shape,geometry;
+var blade,slice;
+let gg,gm;
+var sim=0;
+var t=0;
+var dsp1=document.getElementById("sp1");
+var dsp2=document.getElementById("sp2");
+var clock=new THREE.Timer();
+	
+function init() {
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.setClearColor('#000',1);
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.toneMapping=THREE.ACESFilmicToneMapping;
+	renderer.toneMappingExposure=params.exposure;
+	document.body.appendChild(renderer.domElement);
+
+	scene=new THREE.Scene();
+
+	amb=new THREE.AmbientLight('#fff',10);scene.add(amb);
+
+	camera=new THREE.PerspectiveCamera(70,window.innerWidth/window.innerHeight,1,1000,0.1);
+	camera.position.set(0,0,100);
+	scene.position.set(0,-25,0)
+	controls=new OrbitControls(camera,renderer.domElement);
+
+	loader=new THREE.CubeTextureLoader();
+	loader.setPath('images/pisa/');
+	texture=loader.load(['px.jpg','nx.jpg','py.jpg','ny.jpg','pz.jpg','nz.jpg']);
+	
+// **************** Extruded base
+	let cin=new THREE.MeshStandardMaterial({color:'#ccc',metalness:1,roughness:0});
+	let gm=[cin,cin];
+	extrudeSettings={steps:1,depth:1,bevelEnabled:false};
+	loader=new SVGLoader();
+	loader.load('img/aladdin_1.svg',function(data){
+		const paths=data.paths;
+		for(let i=0;i<paths.length;i++){
+			path=paths[i];
+			shapes=SVGLoader.createShapes(path);
+			for(let j=0;j< shapes.length;j++){
+				shape=shapes[j];
+				let gg=new THREE.ExtrudeGeometry(shape,extrudeSettings);
+				if(j==0){
+					slice=new THREE.Mesh(gg,new THREE.MeshStandardMaterial({roughness:params.roughness,metalness: params.metalness }));
+					slice.scale.setScalar(0.4);
+					slice.position.set(0,20,0);
+				}
+			}
+		}
+		for(let z=0;z<361;z++){
+			s=slice.clone();
+			s.rotation.set(p,z/45,0);
+			scene.add(s);
+		}
+	});
+
+// **************** suporte bulbo
+	//g=new THREE.SphereGeometry(14,16,16,2.11,0.647,1.6,0.182);
+	g=new THREE.SphereGeometry( 14,32,32,p/1.5,p/4,p/2.05,p/15);
+	m=new THREE.MeshStandardMaterial({roughness:0,metalness:1,side:THREE.DoubleSide});
+	blade=new THREE.Mesh(g,m);
+	blade.rotation.set(p/2,p/4,0);
+	blade.position.set(-30,0,0);
+
+	g=new THREE.SphereGeometry(0.1,0.1,16);
+	m=new THREE.MeshStandardMaterial({color:'#000'});
+	s=new THREE.Mesh(g,m);
+	s.position.set(0,0,0);
+
+	s.add(blade);
+
+	s.scale.setScalar(0.3);
+	s.position.y=27.9;
+
+	let h=0
+	for(let z=1;z<41;z++){
+		h=h+p/11;
+		s=s.clone();
+		s.rotation.y=h;
+		scene.add(s)
+	}
+
+// **************** respiro
+	g=new THREE.TorusGeometry(6,1,64,64);
+	m=new THREE.MeshStandardMaterial({roughness:0,metalness:1});
+	s=new THREE.Mesh(g,m);
+	s.rotation.y=p/2;
+	s.position.set(-40,0,0);
+	gr[6].add(s);
+
+	for(let z=1;z<22;z++){
+		s=gr[6].clone();
+		s.rotation.y=z/3.35;
+		s.rotation.z=0.1;
+		gr[7].add(s);
+	}
+
+	for(let z=1;z<22;z++){
+		s=gr[6].clone();
+		s.rotation.y=z/3.35+0.75;
+		s.rotation.z=0.1;
+		s.scale.setScalar(0.975);
+		s.position.set(0,-11,0);
+		gr[7].add(s);
+	}
+
+	for(let z=1;z<22;z++){
+		s=gr[6].clone();
+		s.rotation.y=z/3.35;
+		s.rotation.z=0.1;
+		s.scale.setScalar(0.950);
+		s.position.set(0,-21,0);
+		gr[7].add(s);
+	}
+
+	for(let z=1;z<22;z++){
+		s=gr[6].clone();
+		s.rotation.y=z/3.35+0.75;
+		s.rotation.z=0.1;
+		s.scale.setScalar(0.925);
+		s.position.set(0,-31,0);
+		gr[7].add(s);
+	}
+
+	for(let z=1;z<22;z++){
+		s=gr[6].clone();
+		s.rotation.y=z/3.35;
+		s.rotation.z=0.1;
+		s.scale.setScalar(0.9);
+		s.position.set(0,-41,0);
+		gr[7].add(s);
+	}
+
+	gr[7].scale.setScalar(0.12);
+	gr[7].position.set(0,26.5,0);
+	scene.add(gr[7]);
+
+// **************** rings
+	g=new THREE.SphereGeometry(5,64,64,0,2*p,0.95,1.1);
+	s=new THREE.Mesh(g,new THREE.MeshStandardMaterial({ roughness: params.roughness,metalness: params.metalness }));
+	s.scale.set(1,0.4,1);
+	s.position.set(0,19.5,0);
+	scene.add(s);
+		s=s.clone();
+		s.scale.set(1.05,0.25,1.05);
+		s.position.set(0,26.8,0);
+		scene.add(s);
+
+s=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:'#000',side:THREE.DoubleSide}));
+	s.scale.set(0.8,0.08,0.8);
+	s.position.set(0,26.5,0);
+	scene.add(s);
+
+
+
+
+// **************** camisa
+	g=new THREE.TorusGeometry(6,1,64,64);
+	m=new THREE.MeshStandardMaterial({color:'#ff0'});
+	s=new THREE.Mesh(g,m);
+	s.rotation.y=p/2;
+	s.position.set(-40,0,0);
+	gr[8].add(s);
+
+for(let z=1;z<22;z++){
+	s=gr[8].clone();
+	s.rotation.y=z/3.35;
+	s.rotation.z=0.5;
+	s.position.set(0,10,0);
+	gr[9].add(s);
+}
+
+for(let z=1;z<22;z++){
+	s=gr[8].clone();
+	s.rotation.y=z/3.35+0.75;
+	s.scale.setScalar(1.2);
+	s.rotation.z=0.5;
+	s.position.set(0,25,0);
+	gr[9].add(s);
+}
+
+for(let z=1;z<22;z++){
+	s=gr[8].clone();
+	s.rotation.y=z/3.35;
+	s.scale.setScalar(1.4);
+	s.rotation.z=0.5;
+	s.position.set(0,42,0);
+	gr[9].add(s);
+}
+
+for(let z=1;z<22;z++){
+	s=gr[8].clone();
+	s.rotation.y=z/3.35+0.75;
+	s.scale.setScalar(1.6);
+	s.rotation.z=0.5;
+	s.position.set(0,60,0);
+	gr[9].add(s);
+}
+
+for(let z=1;z<22;z++){
+	s=gr[8].clone();
+	s.rotation.y=z/3.35;
+	s.scale.setScalar(1.8);
+	s.rotation.z=0.5;
+	s.position.set(0,80,0);
+	gr[9].add(s);
+}
+
+
+s=new THREE.Mesh(new THREE.CylinderGeometry(2,2,140),new THREE.MeshStandardMaterial({color:'#000'}));
+s.rotation.x=p/2;
+		s.scale.set(1,0.45,1)
+s.position.set(0,-15,0);
+gr[9].add(s);
+	s=s.clone();
+	s.rotation.z=p/2;
+		s.scale.set(1,1,1)
+	gr[9].add(s);
+		s=s.clone();
+		s.rotation.y=p/2;
+		s.scale.set(1,0.6,1)
+		s.position.set(-70,28,0);
+		gr[9].add(s);
+			s=s.clone();
+			//s.scale.set(1,0.6,1)
+			s.position.set(70,28,0);
+			gr[9].add(s);
+
+gr[9].scale.set(0.05,0.07,0.05);
+gr[9].rotation.x=p;
+gr[9].position.set(0,31,0);
+//scene.add(gr[9]);
+
+
+
+
+
+// **************** bulbo
+	g=new THREE.LatheGeometry(new THREE.Path().moveTo(0.5,-1.5).bezierCurveTo(0.75,-1,0.75,-1,0.5,1.5).getSpacedPoints(20),32);
+	m=new THREE.MeshPhysicalMaterial({
+		transmission:1,
+		ior:1.3,
+		thickness:0.25,
+		metalness:0.3,
+		roughness:0.1,
+		attenuationColor:"#fff",
+		attenuationDistance:0.5
+	});
+	s=new THREE.Mesh(g,m);
+	s.scale.set(8.3,20,8.3);
+	s.position.set(0,55,0);
+	scene.add(s)
+
+// **************** gui
+	gui=new GUI();
+	gui.add(params,'exposure',0,2,0.01);
+	gui.open();
+
+window.addEventListener('resize',onWindowResize);}
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	clock.update();
+	const delta=clock.getDelta();
+/*
+	t=t+delta;
+	if(t && sim==0){
+		dsp1.innerText="Aladdin Lamp is beeing created... "+(t*10).toFixed(1)+" %";
+		dsp2.innerText=dsp1.innerText;
+	}
+*/
+	if (texture.image.length === 6 && sim==0) {
+		console.log('Cubemap is already loaded');
+		texture.needsUpdate=true;
+		scene.background=texture;
+		scene.environment=texture;
+		renderer.setClearColor('#440',1);
+		dsp1.innerText="Aladdin is ready...";
+		dsp2.innerText="Aladdin is ready...";
+		dsp2.style.color="#006";
+		scene.add(gr[9]);
+		sim=1;
+	}
+	renderer.toneMappingExposure=params.exposure;
+	controls.update();
+	renderer.render(scene,camera);
+}
+
+init();
+animate();
+
+/*
+Bulb based on @prisoner https://codepen.io/prisoner849/full/ZYOzqab 
+*/
+</script>
+</body>
+</html>
