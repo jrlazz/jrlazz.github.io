@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>just_screw.html</title>
+<meta charset="utf-8">
+
+
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+<meta name="description" content="... just screw ...">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+
+
+<style>
+body{overflow:hidden;margin:0px;background-color:#369;font-family:Monospace;}
+span{position:absolute;font-size:15pt;}
+</style>
+
+<script type="importmap">
+	{
+		"imports":{
+	"three":"https://unpkg.com/three@0.164.0/build/three.module.js",
+	"three/addons/":"https://unpkg.com/three@0.164.0/examples/jsm/"
+		}
+	}
+</script>
+
+</head>
+
+<body>
+<span style="left:10px;top:10px;color:#ff0;">just screw</SPAN>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import CSG from "../js/new_csg.js";
+
+var renderer,scene,camera,loader,controls,g,m,s,bCSG,bCSG2;;
+var luz=[];
+var axe=[];
+var mat=[];
+
+var ango=0;
+var diam=0;
+var sim=0;
+var p=Math.PI;
+var spring=new THREE.Group();
+var v=0;
+var w=0;
+
+let bM=[];
+let res=[];
+
+function init() {
+
+	scene=new THREE.Scene();
+	camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,1,1000,1);
+	camera.position.set(-30,15,30);
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.setClearColor(0x006699,0);
+	renderer.colorSpace=THREE.SRGBColorSpace;
+	document.body.appendChild(renderer.domElement);
+	window.addEventListener( 'resize',onWindowResize );
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	
+	luz[1]=new THREE.AmbientLight("#fff",3);scene.add(luz[1]);
+	luz[2]=new THREE.PointLight("#fff",15000);luz[2].position.set(40,10,0);scene.add(luz[2]);
+	luz[3]=new THREE.PointLight("#fff",15000);luz[3].position.set(-40,-10,0);scene.add(luz[3]);
+
+	mat[1]=new THREE.MeshStandardMaterial({color:'#860',metalness:0.7,roughness:0.2});
+
+	// tooth ini
+	axe[1]=new THREE.AxesHelper(0.0001);
+	g=new THREE.BoxGeometry(0.5,0.5,0.5);
+	s=new THREE.Mesh(g,mat[1]);
+	s.rotation.set(p/4,0,p/4);
+	s.position.y=4;
+	axe[1].add(s);
+	// tooth end
+
+	// screw ini
+	g=new THREE.CylinderGeometry(2,2,4,5);
+	s=new THREE.Mesh(g,mat[1]);
+	s.rotation.set(0,0,p/2);
+	s.position.set(-20,0,0);
+		bM[2]=s.clone();
+		scene.add(bM[2]);
+		bM[2].updateMatrix();bM[2].updateMatrixWorld();
+
+	g=new THREE.CylinderGeometry(5,3.2,2);
+	s=new THREE.Mesh(g,mat[1]);
+	s.rotation.set(0,0,p/2);
+	s.position.set(-19,0,0);
+		bM[1]=s.clone();
+		scene.add(bM[1]);
+		bM[1].updateMatrix();bM[1].updateMatrixWorld();
+	
+	g=new THREE.CylinderGeometry(3,2.4,5);
+	s=new THREE.Mesh(g,mat[1]);
+	s.rotation.set(0,0,p/2);
+	s.position.set(-16,0,0);
+	scene.add(s);
+
+	g=new THREE.CylinderGeometry(2.4,1.2,28);
+	s=new THREE.Mesh(g,mat[1]);
+	s.rotation.set(0,0,p/2);
+	scene.add(s);
+
+	g=new THREE.CylinderGeometry(1.2,0.1,5);
+	s=new THREE.Mesh(g,mat[1]);
+	s.rotation.set(0,0,p/2);
+	s.position.set(16,0,0);
+	scene.add(s);
+	// screw end
+
+}
+
+function animate() {
+	requestAnimationFrame(animate);
+	if(sim==0){
+		ango=0;
+		diam=1;
+		for(let z=2;z<6000;z++){
+			ango=ango+0.03;
+			diam=(6000-z)/6000;
+			axe[z]=axe[1].clone();
+			axe[z].rotation.x=ango;
+			axe[z].position.x=ango/6.6;
+			axe[z].scale.setScalar(diam/3+0.3);
+			spring.add(axe[z]);
+		}
+		spring.position.x=-13;;
+		scene.add(spring);
+		sim=1;
+	}
+
+	if(bM[1] && bM[2] && w==0){faz(bM[1],bM[2],1,"sub");w=1;}
+
+	function faz(r,s,t,u){
+		m=CSG;g=r.geometry;
+		bCSG=CSG.fromMesh(r,0);
+		bCSG2=CSG.fromMesh(s,0);
+		if(u=="sub"){bCSG=bCSG.subtract(bCSG2);}
+		if(u=="uni"){bCSG=bCSG.union(bCSG2);}
+		res[t]=CSG.toMesh(bCSG,r.matrix,[r.material,s.material]);
+		res[t].geometry.computeVertexNormals();
+		res[t].updateMatrix();res[t].updateMatrixWorld();
+		scene.remove(r);
+		scene.remove(s);
+		scene.add(res[t]);
+	}
+	controls.update();
+	renderer.render(scene,camera);
+}
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+init();
+animate();
+
+</script>
+</body>
+</html>
