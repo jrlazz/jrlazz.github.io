@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>screw_washers_nut.html</title>
+<meta charset="utf-8">
+
+
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+<meta name="description" content="... screw_washers_nut ...">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+
+
+<style>
+body{overflow:hidden;margin:0px;background-color:#369;font-family:Monospace;}
+span{position:absolute;font-size:15pt;}
+</style>
+
+<script type="importmap">
+	{
+		"imports":{
+	"three":"https://unpkg.com/three@0.164.0/build/three.module.js",
+	"three/addons/":"https://unpkg.com/three@0.164.0/examples/jsm/"
+		}
+	}
+</script>
+
+</head>
+
+<body>
+<span style="left:10px;top:10px;color:#ff0;">screw_washers_nut</SPAN>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+import CSG from "../js/new_csg.js";
+import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
+
+
+var renderer,scene,camera,loader,controls,text,font,g,m,s,bCSG,bCSG2;;
+var luz=[];
+var axe=[];
+var bxe=[];
+var geo=[];
+var mat=[];
+var tex=[];
+var mesh=[];
+
+var ango=0;
+var sim=0;
+var p=Math.PI;
+var spring=[];for(let z=1;z<4;z++){spring[z]=new THREE.Group();}
+var v=0;
+var w=0;
+var ww=0;
+var www=0;
+
+var gruNUT=new THREE.Group();
+var gruSCREW=new THREE.Group();
+
+let bM=[];
+let res=[];
+
+function init() {
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.setClearColor(0x006699,0);
+	renderer.colorSpace=THREE.SRGBColorSpace;
+					
+	document.body.appendChild(renderer.domElement);
+
+	scene=new THREE.Scene();
+
+	camera=new THREE.PerspectiveCamera(80,window.innerWidth/window.innerHeight,1,1000,1);
+	camera.position.set(0,30,40);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	
+	window.addEventListener( 'resize',onWindowResize );
+
+	luz[1]=new THREE.AmbientLight("#fff",3);scene.add(luz[1]);
+	luz[2]=new THREE.PointLight("#fff",15000);luz[2].position.set(20,30,0);scene.add(luz[2]);
+	luz[3]=new THREE.PointLight("#ff0",300);luz[3].position.set(26,0,0);scene.add(luz[3]);
+	luz[4]=new THREE.PointLight("#fff",15000);luz[4].position.set(-40,30,0);scene.add(luz[4]);
+
+	g=new THREE.SphereGeometry(0.3,16);
+	s=new THREE.Mesh(g,mat[1]);
+	s.position.set(26,0,0);
+	scene.add(s);
+
+	let t=new THREE.TextureLoader().load("images/made1.jpg");
+	//t.rotation=p/2; 
+	t.wrapS=THREE.RepeatWrapping;t.wrapT=THREE.RepeatWrapping;
+	//t.repeat.set(3,1);
+	let wood=new THREE.MeshStandardMaterial({color:'#840',map:t,metalness:0.4,roughness:0.2,transparent:true,opacity:0.4,side:THREE.DoubleSide});
+
+	mat[1]=new THREE.MeshStandardMaterial({color:'#666',metalness:0.7,roughness:0.2});
+	mat[2]=new THREE.MeshStandardMaterial({color:'#960',metalness:0.7,roughness:0.2});
+	mat[3]=new THREE.MeshStandardMaterial({color:'#069',metalness:0.7,roughness:0.2});
+	mat[4]=new THREE.MeshStandardMaterial({color:'#633',metalness:0.7,roughness:0.2});
+
+// threads ini
+	axe[1]=new THREE.AxesHelper(0.0001);
+	g=new THREE.BoxGeometry(0.5,0.5,0.5);
+	s=new THREE.Mesh(g,mat[4]);
+	s.rotation.set(p/4,0,p/4);
+	s.position.y=4;
+	axe[1].add(s);
+		bxe[1]=new THREE.AxesHelper(0.0001);
+		g=new THREE.BoxGeometry(0.6,1.6,0.6);
+		s=new THREE.Mesh(g,mat[3]);
+		s.position.y=5.5;
+		bxe[1].add(s);
+// threads end
+
+// screw ini
+	g=new THREE.CylinderGeometry(8,8,4,6);
+	s=new THREE.Mesh(g,mat[4]);
+	s.rotation.set(0,0,p/2);
+	s.position.set(-12,0,0);
+	gruSCREW.add(s);
+
+	g=new THREE.CylinderGeometry(4,4,24);
+	s=new THREE.Mesh(g,mat[4]);
+	s.rotation.set(0,0,p/2);
+	s.position.set(0,0,0);
+	gruSCREW.add(s);
+// screw end
+
+// CSG ini
+	g=new THREE.CylinderGeometry(8,8,4,6);
+	s=new THREE.Mesh(g,mat[4]);
+	s.rotation.set(0,0,p/2);
+	s.position.set(0,0,0);
+		bM[1]=s.clone();
+		scene.add(bM[1]);
+		bM[1].updateMatrix();bM[1].updateMatrixWorld();
+
+	g=new THREE.CylinderGeometry(4,4,8,128,128);
+	s=new THREE.Mesh(g,mat[1]);
+	s.rotation.set(0,0,p/2);
+	s.position.set(0,0,0);
+		bM[2]=s.clone();
+		scene.add(bM[2]);
+		bM[2].updateMatrix();bM[2].updateMatrixWorld();
+
+	g=new THREE.CylinderGeometry(7,7,0.5,64,64);
+	s=new THREE.Mesh(g,mat[2]);
+	s.rotation.set(0,0,p/2);
+	s.position.set(0,7,0);
+		bM[3]=s.clone();
+		scene.add(bM[3]);
+		bM[3].updateMatrix();bM[3].updateMatrixWorld();
+
+	g=new THREE.CylinderGeometry(4.7,4.7,4,64,64);
+	s=new THREE.Mesh(g,mat[1]);
+	s.rotation.set(0,0,p/2);
+	s.position.set(0,7,0);
+		bM[4]=s.clone();
+		scene.add(bM[4]);
+		bM[4].updateMatrix();bM[4].updateMatrixWorld();
+
+// CSG end
+	
+}
+
+function animate() {
+	requestAnimationFrame(animate);
+
+	if(sim==0){
+		ango=0;
+		for(let z=2;z<1160;z++){
+			ango=ango+0.02;
+			axe[z]=axe[1].clone();
+			axe[z].rotation.x=ango;
+			axe[z].position.x=ango/7;
+			spring[1].add(axe[z]);
+		}
+
+		ango=0;
+		for(let z=2;z<6000;z++){
+			ango=ango+0.02;
+			axe[z]=axe[1].clone();
+			axe[z].rotation.x=ango;
+			axe[z].position.x=ango/7;
+			spring[2].add(axe[z]);
+		}
+
+		ango=-0.2;
+		for(let z=2;z<310;z++){
+			ango=ango+0.02;
+			bxe[z]=bxe[1].clone();
+			bxe[z].rotation.x=ango;
+			bxe[z].position.x=ango/6;
+			spring[3].add(bxe[z]);
+		}
+
+		sim=1;
+	}
+
+	if(spring[1] && spring[2] && spring[2] && sim==1){
+		spring[1].position.x=-1.5;;
+		scene.add(spring[1]);
+
+		spring[2].position.x=15;
+		scene.add(spring[2]);
+
+		spring[3].position.x=8;
+		scene.add(spring[3]);
+
+		sim=2;
+	}
+
+
+// **************** CSG 
+
+	if(bM[1] && bM[2] && bM[3] && bM[4] && w==0){apply();w=1;}
+
+	function apply(){
+	 	// You can subtract,union or intersect
+		faz(bM[1],bM[2],1,"sub"); // subtract bM[1] and bM[2]
+		faz(bM[3],bM[4],2,"sub"); // subtract bM[3] and bM[4]
+		//faz(bM[21],bM[22],4,"uni"); // union bM[21] and bM[22]
+	}
+
+	function faz(r,s,t,u){
+		m=CSG;g=r.geometry;
+		bCSG=CSG.fromMesh(r,0);
+		bCSG2=CSG.fromMesh(s,0);
+		if(u=="sub"){bCSG=bCSG.subtract(bCSG2);}
+		if(u=="uni"){bCSG=bCSG.union(bCSG2);}
+		res[t]=CSG.toMesh(bCSG,r.matrix,[r.material,s.material]);
+		res[t].geometry.computeVertexNormals();
+		res[t].updateMatrix();res[t].updateMatrixWorld();
+		if(t==4){
+			scene.remove(r);
+			scene.remove(s);
+			//alert("4");
+			scene.add(res[t]);
+			//gruSCREW.add(res[t]);
+			
+		}else{
+			scene.remove(r);
+			scene.remove(s);
+			scene.add(res[t]);
+		}
+
+
+		//alert("fiz_A");
+	}
+
+	if(res[1] && www==0){
+		gruNUT.add(res[1]);
+		gruNUT.add(spring[1]);
+		gruNUT.position.x=28;
+		scene.add(gruNUT);
+
+		spring[2].position.x=-6;
+		gruSCREW.add(spring[2]);
+		scene.add(gruSCREW);
+		www=1;
+		//alert("fiz_B");
+	}
+
+	if(res[2] && ww==0){
+		//alert("fiz_C");
+		res[2].position.set(2,0,0);
+		s=res[2].clone();
+		s.position.set(-4,0,0);
+		scene.add(s);
+		ww=1;
+	}
+
+	if(res[1]){
+		res[1].rotation.x -=0.2;
+		spring[1].rotation.x -=0.2;
+		gruSCREW.rotation.x +=0.2;
+	}
+
+	controls.update();
+	renderer.render(scene,camera);
+}
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+init();
+
+animate();
+
+</script>
+
+</body>
+</html>
