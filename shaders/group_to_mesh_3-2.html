@@ -37,6 +37,7 @@ span{position:absolute;font-size:15pt;}
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import CSG from "../js/short_csg.js";
+import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js'
 
 var renderer,scene,camera,loader,controls,text,font,g,m,s,bCSG,bCSG2;;
 var luz=[];
@@ -66,7 +67,7 @@ var t=new THREE.Group();
 let bM=[];
 let res=[];
 var singleMesh;
-var q=0;
+var q=0.05;
 
 function init() {
 
@@ -77,10 +78,10 @@ function init() {
 					
 	document.body.appendChild(renderer.domElement);
 
+	scene=new THREE.Scene();
+
 	camera=new THREE.PerspectiveCamera(80,window.innerWidth/window.innerHeight,1,1000,1);
 	camera.position.set(10,2,30);
-	scene=new THREE.Scene();
-	scene.position.x=10;
 
 	controls=new OrbitControls(camera,renderer.domElement);
 	
@@ -99,6 +100,16 @@ function init() {
 	mat[1]=new THREE.MeshStandardMaterial({color:'#08b',metalness:0.7,roughness:0.2});
 	mat[4]=new THREE.MeshNormalMaterial();
 
+// threads ini
+	axe[1]=new THREE.AxesHelper(0.0001);
+	g=new THREE.BoxGeometry(0.5,0.5,0.5);
+	s=new THREE.Mesh(g,mat[4]);
+	s.rotation.set(p/4,0,p/4);
+	s.position.y=4.1;
+	axe[1].add(s);
+// threads end
+
+
 
 // threads ini
 	cxe[1]=new THREE.AxesHelper(0.0001);
@@ -107,6 +118,19 @@ function init() {
 	s.rotation.set(0,0,p/4);
 	s.position.y=4.0;
 	cxe[1].add(s);
+//scene.add(cxe[1]);
+// threads end
+
+
+// threads ini
+	cxe[2]=new THREE.AxesHelper(0.0001);
+	g=new THREE.BoxGeometry(5,5,10);
+	s=new THREE.Mesh(g,mat[1]);
+	s.rotation.set(0,0,p/4);
+	s.position.y=4.0;
+	s.position.x=-9;
+	cxe[2].add(s);
+//scene.add(cxe[2]);
 // threads end
 
 
@@ -141,6 +165,13 @@ scene.add(gruSCREW);
 		scene.add(bM[2]);
 		bM[2].updateMatrix();bM[2].updateMatrixWorld();
 
+	g=new THREE.BoxGeometry(20,5,1);
+	s=new THREE.Mesh(g,mat[4]);
+	s.rotation.set(0,0,p/2);
+	s.position.set(0,8,0);
+		bM[4]=s.clone();
+		//scene.add(bM[4]);
+		bM[4].updateMatrix();bM[4].updateMatrixWorld();
 // CSG end
 	
 }
@@ -158,14 +189,22 @@ function animate() {
 		}
 		spring[1].position.x=-1.7;;//1.85
 
+		//singleMesh=mergeGroupToMesh(spring[1]);
+		//singleMesh.material=mat[1];
+		//singleMesh.position.x=20;
+		//scene.add(singleMesh);
+
+		//t=singleMesh.clone();
 		t=spring[1].clone();
 		t.position.x=-17.4;
 		t.rotation.set(p/2+1.8,0,0);
 			gruNUT.add(t);
+		//t=singleMesh.clone();
 		t=spring[1].clone();
 		t.position.x=-20.4;
 		t.rotation.set(p/2+1.8,0,0);
 			gruNUT.add(t);
+		//t=singleMesh.clone();
 		t=spring[1].clone();
 		t.position.x=-23.4;
 		t.rotation.set(p/2+1.8,0,0);
@@ -176,6 +215,9 @@ function animate() {
 			gruNUT.add(t);
 		gruNUT.position.x=10;
 		scene.add(gruNUT);
+		//const singleMesh2=mergeGroupToMesh(gruNUT);
+		//singleMesh2.position.x=-8;
+		//scene.add(singleMesh2);
 		sim=1;
 	}
 
@@ -205,30 +247,43 @@ function animate() {
 
 	if(spring[1] && ww==0){
 		final.add(spring[1]);
+		//final.add(singleMesh);
 		final.add(res[1]);
+		//final.position.x=-12;
 		scene.add(final);
 		ww=1;
 	}
 
 	if(ww=1){
-		if(q==0){
-			final.rotation.x -=0.1;
-			final.position.x -=0.1;
-			gruSCREW.rotation.x +=0.1;
-			gruNUT.rotation.x +=0.1;
-		}
-		if(q==1){
-			final.rotation.x +=0.1;
-			final.position.x +=0.1;
-			gruSCREW.rotation.x -=0.1;
-			gruNUT.rotation.x -=0.1;
-		}
-		if(final.position.x<-14){q=1;}
-		if(final.position.x>0){q=0;}
-
+		final.rotation.x -=0.1;
+		final.position.x -=0.1;
+		gruSCREW.rotation.x +=0.1;
+		gruNUT.rotation.x +=0.1;
+		if(final.position.x<-14){volta();}
 	}
+function volta(){
+	final.position.x=2;
+}
+
+function mergeGroupToMesh(group){
+	const geometries=[];
+	group.updateMatrixWorld(true);
+	group.traverse((child) => {
+		if(child.isMesh){
+			const geometry=child.geometry.clone();
+			geometry.applyMatrix4(child.matrixWorld);
+			geometries.push(geometry);
+		}
+	});
+	if(geometries.length === 0) return null;
+	const mergedGeometry=BufferGeometryUtils.mergeGeometries(geometries,false);
+	const mergedMesh=new THREE.Mesh(mergedGeometry,mat[4]);
+	return mergedMesh;
+}
+
 	controls.update();
 	renderer.render(scene,camera);
+
 }
 
 function onWindowResize(){
