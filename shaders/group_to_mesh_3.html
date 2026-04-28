@@ -62,10 +62,12 @@ var wwww=0;
 var gruNUT=new THREE.Group();
 var gruSCREW=new THREE.Group();
 var final=new THREE.Group();
+var t=new THREE.Group();
 
 let bM=[];
 let res=[];
 var singleMesh;
+var q=0.05;
 
 function init() {
 
@@ -90,10 +92,10 @@ function init() {
 	luz[3]=new THREE.PointLight("#0f0",300);luz[3].position.set(0,0,0);scene.add(luz[3]);
 	luz[4]=new THREE.PointLight("#fff",15000);luz[4].position.set(-40,30,0);scene.add(luz[4]);
 
-	g=new THREE.SphereGeometry(0.2,16);
-	s=new THREE.Mesh(g,mat[1]);
-	s.position.set(0,0,0);
-	scene.add(s);
+	//g=new THREE.SphereGeometry(0.2,16);
+	//s=new THREE.Mesh(g,mat[1]);
+	//s.position.set(0,0,0);
+	//scene.add(s);
 
 	mat[1]=new THREE.MeshStandardMaterial({color:'#08b',metalness:0.7,roughness:0.2});
 	mat[4]=new THREE.MeshNormalMaterial();
@@ -112,7 +114,7 @@ function init() {
 // threads ini
 	cxe[1]=new THREE.AxesHelper(0.0001);
 	g=new THREE.BoxGeometry(0.5,0.5,1);
-	s=new THREE.Mesh(g,mat[4]);
+	s=new THREE.Mesh(g,mat[1]);
 	s.rotation.set(0,0,p/4);
 	s.position.y=4.0;
 	cxe[1].add(s);
@@ -123,7 +125,7 @@ function init() {
 // threads ini
 	cxe[2]=new THREE.AxesHelper(0.0001);
 	g=new THREE.BoxGeometry(5,5,10);
-	s=new THREE.Mesh(g,mat[4]);
+	s=new THREE.Mesh(g,mat[1]);
 	s.rotation.set(0,0,p/4);
 	s.position.y=4.0;
 	s.position.x=-9;
@@ -136,13 +138,13 @@ function init() {
 	g=new THREE.CylinderGeometry(8,8,4,6);
 	s=new THREE.Mesh(g,mat[1]);
 	s.rotation.set(0,0,p/2);
-	s.position.set(-30,0,0);
+	s.position.set(-20.5,0,0);
 	gruSCREW.add(s);
 
 	g=new THREE.CylinderGeometry(4,4,18);
 	s=new THREE.Mesh(g,mat[1]);
 	s.rotation.set(0,0,p/2);
-	s.position.set(-22,0,0);
+	s.position.set(-12.5,0,0);
 	gruSCREW.add(s);
 scene.add(gruSCREW);
 
@@ -186,35 +188,35 @@ function animate() {
 			spring[1].add(axe[z]);
 		}
 		spring[1].position.x=-1.7;;//1.85
-		singleMesh=mergeGroupToMesh(spring[1]);
-		singleMesh.material=mat[1];
+
+		//singleMesh=mergeGroupToMesh(spring[1]);
+		//singleMesh.material=mat[1];
 		//singleMesh.position.x=20;
-		scene.add(singleMesh);
-		const t=singleMesh.clone();
-		t.position.x=-15;
-		const tt=singleMesh.clone();
-		tt.position.x=-17.4;
-		tt.rotation.set(p/2+1.8,0,0);
+		//scene.add(singleMesh);
 
-		const ttt=singleMesh.clone();
-		ttt.position.x=-20.4;
-		ttt.rotation.set(p/2+1.8,0,0);
-
-		const tttt=singleMesh.clone();
-		tttt.position.x=-23.4;
-		tttt.rotation.set(p/2+1.8,0,0);
-
-
-		gruNUT.add(t.clone());
-		gruNUT.add(tt.clone());
-		gruNUT.add(ttt.clone());
-		gruNUT.add(tttt.clone());
-
-
-
+		//t=singleMesh.clone();
+		t=spring[1].clone();
+		t.position.x=-17.4;
+		t.rotation.set(p/2+1.8,0,0);
+			gruNUT.add(t);
+		//t=singleMesh.clone();
+		t=spring[1].clone();
+		t.position.x=-20.4;
+		t.rotation.set(p/2+1.8,0,0);
+			gruNUT.add(t);
+		//t=singleMesh.clone();
+		t=spring[1].clone();
+		t.position.x=-23.4;
+		t.rotation.set(p/2+1.8,0,0);
+			gruNUT.add(t);
+		t=spring[1].clone();
+		t.position.x=-26.4;
+		t.rotation.set(p/2+1.8,0,0);
+			gruNUT.add(t);
+		gruNUT.position.x=10;
 		scene.add(gruNUT);
-		const singleMesh2=mergeGroupToMesh(gruNUT);
-		singleMesh2.position.x=-8;
+		//const singleMesh2=mergeGroupToMesh(gruNUT);
+		//singleMesh2.position.x=-8;
 		//scene.add(singleMesh2);
 		sim=1;
 	}
@@ -244,20 +246,24 @@ function animate() {
 	}
 
 	if(spring[1] && ww==0){
-		//final.add(spring[1]);
-		final.add(singleMesh);
+		final.add(spring[1]);
+		//final.add(singleMesh);
 		final.add(res[1]);
+		//final.position.x=-12;
 		scene.add(final);
 		ww=1;
 	}
 
 	if(ww=1){
-		final.rotation.x -=0.05;
-		final.position.x -=0.025;
-		gruSCREW.rotation.x +=0.05;
-		gruNUT.rotation.x +=0.05;
-		if(final.position.x<-22){final.position.x=0;}
+		final.rotation.x -=0.1;
+		final.position.x -=0.1;
+		gruSCREW.rotation.x +=0.1;
+		gruNUT.rotation.x +=0.1;
+		if(final.position.x<-14){volta();}
 	}
+function volta(){
+	final.position.x=2;
+}
 
 function mergeGroupToMesh(group){
 	const geometries=[];
