@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>group_to_mesh_5.html</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+
+<style>
+body{overflow:hidden;margin:0;background:#369;font-family:Monospace;}
+span{position:absolute;left:10px;top:10px;color:#ff0;font-size:10.5pt;z-index:10;}
+</style>
+
+<script type="importmap">
+{
+	"imports":{
+		"three":"https://unpkg.com/three@0.184.0/build/three.module.js",
+		"three/addons/":"https://unpkg.com/three@0.184.0/examples/jsm/"
+	}
+}
+</script>
+</head>
+
+<body>
+<span>group_to_mesh_5.html ... Simple Screw + Nut (InstancedMesh Only) ... GPT Helped</span>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import CSG from "../js/short_csg.js";
+
+let renderer,scene,camera,controls;
+let screw=new THREE.Group();
+let nut=new THREE.Group();
+let mat, mat2;
+const p=Math.PI;
+let q=0;
+
+// SAME THREAD PITCH FOR SCREW + NUT
+const THREAD_PITCH=6.45;
+
+function init(){
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setClearColor(0x006699,0);
+	renderer.outputColorSpace=THREE.SRGBColorSpace;
+	document.body.appendChild(renderer.domElement);
+
+	scene=new THREE.Scene();
+
+	camera=new THREE.PerspectiveCamera(70,window.innerWidth/window.innerHeight,0.1,2000);
+	camera.position.set(20,10,35);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	controls.enableDamping=true;
+
+	window.addEventListener("resize",onWindowResize);
+
+	scene.add(new THREE.AmbientLight(0xffffff,2.5));
+	const light1=new THREE.PointLight(0xffffff,15000);
+	light1.position.set(20,30,20);
+	scene.add(light1);
+	const light2=new THREE.PointLight(0xffffff,15000);
+	light2.position.set(-30,20,-20);
+	scene.add(light2);
+
+	mat=new THREE.MeshStandardMaterial({color:"#07a",metalness:0.8,roughness:0.25});
+	mat2=new THREE.MeshStandardMaterial({color:"#0a0",metalness:0.8,roughness:0.25});
+
+	buildScrew(mat);
+	buildNut(mat);
+
+	scene.add(screw);
+	scene.add(nut);
+}
+
+function buildScrew(mat){
+
+	// Head
+	const headGeo=new THREE.CylinderGeometry(8,8,4,6);
+	const head=new THREE.Mesh(headGeo,mat);
+	head.rotation.z=p/2;
+	head.position.x=-20.5;
+	screw.add(head);
+
+	// Shaft
+	const shaftGeo=new THREE.CylinderGeometry(4,4,18,64);
+	const shaft=new THREE.Mesh(shaftGeo,mat);
+	shaft.rotation.z=p/2;
+	shaft.position.x=-12.5;
+	screw.add(shaft);
+
+	// External Thread
+	const threadGeo=new THREE.BoxGeometry(0.45,0.45,1);
+	const turns=1440;
+
+	const thread=new THREE.InstancedMesh(threadGeo,mat,turns);
+	const dummy=new THREE.Object3D();
+
+	for(let i=0; i<turns; i++){
+		const ang=i * 0.06;
+		dummy.position.set(
+			-17 + ang / THREAD_PITCH,
+			4 * Math.cos(ang),
+			4 * Math.sin(ang)
+		);
+		dummy.rotation.set(ang,0,p/4);
+		dummy.updateMatrix();
+		thread.setMatrixAt(i,dummy.matrix);
+	}
+	thread.instanceMatrix.needsUpdate=true;
+	screw.add(thread);
+
+	const tex=new THREE.TextureLoader().load('img/three_white_2.png');
+	const logo=new THREE.Mesh(new THREE.PlaneGeometry(8,8),new THREE.MeshStandardMaterial({map:tex,color:'#fff',transparent:true}));
+	logo.rotation.set(p/2,p + p/2,0);
+	logo.position.set(-23,0,0);
+	screw.add(logo);
+}
+
+function buildNut(mat){
+	// Outer body
+	const outerGeo=new THREE.CylinderGeometry(8,8,4,6);
+	const outerMesh=new THREE.Mesh(outerGeo);
+	outerMesh.rotation.z=p/2;
+	outerMesh.updateMatrix();
+	// Inner hole
+	const innerGeo=new THREE.CylinderGeometry(4.2,4.2,14,64);
+	const innerMesh=new THREE.Mesh(innerGeo);
+	innerMesh.rotation.z=p/2;
+	innerMesh.updateMatrix();
+	// CSG
+	let outerCSG=CSG.fromMesh(outerMesh);
+	let innerCSG=CSG.fromMesh(innerMesh);
+	let resultCSG=outerCSG.subtract(innerCSG);
+	const nutBody=CSG.toMesh(resultCSG,outerMesh.matrix,mat2);
+	nutBody.geometry.computeVertexNormals();
+	nut.add(nutBody);
+
+	// ---------------- SIMPLE INTERNAL THREAD ----------------
+	const threadGeo=new THREE.BoxGeometry(0.35,0.35,0.8);
+	const turns=180;
+	const internalThread=new THREE.InstancedMesh(threadGeo,mat2,turns);
+	const dummy=new THREE.Object3D();
+
+	for(let i=0;i<turns;i++){
+		const ang=i * 0.12;
+		dummy.position.set(
+			ang / THREAD_PITCH - 3,
+			4 * Math.cos(ang),
+			4 * Math.sin(ang)
+		);
+		dummy.rotation.set(ang,0,p/4);
+		dummy.updateMatrix();
+		internalThread.setMatrixAt(i,dummy.matrix);
+	}
+
+	internalThread.instanceMatrix.needsUpdate=true;
+
+	// Move thread to nut center
+	internalThread.position.x=1.4;
+	nut.add(internalThread);
+	// Nut initial position
+	nut.position.set(2,0,0);
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+
+	if(q === 0){
+		nut.position.x -= 0.05;
+		nut.rotation.x -= 0.05;
+		screw.rotation.x += 0.05;
+		if(nut.position.x < -14) q=1;
+	}else{
+		nut.position.x += 0.05;
+		nut.rotation.x += 0.05;
+		screw.rotation.x -= 0.05;
+		if(nut.position.x > 2) q=0;
+	}
+
+	controls.update();
+	renderer.render(scene,camera);
+}
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+init();
+animate();
+
+</script>
+</body>
+</html>
