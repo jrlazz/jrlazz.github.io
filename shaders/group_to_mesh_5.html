@@ -6,6 +6,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 
 <link rel="icon" type="image/png" href="../img/github-mark.png">
+<meta name="description" content="... group_to_mesh_5 ...">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
 
 <style>
 body{overflow:hidden;margin:0;background:#369;font-family:Monospace;}
@@ -34,7 +39,7 @@ import CSG from "../js/short_csg.js";
 let renderer,scene,camera,controls;
 let screw=new THREE.Group();
 let nut=new THREE.Group();
-let mat, mat2;
+let mat,mat2;
 const p=Math.PI;
 let q=0;
 
@@ -96,13 +101,11 @@ function buildScrew(mat){
 
 	// External Thread
 	const threadGeo=new THREE.BoxGeometry(0.45,0.45,1);
-	const turns=1440;
-
+	const turns=2880;
 	const thread=new THREE.InstancedMesh(threadGeo,mat,turns);
 	const dummy=new THREE.Object3D();
-
 	for(let i=0; i<turns; i++){
-		const ang=i * 0.06;
+		const ang=i * 0.03;
 		dummy.position.set(
 			-17 + ang / THREAD_PITCH,
 			4 * Math.cos(ang),
@@ -143,12 +146,11 @@ function buildNut(mat){
 
 	// ---------------- SIMPLE INTERNAL THREAD ----------------
 	const threadGeo=new THREE.BoxGeometry(0.35,0.35,0.8);
-	const turns=180;
+	const turns=360;
 	const internalThread=new THREE.InstancedMesh(threadGeo,mat2,turns);
 	const dummy=new THREE.Object3D();
-
 	for(let i=0;i<turns;i++){
-		const ang=i * 0.12;
+		const ang=i * 0.06;
 		dummy.position.set(
 			ang / THREAD_PITCH - 3,
 			4 * Math.cos(ang),
@@ -158,9 +160,7 @@ function buildNut(mat){
 		dummy.updateMatrix();
 		internalThread.setMatrixAt(i,dummy.matrix);
 	}
-
 	internalThread.instanceMatrix.needsUpdate=true;
-
 	// Move thread to nut center
 	internalThread.position.x=1.4;
 	nut.add(internalThread);
@@ -170,25 +170,23 @@ function buildNut(mat){
 
 function animate(){
 	requestAnimationFrame(animate);
-
-	if(q === 0){
-		nut.position.x -= 0.05;
-		nut.rotation.x -= 0.05;
-		screw.rotation.x += 0.05;
-		if(nut.position.x < -14) q=1;
+	if(q===0){
+		nut.position.x -=0.05;
+		nut.rotation.x -=0.05;
+		screw.rotation.x +=0.05;
+		if(nut.position.x<-14)q=1;
 	}else{
-		nut.position.x += 0.05;
-		nut.rotation.x += 0.05;
-		screw.rotation.x -= 0.05;
-		if(nut.position.x > 2) q=0;
+		nut.position.x +=0.05;
+		nut.rotation.x +=0.05;
+		screw.rotation.x -=0.05;
+		if(nut.position.x>2)q=0;
 	}
-
 	controls.update();
 	renderer.render(scene,camera);
 }
 
 function onWindowResize(){
-	camera.aspect=window.innerWidth / window.innerHeight;
+	camera.aspect=window.innerWidth/window.innerHeight;
 	camera.updateProjectionMatrix();
 	renderer.setSize(window.innerWidth,window.innerHeight);
 }
