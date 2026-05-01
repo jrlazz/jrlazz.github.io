@@ -53,6 +53,7 @@ var w=0;
 
 let bM=[];
 let res=[];
+let outer,inner,result;
 
 function init() {
 
@@ -77,35 +78,32 @@ function init() {
 
 	// tooth ini
 	axe[1]=new THREE.AxesHelper(0.0001);
-	g=new THREE.BoxGeometry(0.5,0.5,0.5);
+	g=new THREE.BoxGeometry(0.7,0.7,0.5);
 	s=new THREE.Mesh(g,mat[1]);
-	s.rotation.set(p/4,0,p/4);
-	s.position.y=4;
+	s.rotation.set(0,0,p/4);
+	s.position.y=3.8;
 	axe[1].add(s);
 	// tooth end
 
 	// screw ini
-	g=new THREE.CylinderGeometry(2,2,4,5);
-	s=new THREE.Mesh(g,mat[1]);
-	s.rotation.set(0,0,p/2);
-	s.position.set(-20,0,0);
-		bM[2]=s.clone();
-		scene.add(bM[2]);
-		bM[2].updateMatrix();bM[2].updateMatrixWorld();
-
-	g=new THREE.CylinderGeometry(5,3.2,2);
-	s=new THREE.Mesh(g,mat[1]);
-	s.rotation.set(0,0,p/2);
-	s.position.set(-19,0,0);
-		bM[1]=s.clone();
-		scene.add(bM[1]);
-		bM[1].updateMatrix();bM[1].updateMatrixWorld();
-	
-	g=new THREE.CylinderGeometry(3,2.4,5);
-	s=new THREE.Mesh(g,mat[1]);
-	s.rotation.set(0,0,p/2);
-	s.position.set(-16,0,0);
-	scene.add(s);
+	// Outer body
+	g=new THREE.CylinderGeometry(5,2.4,3,128);
+	bM[2]=new THREE.Mesh(g);
+	bM[2].rotation.z=p/2;
+	bM[2].updateMatrix();
+		// Inner hole
+		g=new THREE.CylinderGeometry(2,2,4,5);
+		bM[1]=new THREE.Mesh(g);
+		bM[1].rotation.z=p/2;
+		bM[1].updateMatrix();
+	// CSG
+	outer=CSG.fromMesh(bM[2]);
+	inner=CSG.fromMesh(bM[1]);
+	result=outer.subtract(inner);
+	res[1]=CSG.toMesh(result,bM[2].matrix,mat[1]);
+	res[1].geometry.computeVertexNormals();
+	res[1].position.x=-15;
+	scene.add(res[1]);
 
 	g=new THREE.CylinderGeometry(2.4,1.2,28);
 	s=new THREE.Mesh(g,mat[1]);
@@ -115,10 +113,10 @@ function init() {
 	g=new THREE.CylinderGeometry(1.2,0.1,5);
 	s=new THREE.Mesh(g,mat[1]);
 	s.rotation.set(0,0,p/2);
-	s.position.set(16,0,0);
+	s.position.set(16.5,0,0);
 	scene.add(s);
-	// screw end
 
+	// screw end
 }
 
 function animate() {
@@ -126,9 +124,9 @@ function animate() {
 	if(sim==0){
 		ango=0;
 		diam=1;
-		for(let z=2;z<6000;z++){
-			ango=ango+0.03;
-			diam=(6000-z)/6000;
+		for(let z=2;z<3000;z++){
+			ango=ango+0.06;
+			diam=(3000-z)/3000;
 			axe[z]=axe[1].clone();
 			axe[z].rotation.x=ango;
 			axe[z].position.x=ango/6.6;
@@ -138,22 +136,6 @@ function animate() {
 		spring.position.x=-13;;
 		scene.add(spring);
 		sim=1;
-	}
-
-	if(bM[1] && bM[2] && w==0){faz(bM[1],bM[2],1,"sub");w=1;}
-
-	function faz(r,s,t,u){
-		m=CSG;g=r.geometry;
-		bCSG=CSG.fromMesh(r,0);
-		bCSG2=CSG.fromMesh(s,0);
-		if(u=="sub"){bCSG=bCSG.subtract(bCSG2);}
-		if(u=="uni"){bCSG=bCSG.union(bCSG2);}
-		res[t]=CSG.toMesh(bCSG,r.matrix,[r.material,s.material]);
-		res[t].geometry.computeVertexNormals();
-		res[t].updateMatrix();res[t].updateMatrixWorld();
-		scene.remove(r);
-		scene.remove(s);
-		scene.add(res[t]);
 	}
 	controls.update();
 	renderer.render(scene,camera);
