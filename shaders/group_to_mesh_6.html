@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>group_to_mesh_6.html</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+<meta name="description" content="... group_to_mesh_6 ...">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+
+<style>
+body{overflow:hidden;margin:0;background:#369;font-family:Monospace;}
+span{position:absolute;width:99%;top:10px;text-align:center;color:#ff0;font-size:10.25pt;z-index:1;}
+</style>
+
+<script type="importmap">
+{
+	"imports":{
+		"three":"https://unpkg.com/three@0.184.0/build/three.module.js",
+		"three/addons/":"https://unpkg.com/three@0.184.0/examples/jsm/"
+	}
+}
+</script>
+</head>
+
+<body>
+<span>group_to_mesh_6.html ... Screw + washers + nut ... GPT Helped (InstancedMesh)</span>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import CSG from "../js/short_csg.js";
+
+let renderer,scene,camera,controls;
+let screw=new THREE.Group();
+let nut=new THREE.Group();
+let mat=[];
+var wa=[];
+let plate=[];
+let p=Math.PI;
+let q=0;
+let t=0;
+
+let bM=[];
+let res=[];
+let g,m,s;
+
+let turns,dummy,outer,inner,result;
+let oldRadius,oldDivisor,radius,divisor;
+let tex,logo;
+let my,your;
+
+function init(){
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setClearColor(0x006699,0);
+	renderer.outputColorSpace=THREE.SRGBColorSpace;
+	document.body.appendChild(renderer.domElement);
+
+	scene=new THREE.Scene();
+
+	camera=new THREE.PerspectiveCamera(70,window.innerWidth/window.innerHeight,0.1,2000);
+	camera.position.set(20,10,35);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	controls.enableDamping=true;
+
+	window.addEventListener("resize",onWindowResize);
+
+	scene.add(new THREE.AmbientLight(0xffffff,2.5));
+	const light1=new THREE.PointLight(0xffffff,15000);
+	light1.position.set(20,30,20);
+	scene.add(light1);
+	const light2=new THREE.PointLight(0xffffff,15000);
+	light2.position.set(-30,20,-20);
+	scene.add(light2);
+
+	mat[1]=new THREE.MeshStandardMaterial({color:"#07a",metalness:0.8,roughness:0.25});
+	mat[2]=mat[1].clone();mat[2].color.set("#0a0");
+	mat[3]=mat[1].clone();mat[3].color.set("#c90");
+	mat[4]=mat[1].clone();mat[4].color.set("#c00");
+	mat[5]=mat[1].clone();mat[5].color.set("#cda");
+	mat[6]=mat[1].clone();mat[6].color.set("#9a8");
+
+	// Head
+	g=new THREE.CylinderGeometry(8,8,4,6);
+	s=new THREE.Mesh(g,mat[1]);
+	s.rotation.z=p/2;
+	s.position.x=-20.5;
+	screw.add(s);
+
+	// Shaft
+	g=new THREE.CylinderGeometry(4,4,18,64);
+	s=new THREE.Mesh(g,mat[1]);
+	s.rotation.z=p/2;
+	s.position.x=-12.5;
+	screw.add(s);
+
+	// screw thread
+	g=new THREE.BoxGeometry(0.45,0.45,1);
+	turns=2880;
+	s=new THREE.InstancedMesh(g,mat[1],turns);
+	dummy=new THREE.Object3D();
+	for(let i=0;i<turns;i++){
+		const ang=i*0.03;
+		dummy.position.set(-17 + ang/6.45,4*Math.cos(ang),4*Math.sin(ang));
+		dummy.rotation.set(ang,0,p/4);
+		dummy.updateMatrix();
+		s.setMatrixAt(i,dummy.matrix);
+	}
+	s.instanceMatrix.needsUpdate=true;
+	screw.add(s);
+
+	// spring washer
+	g=new THREE.BoxGeometry(0.5,2,0.5);
+	g.translate(0.4,0,0);
+	turns=205;
+	wa[3]=new THREE.InstancedMesh(g,mat[4],turns);
+	dummy=new THREE.Object3D();
+	oldRadius=4;
+	oldDivisor=6.45;
+	radius=6;
+	divisor=oldDivisor * (oldRadius / radius);
+	for(let i=0;i<turns;i++){
+		const ang=i*0.03;
+		dummy.position.set(17 + ang/divisor,radius*Math.cos(ang),radius*Math.sin(ang));
+		dummy.rotation.set(ang,0,p);
+		dummy.updateMatrix();
+		wa[3].setMatrixAt(i,dummy.matrix);
+	}
+	wa[3].instanceMatrix.needsUpdate=true;
+	wa[3].position.x=0;
+	scene.add(wa[3]);
+
+	// nut
+	g=new THREE.CylinderGeometry(8,8,4,6);
+	s=new THREE.Mesh(g);
+	s.rotation.z=p/2;
+		bM[1]=s.clone();
+		bM[1].updateMatrix();bM[1].updateMatrixWorld();
+	g=new THREE.CylinderGeometry(4.2,4.2,14,64);
+	s=new THREE.Mesh(g);
+	s.rotation.z=p/2;
+		bM[2]=s.clone();
+		bM[2].updateMatrix();bM[2].updateMatrixWorld();
+	outer=CSG.fromMesh(bM[1]);
+	inner=CSG.fromMesh(bM[2]);
+	result=outer.subtract(inner);
+	s=CSG.toMesh(result,bM[1].matrix,mat[2]);
+	s.geometry.computeVertexNormals();
+	nut.add(s);
+
+	// washer 1,2 and 4
+	g=new THREE.CylinderGeometry(7,7,0.5,64,64);
+	s=new THREE.Mesh(g);
+	s.rotation.z=p/2;
+		bM[3]=s.clone();
+		bM[3].updateMatrix();bM[3].updateMatrixWorld();
+	g=new THREE.CylinderGeometry(4.7,4.7,4,64,64);
+	s=new THREE.Mesh(g);
+	s.rotation.z=p/2;
+		bM[4]=s.clone();
+		bM[4].updateMatrix();bM[4].updateMatrixWorld();
+	outer=CSG.fromMesh(bM[3]);
+	inner=CSG.fromMesh(bM[4]);
+	result=outer.subtract(inner);
+	wa[1]=CSG.toMesh(result,bM[3].matrix,mat[3]);
+	wa[1].geometry.computeVertexNormals();
+	wa[1].position.x=9;
+	scene.add(wa[1]);
+
+	wa[2]=wa[1].clone();
+	wa[2].position.x=15;
+	scene.add(wa[2]);
+
+	wa[4]=wa[1].clone();
+	wa[4].material=wa[1].material.clone();
+	wa[4].material=mat[4];
+	wa[4].position.x=-13;
+	//scene.add(wa[4]);
+
+	// plate 1 and 2
+	g=new THREE.BoxGeometry(0.5,16,16);
+	s=new THREE.Mesh(g);
+		bM[5]=s.clone();
+		bM[5].updateMatrix();bM[5].updateMatrixWorld();
+	g=new THREE.CylinderGeometry(5,5,4,64);
+	s=new THREE.Mesh(g);
+	s.rotation.z=p/2;
+		bM[6]=s.clone();
+		bM[6].updateMatrix();bM[6].updateMatrixWorld();
+	outer=CSG.fromMesh(bM[5]);
+	inner=CSG.fromMesh(bM[6]);
+	result=outer.subtract(inner);
+	plate[1]=CSG.toMesh(result,bM[5].matrix,mat[5]);
+	plate[1].geometry.computeVertexNormals();
+	plate[1].position.x=11;
+	scene.add(plate[1]);
+
+	plate[2]=plate[1].clone();
+	plate[2].material=plate[1].material.clone();
+	plate[2].material=mat[6];
+	plate[2].rotation.x=p/4;
+	plate[2].position.x=13;
+	scene.add(plate[2]);
+
+	// internal thread
+	g=new THREE.BoxGeometry(0.35,0.35,0.8);
+	turns=360;
+	s=new THREE.InstancedMesh(g,mat[2],turns);
+	dummy=new THREE.Object3D();
+	for(let i=0;i<turns;i++){
+		const ang=i * 0.06;
+		dummy.position.set(ang / 6.45 - 3,4 * Math.cos(ang),4 * Math.sin(ang));
+		dummy.rotation.set(ang,0,p/4);
+		dummy.updateMatrix();
+		s.setMatrixAt(i,dummy.matrix);
+	}
+	s.instanceMatrix.needsUpdate=true;
+	s.position.x=1.4;
+	nut.add(s);
+	nut.position.x=20;
+
+	tex=new THREE.TextureLoader().load('img/three_white_2.png');
+	logo=new THREE.Mesh(new THREE.PlaneGeometry(8,8),new THREE.MeshStandardMaterial({map:tex,color:'#fff',transparent:true}));
+	logo.rotation.set(p/2,p + p/2,0);
+	logo.position.set(-23,0,0);
+	screw.add(logo);
+
+	scene.add(screw);
+	scene.add(nut);
+
+}// ini end
+
+function animate(){
+	requestAnimationFrame(animate);
+	if(nut && wa[3] && wa[2] && plate[2] && plate[1] && wa[1]){
+		if(wa[1].position.x>-18.1){	   wa[1].position.x -=0.2;}
+		if(plate[1].position.x>-17.6){	plate[1].position.x -=0.18;}
+		if(plate[2].position.x>-17.1){	plate[2].position.x -=0.16;}
+		if(wa[2].position.x>-16.6){	   wa[2].position.x -=0.14;}
+		if(wa[3].position.x>-33.1){	   wa[3].position.x -=0.12;}
+		if(nut.position.x>0){		     nut.position.x -=0.10;}
+	}
+	if(nut.position.x<0){
+		if(q==0){
+			nut.position.x -=0.05;
+			nut.rotation.x -=0.05;
+			screw.rotation.x +=0.05;
+			if(nut.position.x<-14){q=2;your=setTimeout(neda,2000);}
+		}
+		if(q==1){
+			nut.position.x +=0.05;
+			nut.rotation.x +=0.05;
+			screw.rotation.x -=0.05;
+			if(nut.position.x>0){q=2;my=setTimeout(nada,2000);}
+		}
+	}
+	function nada(){
+		nut.position.x=20;
+		wa[3].position.x=0;
+		wa[2].position.x=15;
+		plate[2].position.x=13;
+		plate[1].position.x=11;
+		wa[1].position.x=9;
+		q=0;clearTimeout(my);
+	}
+	function neda(){q=1;clearTimeout(your);}
+	controls.update();
+	renderer.render(scene,camera);
+}
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+init();
+animate();
+
+</script>
+</body>
+</html>
