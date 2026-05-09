@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>instanced_shader_texture.html</title>
+<meta charset="utf-8">
+
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+<meta name="description" content="... instanced_shader_texture ...">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+
+<style>
+body{overflow:hidden;margin:0;background:#036;font-family:Monospace;}
+span{position:absolute;width:99%;top:10px;text-align:center;color:#ff0;font-size:10.25pt;z-index:1;}
+</style>
+
+<script type="importmap">
+{
+	"imports":{
+		"three":"https://unpkg.com/three@0.184.0/build/three.module.js",
+		"three/addons/":"https://unpkg.com/three@0.184.0/examples/jsm/"
+	}
+}
+</script>
+
+</head>
+
+<body>
+<span>instanced_shader_texture.html</span>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+//import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js";
+//import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.160/examples/jsm/controls/OrbitControls.js";
+
+let renderer,scene,camera,controls;
+let t=0;
+let count=0;
+let geo,mat,mesh,tileIndices,dummy,light;
+
+function init(){
+
+	scene=new THREE.Scene();
+	camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,1000);
+	camera.position.z=40;
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setClearColor(0x006699,0);
+	renderer.outputColorSpace=THREE.SRGBColorSpace;
+
+	document.body.appendChild(renderer.domElement);
+
+	window.addEventListener("resize",onWindowResize);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+
+	geo=new THREE.BoxGeometry(3,3,3);
+	count=60;
+	mat=new THREE.ShaderMaterial({
+		uniforms:{
+			atlas:{value:new THREE.TextureLoader().load("images/pedras.jpg")},
+			tiles:{value:new THREE.Vector2(4,4)} // 4x4 atlas
+		},
+		vertexShader: `
+		attribute float tileIndex;
+		varying vec2 vUv;
+		uniform vec2 tiles;
+		void main(){
+			vUv=uv;
+			vec2 tile;
+			tile.x=mod(tileIndex,tiles.x);
+			tile.y=floor(tileIndex/tiles.x);
+			vUv=(uv+tile)/tiles;
+			vec4 mvPosition=modelViewMatrix*instanceMatrix*vec4(position,1.0);
+			gl_Position=projectionMatrix*mvPosition;
+		}
+		`,
+		fragmentShader: `
+		uniform sampler2D atlas;
+		varying vec2 vUv;
+		void main(){
+			gl_FragColor=texture2D(atlas,vUv);
+		}
+		`
+	});
+
+	mesh=new THREE.InstancedMesh(geo,mat,count);
+
+	// ATTRIBUTE: WHICH TEXTURE TILE
+	tileIndices=new Float32Array(count);
+	for(let i=0;i<count;i++){
+		tileIndices[i]=Math.floor(Math.random()*16); // 4x4 atlas
+	}
+	geo.setAttribute("tileIndex",new THREE.InstancedBufferAttribute(tileIndices,1));
+
+	// POSITION INSTANCES
+	dummy=new THREE.Object3D();
+	for(let i=0; i<count; i++){
+		dummy.position.set(
+			Math.sin(i*0.2)*15,
+			Math.cos(i*0.5)*10,
+			i*0.2
+		);
+		dummy.updateMatrix();
+		mesh.setMatrixAt(i,dummy.matrix);
+	}
+	scene.add(mesh);
+
+	// LIGHT (optional,shader is basic)
+	//light=new THREE.DirectionalLight(0xffffff,100);
+	//light.position.set(5,5,5);
+	//scene.add(light);
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	t++;
+	if(t==100){
+		tileIndices[12]=10; // Use atlas tile #7
+		tileIndices[7]=10; // Use atlas tile #7
+		tileIndices[26]=10; // Use atlas tile #7
+		geo.attributes.tileIndex.needsUpdate=true;
+	}
+
+	let tt=Math.floor(performance.now() * 0.2) % count;
+	tileIndices[t]=Math.floor(Math.random() * 16);
+	geo.attributes.tileIndex.needsUpdate=true;
+
+	if(t>200){t=0;}
+	
+	//mesh.rotation.y += 0.01;
+
+	renderer.render(scene,camera);
+}
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+init();
+animate();
+
+</script>
+</body>
+</html>
