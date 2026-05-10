@@ -38,8 +38,10 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 let renderer,scene,camera,controls;
 let t=0;
+let tt=0;
 let count=0;
 let geo,mat,mesh,tileIndices,dummy,light;
+let u=0;
 
 function init(){
 
@@ -121,18 +123,64 @@ function animate(){
 	requestAnimationFrame(animate);
 	t++;
 	if(t==100){
-		tileIndices[12]=10; // Use atlas tile #7
-		tileIndices[7]=10; // Use atlas tile #7
-		tileIndices[26]=10; // Use atlas tile #7
+		tileIndices[12]=10;
+		tileIndices[7]=10;
+		tileIndices[26]=10;
 		geo.attributes.tileIndex.needsUpdate=true;
 	}
 
-	let tt=Math.floor(performance.now() * 0.2) % count;
+/*
+	tt=Math.floor(performance.now() * 0.2) % count;
+	tileIndices[tt]=Math.floor(Math.random() * 16);
+	geo.attributes.tileIndex.needsUpdate=true;
+*/
 	tileIndices[t]=Math.floor(Math.random() * 16);
 	geo.attributes.tileIndex.needsUpdate=true;
+/*
+	tt=Math.floor(performance.now() * 0.2) % count;
+	mesh.getMatrixAt(tt,dummy.matrix);
+	dummy.matrix.decompose(dummy.position,dummy.quaternion,dummy.scale);
+	dummy.scale.set(3,3,3);
+	dummy.updateMatrix();
+	mesh.setMatrixAt(tt,dummy.matrix);
+	mesh.instanceMatrix.needsUpdate=true;
+*/
 
 	if(t>200){t=0;}
-	
+
+	if(t==130){
+		u++;
+		mesh.getMatrixAt(12,dummy.matrix);
+		dummy.matrix.decompose(dummy.position,dummy.quaternion,dummy.scale);
+		dummy.position.x +=7;
+		dummy.updateMatrix();
+		mesh.setMatrixAt(12,dummy.matrix);
+		mesh.instanceMatrix.needsUpdate=true;
+	}
+	if(u==5){
+		u=0;
+		mesh.getMatrixAt(12,dummy.matrix);
+		dummy.matrix.decompose(dummy.position,dummy.quaternion,dummy.scale);
+		dummy.position.x=-30;
+		dummy.updateMatrix();
+		mesh.setMatrixAt(12,dummy.matrix);
+		mesh.instanceMatrix.needsUpdate=true;
+	}
+
+	if(t==150){
+		// CHANGE TEXTURE
+		tileIndices[12]=10;
+		geo.attributes.tileIndex.needsUpdate=true;
+
+		// ENLARGE ONLY INSTANCE 12
+		mesh.getMatrixAt(12,dummy.matrix);
+		dummy.matrix.decompose(dummy.position,dummy.quaternion,dummy.scale);
+		dummy.scale.set(2.5,2.5,2.5); // enlarge this one
+		dummy.updateMatrix();
+		mesh.setMatrixAt(12,dummy.matrix);
+		mesh.instanceMatrix.needsUpdate=true;
+	}
+
 	//mesh.rotation.y += 0.01;
 
 	renderer.render(scene,camera);
