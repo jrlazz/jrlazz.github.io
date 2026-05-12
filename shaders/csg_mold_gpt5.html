@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>csg_mold_gpt5.html</title>
+
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+<meta name="description" content="... CSG molding with extruded meshes ...">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+
+<style>
+body{overflow:hidden;margin:0;background:#026;font-family:monospace;}
+span{position:absolute;left:10px;top:10px;color:#ff0;font-size:10.25pt;z-index:1}
+button{position:absolute;font-family:monospace;font-size:12pt;color:#009;padding:4px;left:10px;top:40px;border:2px outset gold;cursor:pointer;}
+</style>
+
+<script type="importmap">
+{
+  "imports":{
+	"three":"https://unpkg.com/three@0.184.0/build/three.module.js",
+	"three/addons/":"https://unpkg.com/three@0.184.0/examples/jsm/"
+  }
+}
+</script>
+
+</head>
+
+<body>
+<span>csg_mold_gpt5 ... Jee Peetee helped ... inside extrusion molding</span>
+<button id="bs" style="display:;">SLOW</button>
+<button id="bf" style="display:none;">FAST</button>
+
+<script type="module">
+
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import * as BufferGeometryUtils from "three/addons/utils/BufferGeometryUtils.js";
+import { SVGLoader } from "three/addons/loaders/SVGLoader.js";
+import CSG from "../js/short_csg.js";
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+
+let scene, camera, renderer, controls, text, font;;
+
+let tot=new THREE.Group();
+const p=Math.PI;
+
+let finalMesh;
+let tex,g,m,s,la,logo;
+
+let gclone;
+
+let bM=[];
+let outer,inner,result;
+
+let t=[];for(let z=0;z<10;z++){t[z]=0;}
+let u=[];for(let z=0;z<10;z++){u[z]=0;}
+
+let vel=1;
+
+var extrudeSettings, loader, path=[], material, shapes=[], shape, geometry;
+
+let mat=[],geo=[],res=[];
+
+let dbs=document.getElementById("bs");
+let dbf=document.getElementById("bf");
+
+init();
+animate();
+
+function init(){
+
+	dbs.onclick=function DBS(){vel=0.5;dbs.style.display="none";dbf.style.display="";}
+	dbf.onclick=function DBF(){vel=1;location.reload();}
+
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+	renderer.setClearColor(0x003355,0);
+	document.body.appendChild(renderer.domElement);
+
+	window.addEventListener("resize",onWindowResize);
+
+	scene=new THREE.Scene();
+	camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,0.1,1000);
+	camera.position.set(-12,8,12);
+	scene.rotation.x=-p/2;
+	scene.position.z=-5;
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	controls.enableDamping=true;
+
+	scene.add(new THREE.AmbientLight('#fff',2));
+
+	s=new THREE.Mesh(new THREE.SphereGeometry(1,7,7),new THREE.MeshStandardMaterial({color:"#fff",wireframe:true}));
+	la=new THREE.PointLight('#fff',5000);
+	la.position.set(0,0,20);
+	la.add(s);
+	scene.add(la);
+
+	tex=new THREE.TextureLoader().load('img/three_white_2.png');
+	logo=new THREE.Mesh(new THREE.PlaneGeometry(5,5),new THREE.MeshStandardMaterial({map:tex,transparent:true,side:THREE.DoubleSide}));
+	logo.rotation.set(p/2,0,0);
+	logo.position.set(0,0.5,0);
+
+	mat[1]=new THREE.MeshStandardMaterial({color:"#cc9900",metalness:0.15,roughness:0.55});
+	mat[2]=new THREE.MeshStandardMaterial({color:"#00aaff",wireframe:false});
+	mat[3]=new THREE.MeshStandardMaterial({color:"#060"});
+	mat[4]=new THREE.MeshStandardMaterial({color:"#c00"});
+
+	// ******** ******** Functions start
+	function prepGeo(g){
+		if(g.index){g=g.toNonIndexed();}
+		if(g.getAttribute("uv")){g.deleteAttribute("uv");}
+		g=BufferGeometryUtils.mergeVertices(g);
+		g.computeVertexNormals();
+		g.computeBoundingBox();
+		g.computeBoundingSphere();
+		return g;
+	}
+	function fcsg(k){
+		bM[k]=s.clone();
+		bM[k].updateMatrix();bM[k].updateMatrixWorld();
+	}
+	function fcsgres(k1,k2,k3,op){
+		outer=CSG.fromMesh(bM[k1]);
+		inner=CSG.fromMesh(bM[k2]);
+		if(op=="su"){result=outer.subtract(inner);}
+		if(op=="un"){result=outer.union(inner);}
+		if(op=="in"){result=outer.intersect(inner);}
+		s=CSG.toMesh(result,bM[1].matrix,mat[k3]);
+		s.geometry.computeVertexNormals();
+	}
+	// ******** ******** Functions end
+
+	geo[1]=new THREE.BoxGeometry(1,2,3);
+	geo[2]=new THREE.CylinderGeometry(0.5,0.5,2,32,32,true);
+	geo[2].translate(-1.5,0,0);
+	geo[4]=new THREE.CylinderGeometry(0.5,0.5,2,32,32,true);
+	geo[4].translate(1.5,0,0);
+
+	// Extrude
+	extrudeSettings={steps:1,depth:2,curveSegments:100,bevelEnabled:false};
+	loader=new SVGLoader();
+	loader.load('img/cyl_cut.svg',function(data){
+		shapes=SVGLoader.createShapes(data.paths[0]);
+		shape=shapes[0];
+		geo[3]=new THREE.ExtrudeGeometry(shape,extrudeSettings);
+		geo[3].clearGroups();
+		geo[3].center();
+		geo[3].scale(0.05,0.05,1);
+		geo[3].rotateX(p/2);
+		geo[3].translate(1.5,0,0);
+s=new THREE.Mesh(geo[3],mat[4]);s.position.y=-7;scene.add(s);
+		geo[6]=new THREE.ExtrudeGeometry(shape,extrudeSettings);
+		geo[6].clearGroups();
+		geo[6].center();
+		geo[6].scale(0.05,0.05,1);
+		geo[6].rotateX(p/2);
+		geo[6].translate(-1.5,0,0);
+s=new THREE.Mesh(geo[6],mat[4]);s.position.y=-7;scene.add(s);
+
+		// --------------------------------------------------
+		// PREP ALL
+		// --------------------------------------------------
+		geo[1]=prepGeo(geo[1]);
+//		geo[2]=prepGeo(geo[2]);
+		geo[3]=prepGeo(geo[3]);
+//		geo[4]=prepGeo(geo[4]);
+		geo[6]=prepGeo(geo[6]);
+
+		s=new THREE.Mesh(new THREE.BoxGeometry(5,0.5,5),mat[1]);
+		fcsg(1)
+//scene.add(s);	
+
+		geo[5]=BufferGeometryUtils.mergeGeometries([geo[3],geo[6]]);
+		g=BufferGeometryUtils.mergeGeometries([geo[1],geo[5]]);
+		s=new THREE.Mesh(g,mat[1]);
+		fcsg(2)
+//scene.add(s);
+		fcsgres(1,2,1,"su");
+//scene.add(s);
+		fcsg(2)
+
+		// Press
+		s=s.clone();
+		s.position.y=-4;
+		res[3]=s.clone();
+
+		s=s.clone();
+		s.material=s.material.clone();
+		s.material=mat[3];
+		s.scale.set(1,0.025,1);
+		s.position.y=-8;
+		tot.add(s);
+
+		// left & right sides
+		s=new THREE.Mesh(new THREE.PlaneGeometry(5,0.5),mat[3]);
+		s.position.set(0,-8.25,2.5);
+		tot.add(s);
+			s=s.clone();
+			s.position.set(0,-8.25,-2.5);
+			tot.add(s);
+		s=s.clone();
+		s.position.set(-2.5,-8.25,0);
+		s.rotation.set(0,p/2,0);
+		tot.add(s);
+			s=s.clone();
+			s.position.set(2.5,-8.25,0);
+			tot.add(s);
+
+		// up & down sides
+		s=new THREE.Mesh(new THREE.PlaneGeometry(1,0.5),mat[3]);
+		s.position.set(0,-8.25,1.5);
+		tot.add(s);
+			s=s.clone();
+			s.position.set(0,-8.25,-1.5);
+			tot.add(s);
+		s=s.clone();
+		s.scale.set(3,1,1);
+		s.position.set(-0.5,-8.25,0);
+		s.rotation.set(0,p/2,0);
+		tot.add(s);
+			s=s.clone();
+			s.position.set(0.5,-8.25,0);
+			tot.add(s);
+
+		// rectangle lid
+		s=new THREE.Mesh(new THREE.PlaneGeometry(3,1),mat[3]);
+		s.rotation.set(p/2,0,p/2);
+		s.position.set(0,-8.5,0);
+		tot.add(s);
+
+		// cylinders
+		s=new THREE.Mesh(new THREE.CylinderGeometry(0.6,0.6,0.4,32,32,true),mat[3]);
+		s.position.set(-1.5,-8.25,0);
+		tot.add(s);
+			s=s.clone();
+			s.position.set(1.5,-8.25,0);
+			tot.add(s);
+
+		// cylinders caps
+		s=new THREE.Mesh(new THREE.CircleGeometry(0.6,32),mat[3]);
+		s.rotation.set(p/2,0,0);
+		s.position.set(-1.5,-8.45,0);
+		tot.add(s);
+			s=s.clone();
+			s.position.set(1.5,-8.45,0);
+			tot.position.y=8.2;
+			tot.add(s);
+
+		// mold base
+		s=new THREE.Mesh(new THREE.BoxGeometry(7,0.6,7),mat[1]);
+		s.position.y=0.05;
+		fcsg(1)
+		fcsgres(1,2,2,"su");
+		res[1]=s.clone();
+
+		// sheet
+		s=new THREE.Mesh(new THREE.PlaneGeometry(6,6),mat[3]);
+		s.rotation.set(p/2,0,p/2);
+		s.position.set(0,-2,0);
+		res[2]=s.clone();
+	});
+
+	loader=new FontLoader();
+	loader.load('../fonte/Cascadia_Regular.json',function(response){font=response;createText();});
+	function createText(){
+		m=[new THREE.MeshStandardMaterial({color:'#fff'}),new THREE.MeshStandardMaterial({color:'#c00'})];
+		g=new TextGeometry("2 extruded\n cylinders",{font:font,size:0.5,depth:0.25,curveSegments:6,bevelEnabled:false});
+		g.center();
+		tex[3]=new THREE.Mesh(g,m);
+		tex[3].rotation.set(p/2,0,0);
+		tex[3].position.set(0,-9,0);
+		scene.add(tex[3]);
+	}
+
+}// init end
+	
+function animate(){
+	requestAnimationFrame(animate);
+
+	if(res[1] && res[2] && res[3] && tot){
+		if(t[0]==0){
+			for(let z=1;z<4;z++){scene.add(res[z]);}
+			t[0]=1;
+		}
+		if(res[1] && res[2] && t[0]==0){
+			scene.add(res[1]);
+			scene.add(res[2]);
+			t[0]=1;
+		}
+		scene.add(logo);
+		for(let z=1;z<6;z++){t[z]=t[z]+vel;}
+
+		if(t[1]<100 && u[1]==0){if(Number.isInteger(t[1])){res[2].position.y +=0.0175;}}
+		if(t[1]==100){u[1]=1;t[1]=0;}
+
+		if(t[2]===185 && u[2]==0){if(Number.isInteger(t[2])){res[2].scale.setScalar(0.9);}}
+		if(t[2]===190 && u[2]==0){if(Number.isInteger(t[2])){res[2].scale.setScalar(0.85);}}
+		if(t[2]==195 && u[2]==0){if(Number.isInteger(t[2])){res[2].scale.setScalar(0.8);}}
+		if(t[2]>100 && t[2]<200 && u[2]==0){if(Number.isInteger(t[2])){res[3].position.y +=0.04;}}
+
+		if(t[2]>200 && t[2]<250 && u[2]==0){if(Number.isInteger(t[2])){res[3].position.y -=0.08;}}
+		if(t[2]==250){u[2]=1;t[2]=0;}
+
+		if(t[3]==250 && u[3]==0){scene.remove(res[2]);scene.add(tot);u[3]=1;}
+
+		if(t[4]>260 && t[4]<500 && u[4]==0){
+			if(Number.isInteger(t[4])){
+				tot.position.z +=0.02;
+				tot.position.y -=0.03;
+				tot.rotation.x -=0.01;
+				tot.rotation.y -=0.01;
+				tot.rotation.z -=0.01;
+			}
+		}
+
+		if(t[4]==500){u[4]=1;t[4]=0;}
+
+		if(t[5]==550 && u[5]==0){
+			res[3].position.y=-4;
+			res[2].position.y=-2;
+			res[2].scale.setScalar(1);
+			tot.position.set(0,8.2,0);tot.rotation.set(0,0,0);scene.remove(tot);
+			for(let z=0;z<6;z++){t[z]=0;u[z]=0;}
+		}
+		if(t[5]==550){u[5]=1;t[5]=0;}
+	}
+
+	controls.update();
+	renderer.render(scene,camera);
+
+}
+
+function onWindowResize(){
+	camera.aspect =window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+</script>
+
+</body>
+</html>
