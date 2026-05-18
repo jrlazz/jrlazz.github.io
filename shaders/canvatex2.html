@@ -249,21 +249,3 @@ function toggleFullScreen(){
 
 </body>
 </html>
-
-<!--
-... how to cut the last decimal of a path in svg file with javascript
-<path d="m160 220.878906v27.121094c0-13.28125-5.359375-25.28125-14.078125-33.921875-8.640625-8.71875-20.640625-14.078125-33.921875-14.078125-26.480469 0-48 21.519531-48 48v8h-56v-64.160156c0-14.160156 9.28125-26.640625 22.800781-30.71875l57.199219-17.121094s8 16 24 16 24-16 24-16l50.640625 15.199219c-16.402344 15.441406-26.640625 37.359375-26.640625 61.679687zm0 0" fill="#ff826e"/>
-
-You can use a regex to identify numbers (including those with decimal points) and apply a rounding or truncation function.javascript
-
-const path = document.querySelector('path');
-const d = path.getAttribute('d');
-
-// This regex finds numbers with decimals and limits them to 2 decimal places
-
-const fixedD = d.replace(/(\d+\.\d+)/g, (match) => {
-	return parseFloat(match).toFixed(2); 
-});
-
-path.setAttribute('d', fixedD);
--->
