@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>canvatex3a.html</title>
+
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+
+<style>
+body{overflow:hidden;margin:0;background:#026;}
+canvas{display:block;}
+</style>
+
+<script type="importmap">
+{
+  "imports":{
+	"three":"https://unpkg.com/three@0.184.0/build/three.module.js",
+	"three/addons/":"https://unpkg.com/three@0.184.0/examples/jsm/"
+  }
+}
+</script>
+
+</head>
+
+<body>
+
+<script type="module">
+
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+let scene,camera,renderer,controls,mesh,texture,geo,mat;
+var p=Math.PI;
+let sim=0;
+
+init();
+animate();
+
+function init(){
+
+	renderer =new THREE.WebGLRenderer({antialias:true});
+	renderer.outputColorSpace = THREE.SRGBColorSpace;
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.setClearColor("#048",0);
+	document.body.appendChild(renderer.domElement);
+
+	scene=new THREE.Scene();
+
+	camera = new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,0.1,1000);
+	camera.position.set(0,0,80);
+
+	controls = new OrbitControls(camera,renderer.domElement);
+	controls.enableDamping = true;
+
+	scene.add(new THREE.AmbientLight(0xffffff,20));
+	let lig=new THREE.PointLight(0xffffff,500);
+	lig.position.set(50,50,50);
+	scene.add(lig);
+
+	// CANVAS TEXTURE
+	const canvas = document.createElement("canvas");
+	canvas.width = 2048;
+	canvas.height = 1024;
+	const ctx = canvas.getContext("2d");
+
+	// LOAD IMAGE
+	const img = new Image();
+	img.onload = () => {
+		ctx.drawImage(img,0,0,canvas.width,canvas.height);
+		texture.needsUpdate = true;
+	};
+	//img.src = "img/c_number_line.png";
+
+	// TEXTURE
+
+	//texture = new THREE.CanvasTexture(canvas);
+	//texture.wrapS = THREE.ClampToEdgeWrapping;
+
+	//texture=new THREE.TextureLoader().load("img/b_number.png");
+	texture=new THREE.TextureLoader().load("img/c_number_line.png");
+	//texture.wrapS=THREE.RepeatWrapping;texture.wrapT=THREE.RepeatWrapping;
+	//texture.repeat.set(1,1);
+
+	texture.colorSpace = THREE.SRGBColorSpace;
+
+	// SPHERE
+	const geo = new THREE.SphereGeometry(15,128,128);
+	// const geo = new THREE.PlaneGeometry(256,128);
+
+//	mat=new THREE.MeshPhysicalMaterial({metalness:0.7,roughness:0.3,clearcoat:1,map:texture});
+
+	mat = new THREE.MeshPhysicalMaterial({
+		map:texture,
+		roughness: 0.2,
+		metalness: 0.9,
+		transparent:true
+	})
+
+    	mesh = new THREE.Mesh(geo,mat);
+	mesh.rotation.y=p+p/4;
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	controls.update();
+	if(mesh && sim==0){scene.add(mesh);sim=1;}
+	if(mesh){mesh.rotation.y +=0.03;}
+	renderer.render(scene,camera);
+}
+
+</script>
+
+</body>
+</html>
