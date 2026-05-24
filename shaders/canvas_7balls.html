@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Canvas Snooker Balls - Three.js</title>
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+
+<style>
+body{overflow:hidden;margin:0;background:#024;font-family:monospace;}
+span{position:absolute;left:10px;top:10px;color:#ff0;font-size:10.25pt;z-index:2;}
+canvas{position:absolute;}
+</style>
+
+<script type="importmap">
+{
+	"imports":{
+		"three":"https://unpkg.com/three@0.184.0/build/three.module.js",
+		"three/addons/":"https://unpkg.com/three@0.184.0/examples/jsm/"
+	}
+}
+</script>
+
+</head>
+
+<body>
+
+<span id="spa">7-Ball Snooker Balls with Canvas</span>
+
+<script type="module">
+
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+let scene,camera,renderer,controls;
+let canvas=[];
+let p=Math.PI;
+let cBack=[];
+let cArc=[];
+let cStr=[];
+let cTex=[];
+let g=[];
+let m=[];
+let s=[];
+let t=[];
+let lig=[];
+
+cBack[1]='#990000';	cTex[1]=1;
+cBack[2]='#f57f17';	cTex[2]=2;
+cBack[3]='#004000';	cTex[3]=3;
+cBack[4]='#564023';	cTex[4]=4;
+cBack[5]='#000077';	cTex[5]=5;
+cBack[6]='#db7093';	cTex[6]=6;
+cBack[7]='#000000';	cTex[7]=7;
+cBack[8]='#ccc';	cTex[8]="";
+
+for(let z=1;z<8;z++){cArc[z]='#ffffff';cStr[z]='#000000';}
+cStr[7]='#666666';
+cStr[8]='#ccc';
+let group=new THREE.Group();
+let tim=0;
+
+let canv, ct, im, te, ge, ma, sp;
+
+let sphereGeometry=new THREE.SphereGeometry(10,128,128);
+let setin;
+let conta=1;
+
+//7-Ball Snooker Balls
+
+var texto=[];
+texto[1]="7-Ball Snooker Balls with Canvas";
+texto[2]="Snooker (7 balls) is a table game played with cues and balls in Brazil,";
+texto[3]="a table game invented in 1875 in Great Britain.";
+texto[4]="The textures were generated dynamically with CanvasTexture, with GPT help.";
+texto[5]="The balls originally had no numbers, but I thought they looked nicer this way.";
+texto[6]="In this game, two opponents try to pocket the colored balls (not white),";
+texto[7]="in one of the six pockets on the table in the sequence defined by the rules.";
+texto[8]="It can be played individually or in pairs.";
+texto[9]="Actually 8 balls... without the white ball there is no game.";
+texto[10]="";
+texto[11]="I am 74... 57 years ago I played it for a few days at my Salesian School.";
+
+
+function init(){
+
+//let ReinhardToneMapping=3;
+	// renderer
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+	renderer.setClearColor("#024",0);
+	renderer.physicallyCorrectLights=true;
+	renderer.outputColorSpace=THREE.SRGBColorSpace;
+	//renderer.toneMapping=THREE.ACESFilmicToneMapping;
+	//renderer.toneMapping=THREE.ReinhardToneMapping;
+		renderer.toneMapping=THREE.LinearToneMapping;
+	//renderer.toneMapping=THREE.CineonToneMapping;
+	//renderer.toneMapping=THREE.AgXToneMapping;
+
+
+// LinearToneMapping | ReinhardToneMapping | CineonToneMapping | ACESFilmicToneMapping | CustomToneMapping | AgXToneMapping | NeutralToneMapping
+
+	document.body.appendChild(renderer.domElement);
+
+	window.addEventListener("resize",onWindowResize);
+
+	scene=new THREE.Scene();
+
+	camera=new THREE.PerspectiveCamera(80,window.innerWidth/window.innerHeight,0.1,1000);
+	camera.position.set(0,20,180);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+	controls.enableDamping=true;
+
+	scene.add(new THREE.AmbientLight(0xffffff,3));
+
+	lig[1]=new THREE.PointLight(0xffffff,20000);
+	lig[1].position.set(50,100,0);
+	scene.add(lig[1]);
+
+	lig[2]=new THREE.PointLight(0xffffff,20000);
+	lig[2].position.set(0,100,50);
+	scene.add(lig[2]);
+
+	lig[3]=new THREE.PointLight(0xffffff,20000);
+	lig[3].position.set(-50,100,0);
+	scene.add(lig[3]);
+
+	// Table
+	canv=document.createElement('canvas');
+	canv.width=720;
+	canv.height=380;
+	canv.id ='yourCanvas';
+	document.body.appendChild(canv);
+	yourCanvas.style.left="-800px";
+	//yourCanvas.style.left="20px";
+	ct=yourCanvas.getContext('2d');
+	im=new Image();
+	im.onload=function(){
+		ct.drawImage(im,0,0);
+		te=new THREE.CanvasTexture(yourCanvas);
+		te.colorSpace=THREE.SRGBColorSpace;
+		ge=new THREE.PlaneGeometry(360,190);
+		ma=new THREE.MeshStandardMaterial({color:'#999',map:te,transparent:true,metalness:0,roughness:0.6,side:THREE.DoubleSide});
+		sp=new THREE.Mesh(ge,ma);
+		sp.position.set(0,0,8);
+		group.add(sp);
+	}
+	im.src ="img/sinuca.svg";
+	t[21]=new THREE.TextureLoader().load("images/made_703.jpg");
+	g[21]=new THREE.BoxGeometry(358,186,15.5);
+	s[21]=new THREE.Mesh(g[21],new THREE.MeshStandardMaterial({color:'#850',map:t[21]}));
+	group.add(s[21]);
+
+	// Balls
+	for(let z=1;z<9;z++){
+		canvas[z]=document.createElement('canvas');
+		canvas[z].width=1024;
+		canvas[z].height=512;
+		canvas[z].style.left='10px';
+		canvas[z].style.top='40px';
+		canvas[z].style.border='1px solid #0f0';
+		canvas[z].style.opacity='0.5';
+		canvas[z].style.left="-1050px";
+		document.body.appendChild(canvas[z]);
+		const ctx=canvas[z].getContext('2d');
+
+		// Background
+		ctx.fillStyle=cBack[z];
+		ctx.fillRect(0,0,1024,512);
+
+		// Strip
+		//ctx.fillStyle='#fff';
+		//ctx.fillRect(0,195,1024,125);
+
+		// Circles
+		// left
+		ctx.beginPath();
+		ctx.arc(256,256,64,0,p*2);
+		ctx.fillStyle=cArc[z];
+		ctx.fill();
+		ctx.lineWidth=12;
+		ctx.strokeStyle=cStr[z];
+		ctx.stroke();
+			// right
+			ctx.beginPath();
+			ctx.arc(768,256,64,0,p*2);
+			ctx.fillStyle=cArc[z];
+			ctx.fill();
+			ctx.lineWidth=12;
+			ctx.strokeStyle=cStr[z];
+			ctx.stroke();
+
+		// Texts
+		ctx.fillStyle='#000000';
+		ctx.font='bold 96px Monospace';
+		// left
+		ctx.textAlign = "center";
+		ctx.fillText(cTex[z],257,285);
+			// right
+			ctx.textAlign = "center";
+			ctx.fillText(cTex[z],765,285);
+
+		// Texture
+		t[z]=new THREE.CanvasTexture(canvas[z]);
+		t[z].colorSpace=THREE.SRGBColorSpace;
+		t[z].anisotropy=9;
+
+		// Material
+		m[z]=new THREE.MeshStandardMaterial({map:t[z],metalness:0,roughness:0.05});
+		s[z]=new THREE.Mesh(sphereGeometry,m[z]);
+		s[z].rotation.y=-p;
+		s[z].position.set(z*25-100,-11,50);
+	}
+
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	for(let z=1;z<8;z++){
+		if(s[z] && tim==2){
+			if(z<4){s[z].rotation.y +=0.01;}
+			if(z>4){s[z].rotation.y -=0.01;}
+		}
+	}
+	for(let z=1;z<8;z++){
+		if(s[z] && tim==2){scene.add(s[z]);}
+	}
+	if(s[8] && tim==2){s[8].position.set(0,40,-30);scene.add(s[8]);}
+	if(sp && s[21] && tim==0){scene.add(group);tim=1;}
+	if(sp && s[21] && tim==1){
+		group.rotation.x -=0.0025;
+		if(group.rotation.x<-1){tim=2;}
+	}
+	controls.update();
+	renderer.render(scene,camera);
+}
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+init();
+animate();
+
+setin=setInterval(disp,4000);
+function disp(){
+	document.getElementById("spa").innerText=texto[conta];
+	conta++;if(conta==11){conta=1;}
+}
+
+</script>
+
+</body>
+</html>
