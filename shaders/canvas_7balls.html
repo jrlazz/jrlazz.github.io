@@ -335,7 +335,7 @@ function animate(){
 		if(s[z] && tim==2){scene.add(s[z]);}
 	}
 	if(s[8] && tim==2){s[8].position.set(0,40,-30);scene.add(s[8]);}
-	if(sp && s[21] && tim==0){scene.add(group);tim=1;dimrot.className="norot";dimrot.src="";}
+	if(sp && s[21] && tim==0){scene.add(group);tim=1;dimrot.className="norot";dimrot.style.left="-50%";}
 	if(sp && s[21] && tim==1){
 		group.rotation.x -=0.0025;
 		if(group.rotation.x<-1){tim=2;}
