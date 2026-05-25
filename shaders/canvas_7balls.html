@@ -9,7 +9,7 @@
 body{overflow:hidden;margin:0;background:#024;font-family:monospace;}
 span{position:absolute;left:10px;top:10px;color:#ff0;font-size:10.25pt;z-index:2;}
 canvas{position:absolute;}
-.rot{-webkit-animation:spin 2s linear infinite;-moz-animation:spin 2s linear infinite;animation:spin 2s linear infinite;}
+.rot{-webkit-animation:spin 1s linear infinite;-moz-animation:spin 1s linear infinite;animation:spin 1s linear infinite;}
 @-moz-keyframes spin {100%{-moz-transform:rotate(360deg);}}
 @-webkit-keyframes spin {100%{-webkit-transform:rotate(360deg);}}
 @keyframes spin{100%{-webkit-transform: rotate(360deg);transform:rotate(360deg);}}
@@ -69,6 +69,7 @@ cStr[8]='#ccc';
 let group=new THREE.Group();
 let pockets=new THREE.Group();
 let tim=0;
+let tom=0;
 
 let canv, ct, im, te, ge, ma, sp, ss;
 
@@ -325,21 +326,25 @@ function init(){
 
 function animate(){
 	requestAnimationFrame(animate);
+	if(sp && s[21] && tim==0){scene.add(group);tim=1;dimrot.className="norot";dimrot.style.left="-50%";}
+	if(sp && s[21] && tim==1){
+		group.rotation.x -=0.007;
+		if(group.rotation.x<-1){tim=2;}
+	}
 	for(let z=1;z<8;z++){
 		if(s[z] && tim==2){
-			if(z<4){s[z].rotation.y +=0.01;}
-			if(z>4){s[z].rotation.y -=0.01;}
+			if(z<4){s[z].rotation.y +=0.02;}
+			if(z>4){s[z].rotation.y -=0.02;}
 		}
 	}
 	for(let z=1;z<8;z++){
-		if(s[z] && tim==2){scene.add(s[z]);}
+		if(s[z] && tim==2 && tom==0){
+			scene.add(s[z]);
+		}
 	}
-	if(s[8] && tim==2){s[8].position.set(0,40,-30);scene.add(s[8]);}
-	if(sp && s[21] && tim==0){scene.add(group);tim=1;dimrot.className="norot";dimrot.style.left="-50%";}
-	if(sp && s[21] && tim==1){
-		group.rotation.x -=0.0025;
-		if(group.rotation.x<-1){tim=2;}
-	}
+	if (s[7].parent===scene && tom==0){tom=1;}
+	if(s[8] && tim==2 && tom==1){s[8].position.set(0,40,-30);scene.add(s[8]);tom=2;}
+
 	controls.update();
 	renderer.render(scene,camera);
 }
