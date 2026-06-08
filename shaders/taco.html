@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>taco.html</title>
+<meta charset="utf-8">
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+
+<style>
+body{overflow:hidden;margin:0px;background:#035;font-family:monospace;}
+span{position:absolute;left:10px;top:10px;color:#ff0;font-size:10.25pt;z-index:1;}
+button{position:absolute;left:10px;top:10px;background-color:#666;font-size:10.25pt;z-index:1;}
+img{position:absolute;left:0px;top:0px;width:60px;}
+input{height:12px;background-color:#444;color:#fff;}
+</style>
+<!-- three@0.166.0 the last before webgpu -->
+<script type="importmap">
+{
+	"imports":{
+		"three":"https://unpkg.com/three@0.184.0/build/three.module.min.js",
+		"three/addons/":"https://unpkg.com/three@0.184.0/examples/jsm/"
+	}
+}
+</script>
+</head>
+
+<body>
+<img src="images/cues2.jpg"></img>
+<span style="left:700px;color:#fff;">White pos. X <input id="ix" type="text" inputmode="numeric" style="width:30px;text-align:right;" value=-70 autocomplete="off"></input> Y 
+<input id="iy" type="text" inputmode="numeric" style="width:40px;text-align:right;" value=0 autocomplete="off"></input></span>
+
+<span id="pode" style="left:45.5%;top:3px;width:100px;text-align:center;font-size:20.5pt;color:#f00;background-color:#444;border:3px inset #888;">129</span>
+<span id="find" style="left:84%;top:3px;width:170px;text-align:center;font-size:20.5pt;color:#ff0;background-color:#444;border:3px inset #888;">?</span>
+<!--<span style="top:50px;">slate , green felt, cushions, pockets<br>ard&oacute;sia, feltro verde, almofadas, bolsos</span>-->
+<span id="spang" style="left:500px;color:#0ff;"></span>
+<span id="cam-pos" style="font-size:9pt;left:100px;top:437px;color:#fff;"></span>
+<span id="cam-rot" style="font-size:9pt;left:800px;top:437px;color:#fff;"></span>
+<button id="tro" style="left:200px;top:2px;color:#0e0;">Controls YN</button>
+<button id="url" style="left:350px;top:2px;color:#0dd;">&nbsp;R e l o a d&nbsp;</button>
+
+<img src="img/expand.png" onclick="toggleFullScreen();" id="but" style="position:absolute;left:1px;top:45%;color:gold;background-color:#050;border:3px outset #090;box-shadow:3px 3px 3px #242;width:30px;cursor:pointer;"></img>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+let camera,scene,renderer,controls,tex,geo,mat,mesh,line;
+let p=Math.PI;
+let points=[],g=[],m=[],s=[],luz=[],pcam=[],rcam=[];
+let ax=new THREE.AxesHelper(32);ax.rotation.y=p;
+let gru=new THREE.Group();
+let mouse=new THREE.Vector2(1,1);
+
+const dpode=document.getElementById("pode");
+const dspang=document.getElementById("spang");
+const dtro=document.getElementById("tro");
+const durl=document.getElementById("url");
+const dfind=document.getElementById("find");
+
+const dix=document.getElementById("ix");
+const diy=document.getElementById("iy");
+
+let aout,bout,cout;
+let k=[];for(let z=1;z<21;z++){k[z]=0};
+let q=[];for(let z=1;z<21;z++){q[z]=0};
+
+let cue;
+let ang=0;
+const degrad=0.0174532925;
+const raddeg=57.2958;
+let radang=0;
+let control=0;
+
+var raycaster=new THREE.Raycaster(),selected,intersects=[],alvos=[];
+
+let angle;
+
+let tok=1;
+
+let found=100;
+let touch;
+
+let valx=-70,valy=0;
+
+let move=1;
+
+let objAngle,whiteAngle;
+
+let complete=0;
+
+const timer=new THREE.Timer();
+
+timer.connect(document);
+
+function init(){
+
+	dtro.onclick=function TROL(){control=1-control;}
+	durl.onclick=function URL(){window.location.reload();}
+
+	dix.onchange=function DX(){
+		const ux=138;
+		valx=Number(dix.value);
+		if(valx<-ux){valx=-ux;dix.value=-ux;}
+		if(valx>ux){valx=ux;;dix.value=ux;}
+		pos();
+	}
+	diy.onchange=function DY(){
+		const uy=64;
+		valy=Number(diy.value);
+		if(valy<-uy){valy=-uy;diy.value=-uy;}
+		if(valy>uy){valy=uy;;diy.value=uy;}
+		pos();
+	}
+
+	scene=new THREE.Scene();
+
+	camera =new THREE.PerspectiveCamera(65,window.innerWidth/window.innerHeight,1,1000);
+	camera.position.set(0,0,150);
+
+//scene.rotation.z=p/2;
+
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.setClearColor("#6e6e6a",1);
+
+	document.body.appendChild(renderer.domElement);
+        document.addEventListener('mousemove',onMouseMove,false);
+        document.addEventListener('mousedown',onMouseDown,false);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+
+	window.addEventListener('resize',onWindowResize);
+
+	scene.add(new THREE.AmbientLight("#fff",2));
+
+	luz[1]=new THREE.PointLight("#fff",20000);
+	luz[1].position.set(0,0,50);
+	scene.add(luz[1]);
+
+	luz[2]=new THREE.PointLight("#fff",30000);
+	luz[2].position.set(75,75,50);
+	scene.add(luz[2]);
+
+	luz[3]=new THREE.PointLight("#fff",30000);
+	luz[3].position.set(-75,75,50);
+	scene.add(luz[3]);
+
+	// Table
+	tex=new THREE.TextureLoader().load('img/sinuca6.png');
+	tex.colorSpace=THREE.SRGBColorSpace;
+	geo=new THREE.PlaneGeometry(320,160);
+	mat=new THREE.MeshStandardMaterial({color:'#ccc',map:tex,metalness:0.5,roughness:0.9,side:THREE.DoubleSide});
+	mesh=new THREE.Mesh(geo,mat);
+	mesh.position.set(0,0,-6);
+	scene.add(mesh);
+
+// ******** ******** ******** ******** Cushions ini
+	mat=new THREE.LineBasicMaterial({color:'#ff0'});
+	points=[new THREE.Vector3(-146,61,0),new THREE.Vector3(-146,-61,0)];
+	geo=new THREE.BufferGeometry().setFromPoints(points);
+	s[11]=new THREE.Line(geo,mat);
+	s[11].name="11";alvos.push(s[11]);
+		points=[new THREE.Vector3(-137,71,0),new THREE.Vector3(-9,71,0)];
+		geo=new THREE.BufferGeometry().setFromPoints(points);
+		s[12]=new THREE.Line(geo,mat);
+		s[12].name="12";alvos.push(s[12]);
+	points=[new THREE.Vector3(8,71,0),new THREE.Vector3(137,71,0)];
+	geo=new THREE.BufferGeometry().setFromPoints(points);
+	s[13]=new THREE.Line(geo,mat);
+	s[13].name="13";alvos.push(s[13]);
+		points=[new THREE.Vector3(146,61,0),new THREE.Vector3(146,-61,0)];
+		geo=new THREE.BufferGeometry().setFromPoints(points);
+		s[14]=new THREE.Line(geo,mat);
+		s[14].name="14";alvos.push(s[14]);
+	points=[new THREE.Vector3(8,-71,0),new THREE.Vector3(137,-71,0)];
+	geo=new THREE.BufferGeometry().setFromPoints(points);
+	s[15]=new THREE.Line(geo,mat);
+	s[15].name="15";alvos.push(s[15]);
+		points=[new THREE.Vector3(-137,-71,0),new THREE.Vector3(-9,-71,0)];
+		geo=new THREE.BufferGeometry().setFromPoints(points);
+		s[16]=new THREE.Line(geo,mat);
+		s[16].name="16";alvos.push(s[16]);
+	for(let z=11;z<17;z++){scene.add(s[z]);}
+// ******** ******** ******** ******** Cushions end
+
+	tex =new THREE.TextureLoader().load('images/made_702.jpg');
+	//tex.wrapS=THREE.RepeatWrapping;tex.wrapT=THREE.RepeatWrapping;
+	//tex.repeat.set(1,1);
+/*
+		m[21]=new THREE.MeshStandardMaterial({color:'#840',map:tex,transparent:true});
+    		g[21]=new THREE.BoxGeometry(126,16,7);
+		s[21]=new THREE.Mesh(g[21],m[21]);
+		s[21].position.set(-9,245,0)
+		//scene.add(s[21]);
+			m[22]=new THREE.MeshStandardMaterial({color:'#060'});
+    			g[22]=new THREE.BoxGeometry(125,5,5);
+			g[22].rotateX(p/4);
+			s[22]=new THREE.Mesh(g[22],m[22]);
+			s[22].position.set(-9,237,0)
+			//scene.add(s[22]);
+*/
+
+// ******** ******** ******** Shot line ini
+	mat=new THREE.MeshStandardMaterial({color:'#0ff',transparent:true,opacity:0.9});
+    	geo=new THREE.BoxGeometry(0.25,320,0.25);
+    	geo.translate(0,160,0);
+	line=new THREE.Mesh(geo,mat);
+	gru.add(line);
+// ******** ******** ******** Shot line end
+
+// ******** ******** ******** Balls ini
+	geo=new THREE.SphereGeometry(6,64,64);
+	mat=new THREE.MeshStandardMaterial({color:'#666',metalness:0,roughness:0.1});
+    	s[0]=new THREE.Mesh(geo,mat);
+	pos();
+		mat=new THREE.MeshStandardMaterial({color:'#900',metalness:0,roughness:0.1});
+		s[1]=new THREE.Mesh(geo,mat);
+		s[1].name="1";alvos.push(s[1]);
+	mat=new THREE.MeshStandardMaterial({color:'#960',metalness:0,roughness:0.1});
+	s[2]=new THREE.Mesh(geo,mat);s[2].name="2";alvos.push(s[2]);
+		mat=new THREE.MeshStandardMaterial({color:'#080',metalness:0,roughness:0.1});
+		s[3]=new THREE.Mesh(geo,mat);s[3].name="3";alvos.push(s[3]);
+	mat=new THREE.MeshStandardMaterial({color:'#630',metalness:0,roughness:0.1});
+	s[4]=new THREE.Mesh(geo,mat);s[4].name="4";alvos.push(s[4]);
+		mat=new THREE.MeshStandardMaterial({color:'#00c',metalness:0,roughness:0.1});
+		s[5]=new THREE.Mesh(geo,mat);s[5].name="5";alvos.push(s[5]);
+	mat=new THREE.MeshStandardMaterial({color:'#c3f',metalness:0,roughness:0.1});
+	s[6]=new THREE.Mesh(geo,mat);s[6].name="6";alvos.push(s[6]);
+		mat=new THREE.MeshStandardMaterial({color:'#000',metalness:0,roughness:0.1});
+		s[7]=new THREE.Mesh(geo,mat);s[7].name="7";alvos.push(s[7]);
+	for(let z=0;z<8;z++){scene.add(s[z]);}
+// ******** ******** ******** Balls end
+
+// ******** ******** ******** Holes ini
+	mat=new THREE.MeshStandardMaterial({color:'#303',transparent:true,opacity:0.0});
+    	s[21]=new THREE.Mesh(geo,mat);s[21].position.set(-150,-71,0);
+    	s[22]=new THREE.Mesh(geo,mat);s[22].position.set(-150,71,0);
+    	s[23]=new THREE.Mesh(geo,mat);s[23].position.set(0,-71,0);
+    	s[24]=new THREE.Mesh(geo,mat);s[24].position.set(0,71,0);
+    	s[25]=new THREE.Mesh(geo,mat);s[25].position.set(150,-71,0);
+    	s[26]=new THREE.Mesh(geo,mat);s[26].position.set(150,71,0);
+	for(let z=21;z<27;z++){scene.add(s[z]);}
+// ******** ******** ******** Holes end
+
+// ******** ******** ******** Cue ini
+	mat=new THREE.MeshStandardMaterial({color:'#960',map:tex,metalness:0,roughness:0.3});
+    	geo=new THREE.CylinderGeometry(0.5,3,120);
+    	geo.translate(0,-60,0);
+	cue=new THREE.Mesh(geo,mat);
+	cue.position.set(0,-20,0)
+		mat=new THREE.MeshStandardMaterial({color:'#0ff'});
+    		geo=new THREE.CylinderGeometry(0.5,0.5,1);
+		const pit=new THREE.Mesh(geo,mat);
+		pit.position.set(0,0,0)
+		cue.add(pit);
+		gru.add(cue);
+// ******** ******** ******** Cue end
+
+// ******** ******** ******** Touch red indicator ini
+	mat=new THREE.MeshStandardMaterial({color:'#f00'});
+    	touch=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,20),mat);
+	touch.rotation.x=p/2;
+	touch.position.set(0,0,0)
+	scene.add(touch);
+// ******** ******** ******** Touch red indicator end
+
+	gru.position.set(-70,0,0);
+	scene.add(gru);
+
+	pcam[1]=camera.position.x;pcam[2]=camera.position.y;pcam[3]=camera.position.z;
+	rcam[1]=camera.rotation.x;rcam[2]=camera.rotation.y;rcam[3]=camera.rotation.z;
+
+	function triggerAction(event){
+		//alert(event.code);
+		switch (event.code) {
+			case 'ArrowRight':radang=radang-p/2000;break;//console.log(radang);
+			case 'ArrowLeft':radang=radang+p/2000;break;
+			//case 'ArrowUp':break;
+			//case 'ArrowDown':break;
+		}
+	}
+	window.addEventListener('keydown', triggerAction);
+}
+
+function onMouseMove(event){
+	if(move==1){
+		finder();
+		pos();
+		event.preventDefault();
+		mouse.x=(event.clientX/window.innerWidth)*2-1;
+		ang=mouse.x*p*360/(window.innerWidth-10/2);
+		//dspang.innerText="deg: "+(180*ang).toFixed(3)+" rad: "+(degrad*180*ang).toFixed(3);
+		radang=degrad*180*ang;
+	}
+}
+
+function onMouseDown(event){
+	if(event.button===1){
+		//alert(window.innerHeight/window.innerWidth);
+		// x esquerda -1 a direita 1 ... y acima 1 abaixo -1
+		mouse.x=(event.clientX/window.innerWidth)*2-1;
+		mouse.y=-(event.clientY/window.innerHeight)*2+1;
+		console.log("Right click detected!", mouse.x, mouse.y);
+		dix.value=parseInt(mouse.x*window.innerWidth/5);valx=parseInt(dix.value);pos();
+		diy.value=parseInt(mouse.y*100);valy=parseInt(diy.value);pos();
+	}
+	if(event.button===0){
+		if(tok==1){
+			tok=0;
+			dpode.innerText="Do";
+			cue.position.set(0,-6.2,0);
+			bout=setTimeout(function(){cue.position.set(0,-20,0);pos();for(let z=1;z<21;z++){q[z]=0};if(found){inter(found);}clearTimeout(bout);},500);
+		}
+		cout=setTimeout(function(){tok=1;clearTimeout(cout);},100);
+	}
+}
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function pos(){
+	s[0].position.set(valx,valy,0);
+	gru.position.set(valx,valy,0);
+	if(s[1]){s[1].position.set(-40,40,0);}
+	if(s[2]){s[2].position.set(-40,-40,0);}
+	if(s[3]){s[3].position.set(40,40,0);}
+	if(s[4]){s[4].position.set(-90,20,0);}
+	if(s[5]){s[5].position.set(0,0,0);}
+	if(s[6]){s[6].position.set(81,0,0);}
+	if(s[7]){s[7].position.set(114,0,0);}
+}
+
+function angorig(){
+	const graang=Math.atan2(s[1].position.y,s[1].position.x)*180 / Math.PI;
+	const fimang=graang*degrad;
+	console.log(graang + " ... " + fimang);
+}
+
+function inter(j){
+	move=0;
+	pos();
+	const origin=s[0].position.clone();
+	const direction=new THREE.Vector3(Math.cos(radang+p/2),Math.sin(radang+p/2),0).normalize();
+	raycaster.set(origin,direction);
+	intersects=raycaster.intersectObjects(alvos,false);
+	if(intersects.length>0){
+		const position=intersects[0].point;
+		touch.position.set(intersects[0].point.x,intersects[0].point.y,0);
+		console.log(intersects[0].object.name,intersects[0].point.x,intersects[0].point.y,0);
+		const radius=6;
+		const hit=intersects[0].point.clone();
+		const center=s[j].position.clone();
+		const normal=hit.clone().sub(center).normalize();
+		const dot=direction.dot(normal);
+		const objectDir=normal.clone();
+		const whiteDir=direction.clone().sub(normal.clone().multiplyScalar(dot)).normalize();
+		objAngle=Math.atan2(objectDir.y,objectDir.x);
+		whiteAngle=Math.atan2(whiteDir.y,whiteDir.x);
+			//const outgoing=direction.reflect(normal);
+		const outgoing=direction.clone().reflect(normal);
+			//s[0].position.copy(hit.clone().add(normal.multiplyScalar(radius)));
+		s[0].position.copy(hit.clone().add(normal.clone().multiplyScalar(radius)));
+		angle=Math.atan2(normal.y,normal.x);
+			//console.log("normal:",normal.x,normal.y,Math.atan2(normal.y,normal.x));
+			//console.log("hit:",hit.x,hit.y);
+			//console.log("center:",center.x,center.y);
+			//console.log("direction",direction.x,direction.y);
+			//console.log("normal",normal.x,normal.y);
+			//console.log("dot",direction.dot(normal));
+			//console.log("all",direction.length(),normal.length(),outgoing.length());
+		k[j]=1;
+		tok=0;
+		dpode.innerText="Wait";
+	}else{
+		console.log("... no");
+	}
+}
+
+function finder(){
+	if(tok==1){
+		pos();const origin=s[0].position.clone();
+		const direction=new THREE.Vector3(Math.cos(radang+p/2),Math.sin(radang+p/2),0).normalize();
+		raycaster.set(origin,direction);
+		intersects=raycaster.intersectObjects(alvos,false);
+		if(intersects.length>0){
+			found=Number(intersects[0].object.name);
+			if(found>0 && found<8){dfind.innerText="Ball "+found;}
+			if(found>10 && found<17){dfind.innerText="Cushion "+found;}
+		}else{
+			found="";dfind.innerText=found;console.log("... no found ...");
+		}
+	}
+
+	if(document.readyState==='complete' && complete==0){
+		complete=1;dpode.innerText="Do";
+		console.log('The page is completely downloaded!');
+	}
+}
+
+
+
+function animate(t){
+	requestAnimationFrame(animate);
+	timer.update(t);
+	const delta=timer.getDelta();
+	const deltaw=delta*80;const qtot=80*2;
+	//const elapsedTime=timer.getElapsed();
+
+	if(control==1){
+		controls.enabled=true;
+		/*
+		const posText=document.getElementById('cam-pos');
+		const rotText=document.getElementById('cam-rot');
+		const pX=camera.position.x.toFixed(1);const pY=camera.position.y.toFixed(1);const pZ=camera.position.z.toFixed(1);
+		const rX=camera.rotation.x.toFixed(1);const rY=camera.rotation.y.toFixed(1);const rZ=camera.rotation.z.toFixed(1);
+		posText.innerText=`CamPos X: ${pX},Y: ${pY},Z: ${pZ}`;rotText.innerText=`CamRot X: ${rX},Y: ${rY},Z: ${rZ}`;
+		*/
+	}else{
+		controls.enabled=false;camera.position.set(pcam[1],pcam[2],pcam[3]);camera.rotation.set(rcam[1],rcam[2],rcam[3]);
+	}
+
+	gru.rotation.z=radang;
+
+	// ******** for balls
+	for(let z=1;z<8;z++){if(k[z]==1){ballpos(z);}}
+
+	// ******** for cushions
+	for(let z=11;z<17;z++){
+		if(k[z]==1){
+			if(z==11 || z==14){
+				s[0].position.y +=(deltaw*Math.cos(radang));
+				s[0].position.x +=(deltaw*Math.sin(radang));
+			}
+			if(z==12 || z==16){
+				s[0].position.y -=(deltaw*Math.cos(radang));
+				s[0].position.x -=(deltaw*Math.sin(radang));
+			}
+			if(z==13 || z==15){
+				s[0].position.y -=(deltaw*Math.cos(radang));
+				s[0].position.x -=(deltaw*Math.sin(radang));
+			}
+
+
+			for(let z=31;z<35;z++){
+				const x=s[0].position.x;const y=s[0].position.y;
+				if(x>1570 || y>80){
+					scene.remove(s[0]);
+					//dfind.innerText="Wow!!!";
+				}
+				if(x<-157 || y<-80){
+					scene.remove(s[0]);
+					//dfind.innerText="Wow!!!";
+				}
+				const xx=s[0].position.x;const yy=s[0].position.y;
+				if(xx>157 || yy>80){
+					scene.remove(s[0]);
+					//dfind.innerText="Wow!!!";
+				}
+				if(xx<-157 || yy<-80){
+					scene.remove(s[0]);
+					//dfind.innerText="Wow!!!";
+					}
+			}
+		
+			q[z]++;if(q[z]==qtot){k[z]=0;}
+			if(k[z]==0){
+				aout=setTimeout(function(){q[z]=0;pos();scene.add(s[0]);move=1;tok=1;dpode.innerText="Do";clearTimeout(aout);},300);
+			}
+		}
+	}
+	
+	function ballpos(j){
+		s[j].position.x -=(deltaw*Math.cos(angle));
+		s[j].position.y -=(deltaw*Math.sin(angle));
+		s[0].position.x += deltaw*Math.cos(whiteAngle);
+		s[0].position.y += deltaw*Math.sin(whiteAngle);
+		for(let z=21;z<27;z++){
+			const distance=s[j].position.distanceTo(s[z].position);
+			const proximityThreshold=3.0; 
+			if(distance<proximityThreshold){scene.remove(s[j]);dfind.innerText="Plaft!!!";console.log("Meshes are near each other!");}
+		}
+		for(let z=31;z<35;z++){
+			const x=s[j].position.x;const y=s[j].position.y;
+			if(x>157 || y>80){
+				scene.remove(s[j]);
+				//dfind.innerText="Wow!!!";
+			}
+			if(x<-157 || y<-80){
+				scene.remove(s[j]);
+				//dfind.innerText="Wow!!!";
+			}
+			const xx=s[0].position.x;const yy=s[0].position.y;
+			if(xx>157 || yy>80){
+				scene.remove(s[0]);
+				//dfind.innerText="Wow!!!";
+			}
+			if(xx<-157 || yy<-80){
+					scene.remove(s[0]);
+				//dfind.innerText="Wow!!!";
+				}
+		}
+		q[j]++;if(q[j]==qtot){k[j]=0;}
+		if(k[j]==0){
+			aout=setTimeout(function(){q[j]=0;pos();move=1;tok=1;dpode.innerText="Do";scene.add(s[j]);scene.add(s[0]);clearTimeout(aout);},300);
+		}
+	}
+
+	renderer.render(scene,camera);
+}
+
+init();
+animate();
+
+</script>
+
+<script>
+function toggleFullScreen(){
+    if(!document.fullscreenElement){
+        document.documentElement.requestFullscreen();
+    }else{
+        document.exitFullscreen();
+    }
+}
+</script>
+
+</body>
+</html>
+
+<!--
+
+To get a new THREE.Vector3 based on a mesh's position,
+ the most direct and efficient method is to use
+ the .clone() method on the mesh's position property.javascript
+ const myVector=mesh.position.clone();
+
+and the reverse is
+mesh.position.copy(new THREE.Vector3(x, y, z));
+
+Method 1: Distance Between Center Points (Fastest & Simplest)
+ If your meshes are roughly uniform or spherical,
+ the fastest way is to measure the Euclidean distance between
+ their world positions.
+
+// 1. Create vectors to hold world positions
+const posA=new THREE.Vector3();
+const posB=new THREE.Vector3();
+
+// 2. Extract world positions (handles scaled/nested groups safely)
+meshA.getWorldPosition(posA);
+meshB.getWorldPosition(posB);
+
+// 3. Calculate distance
+const distance=posA.distanceTo(posB);
+
+// 4. Check against your custom proximity threshold
+const proximityThreshold=5.0; 
+if(distance<proximityThreshold) {console.log("Meshes are near each other!");}
+
+Method 2: Bounding Boxes / Spheres (Best Balance for Standard Shapes)
+ If you want to know if the actual volumes of the objects
+ are touching or nearly overlapping, use Three.js's 
+ built-in Box3 (Axis-Aligned Bounding Box) or
+ Sphere utilities.
+ Using Bounding Boxes (Box3)You can expand a bounding box
+ slightly to act as a "proximity zone".javascript
+const boxA=new THREE.Box3().setFromObject(meshA);
+const boxB=new THREE.Box3().setFromObject(meshB);
+
+// Expand boxA by a "nearness padding" value in all directions
+const padding=1.5;
+boxA.expandByScalar(padding);
+
+// Check if the expanded box intersects with the other mesh's box
+if(boxA.intersectsBox(boxB)){console.log("Mesh B is within the proximity zone of Mesh A!");}
+
+Using Bounding SpheresThis checks if the meshes are within
+ a proximity radius calculated directly from their geometry sizes.javascript
+const sphereA=new THREE.Sphere();
+const sphereB=new THREE.Sphere();
+
+// Ensure bounding spheres are computed
+meshA.geometry.computeBoundingSphere();
+meshB.geometry.computeBoundingSphere();
+
+// Copy and apply world matrices to match real scene positions
+sphereA.copy(meshA.geometry.boundingSphere).applyMatrix4(meshA.matrixWorld);
+sphereB.copy(meshB.geometry.boundingSphere).applyMatrix4(meshB.matrixWorld);
+
+// Increase radius of one sphere to create a proximity threshold
+const targetProximityRadius=2.0;
+sphereA.radius += targetProximityRadius;
+if(sphereA.intersectsSphere(sphereB)){console.log("Meshes are near each other based on volume bounds!");}
+
+-->
+
