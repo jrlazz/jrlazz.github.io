@@ -16,8 +16,8 @@ input{height:12px;background-color:#444;color:#fff;}
 <script type="importmap">
 {
 	"imports":{
-		"three":"https://unpkg.com/three@0.166.0/build/three.module.min.js",
-		"three/addons/":"https://unpkg.com/three@0.166.0/examples/jsm/"
+		"three":"https://unpkg.com/three@0.184.0/build/three.module.min.js",
+		"three/addons/":"https://unpkg.com/three@0.184.0/examples/jsm/"
 	}
 }
 </script>
@@ -34,8 +34,8 @@ input{height:12px;background-color:#444;color:#fff;}
 <span id="spang" style="left:500px;color:#0ff;"></span>
 <span id="cam-pos" style="font-size:9pt;left:100px;top:437px;color:#fff;"></span>
 <span id="cam-rot" style="font-size:9pt;left:800px;top:437px;color:#fff;"></span>
-<button id="tro" style="left:200px;top:2px;color:#0e0;">Controls YN</button>
-<button id="url" style="left:350px;top:2px;color:#0dd;">&nbsp;R e l o a d&nbsp;</button>
+<button id="tro" style="left:200px;top:2px;color:#0e0;">Controls Y/N</button>
+<button id="url" style="left:100px;top:2px;color:#0dd;">R e s t a r t </button>
 
 <img src="img/expand.png" onclick="toggleFullScreen();" id="but" style="position:absolute;left:1px;top:45%;color:gold;background-color:#050;border:3px outset #090;box-shadow:3px 3px 3px #242;width:30px;cursor:pointer;"></img>
 
@@ -63,7 +63,7 @@ const diy=document.getElementById("iy");
 let aout,bout,cout;
 let k=[];for(let z=1;z<21;z++){k[z]=0};
 let q=[];for(let z=1;z<21;z++){q[z]=0};
-let plaft=[];for(let z=1;z<21;z++){plaft[z]=1};
+let plaft=[];for(let z=1;z<8;z++){plaft[z]=1};
 
 let cue;
 let ang=0;
@@ -89,16 +89,16 @@ let objAngle,whiteAngle;
 
 let complete=0;
 
-//const timer=new THREE.Timer();
-//timer.connect(document);
-
-const clock = new THREE.Clock();
+const timer=new THREE.Timer();
+timer.connect(document);
 
 function init(){
 
 	dtro.onclick=function TROL(){control=1-control;}
-	durl.onclick=function URL(){window.location.reload();}
-
+	durl.onclick=function URL(){
+		control=1;
+		bout=setTimeout(function(){control=0;for(let z=1;z<8;z++){plaft[z]=1;s[z].scale.setScalar(1);};},200);
+	}
 	dix.onchange=function DX(){
 		const ux=138;
 		valx=Number(dix.value);
@@ -311,7 +311,7 @@ function onMouseDown(event){
 			tok=0;
 			dpode.innerText="Do";
 			cue.position.set(0,-6.2,0);
-			bout=setTimeout(function(){cue.position.set(0,-20,0);pos();for(let z=1;z<21;z++){q[z]=0};if(found){inter(found);}clearTimeout(bout);},500);
+			bout=setTimeout(function(){cue.position.set(0,-20,0);pos();for(let z=1;z<21;z++){q[z]=0};if(found){inter(found);}clearTimeout(bout);},400);
 		}
 		cout=setTimeout(function(){tok=1;clearTimeout(cout);},100);
 	}
@@ -361,9 +361,7 @@ function inter(j){
 		const whiteDir=direction.clone().sub(normal.clone().multiplyScalar(dot)).normalize();
 		objAngle=Math.atan2(objectDir.y,objectDir.x);
 		whiteAngle=Math.atan2(whiteDir.y,whiteDir.x);
-			//const outgoing=direction.reflect(normal);
 		const outgoing=direction.clone().reflect(normal);
-			//s[0].position.copy(hit.clone().add(normal.multiplyScalar(radius)));
 		s[0].position.copy(hit.clone().add(normal.clone().multiplyScalar(radius)));
 		angle=Math.atan2(normal.y,normal.x);
 			//console.log("normal:",normal.x,normal.y,Math.atan2(normal.y,normal.x));
@@ -402,17 +400,11 @@ function finder(){
 	}
 }
 
-
-
 function animate(t){
 	requestAnimationFrame(animate);
-	//timer.update(t);
-	//const delta=timer.getDelta();
-   	 const deltaTime = clock.getDelta();
-
-	const deltaw=deltaTime*90;const qtot=90*2;
-	//const elapsedTime=timer.getElapsed();
-
+	timer.update(t);
+	const delta=timer.getDelta();
+	const deltaw=delta*90;const qtot=90*2;
 	if(control==1){
 		controls.enabled=true;
 		/*
@@ -428,59 +420,11 @@ function animate(t){
 
 	gru.rotation.z=radang;
 
-	// ******** for balls
+	// ******** for balls ini
 	for(let z=1;z<8;z++){if(k[z]==1){ballpos(z);}}
-
-	// ******** for cushions
-	for(let z=11;z<17;z++){
-		if(k[z]==1){
-			if(z==11 || z==14){
-				s[0].position.y +=(deltaw*Math.cos(radang));
-				s[0].position.x +=(deltaw*Math.sin(radang));
-			}
-			if(z==12 || z==16){
-				s[0].position.y -=(deltaw*Math.cos(radang));
-				s[0].position.x -=(deltaw*Math.sin(radang));
-			}
-			if(z==13 || z==15){
-				s[0].position.y -=(deltaw*Math.cos(radang));
-				s[0].position.x -=(deltaw*Math.sin(radang));
-			}
-
-
-			for(let z=31;z<35;z++){
-				const x=s[0].position.x;const y=s[0].position.y;
-				if(x>1570 || y>80){
-					scene.remove(s[0]);
-					//dfind.innerText="Wow!!!";
-				}
-				if(x<-157 || y<-80){
-					scene.remove(s[0]);
-					//dfind.innerText="Wow!!!";
-				}
-				const xx=s[0].position.x;const yy=s[0].position.y;
-				if(xx>157 || yy>80){
-					scene.remove(s[0]);
-					//dfind.innerText="Wow!!!";
-				}
-				if(xx<-157 || yy<-80){
-					scene.remove(s[0]);
-					//dfind.innerText="Wow!!!";
-					}
-			}
-		
-			q[z]++;if(q[z]==qtot){k[z]=0;}
-			if(k[z]==0){
-				aout=setTimeout(function(){q[z]=0;pos();scene.add(s[0]);move=1;tok=1;dpode.innerText="Do";clearTimeout(aout);},200);
-			}
-		}
-	}
-	
 	function ballpos(j){
-		s[j].position.x -=(deltaw*Math.cos(angle));
-		s[j].position.y -=(deltaw*Math.sin(angle));
-		s[0].position.x += deltaw*Math.cos(whiteAngle);
-		s[0].position.y += deltaw*Math.sin(whiteAngle);
+		s[j].position.x -=(deltaw*Math.cos(angle));s[j].position.y -=(deltaw*Math.sin(angle));
+		s[0].position.x += deltaw*Math.cos(whiteAngle);s[0].position.y += deltaw*Math.sin(whiteAngle);
 		for(let z=21;z<27;z++){
 			const distance=s[j].position.distanceTo(s[z].position);
 			const proximityThreshold=3.0; 
@@ -488,23 +432,11 @@ function animate(t){
 		}
 		for(let z=31;z<35;z++){
 			const x=s[j].position.x;const y=s[j].position.y;
-			if(x>157 || y>80){
-				scene.remove(s[j]);
-				//dfind.innerText="Wow!!!";
-			}
-			if(x<-157 || y<-80){
-				scene.remove(s[j]);
-				//dfind.innerText="Wow!!!";
-			}
+			if(x>157 || y>80){scene.remove(s[j]);fwow();}
+			if(x<-157 || y<-80){scene.remove(s[j]);fwow();}
 			const xx=s[0].position.x;const yy=s[0].position.y;
-			if(xx>157 || yy>80){
-				scene.remove(s[0]);
-				//dfind.innerText="Wow!!!";
-			}
-			if(xx<-157 || yy<-80){
-					scene.remove(s[0]);
-				//dfind.innerText="Wow!!!";
-				}
+			if(xx>157 || yy>80){scene.remove(s[0]);fwow();}
+			if(xx<-157 || yy<-80){scene.remove(s[0]);fwow();}
 		}
 		q[j]++;if(q[j]==qtot){k[j]=0;}
 		if(k[j]==0){
@@ -512,6 +444,32 @@ function animate(t){
 		}
 		if(plaft[j]==0){s[j].position.set(-135,-60+(15*j),12);s[j].scale.setScalar(0.4);}
 	}
+	// ******** for balls end
+
+
+
+	// ******** for cushions ini
+	for(let z=11;z<17;z++){
+		if(k[z]==1){
+			if(z==11 || z==14){s[0].position.y +=(deltaw*Math.cos(radang));s[0].position.x +=(deltaw*Math.sin(radang));}
+			if(z==12 || z==16){s[0].position.y -=(deltaw*Math.cos(radang));s[0].position.x -=(deltaw*Math.sin(radang));}
+			if(z==13 || z==15){s[0].position.y -=(deltaw*Math.cos(radang));s[0].position.x -=(deltaw*Math.sin(radang));}
+			for(let z=31;z<35;z++){
+				const x=s[0].position.x;const y=s[0].position.y;
+				if(x>157 || y>80){scene.remove(s[0]);fwow();}
+				if(x<-157 || y<-80){scene.remove(s[0]);fwow();}
+				const xx=s[0].position.x;const yy=s[0].position.y;
+				if(xx>157 || yy>80){scene.remove(s[0]);fwow();}
+				if(xx<-157 || yy<-80){scene.remove(s[0]);fwow();}
+			}
+		
+			q[z]++;if(q[z]==qtot){k[z]=0;}
+			if(k[z]==0){aout=setTimeout(function(){q[z]=0;pos();scene.add(s[0]);move=1;tok=1;dpode.innerText="Do";clearTimeout(aout);},200);}
+		}
+	}
+	// ******** for cushions end
+
+	function fwow(){dfind.innerText="Wow!!!";}
 
 	renderer.render(scene,camera);
 }
