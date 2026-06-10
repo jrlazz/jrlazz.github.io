@@ -47,53 +47,38 @@ X <input id="ix" type="text" inputmode="numeric" style="width:30px;text-align:ri
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-let camera,scene,renderer,controls,tex,geo,mat,mesh,line;
-let p=Math.PI;
-let points=[],g=[],m=[],s=[],luz=[],pcam=[],rcam=[];
-let ax=new THREE.AxesHelper(32);ax.rotation.y=p;
-let gru=new THREE.Group();
-let mouse=new THREE.Vector2(1,1);
+let camera,scene,renderer,controls,tex,geo,mat,mesh,line,cue;
 
+const p=Math.PI;
+const degrad=0.0174532925;
+const raddeg=57.2958;
+const gru=new THREE.Group();
+const mouse=new THREE.Vector2(1,1);
 const dpode=document.getElementById("pode");
 const dspang=document.getElementById("spang");
 const dtro=document.getElementById("tro");
 const durl=document.getElementById("url");
 const dfind=document.getElementById("find");
-
 const dix=document.getElementById("ix");
 const diy=document.getElementById("iy");
+const raycaster=new THREE.Raycaster();
+const timer=new THREE.Timer();timer.connect(document);
 
-let aout,bout,cout;
+let angle,touch,selected,objAngle,whiteAngle,aout,bout,cout;
+
+let intersects=[],alvos=[];
+let points=[],s=[],luz=[],pcam=[],rcam=[];
 let k=[];for(let z=1;z<21;z++){k[z]=0};
 let q=[];for(let z=1;z<21;z++){q[z]=0};
 let plaft=[];for(let z=1;z<8;z++){plaft[z]=1};
+let v=[];
+	v[1]=new THREE.Vector3(-40,40,0);	v[2]=new THREE.Vector3(-40,-40,0);
+	v[3]=new THREE.Vector3(40,40,0);	v[4]=new THREE.Vector3(-90,20,0);
+	v[5]=new THREE.Vector3(0,0,0);		v[6]=new THREE.Vector3(81,0,0);
+	v[7]=new THREE.Vector3(114,0,0);
 
-let cue;
-let ang=0;
-const degrad=0.0174532925;
-const raddeg=57.2958;
-let radang=0;
-let control=0;
+let ang=0,radang=0,control=0,tok=1,found=100,valx=-70,valy=0,move=1,complete=0;
 
-var raycaster=new THREE.Raycaster(),selected,intersects=[],alvos=[];
-
-let angle;
-
-let tok=1;
-
-let found=100;
-let touch;
-
-let valx=-70,valy=0;
-
-let move=1;
-
-let objAngle,whiteAngle;
-
-let complete=0;
-
-const timer=new THREE.Timer();
-timer.connect(document);
 
 function init(){
 
@@ -101,6 +86,12 @@ function init(){
 	durl.onclick=function URL(){
 		control=1;
 		bout=setTimeout(function(){control=0;for(let z=1;z<8;z++){plaft[z]=1;s[z].scale.setScalar(1);};},200);
+		for(let z=1;z<8;z++){
+			const vh=Math.random()*(100-(-100))+(-100);
+			const vv=Math.random()*(60-(-60))+(-60);
+			v[z]=new THREE.Vector3(parseInt(vh),parseInt(vv),0);
+			s[z].position.copy(v[z]);
+		}
 	}
 	dix.onchange=function DX(){
 		const ux=138;
@@ -121,8 +112,6 @@ function init(){
 
 	camera =new THREE.PerspectiveCamera(65,window.innerWidth/window.innerHeight,1,1000);
 	camera.position.set(0,0,150);
-
-//scene.rotation.z=p/2;
 
 	renderer=new THREE.WebGLRenderer({antialias:true});
 	renderer.setSize(window.innerWidth,window.innerHeight);
@@ -191,19 +180,6 @@ function init(){
 	tex =new THREE.TextureLoader().load('images/made_702.jpg');
 	//tex.wrapS=THREE.RepeatWrapping;tex.wrapT=THREE.RepeatWrapping;
 	//tex.repeat.set(1,1);
-/*
-		m[21]=new THREE.MeshStandardMaterial({color:'#840',map:tex,transparent:true});
-    		g[21]=new THREE.BoxGeometry(126,16,7);
-		s[21]=new THREE.Mesh(g[21],m[21]);
-		s[21].position.set(-9,245,0)
-		//scene.add(s[21]);
-			m[22]=new THREE.MeshStandardMaterial({color:'#060'});
-    			g[22]=new THREE.BoxGeometry(125,5,5);
-			g[22].rotateX(p/4);
-			s[22]=new THREE.Mesh(g[22],m[22]);
-			s[22].position.set(-9,237,0)
-			//scene.add(s[22]);
-*/
 
 // ******** ******** ******** Shot line ini
 	mat=new THREE.MeshStandardMaterial({color:'#0ff',transparent:true,opacity:0.9});
@@ -278,7 +254,7 @@ function init(){
 	function triggerAction(event){
 		//alert(event.code);
 		switch (event.code) {
-			case 'ArrowRight':radang=radang-p/2000;break;//console.log(radang);
+			case 'ArrowRight':radang=radang-p/2000;break;
 			case 'ArrowLeft':radang=radang+p/2000;break;
 			//case 'ArrowUp':break;
 			//case 'ArrowDown':break;
@@ -302,10 +278,10 @@ function onMouseMove(event){
 function onMouseDown(event){
 	if(event.button===1){
 		//alert(window.innerHeight/window.innerWidth);
-		// x esquerda -1 a direita 1 ... y acima 1 abaixo -1
+		//x esquerda -1 a direita 1 ... y acima 1 abaixo -1
 		mouse.x=(event.clientX/window.innerWidth)*2-1;
 		mouse.y=-(event.clientY/window.innerHeight)*2+1;
-		console.log("Right click detected!", mouse.x, mouse.y);
+		//console.log("Right click detected!", mouse.x, mouse.y);
 		dix.value=parseInt(mouse.x*window.innerWidth/5);valx=parseInt(dix.value);pos();
 		diy.value=parseInt(mouse.y*100);valy=parseInt(diy.value);pos();
 	}
@@ -329,19 +305,7 @@ function onWindowResize(){
 function pos(){
 	s[0].position.set(valx,valy,0);
 	gru.position.set(valx,valy,0);
-	if(s[1] && plaft[1]==1){s[1].position.set(-40,40,0);}
-	if(s[2] && plaft[2]==1){s[2].position.set(-40,-40,0);}
-	if(s[3] && plaft[3]==1){s[3].position.set(40,40,0);}
-	if(s[4] && plaft[4]==1){s[4].position.set(-90,20,0);}
-	if(s[5] && plaft[5]==1){s[5].position.set(0,0,0);}
-	if(s[6] && plaft[6]==1){s[6].position.set(81,0,0);}
-	if(s[7] && plaft[7]==1){s[7].position.set(114,0,0);}
-}
-
-function angorig(){
-	const graang=Math.atan2(s[1].position.y,s[1].position.x)*180 / Math.PI;
-	const fimang=graang*degrad;
-	console.log(graang + " ... " + fimang);
+	for(let z=1;z<8;z++){if(s[z] && v[z] && plaft[z]==1){s[z].position.copy(v[z]);}}
 }
 
 function inter(j){
@@ -354,7 +318,7 @@ function inter(j){
 	if(intersects.length>0){
 		const position=intersects[0].point;
 		touch.position.set(intersects[0].point.x,intersects[0].point.y,0);
-		console.log(intersects[0].object.name,intersects[0].point.x,intersects[0].point.y,0);
+		//console.log(intersects[0].object.name,intersects[0].point.x,intersects[0].point.y,0);
 		const radius=6;
 		const hit=intersects[0].point.clone();
 		const center=s[j].position.clone();
@@ -399,7 +363,7 @@ function finder(){
 
 	if(document.readyState==='complete' && complete==0){
 		complete=1;dpode.innerText="Do";
-		console.log('The page is completely downloaded!');
+		//console.log('The page is completely downloaded!');
 	}
 }
 
@@ -431,7 +395,7 @@ function animate(t){
 		for(let z=21;z<27;z++){
 			const distance=s[j].position.distanceTo(s[z].position);
 			const proximityThreshold=3.0; 
-			if(distance<proximityThreshold){plaft[j]=0;dfind.innerText="Plaft!!!";console.log("Meshes are near each other!");}
+			if(distance<proximityThreshold){plaft[j]=0;dfind.innerText="Plaft!!!";}
 		}
 		for(let z=31;z<35;z++){
 			const x=s[j].position.x;const y=s[j].position.y;
@@ -448,8 +412,6 @@ function animate(t){
 		if(plaft[j]==0){s[j].position.set(-135,-60+(15*j),12);s[j].scale.setScalar(0.4);}
 	}
 	// ******** for balls end
-
-
 
 	// ******** for cushions ini
 	for(let z=11;z<17;z++){
@@ -472,7 +434,7 @@ function animate(t){
 	}
 	// ******** for cushions end
 
-	function fwow(){dfind.innerText="Wow!!!";}
+	function fwow(){dfind.innerText="... out";}
 
 	renderer.render(scene,camera);
 }
@@ -494,71 +456,3 @@ function toggleFullScreen(){
 
 </body>
 </html>
-
-<!--
-
-To get a new THREE.Vector3 based on a mesh's position,
- the most direct and efficient method is to use
- the .clone() method on the mesh's position property.javascript
- const myVector=mesh.position.clone();
-
-and the reverse is
-mesh.position.copy(new THREE.Vector3(x, y, z));
-
-Method 1: Distance Between Center Points (Fastest & Simplest)
- If your meshes are roughly uniform or spherical,
- the fastest way is to measure the Euclidean distance between
- their world positions.
-
-// 1. Create vectors to hold world positions
-const posA=new THREE.Vector3();
-const posB=new THREE.Vector3();
-
-// 2. Extract world positions (handles scaled/nested groups safely)
-meshA.getWorldPosition(posA);
-meshB.getWorldPosition(posB);
-
-// 3. Calculate distance
-const distance=posA.distanceTo(posB);
-
-// 4. Check against your custom proximity threshold
-const proximityThreshold=5.0; 
-if(distance<proximityThreshold) {console.log("Meshes are near each other!");}
-
-Method 2: Bounding Boxes / Spheres (Best Balance for Standard Shapes)
- If you want to know if the actual volumes of the objects
- are touching or nearly overlapping, use Three.js's 
- built-in Box3 (Axis-Aligned Bounding Box) or
- Sphere utilities.
- Using Bounding Boxes (Box3)You can expand a bounding box
- slightly to act as a "proximity zone".javascript
-const boxA=new THREE.Box3().setFromObject(meshA);
-const boxB=new THREE.Box3().setFromObject(meshB);
-
-// Expand boxA by a "nearness padding" value in all directions
-const padding=1.5;
-boxA.expandByScalar(padding);
-
-// Check if the expanded box intersects with the other mesh's box
-if(boxA.intersectsBox(boxB)){console.log("Mesh B is within the proximity zone of Mesh A!");}
-
-Using Bounding SpheresThis checks if the meshes are within
- a proximity radius calculated directly from their geometry sizes.javascript
-const sphereA=new THREE.Sphere();
-const sphereB=new THREE.Sphere();
-
-// Ensure bounding spheres are computed
-meshA.geometry.computeBoundingSphere();
-meshB.geometry.computeBoundingSphere();
-
-// Copy and apply world matrices to match real scene positions
-sphereA.copy(meshA.geometry.boundingSphere).applyMatrix4(meshA.matrixWorld);
-sphereB.copy(meshB.geometry.boundingSphere).applyMatrix4(meshB.matrixWorld);
-
-// Increase radius of one sphere to create a proximity threshold
-const targetProximityRadius=2.0;
-sphereA.radius += targetProximityRadius;
-if(sphereA.intersectsSphere(sphereB)){console.log("Meshes are near each other based on volume bounds!");}
-
--->
-
