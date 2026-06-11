@@ -25,7 +25,7 @@ input{height:12px;background-color:#444;color:#fff;}
 
 <body>
 <img src="images/cues2.jpg"></img>
-<img id="relo" src="img/reload.png" style="left:8px;top:60px;width:40px;cursor:pointer;"></img>
+<img id="relo" src="img/reload.png" style="left:6px;top:60px;width:40px;cursor:pointer;"></img>
 <span style="left:650px;color:#fff;">White pos. </span>
 <img src="img/midle.png" style="left:730px;top:3px;width:32px"></img>
 <span style="left:770px;color:#fff;">or 
@@ -39,7 +39,7 @@ X <input id="ix" type="text" inputmode="numeric" style="width:30px;text-align:ri
 <span id="cam-rot" style="font-size:9pt;left:800px;top:437px;color:#fff;"></span>
 <button id="tro" style="left:200px;top:2px;color:#0e0;">Controls Y/N</button>
 <button id="url" style="left:100px;top:2px;color:#0dd;">R e s t a r t </button>
-<img src="img/expand.png" onclick="toggleFullScreen();" id="but" style="position:absolute;left:1px;top:45%;color:gold;background-color:#050;border:3px outset #090;box-shadow:3px 3px 3px #242;width:30px;cursor:pointer;"></img>
+<img src="img/expand.png" onclick="toggleFullScreen();" id="but" style="position:absolute;left:8px;top:45%;color:gold;background-color:#050;border:3px outset #090;box-shadow:3px 3px 3px #242;width:30px;cursor:pointer;"></img>
 
 <script type="module">
 
@@ -397,7 +397,7 @@ function animate(t){
 		for(let z=21;z<27;z++){
 			const distance=s[j].position.distanceTo(s[z].position);
 			const proximityThreshold=3.0; 
-			if(distance<proximityThreshold){plaft[j]=0;dfind.innerText="Plaft!!!";}
+			if(distance<proximityThreshold){plaft[j]=0;q[j]=qtot-1;dfind.innerText="Plaft!!!";}
 		}
 		for(let z=31;z<35;z++){
 			const x=s[j].position.x;const y=s[j].position.y;
