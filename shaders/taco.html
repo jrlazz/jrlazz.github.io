@@ -102,8 +102,6 @@ function init(){
 	drelo.onclick=function RELO(){window.location.reload();}
 	dtro.onclick=function TROL(){control=1-control;}
 	durl.onclick=function URL(){
-		control=1;
-		//bout=setTimeout(function(){control=0;for(let z=1;z<8;z++){plaft[z]=1;s[z].scale.setScalar(1);};},200);
 		for(let z=1;z<8;z++){
 			if(plaft[z]==1){
 				const vh=Math.random()*(100-(-100))+(-100);
@@ -112,6 +110,7 @@ function init(){
 				s[z].position.copy(v[z]);
 			}
 		}
+	durl.blur();
 	}
 	dix.onchange=function DX(){
 		const ux=138;
