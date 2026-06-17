@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>b8.html</title>
+<meta charset="utf-8">
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+
+<style>
+body{overflow:hidden;margin:0px;background:#035;font-family:monospace;}
+span{position:absolute;left:10px;top:10px;color:#ff0;font-size:10.25pt;z-index:1;}
+button{position:absolute;left:10px;top:10px;background-color:#666;font-size:10.25pt;cursor:pointer;z-index:1;}
+img{position:absolute;left:0px;top:0px;width:60px;}
+div{position:absolute;left:50px;top:50px;width:600px;height:300px;background-color:beige;color:#009;border:3px outset gold;}
+input{height:12px;background-color:#444;color:#fff;}
+</style>
+
+<!-- slate , green felt, cushions, pockets ... ard&oacute;sia, feltro verde, almofadas, bolsos -->
+
+<script type="importmap">
+{
+	"imports":{
+		"three":"https://unpkg.com/three@0.184.0/build/three.module.min.js",
+		"three/addons/":"https://unpkg.com/three@0.184.0/examples/jsm/"
+	}
+}
+</script>
+</head>
+
+<body>
+<img id="relo" src="img/reload.png" style="left:6px;top:5px;width:40px;cursor:pointer;"></img>
+<img id="help" src="img/help.png" style="left:5px;top:55px;width:40px;cursor:pointer;"></img>
+<img src="img/expand.png" onclick="toggleFullScreen();" id="but" style="position:absolute;left:8px;top:110px;;color:gold;background-color:#050;border:3px outset #090;box-shadow:3px 3px 3px #242;width:30px;cursor:pointer;"></img>
+<button id="tro" style="left:80px;top:10px;color:#0e0;">3D Y/N</button>
+<button id="url" style="left:160px;top:10px;color:#0dd;">RePos</button>
+
+<span style="left:650px;color:#fff;">White pos. </span>
+<img src="img/midle.png" style="left:730px;top:3px;width:32px"></img>
+<span style="left:770px;color:#fff;">or 
+X <input id="ix" type="text" inputmode="numeric" style="width:30px;text-align:right;" value=-70 autocomplete="off"></input> Y 
+<input id="iy" type="text" inputmode="numeric" style="width:40px;text-align:right;" value=0 autocomplete="off"></input></span>
+
+<span id="pode" style="left:45.5%;top:3px;width:100px;text-align:center;font-size:20.5pt;color:#f00;background-color:#444;border:3px inset #888;">Hello</span>
+<span id="find" style="left:84%;top:3px;width:170px;text-align:center;font-size:20.5pt;color:#ff0;background-color:#444;border:3px inset #888;">?</span>
+
+<span id="ush" style="left:84%;top:50px;width:170px;text-align:center;font-size:20.5pt;color:#ff0;background-color:#444;border:3px inset #888;opacity:0.5">?</span>
+
+
+<span id="spang" style="left:500px;color:#0ff;"></span>
+<span id="cam-pos" style="font-size:9pt;left:100px;top:437px;color:#fff;"></span>
+<span id="cam-rot" style="font-size:9pt;left:800px;top:437px;color:#fff;"></span>
+
+<div id="he" style="font-size:13.67pt;display:none;">Hello!!!</div>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+let camera,scene,renderer,controls,tex,geo,mat,mesh,line,cue;
+
+const p=Math.PI;
+const degrad=0.0174532925;
+const raddeg=57.2958;
+const gru=new THREE.Group();
+const mouse=new THREE.Vector2(1,1);
+
+var bId=function(id){return document.getElementById(id);}
+const drelo=bId("relo");
+const dpode=bId("pode");
+const dspang=bId("spang");
+const dtro=bId("tro");
+const durl=bId("url");
+const dfind=bId("find");
+const dush=bId("ush");
+const dix=bId("ix");
+const diy=bId("iy");
+const dhelp=bId("help");
+const dhe=bId("he");
+const raycaster=new THREE.Raycaster();
+const zraycaster=new THREE.Raycaster();
+const timer=new THREE.Timer();timer.connect(document);
+
+let angle,touch,selected,objAngle,whiteAngle,aout,bout,cout;
+let zangle,zwhiteAngle;
+
+let intersects=[],alvos=[];
+let cushintersects=[];
+let direction;
+
+let CushionTouchPoint,CushionTargetPoint;
+
+let points=[];
+const sete=[],treze=[];
+const s=[],luz=[],pcam=[],rcam=[];
+const k =new Array(21).fill(0);
+const kk=new Array(21).fill(0);
+const q =new Array(21).fill(0);
+const qq=new Array(21).fill(0);
+const plaft=[];for(let z=1;z<8;z++){plaft[z]=1};
+const v=[];
+	v[1]=new THREE.Vector3(-40,40,0);	v[2]=new THREE.Vector3(-40,-40,0);
+	v[3]=new THREE.Vector3(40,40,0);	v[4]=new THREE.Vector3(-90,20,0);
+	v[5]=new THREE.Vector3(0,0,0);		v[6]=new THREE.Vector3(81,0,0);
+	v[7]=new THREE.Vector3(114,0,0);
+
+let ang=0,radang=0,control=0,MayPressSpace=1,found=100,valx=-70,valy=0,MayMoveMouse=1,complete=0;
+
+let str="<img src='img/close.png' style='position:relative;left:520px;'></img>";
+str=str+"<br>* Mouse movements changes the angle of shots.";
+str=str+"<br>* Space key hits the white ball.";
+str=str+"<br>* Middle mouse button changes white ball position.";
+str=str+"<br>* Arrows changes cue angle by small amounts.";
+str=str+"<br>* RePos button changes positions of the collored balls.";
+str=str+"<br>* <img src='img/reload.png' style='position:relative;width:24px;'></img> Restart the game when it freezes";
+str=str+"<br>* Reload icon reloads to a new page.";
+
+let fator=0;
+let cushorigin,cushdirection;
+let arrowHelper=new THREE.ArrowHelper();
+let cushioned=0;
+
+function init(){
+
+	drelo.onclick=function RELO(){window.location.reload();}
+	dtro.onclick=function TROL(){
+		control=1-control;
+		if(control==1){
+			camera.position.set(0,-140,80);
+			camera.rotation.set(0.9,0,0);
+		}
+		dtro.blur();
+	}
+	durl.onclick=function URL(){
+		for(let z=1;z<8;z++){
+			if(plaft[z]==1){
+				const vh=Math.random()*(100-(-100))+(-100);
+				const vv=Math.random()*(60-(-60))+(-60);
+				v[z]=new THREE.Vector3(parseInt(vh),parseInt(vv),0);
+				s[z].position.copy(v[z]);
+			}
+		}
+		durl.blur();
+	}
+	dix.onchange=function DX(){
+		const ux=138;
+		valx=Number(dix.value);
+		if(valx<-ux){valx=-ux;dix.value=-ux;}
+		if(valx>ux){valx=ux;;dix.value=ux;}
+		pos();
+		dix.blur();
+	}
+	diy.onchange=function DY(){
+		const uy=64;
+		valy=Number(diy.value);
+		if(valy<-uy){valy=-uy;diy.value=-uy;}
+		if(valy>uy){valy=uy;;diy.value=uy;}
+		pos();
+		diy.blur();
+	}
+
+	dhelp.onclick=function DHELP(){dhe.style.display="";dhelp.blur();}
+	dhe.onclick=function DHE(){dhe.style.display="none";dhe.blur();}
+	dhe.innerHTML=str;
+
+	scene=new THREE.Scene();
+
+	camera =new THREE.PerspectiveCamera(65,window.innerWidth/window.innerHeight,1,1000);
+	camera.position.set(0,0,150);
+
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.setClearColor("#6e6e6a",1);
+
+	document.body.appendChild(renderer.domElement);
+        document.addEventListener('mousemove',onMouseMove,false);
+        document.addEventListener('mousedown',onMouseDown,false);
+	document.addEventListener('keydown', triggerAction);
+	window.addEventListener('resize',onWindowResize);
+	
+	controls=new OrbitControls(camera,renderer.domElement);
+
+	scene.add(new THREE.AmbientLight("#fff",2));
+
+	luz[1]=new THREE.PointLight("#fff",20000);
+	luz[1].position.set(0,0,50);
+	scene.add(luz[1]);
+
+	luz[2]=new THREE.PointLight("#fff",30000);
+	luz[2].position.set(75,75,50);
+	scene.add(luz[2]);
+
+	luz[3]=new THREE.PointLight("#fff",30000);
+	luz[3].position.set(-75,75,50);
+	scene.add(luz[3]);
+
+	// Table
+	tex=new THREE.TextureLoader().load('img/sinuca6.png');
+	tex.colorSpace=THREE.SRGBColorSpace;
+	geo=new THREE.PlaneGeometry(320,160);
+	mat=new THREE.MeshStandardMaterial({color:'#ccc',map:tex,metalness:0.5,roughness:0.9,side:THREE.DoubleSide});
+	mesh=new THREE.Mesh(geo,mat);
+	mesh.position.set(0,0,-6);
+	scene.add(mesh);
+
+	tex =new THREE.TextureLoader().load('images/made_702.jpg');
+
+// ******** ******** ******** Shot line ini
+	mat=new THREE.MeshStandardMaterial({color:'#0ff',transparent:true,opacity:0.9});
+    	geo=new THREE.BoxGeometry(0.25,320,0.25);
+    	geo.translate(0,160,0);
+	line=new THREE.Mesh(geo,mat);
+	gru.add(line);
+// ******** ******** ******** Shot line end
+
+// ******** ******** ******** Balls ini
+	geo=new THREE.SphereGeometry(6,129,129);
+	mat=new THREE.MeshStandardMaterial({color:'#666',metalness:0,roughness:0.1});
+    	s[0]=new THREE.Mesh(geo,mat);
+	pos();
+		mat=new THREE.MeshStandardMaterial({color:'#900',metalness:0,roughness:0.1});
+		s[1]=new THREE.Mesh(geo,mat);
+		s[1].name="1";sete.push(s[1]);treze.push(s[1]);
+	mat=new THREE.MeshStandardMaterial({color:'#960',metalness:0,roughness:0.1});
+	s[2]=new THREE.Mesh(geo,mat);s[2].name="2";sete.push(s[2]);treze.push(s[2]);
+		mat=new THREE.MeshStandardMaterial({color:'#080',metalness:0,roughness:0.1});
+		s[3]=new THREE.Mesh(geo,mat);s[3].name="3";sete.push(s[3]);treze.push(s[3]);
+	mat=new THREE.MeshStandardMaterial({color:'#630',metalness:0,roughness:0.1});
+	s[4]=new THREE.Mesh(geo,mat);s[4].name="4";sete.push(s[4]);treze.push(s[4]);
+		mat=new THREE.MeshStandardMaterial({color:'#00c',metalness:0,roughness:0.1});
+		s[5]=new THREE.Mesh(geo,mat);s[5].name="5";sete.push(s[5]);treze.push(s[5]);
+	mat=new THREE.MeshStandardMaterial({color:'#c3f',metalness:0,roughness:0.1});
+	s[6]=new THREE.Mesh(geo,mat);s[6].name="6";sete.push(s[6]);treze.push(s[6]);
+		mat=new THREE.MeshStandardMaterial({color:'#000',metalness:0,roughness:0.1});
+		s[7]=new THREE.Mesh(geo,mat);s[7].name="7";sete.push(s[7]);treze.push(s[7]);
+	for(let z=0;z<8;z++){scene.add(s[z]);}
+
+
+	mat=new THREE.MeshStandardMaterial({color:'#666',transparent:true,opacity:0.4});
+	CushionTouchPoint=new THREE.Mesh(geo,mat);
+	CushionTouchPoint.position.set(-1000,0,0);
+		CushionTargetPoint=new THREE.Mesh(geo,mat);
+		CushionTargetPoint.position.set(-1000,0,0);
+// ******** ******** ******** Balls end
+
+// ******** ******** ******** ******** Cushions ini
+	mat=new THREE.LineBasicMaterial({color:'#ff0'});
+	points=[new THREE.Vector3(-146,61,0),new THREE.Vector3(-146,-61,0)];
+	geo=new THREE.BufferGeometry().setFromPoints(points);
+	s[11]=new THREE.Line(geo,mat);
+	s[11].name="11";treze.push(s[11]);
+		points=[new THREE.Vector3(-137,71,0),new THREE.Vector3(-9,71,0)];
+		geo=new THREE.BufferGeometry().setFromPoints(points);
+		s[12]=new THREE.Line(geo,mat);
+		s[12].name="12";treze.push(s[12]);
+	points=[new THREE.Vector3(8,71,0),new THREE.Vector3(137,71,0)];
+	geo=new THREE.BufferGeometry().setFromPoints(points);
+	s[13]=new THREE.Line(geo,mat);
+	s[13].name="13";treze.push(s[13]);
+		points=[new THREE.Vector3(146,61,0),new THREE.Vector3(146,-61,0)];
+		geo=new THREE.BufferGeometry().setFromPoints(points);
+		s[14]=new THREE.Line(geo,mat);
+		s[14].name="14";treze.push(s[14]);
+	points=[new THREE.Vector3(8,-71,0),new THREE.Vector3(137,-71,0)];
+	geo=new THREE.BufferGeometry().setFromPoints(points);
+	s[15]=new THREE.Line(geo,mat);
+	s[15].name="15";treze.push(s[15]);
+		points=[new THREE.Vector3(-137,-71,0),new THREE.Vector3(-9,-71,0)];
+		geo=new THREE.BufferGeometry().setFromPoints(points);
+		s[16]=new THREE.Line(geo,mat);
+		s[16].name="16";treze.push(s[16]);
+	for(let z=11;z<17;z++){scene.add(s[z]);}
+// ******** ******** ******** ******** Cushions end
+
+// ******** ******** ******** Holes ini
+	mat=new THREE.MeshStandardMaterial({color:'#303',transparent:true,opacity:0.0});
+    	s[21]=new THREE.Mesh(geo,mat);s[21].position.set(-150,-71,0);
+    	s[22]=new THREE.Mesh(geo,mat);s[22].position.set(-150,71,0);
+    	s[23]=new THREE.Mesh(geo,mat);s[23].position.set(0,-71,0);
+    	s[24]=new THREE.Mesh(geo,mat);s[24].position.set(0,71,0);
+    	s[25]=new THREE.Mesh(geo,mat);s[25].position.set(150,-71,0);
+    	s[26]=new THREE.Mesh(geo,mat);s[26].position.set(150,71,0);
+	for(let z=21;z<27;z++){scene.add(s[z]);}
+// ******** ******** ******** Holes end
+
+// ******** ******** ******** Cue ini
+	mat=new THREE.MeshStandardMaterial({color:'#960',map:tex,metalness:0,roughness:0.3});
+    	geo=new THREE.CylinderGeometry(0.5,3,120);
+    	geo.translate(0,-60,0);
+	cue=new THREE.Mesh(geo,mat);
+	cue.position.set(0,-20,0)
+		mat=new THREE.MeshStandardMaterial({color:'#0ff'});
+    		geo=new THREE.CylinderGeometry(0.5,0.5,1);
+		const pit=new THREE.Mesh(geo,mat);
+		pit.position.set(0,0,0)
+		cue.add(pit);
+		gru.add(cue);
+// ******** ******** ******** Cue end
+
+// ******** ******** ******** Touch red indicator ini
+	mat=new THREE.MeshStandardMaterial({color:'#f00'});
+    	touch=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,20),mat);
+	touch.rotation.x=p/2;
+	touch.position.set(0,0,0)
+	scene.add(touch);
+// ******** ******** ******** Touch red indicator end
+
+	gru.position.set(-70,0,0);
+	scene.add(gru);
+
+	pcam[1]=camera.position.x;pcam[2]=camera.position.y;pcam[3]=camera.position.z;
+	rcam[1]=camera.rotation.x;rcam[2]=camera.rotation.y;rcam[3]=camera.rotation.z;
+
+}// init end
+
+/*
+When MayMoveMouse=1 the mouse can be moved.
+When it is moved finder() is called and raycaster looks for
+ seven balls or six cushions.
+At this moment You can press Space Key.
+When You press Space Key, MayPressSpace goes from one to zero to prevent many spaces
+
+ if MayMoveMouse==1 pode-se mover o mouse
+*/
+
+function onMouseMove(event){
+	if(MayMoveMouse==1){
+		finder();
+		pos();
+		event.preventDefault();
+		mouse.x=(event.clientX/window.innerWidth)*2-1;
+		ang=mouse.x*p*360/(window.innerWidth-10/2);
+		//dspang.innerText="deg: "+(180*ang).toFixed(3)+" rad: "+(degrad*180*ang).toFixed(3);
+		radang=degrad*180*ang;
+	}
+	scene.remove(arrowHelper);
+	CushionTouchPoint.position.set(-1000,0,0);
+	CushionTargetPoint.position.set(-1000,0,0);
+	scene.add(CushionTouchPoint);scene.add(CushionTargetPoint);
+	dush.innerText="?";
+	dush.innerText=radang.toFixed(8);
+}
+
+function onMouseDown(event){
+	if(event.button===1){// Middle Mouse Button changes white ball position
+		mouse.x=(event.clientX/window.innerWidth)*2-1;
+		mouse.y=-(event.clientY/window.innerHeight)*2+1;
+		//console.log("Right click detected!", mouse.x, mouse.y);
+		dix.value=parseInt(mouse.x*window.innerWidth/5);valx=parseInt(dix.value);pos();
+		diy.value=parseInt(mouse.y*100);valy=parseInt(diy.value);pos();
+	}
+}
+
+function pos(){
+	s[0].position.set(valx,valy,0);
+	gru.position.set(valx,valy,0);
+	for(let z=1;z<8;z++){if(s[z] && v[z] && plaft[z]==1){s[z].position.copy(v[z]);}}
+}
+
+/*
+Obs:
+inter(j) entra somente quando MayPressSpace=1 e envia para "balls ini" ou  "cushions ini"
+a tecla space funciona com MayPressSpace=1, passa para MayPressSpace-0 e depois de if(found){inter(found); passa MayPressSpace=1
+found vem de finder() que foi ativada em mouse move
+inter()vem de tecla space se existe um found
+*/
+
+function inter(j){
+	if(cushioned==0){MayMoveMouse=0;pos();}
+	const origin=s[0].position.clone();
+	if(cushioned==0){
+		direction=new THREE.Vector3(Math.cos(radang+p/2),Math.sin(radang+p/2),0).normalize();
+		raycaster.set(origin,direction);
+		intersects=raycaster.intersectObjects(treze,false);
+	}else{
+		direction=cushdirection;
+		raycaster.set(origin,direction);
+		intersects=raycaster.intersectObjects(sete,false);
+	}
+	if(intersects.length>0){
+		touch.position.set(intersects[0].point.x,intersects[0].point.y,0);
+		const radius=6;
+		const hit=intersects[0].point.clone();
+		const center=s[j].position.clone();
+		const normal=hit.clone().sub(center).normalize();
+		const dot=direction.dot(normal);
+		const objectDir=normal.clone();
+		const whiteDir=direction.clone().sub(normal.clone().multiplyScalar(dot)).normalize();
+		objAngle=Math.atan2(objectDir.y,objectDir.x);
+		whiteAngle=Math.atan2(whiteDir.y,whiteDir.x);
+		s[0].position.copy(hit.clone().add(normal.clone().multiplyScalar(radius)));
+		cushorigin=s[0].position.clone();
+		angle=Math.atan2(normal.y,normal.x);
+		k[j]=1;
+		MayPressSpace=0;
+		dpode.innerText="Wait";
+	}else{
+		//console.log("... no");
+	}
+}
+
+function finder(){
+	if(MayPressSpace==1){
+		pos();const origin=s[0].position.clone();
+		const direction=new THREE.Vector3(Math.cos(radang+p/2),Math.sin(radang+p/2),0).normalize();
+		raycaster.set(origin,direction);
+		intersects=raycaster.intersectObjects(treze,false);
+		if(intersects.length>0){
+			found=Number(intersects[0].object.name);
+			if(found>0 && found<8){dfind.innerText="Ball "+found;}
+			if(found>10 && found<17){dfind.innerText="Cushion "+found;}
+		}else{
+			found="";dfind.innerText=found;//console.log("... no found ...");
+		}
+	}
+}
+
+function intercushion(){
+	cushdirection=new THREE.Vector3();
+	cushdirection.subVectors(CushionTargetPoint.position,CushionTouchPoint.position).normalize();
+	scene.remove(arrowHelper);
+	arrowHelper=new THREE.ArrowHelper(cushdirection.normalize(),cushorigin,200,'#777');
+	scene.add(arrowHelper);
+	found=0;
+	zraycaster.set(cushorigin,cushdirection);
+	cushintersects=zraycaster.intersectObjects(sete,false);
+	if(cushintersects.length>0){
+		found=Number(cushintersects[0].object.name);
+		//alert(found);
+		s[0].position.copy(CushionTouchPoint.position);
+		dush.innerText="cush "+found;
+		//alert("s[0]")
+		cushioned=1;
+		inter(found);
+	}
+}
+
+function triggerAction(event){
+	//alert(event.code);
+	switch (event.code) {
+		case 'ArrowRight':arrows();radang=radang-p/2000;break;
+		case 'ArrowLeft':arrows();radang=radang+p/2000;break;
+		case 'Space':
+			if(MayPressSpace==1){
+				MayPressSpace=0;
+				dpode.innerText="Do";
+				cue.position.set(0,-6.2,0);
+				bout=setTimeout(function(){cue.position.set(0,-20,0);pos();for(let z=1;z<21;z++){q[z]=0};if(found){inter(found);}clearTimeout(bout);},400);
+			}
+	//cout=setTimeout(function(){MayPressSpace=1;clearTimeout(cout);},100);
+			break;
+		case 'ArrowUp':arrows();radang=radang+p/2000;break;
+		case 'ArrowDown':arrows();radang=radang-p/2000;break;
+	}
+}
+	
+function arrows(){
+	finder();
+	scene.remove(arrowHelper);
+	CushionTouchPoint.position.set(-1000,0,0);CushionTargetPoint.position.set(-1000,0,0);
+	scene.add(CushionTouchPoint);scene.add(CushionTargetPoint);
+	dush.innerText="?";
+	dush.innerText=radang.toFixed(8);
+}
+
+function animate(t){
+	requestAnimationFrame(animate);
+	timer.update(t);
+	const delta=Math.min(timer.getDelta(),0.05);
+	const deltaw=delta * 120;const qtot=70*2;
+
+	gru.rotation.z=radang;
+
+	if(control==1){
+		controls.enabled=true;
+		/*
+		const posText=bId('cam-pos');
+		const rotText=bId('cam-rot');
+		const pX=camera.position.x.toFixed(1);const pY=camera.position.y.toFixed(1);const pZ=camera.position.z.toFixed(1);
+		const rX=camera.rotation.x.toFixed(1);const rY=camera.rotation.y.toFixed(1);const rZ=camera.rotation.z.toFixed(1);
+		posText.innerText=`CamPos X: ${pX},Y: ${pY},Z: ${pZ}`;rotText.innerText=`CamRot X: ${rX},Y: ${rY},Z: ${rZ}`;
+		*/
+	}else{
+		controls.enabled=false;camera.position.set(pcam[1],pcam[2],pcam[3]);camera.rotation.set(rcam[1],rcam[2],rcam[3]);
+	}
+
+	// ******** for balls ini
+	for(let z=1;z<8;z++){if(k[z]==1){ballpos(z);}}
+	function ballpos(j){
+		s[j].position.x -=(deltaw*Math.cos(angle));s[j].position.y -=(deltaw*Math.sin(angle));
+		s[0].position.x +=(deltaw*Math.cos(whiteAngle));s[0].position.y +=(deltaw*Math.sin(whiteAngle));
+		// pockets
+		for(let z=21;z<27;z++){
+			const distance=s[j].position.distanceTo(s[z].position);
+			const proximityThreshold=6.0; 
+			if(distance<proximityThreshold){plaft[j]=0;q[j]=qtot-1;dfind.innerText="Plaft!!!";}
+		}
+		if(outOf(s[j])){scene.remove(s[j]);fwow();}
+		if(outOf(s[0])){scene.remove(s[0]);fwow();}
+		q[j]++;if(q[j]==qtot){k[j]=0;}
+		if(k[j]==0){
+			aout=setTimeout(function(){q[j]=0;pos();MayMoveMouse=1;MayPressSpace=1;dpode.innerText="Do";scene.add(s[j]);scene.add(s[0]);cushioned=0;clearTimeout(aout);},200);
+		}
+		if(plaft[j]==0){s[j].position.set(-135,-60+(15*j),12);s[j].scale.setScalar(0.4);}
+	}
+	// ******** for balls end
+
+	// ******** for cushions ini
+	for(let z=11;z<17;z++){
+		fator=3;
+		if(k[z]==1){
+			if(z==11 || z==14){s[0].position.y +=(fator*deltaw*Math.cos(radang));s[0].position.x +=(fator*deltaw*Math.sin(radang));}
+			if(z==12 || z==13 || z==15 || z==16){s[0].position.y -=(fator*deltaw*Math.cos(radang));s[0].position.x -=(fator*deltaw*Math.sin(radang));}
+			if(outOf(s[0])){scene.remove(s[0]);fwow();arrows();}
+			if(q[z]==1){CushionTouchPoint.position.copy(s[0].position);}
+			if(q[z]==20){CushionTargetPoint.position.copy(s[0].position);intercushion();}
+			q[z]++;if(q[z]==21){k[z]=0;}
+			//if(k[z]==0){aout=setTimeout(function(){q[z]=0;pos();scene.add(s[0]);MayMoveMouse=1;MayPressSpace=1;dpode.innerText="Do";clearTimeout(aout);},200);}
+			if(k[z]==0){aout=setTimeout(function(){q[z]=0;pos();MayMoveMouse=1;MayPressSpace=1;dpode.innerText="Do";scene.add(s[0]);clearTimeout(aout);},200);}
+		}
+	}
+	// ******** for cushions end
+
+	function outOf(obj){return(obj.position.x>157 || obj.position.x<-157 || obj.position.y>80 || obj.position.y<-80);}
+
+	function fwow(){dfind.innerText="out";}
+
+	renderer.render(scene,camera);
+}
+
+init();
+animate();
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+</script>
+
+<script>
+function toggleFullScreen(){
+    if(!document.fullscreenElement){
+        document.documentElement.requestFullscreen();
+    }else{
+        document.exitFullscreen();
+    }
+}
+</script>
+
+</body>
+</html>
