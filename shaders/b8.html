@@ -105,10 +105,11 @@ const v=[];
 
 let ang=0,radang=0,control=0,found=100,valx=-70,valy=0,complete=0;
 
-
 let MayMoveMouse=1;
 let MayPressSpace=0;
 let cushioned=0;
+let fator=0;
+let arrowHelper=new THREE.ArrowHelper();
 
 let str="<img src='img/close.png' style='position:relative;left:520px;'></img>";
 str=str+"<br>* Mouse movements changes the angle of shots.";
@@ -118,10 +119,6 @@ str=str+"<br>* Arrows changes cue angle by small amounts.";
 str=str+"<br>* RePos button changes positions of the collored balls.";
 str=str+"<br>* <img src='img/reload.png' style='position:relative;width:24px;'></img> Restart the game when it freezes";
 str=str+"<br>* Reload icon reloads to a new page.";
-
-let fator=0;
-let arrowHelper=new THREE.ArrowHelper();
-
 
 function init(){
 
@@ -246,6 +243,7 @@ function init(){
 		CushionTargetPoint.position.set(-1000,0,0);
 	CushTouch=new THREE.Mesh(geo,mat);
 	CushTouch.position.set(-1000,0,0);
+		//const Test=new THREE.Mesh(geo,mat);Test.position.set(0,77,0);scene.add(Test);
 // ******** ******** ******** Balls end
 
 // ******** ******** ******** ******** Cushions ini
@@ -319,13 +317,12 @@ function init(){
 }// init end
 
 /*
-When MayMoveMouse=1 the mouse can be moved.
-When it is moved finder() is called and raycaster looks for
+	When MayMoveMouse=1 the mouse can be moved.
+	When it is moved finder() is called and raycaster looks for
  seven balls or six cushions.
-At this moment You can press Space Key.
-When You press Space Key, MayPressSpace goes from one to zero to prevent many spaces
-
- if MayMoveMouse==1 pode-se mover o mouse
+	At this moment You can press Space Key.
+	When You press Space Key, MayPressSpace goes from one to zero to prevent many spaces
+	if MayMoveMouse==1 pode-se mover o mouse
 */
 
 function onMouseMove(event){
@@ -346,16 +343,13 @@ function onMouseMove(event){
 		}
 		dush.innerText="?";
 		dush.innerText=radang.toFixed(8);
-
 	}
-	
 }
 
 function onMouseDown(event){
 	if(event.button===1){// Middle Mouse Button changes white ball position
 		mouse.x=(event.clientX/window.innerWidth)*2-1;
 		mouse.y=-(event.clientY/window.innerHeight)*2+1;
-		//console.log("Right click detected!", mouse.x, mouse.y);
 		dix.value=parseInt(mouse.x*window.innerWidth/5);valx=parseInt(dix.value);pos();
 		diy.value=parseInt(mouse.y*100);valy=parseInt(diy.value);pos();
 	}
@@ -366,14 +360,6 @@ function pos(){
 	gru.position.set(valx,valy,0);
 	for(let z=1;z<8;z++){if(s[z] && v[z] && plaft[z]==1){s[z].position.copy(v[z]);}}
 }
-
-/*
-Obs:
-inter(j) entra somente quando MayPressSpace=1 e envia para "balls ini" ou  "cushions ini"
-a tecla space funciona com MayPressSpace=1, passa para MayPressSpace-0 e depois de if(found){inter(found); passa MayPressSpace=1
-found vem de finder() que foi ativada em mouse move
-inter()vem de tecla space se existe um found
-*/
 
 function inter(j){
 	if(cushioned==0){
@@ -399,12 +385,9 @@ function inter(j){
 		objAngle=Math.atan2(objectDir.y,objectDir.x);
 		whiteAngle=Math.atan2(whiteDir.y,whiteDir.x);
 		s[0].position.copy(hit.clone().add(normal.clone().multiplyScalar(radius)));
-//	if(cushioned==0){cushorigin=s[0].position.clone();}
 		angle=Math.atan2(normal.y,normal.x);
 		k[j]=1;
 		q[j]=0;
-//cushioned=0;
-		//MayPressSpace=1;
 		dpode.innerText="Wait";
 	}else{
 		//console.log("... no");
@@ -412,23 +395,19 @@ function inter(j){
 }
 
 function finder(){
-//alert("MayPressSpace:"+MayPressSpace);
-//	if(MayPressSpace==0){
-		pos();const origin=s[0].position.clone();
-		const direction=new THREE.Vector3(Math.cos(radang+p/2),Math.sin(radang+p/2),0).normalize();
-		raycaster.set(origin,direction);
-		intersects=raycaster.intersectObjects(treze,false);
-		if(intersects.length>0){
-			found=Number(intersects[0].object.name);
-			if(found>0 && found<8){dfind.innerText="Ball "+found;}
-			if(found>10 && found<17){dfind.innerText="Cushion "+found;}
-			MayPressSpace=1;
-		}else{
-			MayPressSpace=0;
-
-			found="";dfind.innerText=found;//console.log("... no found ...");
-		}
-//	}
+	pos();const origin=s[0].position.clone();
+	const direction=new THREE.Vector3(Math.cos(radang+p/2),Math.sin(radang+p/2),0).normalize();
+	raycaster.set(origin,direction);
+	intersects=raycaster.intersectObjects(treze,false);
+	if(intersects.length>0){
+		found=Number(intersects[0].object.name);
+		if(found>0 && found<8){dfind.innerText="Ball "+found;}
+		if(found>10 && found<17){dfind.innerText="Cushion "+found;}
+		MayPressSpace=1;
+	}else{
+		MayPressSpace=0;
+		found="";dfind.innerText=found;//console.log("... no found ...");
+	}
 }
 
 
@@ -525,7 +504,7 @@ function animate(t){
 
 	// ******** for cushions ini
 	for(let z=11;z<17;z++){
-		fator=1;
+		fator=2;
 		const qtotC=10;
 		if(k[z]==1){
 			if(z==11 || z==14){s[0].position.y +=(fator*deltaw*Math.cos(radang));s[0].position.x +=(fator*deltaw*Math.sin(radang));}
@@ -534,8 +513,6 @@ function animate(t){
 			if(q[z]== 0){CushionTouchPoint.position.copy(s[0].position);}
 			if(q[z]==qtotC){CushionTargetPoint.position.copy(s[0].position);}
 
-
-// MayMoveMouse==0; // sera necessario???
 			origin=CushionTouchPoint.position.clone();
 			direction=new THREE.Vector3();
 			direction.subVectors(CushionTargetPoint.position,CushionTouchPoint.position).normalize();
@@ -549,28 +526,11 @@ function animate(t){
 				CushTouch.position.set(intersects[0].point.x,intersects[0].point.y,0);
 				found=Number(intersects[0].object.name);
 				//alert(found);
-				//s[0].position.copy(CushionTouchPoint.position);
 				dush.innerText="cush "+found;
-				//alert("s[0]")
 				cushioned=1;//alert(cushioned);
 				inter(found);
 			}
-
-
-
-
-
-//***************************
-
 			q[z]++;if(q[z]==qtotC+1){k[z]=0;}
-			//if(k[z]==0){
-			//	q[z]=0;
-			//	pos();
-			//	scene.add(s[0]);
-			//	MayMoveMouse=1;
-			//	MayPressSpace=1;
-			//	dpode.innerText="Do";
-			//}
 			if(k[z]==0){
 				q[z]=0;
 				pos();
@@ -583,7 +543,7 @@ function animate(t){
 	}
 	// ******** for cushions end
 
-	function outOf(obj){return(obj.position.x>157 || obj.position.x<-157 || obj.position.y>80 || obj.position.y<-80);}
+	function outOf(obj){return(obj.position.x>153 || obj.position.x<-153 || obj.position.y>77 || obj.position.y<-77);}
 
 	function fwow(){dfind.innerText="out";}
 
