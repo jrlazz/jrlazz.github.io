@@ -107,8 +107,8 @@ let ang=0,radang=0,control=0,found=100,valx=-70,valy=0,complete=0;
 
 let MayMoveMouse=1;
 let MayPressSpace=0;
-let cushioned=0;
-let fator=0;
+let CushBeat=0;
+let fator=1;
 let arrowHelper=new THREE.ArrowHelper();
 
 let str="<img src='img/close.png' style='position:relative;left:520px;'></img>";
@@ -326,7 +326,7 @@ function init(){
 */
 
 function onMouseMove(event){
-	if(MayMoveMouse==1){
+	if(MayMoveMouse==1 && CushBeat==0){
 		finder();
 		pos();
 		event.preventDefault();
@@ -362,7 +362,7 @@ function pos(){
 }
 
 function inter(j){
-	if(cushioned==0){
+	if(CushBeat==0){
 		MayMoveMouse=0;
 		pos();
 		origin=s[0].position.clone();
@@ -467,11 +467,8 @@ function animate(t){
 	// ******** for balls ini
 	for(let z=1;z<8;z++){if(k[z]==1){ballpos(z);}}
 	function ballpos(j){
-		//fator=2;
-		if(cushioned==1 && q[j]==0){
-			s[0].position.copy(CushTouch.position);
-			//alert("cto");
-		}
+		fator=1;
+		if(CushBeat==1 && q[j]==0){s[0].position.copy(CushTouch.position);}
 		s[j].position.x -=(fator*deltaw*Math.cos(angle));s[j].position.y -=(fator*deltaw*Math.sin(angle));
 		s[0].position.x +=(fator*deltaw*Math.cos(whiteAngle));s[0].position.y +=(fator*deltaw*Math.sin(whiteAngle));
 		// pockets
@@ -496,7 +493,7 @@ function animate(t){
 			dpode.innerText="Do";
 			scene.add(s[j]);
 			scene.add(s[0]);
-			cushioned=0;
+			CushBeat=0;
 		}
 		if(plaft[j]==0){s[j].position.set(-135,-60+(15*j),12);s[j].scale.setScalar(0.4);}
 	}
@@ -504,7 +501,7 @@ function animate(t){
 
 	// ******** for cushions ini
 	for(let z=11;z<17;z++){
-		fator=2;
+		fator=1.5;
 		const qtotC=10;
 		if(k[z]==1){
 			if(z==11 || z==14){s[0].position.y +=(fator*deltaw*Math.cos(radang));s[0].position.x +=(fator*deltaw*Math.sin(radang));}
@@ -512,7 +509,6 @@ function animate(t){
 			if(outOf(s[0])){scene.remove(s[0]);fwow();arrows();}
 			if(q[z]== 0){CushionTouchPoint.position.copy(s[0].position);}
 			if(q[z]==qtotC){CushionTargetPoint.position.copy(s[0].position);}
-
 			origin=CushionTouchPoint.position.clone();
 			direction=new THREE.Vector3();
 			direction.subVectors(CushionTargetPoint.position,CushionTouchPoint.position).normalize();
@@ -525,9 +521,8 @@ function animate(t){
 			if(intersects.length>0){
 				CushTouch.position.set(intersects[0].point.x,intersects[0].point.y,0);
 				found=Number(intersects[0].object.name);
-				//alert(found);
 				dush.innerText="cush "+found;
-				cushioned=1;//alert(cushioned);
+				CushBeat=1;
 				inter(found);
 			}
 			q[z]++;if(q[z]==qtotC+1){k[z]=0;}
