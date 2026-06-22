@@ -126,6 +126,10 @@ str=str+"<br>* RePos button changes positions of the collored balls.";
 str=str+"<br>* <img src='img/reload.png' style='position:relative;width:24px;'></img> Restart the game when it freezes";
 str=str+"<br>* Reload icon reloads to a new page.";
 
+let walk=0;
+let jota=0;
+var Walker;
+
 function init(){
 
 	drelo.onclick=function RELO(){window.location.reload();}
@@ -223,6 +227,7 @@ function init(){
 	geo=new THREE.SphereGeometry(6,129,129);
 	mat=new THREE.MeshStandardMaterial({color:'#666',metalness:0,roughness:0.1});
     	s[0]=new THREE.Mesh(geo,mat);
+	Walker=new THREE.Mesh(geo,mat);Walker.position.set(0,0,0);
 	pos();
 		mat=new THREE.MeshStandardMaterial({color:'#900',metalness:0,roughness:0.1});
 		s[1]=new THREE.Mesh(geo,mat);
@@ -249,7 +254,6 @@ function init(){
 		CushionTargetPoint.position.set(-1000,0,0);
 	CushTouch=new THREE.Mesh(geo,mat);
 	CushTouch.position.set(-1000,0,0);
-		//const Test=new THREE.Mesh(geo,mat);Test.position.set(0,77,0);scene.add(Test);
 // ******** ******** ******** Balls end
 
 // ******** ******** ******** ******** Cushions ini
@@ -322,15 +326,6 @@ function init(){
 
 }// init end
 
-/*
-	When MayMoveMouse=1 the mouse can be moved.
-	When it is moved finder() is called and raycaster looks for
- seven balls or six cushions.
-	At this moment You can press Space Key.
-	When You press Space Key, MayPressSpace goes from one to zero to prevent many spaces
-	if MayMoveMouse==1 pode-se mover o mouse
-*/
-
 function onMouseMove(event){
 	if(MayMoveMouse==1 && CushBeat==0){
 		finder();
@@ -353,7 +348,7 @@ function onMouseMove(event){
 }
 
 function onMouseDown(event){
-	if(event.button===1){// Middle Mouse Button changes white ball position
+	if(event.button===1){
 		mouse.x=(event.clientX/window.innerWidth)*2-1;
 		mouse.y=-(event.clientY/window.innerHeight)*2+1;
 		dix.value=parseInt(mouse.x*window.innerWidth/5);valx=parseInt(dix.value);pos();
@@ -368,6 +363,8 @@ function pos(){
 }
 
 function inter(j){
+	jota=j;
+	Walker.position.copy(s[0].position);
 	if(CushBeat==0){
 		MayMoveMouse=0;
 		pos();
@@ -392,9 +389,7 @@ function inter(j){
 		whiteAngle=Math.atan2(whiteDir.y,whiteDir.x);
 		s[0].position.copy(hit.clone().add(normal.clone().multiplyScalar(radius)));
 		angle=Math.atan2(normal.y,normal.x);
-		k[j]=1;
-		q[j]=0;
-		dpode.innerText="Wait";
+		walk=1;
 	}else{
 		//console.log("... no");
 	}
@@ -453,7 +448,7 @@ function animate(t){
 	requestAnimationFrame(animate);
 	timer.update(t);
 	const delta=Math.min(timer.getDelta(),0.05);
-	const deltaw=delta * 120;const qtot=70*2;
+	const deltaw=delta*120;const qtot=70*2;
 
 	gru.rotation.z=radang;
 
@@ -547,6 +542,21 @@ function animate(t){
 	function outOf(obj){return(obj.position.x>153 || obj.position.x<-153 || obj.position.y>77 || obj.position.y<-77);}
 
 	function fwow(){dfind.innerText="out";}
+
+	if(walk==1){
+		scene.add(Walker);
+		scene.remove(s[0]);
+		Walker.position.lerp(touch.position,delta*6);
+    		if(Walker.position.distanceTo(touch.position) < 6.01) {//0.01
+			Walker.position.copy(touch.position);
+			k[jota]=1;
+			q[jota]=0;
+			dpode.innerText="Wait";
+			walk=0;
+			scene.remove(Walker);
+			scene.add(s[0]);
+		}
+	}
 
 	renderer.render(scene,camera);
 }
