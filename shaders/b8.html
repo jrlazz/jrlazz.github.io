@@ -90,10 +90,7 @@ let angle,touch,selected,objAngle,whiteAngle,aout,bout,cout;
 let zangle,zwhiteAngle;
 
 let intersects=[],alvos=[];
-let cushintersects=[];
 let origin,direction;
-
-let CushionTouchPoint,CushionTargetPoint,CushTouch;
 
 let points=[];
 const sete=[],treze=[];
@@ -113,7 +110,6 @@ let ang=0,radang=0,control=0,found=100,valx=-70,valy=0,complete=0;
 
 let MayMoveMouse=1;
 let MayPressSpace=0;
-let CushBeat=0;
 let fator=1;
 let arrowHelper=new THREE.ArrowHelper();
 
@@ -245,15 +241,6 @@ function init(){
 		mat=new THREE.MeshStandardMaterial({color:'#000',metalness:0,roughness:0.1});
 		s[7]=new THREE.Mesh(geo,mat);s[7].name="7";sete.push(s[7]);treze.push(s[7]);
 	for(let z=0;z<8;z++){scene.add(s[z]);}
-
-
-	mat=new THREE.MeshStandardMaterial({color:'#666',transparent:true,opacity:0.4});
-	CushionTouchPoint=new THREE.Mesh(geo,mat);
-	CushionTouchPoint.position.set(-1000,0,0);
-		CushionTargetPoint=new THREE.Mesh(geo,mat);
-		CushionTargetPoint.position.set(-1000,0,0);
-	CushTouch=new THREE.Mesh(geo,mat);
-	CushTouch.position.set(-1000,0,0);
 // ******** ******** ******** Balls end
 
 // ******** ******** ******** ******** Cushions ini
@@ -261,27 +248,21 @@ function init(){
 	points=[new THREE.Vector3(-146,61,0),new THREE.Vector3(-146,-61,0)];
 	geo=new THREE.BufferGeometry().setFromPoints(points);
 	s[11]=new THREE.Line(geo,mat);
-	s[11].name="11";treze.push(s[11]);
 		points=[new THREE.Vector3(-137,71,0),new THREE.Vector3(-9,71,0)];
 		geo=new THREE.BufferGeometry().setFromPoints(points);
 		s[12]=new THREE.Line(geo,mat);
-		s[12].name="12";treze.push(s[12]);
 	points=[new THREE.Vector3(8,71,0),new THREE.Vector3(137,71,0)];
 	geo=new THREE.BufferGeometry().setFromPoints(points);
 	s[13]=new THREE.Line(geo,mat);
-	s[13].name="13";treze.push(s[13]);
 		points=[new THREE.Vector3(146,61,0),new THREE.Vector3(146,-61,0)];
 		geo=new THREE.BufferGeometry().setFromPoints(points);
 		s[14]=new THREE.Line(geo,mat);
-		s[14].name="14";treze.push(s[14]);
 	points=[new THREE.Vector3(8,-71,0),new THREE.Vector3(137,-71,0)];
 	geo=new THREE.BufferGeometry().setFromPoints(points);
 	s[15]=new THREE.Line(geo,mat);
-	s[15].name="15";treze.push(s[15]);
 		points=[new THREE.Vector3(-137,-71,0),new THREE.Vector3(-9,-71,0)];
 		geo=new THREE.BufferGeometry().setFromPoints(points);
 		s[16]=new THREE.Line(geo,mat);
-		s[16].name="16";treze.push(s[16]);
 	for(let z=11;z<17;z++){scene.add(s[z]);}
 // ******** ******** ******** ******** Cushions end
 
@@ -327,7 +308,7 @@ function init(){
 }// init end
 
 function onMouseMove(event){
-	if(MayMoveMouse==1 && CushBeat==0){
+	if(MayMoveMouse==1){
 		finder();
 		pos();
 		event.preventDefault();
@@ -335,13 +316,6 @@ function onMouseMove(event){
 		ang=mouse.x*p*360/(window.innerWidth-10/2);
 		//dspang.innerText="deg: "+(180*ang).toFixed(3)+" rad: "+(degrad*180*ang).toFixed(3);
 		radang=degrad*180*ang;
-
-		if(arrowHelper.parent===scene){
-			scene.remove(arrowHelper);
-			CushionTouchPoint.position.set(-1000,0,0);
-			CushionTargetPoint.position.set(-1000,0,0);
-			scene.add(CushionTouchPoint);scene.add(CushionTargetPoint);
-		}
 		dush.innerText="?";
 		dush.innerText=radang.toFixed(8);
 	}
@@ -365,18 +339,14 @@ function pos(){
 function inter(j){
 	jota=j;
 	Walker.position.copy(s[0].position);
-	if(CushBeat==0){
-		MayMoveMouse=0;
-		pos();
-		origin=s[0].position.clone();
-		direction=new THREE.Vector3(Math.cos(radang+p/2),Math.sin(radang+p/2),0).normalize();
-		raycaster.set(origin,direction);
-		intersects=raycaster.intersectObjects(treze,false);
-	}else{
-		raycaster.set(origin,direction);
-		intersects=raycaster.intersectObjects(sete,false);
-	}
+	MayMoveMouse=0;
+	pos();
+	origin=s[0].position.clone();
+	direction=new THREE.Vector3(Math.cos(radang+p/2),Math.sin(radang+p/2),0).normalize();
+	raycaster.set(origin,direction);
+	intersects=raycaster.intersectObjects(treze,false);
 	if(intersects.length>0){
+		scene.add(arrowHelper);
 		touch.position.set(intersects[0].point.x,intersects[0].point.y,0);
 		const radius=6;
 		const hit=intersects[0].point.clone();
@@ -399,18 +369,16 @@ function finder(){
 	pos();const origin=s[0].position.clone();
 	const direction=new THREE.Vector3(Math.cos(radang+p/2),Math.sin(radang+p/2),0).normalize();
 	raycaster.set(origin,direction);
-	intersects=raycaster.intersectObjects(treze,false);
+	intersects=raycaster.intersectObjects(sete,false);
 	if(intersects.length>0){
 		found=Number(intersects[0].object.name);
 		if(found>0 && found<8){dfind.innerText="Ball "+found;}
-		if(found>10 && found<17){dfind.innerText="Cushion "+found;}
 		MayPressSpace=1;
 	}else{
 		MayPressSpace=0;
 		found="";dfind.innerText=found;//console.log("... no found ...");
 	}
 }
-
 
 function triggerAction(event){
 	//alert(event.code);
@@ -437,9 +405,6 @@ function triggerAction(event){
 	
 function arrows(){
 	finder();
-	scene.remove(arrowHelper);
-	CushionTouchPoint.position.set(-1000,0,0);CushionTargetPoint.position.set(-1000,0,0);
-	scene.add(CushionTouchPoint);scene.add(CushionTargetPoint);
 	dush.innerText="?";
 	dush.innerText=radang.toFixed(8);
 }
@@ -469,7 +434,6 @@ function animate(t){
 	for(let z=1;z<8;z++){if(k[z]==1){ballpos(z);}}
 	function ballpos(j){
 		fator=1;
-		if(CushBeat==1 && q[j]==0){s[0].position.copy(CushTouch.position);}
 		s[j].position.x -=(fator*deltaw*Math.cos(angle));s[j].position.y -=(fator*deltaw*Math.sin(angle));
 		s[0].position.x +=(fator*deltaw*Math.cos(whiteAngle));s[0].position.y +=(fator*deltaw*Math.sin(whiteAngle));
 		// pockets
@@ -494,50 +458,10 @@ function animate(t){
 			dpode.innerText="Do";
 			scene.add(s[j]);
 			scene.add(s[0]);
-			CushBeat=0;
 		}
 		if(plaft[j]==0){s[j].position.set(-135,-60+(15*j),12);s[j].scale.setScalar(0.4);}
 	}
 	// ******** for balls end
-
-	// ******** for cushions ini
-	for(let z=11;z<17;z++){
-		fator=1.5;
-		const qtotC=10;
-		if(k[z]==1){
-			if(z==11 || z==14){s[0].position.y +=(fator*deltaw*Math.cos(radang));s[0].position.x +=(fator*deltaw*Math.sin(radang));}
-			if(z==12 || z==13 || z==15 || z==16){s[0].position.y -=(fator*deltaw*Math.cos(radang));s[0].position.x -=(fator*deltaw*Math.sin(radang));}
-			if(outOf(s[0])){scene.remove(s[0]);fwow();arrows();}
-			if(q[z]== 0){CushionTouchPoint.position.copy(s[0].position);}
-			if(q[z]==qtotC){CushionTargetPoint.position.copy(s[0].position);}
-			origin=CushionTouchPoint.position.clone();
-			direction=new THREE.Vector3();
-			direction.subVectors(CushionTargetPoint.position,CushionTouchPoint.position).normalize();
-			scene.remove(arrowHelper);
-			arrowHelper=new THREE.ArrowHelper(direction.normalize(),origin,200,'#777');
-			scene.add(arrowHelper);
-			dush.innerText="cush "+found;
-			raycaster.set(origin,direction);
-			intersects=raycaster.intersectObjects(sete,false);
-			if(intersects.length>0){
-				CushTouch.position.set(intersects[0].point.x,intersects[0].point.y,0);
-				found=Number(intersects[0].object.name);
-				dush.innerText="cush "+found;
-				CushBeat=1;
-				inter(found);
-			}
-			q[z]++;if(q[z]==qtotC+1){k[z]=0;}
-			if(k[z]==0){
-				q[z]=0;
-				pos();
-				MayMoveMouse=1;
-				MayPressSpace=0;
-				dpode.innerText="Do";
-				scene.add(s[0]);
-			}
-		}
-	}
-	// ******** for cushions end
 
 	function outOf(obj){return(obj.position.x>153 || obj.position.x<-153 || obj.position.y>77 || obj.position.y<-77);}
 
