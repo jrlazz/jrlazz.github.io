@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>billiard_abc.html</title>
+<meta charset="utf-8">
+
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+<meta name="description" content="Billiard ABC Balls game">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+
+<style>
+body{overflow:hidden;margin:0px;background:#454;font-family:monospace;}
+span{position:absolute;left:10px;top:10px;color:#ff0;font-size:10.25pt;z-index:1;}
+button{position:absolute;left:10px;top:10px;background-color:#444;font-size:10.25pt;cursor:pointer;z-index:1;}
+img{position:absolute;left:0px;top:0px;width:40px;}
+div{position:absolute;left:50px;top:50px;width:600px;height:250px;padding:6px;background-color:beige;color:#009;border:3px outset gold;}
+input{height:12px;background-color:#444;color:#fff;}
+</style>
+
+<!-- slate , green felt, Pads, pockets ... ard&oacute;sia, feltro verde, almofadas, bolsos -->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script type="importmap">
+{
+	"imports":{
+		"three":"https://unpkg.com/three@0.184.0/build/three.module.min.js",
+		"three/addons/":"https://unpkg.com/three@0.184.0/examples/jsm/"
+	}
+}
+</script>
+</head>
+
+<body>
+<img id="relo" src="img/reload.png" style="left:5px;top:5px;width:40px;cursor:pointer;"></img>
+<img id="help" src="img/help.png" style="left:55px;top:5px;width:40px;cursor:pointer;"></img>
+
+<button id="tro" style="left:105px;top:10px;color:#0f0;">3D Y/N</button>
+<button id="url" style="left:175px;top:10px;color:#0ff;">RePos</button>
+
+<span id="pode" style="left:85%;top:10px;width:100px;text-align:center;font-size:20.5pt;color:#0f0;background-color:#444;border:3px inset #888;">Wait</span>
+<span id="cam-pos" style="font-size:9pt;left:100px;top:437px;color:#fff;"></span>
+<span id="cam-rot" style="font-size:9pt;left:800px;top:437px;color:#fff;"></span>
+
+<div id="he" style="font-size:13.67pt;display:none;"></div>
+
+<img id="Bb" src="img/Bball.png" style="left:88%;top:55px;display:none;"></img>
+<img id="Cb" src="img/Cball.png" style="left:88%;top:105px;display:none;"></img>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import CSG from "../js/short_csg.js";
+
+var camera,scene,renderer,controls,tex,bump,geo,mat,mesh,line,cue;
+
+const p=Math.PI;
+const degrad=0.0174532925;
+const raddeg=57.2958;
+const gru=new THREE.Group();
+const mouse=new THREE.Vector2(1,1);
+
+var bId=function(id){return document.getElementById(id);}
+const drelo=bId("relo");
+const dpode=bId("pode");
+const dtro=bId("tro");
+const durl=bId("url");
+const dhelp=bId("help");
+const dhe=bId("he");
+const dBb=bId("Bb");
+const dCb=bId("Cb");
+
+const raycaster=new THREE.Raycaster();
+const timer=new THREE.Timer();timer.connect(document);
+
+var angle,touch,selected,whiteAngle,tout,origin,direction,distance;
+var outer,inner,result,ab,bb;
+
+var intersects=[],alvos=[],vx=[],vy=[],orig=[],targ=[],Padball=[];
+const c=[],m=[],s=[],t=[],luz=[],pcam=[],rcam=[];
+const k=new Array(4).fill(0);
+const q=new Array(4).fill(0);
+const arrow=[];for(let z=0;z<9;z++){arrow[z]=new THREE.ArrowHelper();}
+
+var ang=0,radang=0,control=0,found=100,walk=0,jota=0,cal=0,beat=0,wall=0;
+var MayMoveMouse=1,MayPressSpace=0,fator=1;
+
+var str="<img src='img/close.png' style='position:relative;left:520px;'></img>";
+str=str+"<br>* Mouse movements changes the angle of shots.";
+str=str+"<br>* Space key hits the red ball (A).";
+str=str+"<br>* Arrows changes cue angle by small amounts.";
+str=str+"<br>* Your first hit can only be with A and B.";
+str=str+"<br>* Then A must reach C using the cushions.";
+str=str+"<br>* If A does not hit C, You 'LOST' and must restart!";
+str=str+"<br>* RePos button changes positions of the balls.";
+str=str+"<br>* Pressing Key 'P' reloads the game.";
+str=str+"<br>* <img src='img/reload.png' style='position:relative;top:5px;width:24px;'></img> Restart the game when it freezes!";
+
+var canvas=[],cBack=[],cTex=[];
+cBack[0]='#a00';cTex[0]="A";
+cBack[1]='#960';cTex[1]="B";
+cBack[2]='#060';cTex[2]="C";
+var cArc=[],cStr=[];
+for(let z=0;z<3;z++){cArc[z]='#fff';cStr[z]='#000';}
+
+function init(){
+
+	drelo.onclick=function RELO(){window.location.reload();}
+	dtro.onclick=function TROL(){
+		control=1-control;
+		if(control==1){
+			camera.position.set(0,-140,80);
+			camera.rotation.set(0.9,0,0);
+		}
+		dtro.blur();
+	}
+	durl.onclick=function URL(){
+		onde();
+		durl.blur();
+	}
+	dhelp.onclick=function DHELP(){dhe.style.display="";dhelp.blur();}
+	dhe.onclick=function DHE(){dhe.style.display="none";dhe.blur();}
+	dhe.innerHTML=str;
+
+	scene=new THREE.Scene();
+
+	camera =new THREE.PerspectiveCamera(70,window.innerWidth/window.innerHeight,1,1000);
+	camera.position.set(0,0,120);
+
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.setClearColor("#454",1);
+
+	document.body.appendChild(renderer.domElement);
+        document.addEventListener('mousemove',onMouseMove,false);
+	document.addEventListener('keydown', triggerAction);
+	window.addEventListener('resize',onWindowResize);
+	
+	controls=new OrbitControls(camera,renderer.domElement);
+
+	scene.add(new THREE.AmbientLight("#fff",2));
+
+	luz[1]=new THREE.PointLight("#fff",10000);
+	luz[1].position.set(0,0,50);
+	scene.add(luz[1]);
+
+	luz[2]=new THREE.PointLight("#fff",10000);
+	luz[2].position.set(75,75,50);
+	scene.add(luz[2]);
+
+	luz[3]=new THREE.PointLight("#fff",10000);
+	luz[3].position.set(-75,75,50);
+	scene.add(luz[3]);
+
+	tex=new THREE.TextureLoader().load('images/made_702.jpg');
+	tex.wrapS=THREE.RepeatWrapping;tex.wrapT=THREE.RepeatWrapping;
+	//tex.repeat.set(6,6);
+	bump=new THREE.TextureLoader().load('images/made_702_bump.jpg');
+	bump.wrapS=THREE.RepeatWrapping;bump.wrapT=THREE.RepeatWrapping;
+	//bump.repeat.set(6,6);
+
+// ******** ******** Table START
+	geo=new THREE.PlaneGeometry(224,124);
+	mat=new THREE.MeshStandardMaterial({color:'#060',metalness:0.4,roughness:0.8,side:THREE.DoubleSide});
+	mesh=new THREE.Mesh(geo,mat);
+	mesh.position.set(0,0,-6);
+	scene.add(mesh);
+	geo=new THREE.BoxGeometry(224,5,5);
+	mat=new THREE.MeshStandardMaterial({color:'#060',metalness:0.4,roughness:0.8});
+	mesh=new THREE.Mesh(geo,mat);
+	mesh.rotation.x=p/4
+	mesh.position.set(0,60,0);
+	scene.add(mesh);
+		mesh=mesh.clone();
+		mesh.position.set(0,-60,0);
+		scene.add(mesh);
+			geo=new THREE.BoxGeometry(228,1,8);
+			mesh=new THREE.Mesh(geo,mat);
+			mesh.position.set(0,60,-2);
+			scene.add(mesh);
+				mesh=mesh.clone();
+				mesh.position.set(0,-60,-2);
+				scene.add(mesh);
+
+	geo=new THREE.BoxGeometry(5,124,5);
+	mesh=new THREE.Mesh(geo,mat);
+	mesh.rotation.set(0,p/4,0);
+	mesh.position.set(-105.75,0,0);
+	scene.add(mesh);
+		mesh=mesh.clone();
+		mesh.position.set(105.75,0,0);
+		scene.add(mesh);
+			geo=new THREE.BoxGeometry(1,128,8);
+			mesh=new THREE.Mesh(geo,mat);
+			mesh.position.set(-105.75,-5,-2);
+			scene.add(mesh);
+				mesh=mesh.clone();
+				mesh.position.set(105.75,-5,-2);
+				scene.add(mesh);
+
+	mat=new THREE.MeshStandardMaterial({color:'#840',map:tex,bumpMap:bump,bumpScale:30});
+	const bm1=new THREE.Mesh(new THREE.BoxGeometry(236,142,10),mat);
+	bm1.updateMatrix();bm1.updateMatrixWorld();
+	const bm2=new THREE.Mesh(new THREE.BoxGeometry(212,120,10),mat);
+	bm2.updateMatrix();bm2.updateMatrixWorld();
+	outer=CSG.fromMesh(bm1);inner=CSG.fromMesh(bm2);
+	result=outer.subtract(inner);
+	const bm3=CSG.toMesh(result,bm1.matrix,mat);
+	bm3.geometry.computeVertexNormals();
+	bm3.position.set(0,0,-1.5);
+	scene.add(bm3);
+// ******** ******** Table END
+
+// ******** ******** Balls START
+	for(let z=0;z<3;z++){
+		canvas[z]=document.createElement('canvas');
+		canvas[z].width=1024;canvas[z].height=512;
+		canvas[z].style.left="-1050px";
+		document.body.appendChild(canvas[z]);
+		const ctx=canvas[z].getContext('2d');
+		// Background
+		ctx.fillStyle=cBack[z];
+		ctx.fillRect(0,0,1024,512);
+		// Strip
+		if(z!=0){
+			ctx.fillStyle='#000';
+			ctx.fillRect(0,240,1024,40);
+		}
+		// Circles
+			// left
+				ctx.beginPath();
+				ctx.arc(256,256,128,0,p*2);
+				ctx.fillStyle=cArc[z];
+				ctx.fill();
+				ctx.lineWidth=40;
+				ctx.strokeStyle=cStr[z];
+				ctx.stroke();
+			// right
+				ctx.beginPath();
+				ctx.arc(768,256,128,0,p*2);
+				ctx.fillStyle=cArc[z];
+				ctx.fill();
+				ctx.lineWidth=40;
+				ctx.strokeStyle=cStr[z];
+				ctx.stroke();
+		// Texts
+		ctx.fillStyle='#000000';
+		ctx.font='bold 192px Monospace';
+			// left
+				ctx.textAlign="center";
+				ctx.fillText(cTex[z],257,315);
+			// right
+				ctx.textAlign="center";
+				ctx.fillText(cTex[z],765,315);
+		// Texture
+		t[z]=new THREE.CanvasTexture(canvas[z]);
+		// Material
+		m[z]=new THREE.MeshStandardMaterial({map:t[z],metalness:0,roughness:0.05});
+		const ponto=new THREE.SphereGeometry(0.1,129,129);
+		const seis=new THREE.SphereGeometry(6,129,129);
+		if(z==0){
+			c[z]=new THREE.Mesh(ponto,m[z]);scene.add(c[z]);
+			s[z]=new THREE.Mesh(seis,m[z]);scene.add(s[z]);
+		}
+		if(z==1){
+			c[z]=new THREE.Mesh(ponto,m[z]);c[z].name=z;alvos.push(c[z]);scene.add(c[z]);
+			s[z]=new THREE.Mesh(seis,m[z]);s[z].name=z;alvos.push(s[z]);scene.add(s[z]);
+		}
+		if(z==2){
+			c[z]=new THREE.Mesh(ponto,m[z]);c[z].name=z;alvos.push(c[z]);scene.add(c[z]);
+			s[z]=new THREE.Mesh(seis,m[z]);s[z].name=z;alvos.push(s[z]);scene.add(s[z]);
+		}
+	}
+// ******** ******** Balls END
+
+// ******** ******** Shot line START
+	mat=new THREE.MeshStandardMaterial({color:'#0ff',transparent:true,opacity:0.9});
+    	geo=new THREE.BoxGeometry(0.3,200,0.3);
+    	geo.translate(0,100,0);
+	line=new THREE.Mesh(geo,mat);
+	gru.add(line);
+// ******** ******** Shot line END
+
+// ******** ******** Extra Balls START
+	geo=new THREE.SphereGeometry(6);
+	mat=new THREE.MeshStandardMaterial({color:'#999',transparent:true,opacity:0.3});
+	for(let z=0;z<4;z++){
+		Padball[z]=new THREE.Mesh(geo,mat);
+		Padball[z].position.set(-500,0,0);scene.add(Padball[z]);
+	}
+	mat=new THREE.MeshStandardMaterial({color:'#000',transparent:true,opacity:0.3});
+	ab=new THREE.Mesh(geo,mat);
+	bb=new THREE.Mesh(geo,mat);
+// ******** ******** Extra Balls END
+
+// ******** ******** Pads START
+	mat=new THREE.MeshStandardMaterial({color:'#000',transparent:true,opacity:0.01});
+    	geo=new THREE.BoxGeometry(0.001,2.5,2.5);//0.01,2.5,2.5 ???
+	const l=new THREE.Mesh(geo,mat);
+	var d=0;
+	for(let z=0;z<40;z++){
+		d=d+2.5;
+		c[z+100]=l.clone();
+		c[z+100].position.set(-100,-51.25+d,0);//51
+		c[z+100].name=100+z;alvos.push(c[z+100]);
+		scene.add(c[z+100]);//left
+	}
+	d=0;
+	for(let z=0;z<40;z++){
+		d=d+2.5;
+		c[z+300]=l.clone();
+		c[z+300].position.set(100,51.25-d,0);
+		c[z+300].name=300+z;alvos.push(c[z+300]);
+		scene.add(c[z+300]);//right
+	}
+	d=0;
+    	geo=new THREE.BoxGeometry(2.5,0.001,2.5);//0.01,2.5,2.5 ???
+	const f=new THREE.Mesh(geo,mat);
+	for(let z=0;z<80;z++){
+		d=d+2.5;
+		c[z+200]=f.clone();
+		c[z+200].position.set(-101.25+d,50,0);
+		c[z+200].name=200+z;alvos.push(c[z+200]);
+		scene.add(c[z+200]);//top
+	}
+	d=0;
+	for(let z=0;z<80;z++){
+		d=d+2.5;
+		c[z+400]=f.clone();
+		c[z+400].position.set(101.25-d,-50,0);
+		c[z+400].name=400+z;alvos.push(c[z+400]);
+		scene.add(c[z+400]);//down
+	}
+// ******** ******** Pads END
+
+// ******** ******** Cue START
+	mat=new THREE.MeshStandardMaterial({color:'#960',map:tex,bumpMap:bump,bumpScale:1,metalness:0,roughness:30});
+    	geo=new THREE.CylinderGeometry(0.5,3,120);
+    	geo.translate(0,-60,0);
+	cue=new THREE.Mesh(geo,mat);
+	cue.position.set(0,-20,0)
+		mat=new THREE.MeshStandardMaterial({color:'#0ff'});
+    		geo=new THREE.CylinderGeometry(0.5,0.5,1);
+		const pit=new THREE.Mesh(geo,mat);
+		pit.position.set(0,0,0)
+		cue.add(pit);
+		gru.add(cue);
+// ******** ******** Cue END
+
+// ******** ******** Touch red indicator START
+	mat=new THREE.MeshStandardMaterial({color:'#f00'});
+    	touch=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,20),mat);
+// ******** ******** Touch red indicator END
+
+	scene.add(gru);
+
+	pcam[1]=camera.position.x;pcam[2]=camera.position.y;pcam[3]=camera.position.z;
+	rcam[1]=camera.rotation.x;rcam[2]=camera.rotation.y;rcam[3]=camera.rotation.z;
+
+} // init END
+
+function onMouseMove(event){
+	if(MayMoveMouse==1){
+		finder();
+		event.preventDefault();
+		mouse.x=(event.clientX/window.innerWidth)*2-1;
+		ang=mouse.x*p*360/(window.innerWidth-10/2);
+		radang=degrad*180*ang;
+		for(let z=0;z<6;z++){scene.remove(arrow[z]);}
+		scene.add(s[0]);
+		for(let z=0;z<4;z++){Padball[z].position.set(-500,0,0);}
+	}
+}
+
+function pos(){
+	for(let z=0;z<3;z++){
+		if(c[z]){c[z].position.x=vx[z];c[z].position.y=vy[z];}
+		if(s[z]){s[z].position.x=vx[z];s[z].position.y=vy[z];}
+	}
+	gru.position.copy(c[0].position);
+}
+
+// ******** ******** INTER(j) START
+function inter(j){
+	jota=j;
+	s[0].position.copy(c[0].position);
+	MayMoveMouse=0;
+	if(j==1){
+		origin=s[0].position.clone();
+		direction=new THREE.Vector3(Math.cos(radang+p/2),Math.sin(radang+p/2),0).normalize();
+		raycaster.set(origin,direction);
+		intersects=raycaster.intersectObjects(alvos,false);
+		dBb.style.display="";
+	}
+	if(j==2 && beat==1 && orig[3]){
+		origin=c[0].position.clone();
+		c[0].position.set(orig[3].x,orig[3].y,0);
+		raycaster.set(origin,direction);
+		intersects=raycaster.intersectObjects(alvos,false);
+	}
+	if(j==1 && intersects.length>0){
+		interOK();
+		MayMoveMouse=0;
+	}else{
+		console.log("... no!");
+		MayMoveMouse=1;
+	}
+
+	if(j==2 && beat==2 && orig[3] && intersects.length>0){
+		interOK();
+		k[jota]=1;
+		q[jota]=0;
+	}
+}
+
+function interOK(){
+	touch.position.set(intersects[0].point.x,intersects[0].point.y,0);
+	const radius=6;
+	const hit=intersects[0].point.clone();
+	const center=c[jota].position.clone();
+	const normal=hit.clone().sub(center).normalize();
+	const dot=direction.dot(normal);
+	const whiteDir=direction.clone().sub(normal.clone().multiplyScalar(dot)).normalize();
+	whiteAngle=Math.atan2(whiteDir.y,whiteDir.x);
+	c[0].position.copy(hit.clone().add(normal.clone().multiplyScalar(radius)));
+	s[0].position.copy(hit.clone().add(normal.clone().multiplyScalar(radius)));
+	angle=Math.atan2(normal.y,normal.x);
+	if(jota==1){walk=1;}
+	s[0].position.clone(origin);
+	c[0].position.clone(origin);
+}
+// ******** ******** INTER(j) END
+
+function finder(){
+	origin=c[0].position.clone();
+	direction=new THREE.Vector3(Math.cos(radang+p/2),Math.sin(radang+p/2),0).normalize();
+	raycaster.set(origin,direction);
+	intersects=raycaster.intersectObjects(alvos,false);
+	if(intersects.length>0){
+		found=Number(intersects[0].object.name);
+		dBb.style.display="none";
+		if(found==1){
+			//dfind.style.display="";dfind.innerText=intersects[0].object.name;
+			dBb.style.display="";
+		}
+		MayPressSpace=1;
+	}else{
+		MayPressSpace=0;
+		found="";
+	}
+}
+
+function triggerAction(event){
+	//alert(event.code);
+	switch (event.code) {
+		case 'ArrowRight':finder();radang=radang-p/2000;break;
+		case 'ArrowLeft':finder();radang=radang+p/2000;break;
+		case 'Space':
+			if(MayPressSpace==1){
+				for(let z=0;z<6;z++){scene.remove(arrow[z]);}
+				MayMoveMouse=0;
+				MayPressSpace=0;
+				dpode.innerText="Go";
+				cue.position.set(0,-6.2,0);
+				tout=setTimeout(function(){cue.position.set(0,-20,0);clearTimeout(tout);},400);
+				if(found){inter(found);}
+			}
+			tout=setTimeout(function(){MayPressSpace=1;clearTimeout(tout);},100);
+			break;
+		case 'ArrowUp':finder();radang=radang+p/2000;break;
+		case 'ArrowDown':finder();radang=radang-p/2000;break;
+		case 'KeyZ':location.reload();break;
+		case 'KeyS':
+			MayMoveMouse=1;MayPressSpace=1;
+			for(let z=1;z<5;z++){scene.remove(arrow[z]);}
+			for(let z=0;z<4;z++){Padball[z].position.set(-500,0,0);}
+			dBb.style.display="none";dCb.style.display="none";
+			gru.add(cue);gru.add(line);
+			onde();durl.blur();
+			break;
+	}
+
+} // init END
+
+function animate(t){
+	requestAnimationFrame(animate);
+	timer.update(t);
+	const delta=Math.min(timer.getDelta(),0.05);
+	const deltaw=delta*120;const qtot=100;
+
+	gru.rotation.z=radang;
+
+	if(control==1){
+		controls.enabled=true;
+		/*
+		const posText=bId('cam-pos');
+		const rotText=bId('cam-rot');
+		const pX=camera.position.x.toFixed(1);const pY=camera.position.y.toFixed(1);const pZ=camera.position.z.toFixed(1);
+		const rX=camera.rotation.x.toFixed(1);const rY=camera.rotation.y.toFixed(1);const rZ=camera.rotation.z.toFixed(1);
+		posText.innerText=`CamPos X: ${pX},Y: ${pY},Z: ${pZ}`;rotText.innerText=`CamRot X: ${rX},Y: ${rY},Z: ${rZ}`;
+		*/
+	}else{
+		controls.enabled=false;camera.position.set(pcam[1],pcam[2],pcam[3]);camera.rotation.set(rcam[1],rcam[2],rcam[3]);
+	}
+
+	// ******** ******** for BALLS START
+	if(k[jota]==1 && jota<3){ballpos();}
+	function ballpos(){
+		gru.remove(cue);gru.remove(line);
+		MayMoveMouse=0;MayPressSpace=0;
+		let total=24;if(jota==2){total=28;}
+		fator=0.25;
+		c[jota].position.x -=(fator*deltaw*Math.cos(angle));c[jota].position.y -=(fator*deltaw*Math.sin(angle));
+		c[0].position.x +=(fator*deltaw*Math.cos(whiteAngle));c[0].position.y +=(fator*deltaw*Math.sin(whiteAngle));
+		s[0].position.copy(c[0].position);
+		s[jota].position.copy(c[jota].position);
+			if(q[jota]==0){orig[0]=new THREE.Vector3(c[0].position.x,c[0].position.y,0);}
+		q[jota]++;if(q[jota]==total){k[jota]=0;}
+			if(q[jota]==total){targ[0]=new THREE.Vector3(c[0].position.x,c[0].position.y,0);}
+			if(jota==1){Padball[0].position.set(c[0].position.x,c[0].position.y,0);}
+		if(k[jota]==0){
+			q[jota]=0;
+			gru.position.copy(c[0].position);
+			scene.remove(arrow[0]);
+			direction=new THREE.Vector3();
+			direction.subVectors(targ[0],orig[0]);
+			distance=orig[0].distanceTo(targ[0]);
+			if(jota==1){
+				raycaster.set(targ[0],direction);
+
+				// ******** Look for C
+				// ******** 1st Look
+				intersects=raycaster.intersectObjects(alvos,false);
+				if(intersects.length>0 && walk==0){
+					found=Number(intersects[0].object.name);
+				console.log("inter1...found="+found);						
+					orig[1]=new THREE.Vector3(intersects[0].point.x,intersects[0].point.y,0);
+					distance=orig[0].distanceTo(orig[1]);
+					arrow[1]=new THREE.ArrowHelper(direction.normalize(),targ[0],distance,'#f00',10,2);
+					scene.add(arrow[1]);
+					wall=Math.floor(found/100);
+					(wall==1 || wall==3) ? direction.x *= -1 : direction.y *= -1;
+					if(found==2){
+						look(orig[1].x,orig[1].y);
+					}else{
+						Padball[1].position.copy(orig[1]);
+						s[0].position.copy(targ[0]);
+						bb.position.copy(orig[1]);
+						walk=2;
+						tout=setTimeout(second,600);
+					}
+					raycaster.set(orig[1],direction);
+				}
+				function second(){
+					// ******** 2nd Look
+					intersects=raycaster.intersectObjects(alvos,false);
+					if(intersects.length>0 && walk==0){
+						found=Number(intersects[0].object.name);
+				 console.log("inter2...found="+found);							
+						orig[2]=new THREE.Vector3(intersects[0].point.x,intersects[0].point.y,0);
+						distance=orig[1].distanceTo(orig[2]);
+						arrow[2]=new THREE.ArrowHelper(direction.normalize(),orig[1],distance,'#ff0',10,2);
+						scene.add(arrow[2]);
+						wall=Math.floor(found/100);
+						(wall==1 || wall==3) ? direction.x *= -1 : direction.y *= -1;
+						if(found==2){
+							look(orig[2].x,orig[2].y);
+						}else{
+							Padball[2].position.copy(orig[2]);
+							s[0].position.copy(orig[1]);
+							bb.position.copy(orig[2]);
+							walk=2;
+							tout=setTimeout(third,600);
+						}
+					}
+					raycaster.set(orig[2],direction);
+				} // second END
+
+				function third(){
+					// ******** 3rd Look
+					intersects=raycaster.intersectObjects(alvos,false);
+					if(intersects.length>0 && walk==0){
+						found=Number(intersects[0].object.name);
+				console.log("inter3...found="+found);
+						targ[2]=new THREE.Vector3(intersects[0].point.x,intersects[0].point.y,0);
+						distance=orig[2].distanceTo(targ[2]);
+						arrow[3]=new THREE.ArrowHelper(direction.normalize(),orig[2],distance,'#0f0',10,2);
+						scene.add(arrow[3]);
+						if(found==2){
+							look(targ[2].x,targ[2].y);
+						}else{
+							dpode.style.color="#f00";
+							dpode.innerText="Lost";
+							Padball[3].position.copy(targ[2]);
+							s[0].position.copy(orig[2]);
+							bb.position.copy(targ[2]);
+							walk=2;
+						}
+					} // third END
+				}
+			}
+		}
+	}
+	function look(a,b){
+		orig[3]=new THREE.Vector3(a,b,0);
+		beat=2;
+		dCb.style.display="";;
+		dpode.innerText="Won";
+		limpaarrows();
+		inter(2);
+	}
+	// ******** ******** for BALLS END
+
+	if(walk==1){
+		s[0].position.lerp(touch.position,delta*3);
+    		if(s[0].position.distanceTo(touch.position)<4.1) {//0.01
+			s[0].position.copy(touch.position);
+			k[jota]=1;
+			q[jota]=0;
+			dpode.innerText="Wait";
+			walk=0;
+		}
+	}
+
+	if(walk==2){
+		s[0].position.lerp(bb.position,delta*20);
+    		if(s[0].position.distanceTo(bb.position)<6.1){
+			s[0].position.copy(bb.position);
+			walk=0;
+		}
+	}
+
+	function limpaarrows(){
+		for(let z=1;z<5;z++){scene.remove(arrow[z]);}
+		for(let z=0;z<4;z++){Padball[z].position.set(-500,0,0);}
+	}
+	renderer.render(scene,camera);
+}
+
+init();
+animate();
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function onde(){
+	const qua=Math.floor(Math.random()*4)+1;
+	const hz=35;const vt=20;
+	switch(qua){
+		case 1:	ran(hz);vx[0]=-hz-cal;ran(vt);vy[0]=-vt-cal;
+			ran(hz);vx[1]=+hz+cal;ran(vt);vy[1]=+vt+cal;
+			ran(hz);vx[2]=+hz+cal;ran(vt);vy[2]=-vt-cal;break
+		case 2:	ran(hz);vx[0]=-hz-cal;ran(vt);vy[0]=+vt+cal;
+			ran(hz);vx[1]=+hz+cal;ran(vt);vy[1]=-vt-cal;
+			ran(hz);vx[2]=+hz+cal;ran(vt);vy[2]=+vt+cal;break
+		case 3:	ran(hz);vx[0]=+hz+cal;ran(vt);vy[0]=-vt-cal;
+			ran(hz);vx[1]=-hz-cal;ran(vt);vy[1]=+vt+cal;
+			ran(hz);vx[2]=-hz-cal;ran(vt);vy[2]=-vt-cal;break
+		case 4:	ran(hz);vx[0]=+hz+cal;ran(vt);vy[0]=+vt+cal;
+			ran(hz);vx[1]=-hz-cal;ran(vt);vy[1]=-vt-cal;
+			ran(hz);vx[2]=-hz-cal;ran(vt);vy[2]=+vt+cal;break
+	}
+	pos();
+	durl.blur();
+	dpode.innerText="Go";
+	function ran(u){cal=parseInt(Math.random()*u);;}
+}
+
+onde();
+
+</script>
+
+</body>
+</html>
