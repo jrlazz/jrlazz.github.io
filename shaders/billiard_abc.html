@@ -124,8 +124,18 @@ function init(){
 		onde();
 		durl.blur();
 	}
+	dpressP.onclick=function DPRESSP(){
+			MayMoveMouse=1;MayPressSpace=1;
+			for(let z=1;z<5;z++){scene.remove(arrow[z]);}
+			for(let z=0;z<4;z++){Padball[z].position.set(-500,0,0);}
+			dBb.style.display="none";dCb.style.display="none";;dpressP.style.display="none";
+			gru.add(cue);gru.add(line);
+			onde();durl.blur();dpode.style.color="#0f0";
+			console.clear();
+	}
 	dhelp.onclick=function DHELP(){dhe.style.display="";dhelp.blur();}
 	dhe.onclick=function DHE(){dhe.style.display="none";dhe.blur();}
+
 	dhe.innerHTML=str;
 
 	scene=new THREE.Scene();
