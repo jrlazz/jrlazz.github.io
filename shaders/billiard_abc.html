@@ -47,8 +47,9 @@ input{height:12px;background-color:#444;color:#fff;}
 
 <div id="he" style="font-size:13.67pt;display:none;"></div>
 
-<img id="Bb" src="img/Bball.png" style="left:88%;top:55px;display:none;"></img>
-<img id="Cb" src="img/Cball.png" style="left:88%;top:105px;display:none;"></img>
+<img id="Bb" src="img/Bball.png" style="left:88%;top:65px;display:none;"></img>
+<img id="Cb" src="img/Cball.png" style="left:88%;top:120px;display:none;"></img>
+<img id="pressP" src="img/pressP.png" style="left:85%;top:175px;width:120px;display:none;"></img>
 
 <script type="module">
 
@@ -73,6 +74,7 @@ const dhelp=bId("help");
 const dhe=bId("he");
 const dBb=bId("Bb");
 const dCb=bId("Cb");
+const dpressP=bId("pressP");
 
 const raycaster=new THREE.Raycaster();
 const timer=new THREE.Timer();timer.connect(document);
@@ -430,8 +432,8 @@ function interOK(){
 	s[0].position.copy(hit.clone().add(normal.clone().multiplyScalar(radius)));
 	angle=Math.atan2(normal.y,normal.x);
 	if(jota==1){walk=1;}
-	s[0].position.clone(origin);
-	c[0].position.clone(origin);
+	//s[0].position.clone(origin);
+	//c[0].position.clone(origin);
 }
 // ******** ******** INTER(j) END
 
@@ -478,9 +480,10 @@ function triggerAction(event){
 			MayMoveMouse=1;MayPressSpace=1;
 			for(let z=1;z<5;z++){scene.remove(arrow[z]);}
 			for(let z=0;z<4;z++){Padball[z].position.set(-500,0,0);}
-			dBb.style.display="none";dCb.style.display="none";
+			dBb.style.display="none";dCb.style.display="none";;dpressP.style.display="none";
 			gru.add(cue);gru.add(line);
-			onde();durl.blur();
+			onde();durl.blur();dpode.style.color="#0f0";
+			console.clear();
 			break;
 	}
 
@@ -550,6 +553,7 @@ function animate(t){
 						Padball[1].position.copy(orig[1]);
 						s[0].position.copy(targ[0]);
 						bb.position.copy(orig[1]);
+						console.log(performance.now(),"walk =",walk);
 						walk=2;
 						tout=setTimeout(second,600);
 					}
@@ -573,6 +577,7 @@ function animate(t){
 							Padball[2].position.copy(orig[2]);
 							s[0].position.copy(orig[1]);
 							bb.position.copy(orig[2]);
+							console.log(performance.now(),"walk =",walk);
 							walk=2;
 							tout=setTimeout(third,600);
 						}
@@ -581,6 +586,7 @@ function animate(t){
 				} // second END
 
 				function third(){
+					console.log(performance.now(),"third()","walk =",walk,"intersects =",intersects.length);
 					// ******** 3rd Look
 					intersects=raycaster.intersectObjects(alvos,false);
 					if(intersects.length>0 && walk==0){
@@ -595,9 +601,11 @@ function animate(t){
 						}else{
 							dpode.style.color="#f00";
 							dpode.innerText="Lost";
+							dpressP.style.display="";
 							Padball[3].position.copy(targ[2]);
 							s[0].position.copy(orig[2]);
 							bb.position.copy(targ[2]);
+							console.log(performance.now(),"walk =",walk);
 							walk=2;
 						}
 					} // third END
@@ -612,6 +620,7 @@ function animate(t){
 		dpode.innerText="Won";
 		limpaarrows();
 		inter(2);
+		dpressP.style.display="";
 	}
 	// ******** ******** for BALLS END
 
@@ -627,8 +636,13 @@ function animate(t){
 	}
 
 	if(walk==2){
+		console.log(
+    			performance.now(),"animate","distance",
+			parseInt(s[0].position.distanceTo(bb.position)),"walk",walk);
 		s[0].position.lerp(bb.position,delta*20);
     		if(s[0].position.distanceTo(bb.position)<6.1){
+			console.log(performance.now(),"Reached bb",s[0].position.distanceTo(bb.position));
+			console.log("Reached bb. beat =",beat,"found =",found,"walk =", walk);
 			s[0].position.copy(bb.position);
 			walk=0;
 		}
