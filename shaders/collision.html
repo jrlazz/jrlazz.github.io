@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>collision.html</title>
+<meta charset="utf-8">
+
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+<meta name="description" content="intersect">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+
+<style>
+body{overflow:hidden;margin:0px;background:#454;font-family:monospace;font-size:10.25pt;}
+span{position:absolute;left:10px;top:10px;color:#ff0;font-size:10.25pt;z-index:1;}
+button{position:absolute;left:10px;top:10px;background-color:#444;font-size:10.25pt;cursor:pointer;z-index:1;}
+img{position:absolute;left:0px;top:0px;width:40px;}
+</style>
+
+<script type="importmap">
+{
+	"imports":{
+		"three":"https://unpkg.com/three@0.184.0/build/three.module.min.js",
+		"three/addons/":"https://unpkg.com/three@0.184.0/examples/jsm/"
+	}
+}
+</script>
+
+</head>
+
+<body>
+<img id="relo" src="img/reload.png" style="left:50px;top:5px;width:40px;cursor:pointer;"></img>
+<span id="quad" style="top:50px;font-size:20.5px;color:#ff0;">quadrant: 1</span>
+<span id="ytouch" style="top:80px;font-size:20.5px;color:#ff0;"></span>
+<span id="cam-pos" style="font-size:9pt;left:100px;top:437px;color:#fff;"></span>
+<span id="cam-rot" style="font-size:9pt;left:800px;top:437px;color:#fff;"></span>
+<span id="now" style="top:80%;width:95%;font-size:20.5px;color:#0f0;text-align:center;"></span>
+<img id="KS" src="img/pressP.png" style="left:10px;top:120px;width:120px;display:;"></img>
+<img id="Bb" src="img/bola1red.png" style="left:29px;top:127px;width:80px;display:none;"></img>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+function repress(){
+	dytouch.innerText="";
+	controls.enabled=false;camera.position.set(pcam[1],pcam[2],pcam[3]);camera.rotation.set(rcam[1],rcam[2],rcam[3]);
+	MayMoveMouse=1;
+	for(let z=0;z<50;z++){if(arrow[z]){scene.remove(arrow[z]);}}
+	for(let z=0;z<12;z++){if(copy[z]){copy[z].position.set(-500,0,0);}}
+	for(let z=0;z<50;z++){if(TS[z]){scene.remove(TS[z]);}}
+	dBb.style.display="none";
+	gru.add(cue);gru.add(line);
+	scene.remove(grucopy);
+	onde();
+}
+
+var camera,scene,renderer,controls,tex,bump,geo,mat,mesh,line,cue;
+
+const p=Math.PI;
+const degrad=0.0174532925;
+const raddeg=57.2958;
+const gru=new THREE.Group();
+const mouse=new THREE.Vector2(1,1);
+
+var bId=function(id){return document.getElementById(id);}
+const drelo=bId("relo");
+const dquad=bId("quad");
+const dytouch=bId("ytouch");
+const dBb=bId("Bb");
+const dKS=bId("KS");
+const dnow=bId("now");
+
+const raycaster=new THREE.Raycaster();
+const timer=new THREE.Timer();timer.connect(document);
+
+var touch,selected,origin,direction,distance,grucopy;
+
+var intersects=[],alvos=[],vx=[],vy=[],orig=[],targ=[],copy=[];
+const c=[],m=[],s=[],t=[],luz=[],pcam=[],rcam=[];
+const k=new Array(4).fill(0);
+const q=new Array(4).fill(0);
+const arrow=[];
+const radius=8;
+
+var ang=0,radang=0,control=1,found=100,walk=0,jota=0;
+var MayMoveMouse=1,fator=1;
+
+var canvas=[],cBack=[],cTex=[];
+cBack[0]='#ccc';cTex[0]="0";
+cBack[1]='#f00';cTex[1]="1";
+var cArc=[],cStr=[];
+for(let z=0;z<2;z++){cArc[z]='#fff';cStr[z]='#000';}
+
+var TS=[];
+var hit,normal;
+
+var x0=0,y0=0,x1=0,y1=0;
+var quadrant=0,signal=1;
+var collisionCenter;
+
+function init(){
+
+	drelo.onclick=function RELO(){window.location.reload();}
+	scene=new THREE.Scene();
+
+	camera =new THREE.PerspectiveCamera(70,window.innerWidth/window.innerHeight,1,1000);
+	camera.position.set(0,0,120);
+
+	renderer=new THREE.WebGLRenderer({antialias:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.setClearColor("#454",1);
+
+	document.body.appendChild(renderer.domElement);
+		document.addEventListener('mousemove',onMouseMove,false);
+		document.addEventListener('mousedown',onMouseDown,false);
+	document.addEventListener('keydown',triggerAction);
+	window.addEventListener('resize',onWindowResize);
+	
+	controls=new OrbitControls(camera,renderer.domElement);
+
+	scene.add(new THREE.AmbientLight("#fff",1));
+
+	luz[1]=new THREE.PointLight("#fff",10000);
+	luz[1].position.set(0,20,20);
+	scene.add(luz[1]);
+
+// ******** ******** Balls START
+	for(let z=0;z<2;z++){
+		canvas[z]=document.createElement('canvas');
+		canvas[z].width=1024;canvas[z].height=512;
+		canvas[z].style.left="-1050px";
+		document.body.appendChild(canvas[z]);
+		const ctx=canvas[z].getContext('2d');
+		// Background
+		ctx.fillStyle=cBack[z];
+		ctx.fillRect(0,0,1024,512);
+		// Strip
+		if(z!=0){
+			ctx.fillStyle='#000';
+			ctx.fillRect(0,240,1024,40);
+		}
+		// Circles
+			// left
+				ctx.beginPath();
+				ctx.arc(256,256,128,0,p*2);
+				ctx.fillStyle=cArc[z];
+				ctx.fill();
+				ctx.lineWidth=40;
+				ctx.strokeStyle=cStr[z];
+				ctx.stroke();
+			// right
+				ctx.beginPath();
+				ctx.arc(768,256,128,0,p*2);
+				ctx.fillStyle=cArc[z];
+				ctx.fill();
+				ctx.lineWidth=40;
+				ctx.strokeStyle=cStr[z];
+				ctx.stroke();
+		// Texts
+		ctx.fillStyle='#000';
+		ctx.font='bold 192px Monospace';
+			// left
+				ctx.textAlign="center";
+				ctx.fillText(cTex[z],257,315);
+			// right
+				ctx.textAlign="center";
+				ctx.fillText(cTex[z],765,315);
+		// Texture
+		t[z]=new THREE.CanvasTexture(canvas[z]);
+		// Material
+		m[z]=new THREE.MeshStandardMaterial({map:t[z],metalness:0,roughness:0.05});
+		const seis=new THREE.SphereGeometry(radius,129,129);
+		if(z==0){
+			s[z]=new THREE.Mesh(seis,m[z]);scene.add(s[z]);
+			copy[0]=s[z].clone();
+			copy[0].material=s[z].material.clone();
+			copy[0].material.transparent=true;
+			copy[0].material.opacity=0.4;
+		}
+		if(z==1){
+			s[z]=new THREE.Mesh(seis,m[z]);s[z].name=z;alvos.push(s[z]);scene.add(s[z]);
+			copy[1]=s[z].clone();
+			copy[1].material=s[z].material.clone();
+			copy[1].material.transparent=true;
+			copy[1].material.opacity=0.4;
+		}
+	}
+// ******** ******** Balls END
+
+// ******** ******** Shot line START
+	mat=new THREE.MeshStandardMaterial({color:'#099'});
+		geo=new THREE.CylinderGeometry(0.3,0.3,200);
+		geo.translate(0,100,0);
+	line=new THREE.Mesh(geo,mat);
+	gru.add(line);
+// ******** ******** Shot line END
+
+// ******** ******** Cue START
+	mat=new THREE.MeshStandardMaterial({color:'#960'});
+		geo=new THREE.CylinderGeometry(0.5,3,100);
+		geo.translate(0,-50,0);
+	cue=new THREE.Mesh(geo,mat);
+	cue.position.set(0,-12,0)
+		mat=new THREE.MeshStandardMaterial({color:'#0ff'});
+			geo=new THREE.CylinderGeometry(0.5,0.5,1);
+		const pit=new THREE.Mesh(geo,mat);
+		pit.position.set(0,0,0)
+		cue.add(pit);
+		gru.add(cue);
+// ******** ******** Cue END
+
+// ******** ******** Touch red indicator START
+	mat=new THREE.MeshNormalMaterial();
+		touch=new THREE.Mesh(new THREE.SphereGeometry(radius,32),mat);
+// ******** ******** Touch red indicator END
+
+	scene.add(gru);
+	pcam[1]=camera.position.x;pcam[2]=camera.position.y;pcam[3]=camera.position.z;
+	rcam[1]=camera.rotation.x;rcam[2]=camera.rotation.y;rcam[3]=camera.rotation.z;
+
+} // init END
+
+function onMouseDown(event){
+	if(dBb.style.display==""){
+		dKS.style.display="none";
+		MayMoveMouse=0;
+		cue.position.set(0,-6.5,0);
+		if(found){inter(found);}
+	}
+}
+
+function onMouseMove(event){
+	if(MayMoveMouse==1){
+		finder();
+		event.preventDefault();
+		mouse.x=(event.clientX/window.innerWidth)*2-1;
+		ang=mouse.x*p*360/(window.innerWidth-10/2);
+		radang=degrad*180*ang;
+		dytouch.innerText="";
+	}
+}
+
+function pos(){
+	for(let z=0;z<2;z++){
+		if(s[z]){s[z].position.x=vx[z];s[z].position.y=vy[z];}
+		if(copy[z]){copy[z].position.x=vx[z];copy[z].position.y=vy[z];}
+	}
+	gru.position.copy(s[0].position);
+}
+
+// ******** ******** INTER(j) START
+function inter(j){
+	jota=j;
+	MayMoveMouse=0;
+	if(j==1){
+		origin=s[0].position.clone();
+		copy[0].position.copy(origin);
+		copy[5]=copy[0].clone();
+		copy[5].position.copy(origin);scene.add(copy[5]);
+		copy[3]=s[0].clone();scene.add(copy[3]);
+		direction=new THREE.Vector3(Math.cos(radang+p/2),Math.sin(radang+p/2),0).normalize();
+		raycaster.set(origin,direction);
+		intersects=raycaster.intersectObjects(alvos,false);
+		if(intersects.length>0){
+			touch.position.set(intersects[0].point.x,intersects[0].point.y,0);
+			hit=intersects[0].point.clone();
+			const center=s[jota].position.clone();
+			collisionCenter=hit.clone().sub(direction.clone().multiplyScalar(radius));
+			const hitPoint=new THREE.Vector3(intersects[0].point.x,intersects[0].point.y,0);
+			const sphereCenter=s[1].position;
+			normal=new THREE.Vector3().subVectors(sphereCenter,hitPoint).normalize();
+
+			grucopy=gru.clone();
+			scene.add(grucopy);
+
+			const cross=direction.x*normal.y-direction.y*normal.x;
+			if(cross>0){
+				signal=1;dytouch.innerText="hit right side";
+			}else{
+				signal=-1;dytouch.innerText="hit left side";
+			}
+			let dot=direction.dot(normal);
+			const tolerance=0.01; // 0.0001
+			if(Math.abs(dot-1)<tolerance){signal=0;dytouch.innerText="hit near alignment";}
+	
+			dBb.style.display="none";
+			dKS.style.display="none";
+			dnow.innerText="";
+
+			scene.add(copy[0]);
+			scene.add(copy[1]);
+			walk=1;
+			s[0].position.copy(touch.clone().position.addScaledVector(direction,-radius));
+		}else{
+			dnow.innerText="";
+			repress();
+		}
+	}
+}
+// ******** ******** INTER(j) END
+
+function finder(){
+	origin=s[0].position.clone();
+	direction=new THREE.Vector3(Math.cos(radang+p/2),Math.sin(radang+p/2),0).normalize();
+	raycaster.set(origin,direction);
+	intersects=raycaster.intersectObjects(alvos,false);
+	if(intersects.length>0){
+		found=Number(intersects[0].object.name);
+		dBb.style.display="none";
+		dKS.style.display="";dnow.innerText="";
+		if(found==1){dBb.style.display="";dKS.style.display="none";dnow.innerText="You may click now!";}
+	}else{
+		dBb.style.display="none";
+		dKS.style.display="";
+		dnow.innerText="";
+		found="";
+	}
+}
+
+function triggerAction(event){
+	//alert(event.code);
+	switch (event.code) {
+		case 'ArrowRight':finder();radang=radang-p/2000;break;
+		case 'ArrowLeft':finder();radang=radang+p/2000;break;
+		case 'ArrowUp':finder();radang=radang+p/2000;break;
+		case 'ArrowDown':finder();radang=radang-p/2000;break;
+		case 'KeyZ':location.reload();break;
+		case 'KeyS':repress();break;
+	}
+}
+
+//********************************************************animate
+function animate(t){
+	requestAnimationFrame(animate);
+	timer.update(t);
+	const delta=Math.min(timer.getDelta(),0.05);
+	const deltaw=delta*60;
+
+	gru.rotation.z=radang;
+
+	if(control==1){controls.enabled=true;}
+
+	// ******** for Collision START
+	if(k[jota]==1){
+		gru.remove(cue);gru.remove(line);
+		const total=50;
+		if(q[jota]==0){
+			orig[0]=s[0].position.clone();
+			copy[10]=copy[0].clone();
+			copy[10].position.copy(s[0].position);
+			scene.add(copy[10]);
+			orig[1]=s[jota].position.clone();
+		}
+		s[jota].position.addScaledVector(normal,deltaw);
+			const dir1=normal.clone().applyAxisAngle(new THREE.Vector3(0,0,1),-p/2);
+		s[0].position.addScaledVector(dir1,signal*deltaw);
+
+		if(q[jota]==0){orig[0]=new THREE.Vector3(s[0].position.x,s[0].position.y,0);}
+		q[jota]++;if(q[jota]==total){k[jota]=0;}
+		if(q[jota]==total){
+			targ[0]=new THREE.Vector3(s[0].position.x,s[0].position.y,0);
+			targ[1]=new THREE.Vector3(s[jota].position.x,s[jota].position.y,0);
+		}
+		if(k[jota]==0){
+			q[jota]=0;
+			gru.position.copy(s[0].position);
+			direction=new THREE.Vector3();
+			direction.subVectors(targ[0],orig[0]).normalize();
+			distance=orig[0].distanceTo(targ[0]);
+			if(signal!=0){
+				arrow[1]=new THREE.ArrowHelper(direction,orig[0],distance,'#fff',10,1);
+				scene.add(arrow[1]);
+			}
+			targ[1]=s[jota].position.clone();
+			direction.subVectors(targ[1],orig[1]).normalize();
+			distance=orig[1].distanceTo(targ[1]);
+			arrow[2]=new THREE.ArrowHelper(direction,orig[1],distance,'#f00',10,1);
+			scene.add(arrow[2]);
+		}
+	}
+	// ******** for Collision END
+
+	if(walk==1){
+		scene.remove(s[0]);
+		copy[3].position.lerp(touch.position,deltaw/10);
+			if(copy[3].position.distanceTo(touch.position)<6.001){
+			k[jota]=1;
+			q[jota]=0;
+			walk=0;
+			scene.add(s[0]);
+			scene.remove(copy[3]);
+			walk=0;
+		}
+	}
+
+	renderer.render(scene,camera);
+}
+
+init();
+animate();
+
+function onWindowResize(){
+	camera.aspect=window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+function onde(){
+	var cal=0,calsig=0,sig=0;
+	ran();vx[0]=cal*sig;
+	ran();vy[0]=cal*sig/2;
+	ran();vx[1]=cal*sig;
+	ran();vy[1]=cal*sig/2;
+
+	const point1 = new THREE.Vector3(vx[0],vy[0],0);
+	const point2 = new THREE.Vector3(vx[1],vy[1],0);
+	const distance = point1.distanceTo(point2);
+	if(distance<20){vx[0]=-vx[0];}
+	if(distance<20){vy[0]=-vy[0];}
+
+	if(vx[0]>vx[1] && vy[0]>vy[1]){quadrant=1;}
+	if(vx[0]>vx[1] && vy[0]<vy[1]){quadrant=2;}
+	if(vx[0]<vx[1] && vy[0]<vy[1]){quadrant=3;}
+	if(vx[0]<vx[1] && vy[0]>vy[1]){quadrant=4;}
+	dquad.innerText="quadrant: "+quadrant;
+	pos();
+	function ran(){
+		calsig=Math.floor(Math.random()*10);
+		sig=1;if(calsig<5){sig=-1;}
+		cal=Math.floor(Math.random()*20)+40;
+	}
+}
+
+onde();
+
+</script>
+
+</body>
+</html>
