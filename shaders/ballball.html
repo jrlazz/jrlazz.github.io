@@ -229,12 +229,21 @@ function finder(){
 function triggerAction(event){
 	//alert(event.code);
 	switch (event.code) {
-		case 'ArrowRight':finder();radang=radang-p/2000;break;
-		case 'ArrowLeft':finder();radang=radang+p/2000;break;
-		case 'ArrowUp':finder();radang=radang+p/2000;break;
-		case 'ArrowDown':finder();radang=radang-p/2000;break;
+		case 'ArrowRight':finder();radang=radang-p/4000;break;
+		case 'ArrowLeft':finder();radang=radang+p/4000;break;
+		case 'ArrowUp':finder();radang=radang+p/4000;break;
+		case 'ArrowDown':finder();radang=radang-p/4000;break;
 		case 'KeyZ':location.reload();break;
 		case 'KeyS':location.reload();break;
+		case 'Space':
+		if(MayClick==1){
+			if(walk<2){
+				walk=1;
+				cue.position.set(0,-6.2,0);
+				const tout=setTimeout(function(){cue.position.set(0,-12,0);clearTimeout(tout);},400);
+
+			}
+		};;break;
 	}
 }
 
