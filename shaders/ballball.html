@@ -33,10 +33,8 @@ img{position:absolute;left:0px;top:0px;width:40px;}
 <img id="relo" src="img/reload.png" style="left:30px;top:10px;width:80px;cursor:pointer;"></img>
 <span id="show" style="top:25px;left:150px;font-size:20.5px;color:#0f0;"></span>
 
+<span id="quad" style="top:38px;left:66px;font-size:20.5px;color:#ff0;">1</span>
 
-<!--
-<span id="quad" style="top:50px;font-size:20.5px;color:#ff0;">quadrant: 1</span>
--->
 <span id="ytouch" style="top:80px;font-size:20.5px;color:#ff0;"></span>
 <span id="cam-pos" style="font-size:9pt;left:100px;top:437px;color:#fff;"></span>
 <span id="cam-rot" style="font-size:9pt;left:800px;top:437px;color:#fff;"></span>
@@ -49,30 +47,73 @@ img{position:absolute;left:0px;top:0px;width:40px;}
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+function repress(){
+		controls.enabled=false;camera.position.set(pcam[1],pcam[2],pcam[3]);camera.rotation.set(rcam[1],rcam[2],rcam[3]);
+control=1;
+	quadrant++;
+	if(quadrant==5){quadrant=1;}
+	dquad.innerText=quadrant;
+	switch(quadrant){
+		case 1:s[0].position.x=dx;s[0].position.y=dy;	s[1].position.x=-dx;s[1].position.y=-dy;break;
+		case 2:s[0].position.x=dx;s[0].position.y=-dy;	s[1].position.x=-dx;s[1].position.y=dy;break;
+		case 3:s[0].position.x=-dx;s[0].position.y=-dy;	s[1].position.x=dx;s[1].position.y=dy;break;
+		case 4:s[0].position.x=-dx;s[0].position.y=dy;	s[1].position.x=dx;s[1].position.y=-dy;break;
+	}
+
+
+
+	str="";
+	dnow.innerText="";
+	dshow.innerText="";
+	ti=0;
+	ar=0;
+	for(let z=0;z<50;z++){if(arrow[z]){scene.remove(arrow[z]);}}
+
+	dBb.style.display="none";
+
+	copy[0].position.copy(s[0].position);
+	copy[1].position.copy(s[1].position);
+
+	sTouch[0].position.copy(s[0].position);
+	sTouch[1].position.copy(s[1].position);
+
+	cylC.position.set(0,0,0);
+	toDetect.position.set(0,0,0);
+
+	MayMoveMouse=1;
+	MayClick=1;
+	walk=0;
+	gru.position.copy(s[0].position);
+	scene.add(gru);
+	scene.add(toDetect);
+		//console.clear();
+
+}
+
 var camera,scene,renderer,controls,tex,bump,geo,mat,mesh,line,cue;
 
-const p=Math.PI;
-const degrad=0.0174532925;
-const raddeg=57.2958;
+const p=Math.PI,degrad=0.0174532925,raddeg=57.2958;
 const gru=new THREE.Group();
 const mouse=new THREE.Vector2(1,1);
 
 var bId=function(id){return document.getElementById(id);}
-const drelo=bId("relo");
-const dytouch=bId("ytouch");
-const dBb=bId("Bb");
-const dKS=bId("KS");
-const dnow=bId("now");
-const dshow=bId("show");
+	const drelo=bId("relo");
+	const dytouch=bId("ytouch");
+	const dBb=bId("Bb");
+	const dKS=bId("KS");
+	const dnow=bId("now");
+	const dshow=bId("show");
+	const dquad=bId("quad");
 
-var copy=[],poi=[],dir=[];
+var copy=[],poi=[],dir=[],pcam=[],rcam=[];
 const s=[],sTouch=[],luz=[];
 const arrow=[];
 const radius=6;
 
-var ang=0,radang=0,control=1,found=100,walk=0,jota=0;
+var ang=0,radang=0,control=1,found=100,walk=0;
 var MayMoveMouse=1,MayClick=1;
 var speed=1;
+
 var ti=0;
 var ar=0;
 
@@ -82,6 +123,13 @@ var inv=1;
 var str="";
 
 var ballD,cylC,toDetect;
+
+var s1final;
+var quadrant=1;
+
+const dx=40;const dy=15;
+
+var zer=0;
 
 function init(){
 
@@ -112,7 +160,7 @@ function init(){
 	geo=new THREE.SphereGeometry(radius,32,32);
 	mat=new THREE.MeshStandardMaterial({color:'#ccc',metalness:0,roughness:0.2});
 	s[0]=new THREE.Mesh(geo,mat);
-	s[0].position.set(-50,0,0);scene.add(s[0]);
+	s[0].position.set(dx,dy,0);scene.add(s[0]);
 	copy[0]=s[0].clone();
 	copy[0].material=s[0].material.clone();
 	copy[0].material.transparent=true;
@@ -122,7 +170,7 @@ function init(){
 	geo=new THREE.SphereGeometry(radius,32,32);
 	mat=new THREE.MeshStandardMaterial({color:'#f00',metalness:0,roughness:0.2});
 	s[1]=new THREE.Mesh(geo,mat);
-	s[1].position.set(0,0,0);scene.add(s[1]);
+	s[1].position.set(-dx,-dy,0);scene.add(s[1]);
 	copy[1]=s[1].clone();
 	copy[1].material=s[1].material.clone();
 	copy[1].material.transparent=true;
@@ -137,7 +185,7 @@ function init(){
 	mat=new THREE.MeshStandardMaterial({color:'#f9c'});
 	cylC=new THREE.Mesh(geo,mat);
 	cylC.rotation.x=p/2;
-	cylC.position.set(20,0,0);scene.add(cylC);
+	cylC.position.set(0,0,0);scene.add(cylC);
 
 	geo=new THREE.SphereGeometry(0.1,32,32);
 	mat=new THREE.MeshStandardMaterial({color:'#990'});
@@ -169,6 +217,9 @@ function init(){
 
 	gru.position.copy(s[0].position);
 	scene.add(gru);
+	pcam[1]=camera.position.x;pcam[2]=camera.position.y;pcam[3]=camera.position.z;
+	rcam[1]=camera.rotation.x;rcam[2]=camera.rotation.y;rcam[3]=camera.rotation.z;
+
 
 } // init END
 
@@ -209,21 +260,50 @@ function finder(){
 	const po2 = new THREE.Vector3(s[1].position.x,s[1].position.y,0);
 	const dist = po1.distanceTo(po2);//alert(dist);
 
+const po3=new THREE.Vector3();
+po3.subVectors(s[1].position,s[0].position);
+po3.normalize();
+//console.log(po3.x+ "    "+(po3.y));
+arrow[17]=new THREE.ArrowHelper(po3,s[0].position,100,'#0f0',10,2);
+//scene.add(arrow[17]);
+
+
+
+// Normalize to get length of 1
+direction.normalize();
+
 	if(dist<=radius*2){
 //console.log(dist);
+//scene.add(arrow[17]);
 		dBb.style.display="";
 		dKS.style.display="none";
 		dnow.innerText="You may click now!";
 		MayClick=1;
 	}else{
+//scene.remove(arrow[17]);
 		console.clear();
 		dBb.style.display="none";
 		dKS.style.display="";
 		dnow.innerText="";
 		MayClick=0;
 	}
-	inv=1;
-	if(direction.y<=0){inv=-1;}
+	inv=-1;
+
+const direc=new THREE.Vector3(direction.x-po3.x,direction.y-po3.y,0).normalize();
+
+if(direc.y<=0 && quadrant<3){inv=1;}
+
+if(direc.y<=0 && quadrant>2){inv=-1;}
+if(direc.y>0 && quadrant>2){inv=1;}
+
+//if(Math.abs(direc.y)<0.1){inv=0;}
+
+//if((direction.y-po3.y)<=0){inv=1;}
+
+//console.log(direction.x+ "    "+direction.y);
+//if(Math.abs(direction.y)<0.01){inv=0;}
+//console.log(direction.x+ "    "+(direction.y-po3.y));
+//console.log(direc.x+ "    "+(direc.y));
 }
 
 function triggerAction(event){
@@ -234,16 +314,14 @@ function triggerAction(event){
 		case 'ArrowUp':finder();radang=radang+p/4000;break;
 		case 'ArrowDown':finder();radang=radang-p/4000;break;
 		case 'KeyZ':location.reload();break;
-		case 'KeyS':location.reload();break;
+		case 'KeyS':repress();break;
 		case 'Space':
-		if(MayClick==1){
-			if(walk<2){
-				walk=1;
-				cue.position.set(0,-6.2,0);
-				const tout=setTimeout(function(){cue.position.set(0,-12,0);clearTimeout(tout);},400);
+		if(walk<2){
+			walk=1;
+			cue.position.set(0,-6.2,0);
+			const tout=setTimeout(function(){cue.position.set(0,-12,0);clearTimeout(tout);},400);
 
-			}
-		};;break;
+		};break;
 	}
 }
 
@@ -258,15 +336,20 @@ function animate(){
 
 	gru.rotation.z=radang;
 
-	if(walk==1){
+	if(control==1){
+		controls.enabled=true;
+	}else{
+		controls.enabled=false;camera.position.set(pcam[1],pcam[2],pcam[3]);camera.rotation.set(rcam[1],rcam[2],rcam[3]);
+	}
 
+	if(walk==1){
 		MayMoveMouse=0;
 		scene.remove(toDetect);
 		dnow.innerText="";
 		dBb.style.display="none";
 		dKS.style.display="";
 		MayClick=0;
-		const tout=setTimeout(function(){scene.remove(gru);clearTimeout(tout);},3000);
+		//const tout=setTimeout(function(){scene.remove(gru);clearTimeout(tout);},2000);
 
 		if(ar==0){
 			arrow[1]=new THREE.ArrowHelper(direction,s[0].position,100,'#ccc',10,2);
@@ -278,7 +361,11 @@ function animate(){
 		const distance=s[0].position.distanceTo(s[1].position);
 		const minDistance=radius*2;
 //console.log(s[0].position.x);
-		if(s[0].position.x>s[1].position.x+10){walk=2;}
+
+
+//		if(s[0].position.x>s[1].position.x+10){walk=2;}
+
+
 		if (distance<=minDistance){
 			walk=2;
 
@@ -316,20 +403,22 @@ function animate(){
 			arrow[3]=new THREE.ArrowHelper(dir[0],ballD.position,30,'#ccc',10,2);
 			scene.add(arrow[3]);
 				//s[0].position.addScaledVector(dir[0],30);
+			const pStart=new THREE.Vector3(copy[0].position.x,copy[0].position.y,0);
 
-			let pStart=new THREE.Vector3(copy[0].position.x,copy[0].position.y,0);
-			let pEnd=new THREE.Vector3(touchPos.x,touchPos.y,0);
-			const dirStartEndTouch=new THREE.Vector3().subVectors(pEnd, pStart);
+
+
+			const pEnd=new THREE.Vector3(touchPos.x,touchPos.y,0);
+			const dirStartEndTouch=new THREE.Vector3().subVectors(pEnd,pStart);
 			dirStartEndTouch.normalize();
-			arrow[12]=new THREE.ArrowHelper(dirStartEndTouch, pStart, 100,'#ff0',10,2);
+			arrow[12]=new THREE.ArrowHelper(dirStartEndTouch,pStart,100,'#ff0',10,2);
 					scene.add(arrow[12]);
 
-			pStart=new THREE.Vector3(copy[0].position.x,copy[0].position.y,0);
-			pEnd=new THREE.Vector3(copy[1].x,copy[1].y,0);
-			const dirStartEndS1=new THREE.Vector3().subVectors(pEnd, pStart);
-			dirStartEndS1.normalize();
-			arrow[13]=new THREE.ArrowHelper(dirStartEndS1, pStart, 100,'#f00',10,2);
-				scene.add(arrow[13]);
+	const pStart2=new THREE.Vector3(copy[0].position.x,copy[0].position.y,0);
+	const pEnd2=new THREE.Vector3(copy[1].position.x,copy[1].position.y,0);
+	const dirStartEndS1=new THREE.Vector3().subVectors(pEnd2,pStart2);
+	dirStartEndS1.normalize();
+	arrow[13]=new THREE.ArrowHelper(dirStartEndS1,pStart2,100,'#f00',10,2);
+		scene.add(arrow[13]);
 
 			getSignedAngle(dirStartEndTouch,dir[1],"red");
 			getSignedAngle(dirStartEndTouch,dir[0],"white");
@@ -338,7 +427,7 @@ function animate(){
 				const cross=dir1.x * dir2.y - dir1.y * dir2.x;
 				const dot  =dir1.x * dir2.x + dir1.y * dir2.y;
 				const angle=Math.atan2(cross,dot);
-//console.log(angle * raddeg);
+				if(ball=="red"){zer=Math.abs(angle);}//alert(angle);}
 				str=str+"angle relative "+ball+"= "+(angle*raddeg).toFixed(1)+"\xB0\n";
 				dshow.innerText=str;
 				return angle * raddeg;
@@ -347,7 +436,7 @@ function animate(){
 			const setin=setInterval(anda,10);
 			function anda(){
 				ti++;
-				s[0].position.addScaledVector(dir[0],ti/50);
+				if(zer>0.07){s[0].position.addScaledVector(dir[0],ti/50);}
 				s[1].position.addScaledVector(dir[1],ti/50);
 				if(ti==57){clearInterval(setin);}
 			}
@@ -364,3 +453,20 @@ animate();
 
 </body>
 </html>
+
+<!--
+
+quadrant 1... white beating in left side of red ... WRONG
+quadrant 1... white beating in right side of red ... OK
+
+quadrant 2... white beating in leftt side of red ... OK
+quadrant 2... white beating in right side of red ... WRONG
+
+quadrant 3... white beating in left side of red ... OK
+quadrant 3... white beating in right side of red ... WRONG
+
+quadrant 4... white beating in left side of red ... OK
+quadrant 4... white beating in right side of red ... WRONG
+
+-->
+
