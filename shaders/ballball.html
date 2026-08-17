@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>ballball.html</title>
+<title>ballballv.html</title>
 <meta charset="utf-8">
 
 <link rel="icon" type="image/png" href="../img/github-mark.png">
@@ -59,9 +59,6 @@ control=1;
 		case 3:s[0].position.x=-dx;s[0].position.y=-dy;	s[1].position.x=dx;s[1].position.y=dy;break;
 		case 4:s[0].position.x=-dx;s[0].position.y=dy;	s[1].position.x=dx;s[1].position.y=-dy;break;
 	}
-
-
-
 	str="";
 	dnow.innerText="";
 	dshow.innerText="";
@@ -78,14 +75,14 @@ control=1;
 	sTouch[1].position.copy(s[1].position);
 
 	cylC.position.set(0,0,0);
-	toDetect.position.set(0,0,0);
+	toDetect[1].position.set(0,0,0);
 
 	MayMoveMouse=1;
 	MayClick=1;
 	walk=0;
 	gru.position.copy(s[0].position);
 	scene.add(gru);
-	scene.add(toDetect);
+	scene.add(toDetect[1]);toDetect[1].visible=false;
 		//console.clear();
 
 }
@@ -105,7 +102,7 @@ var bId=function(id){return document.getElementById(id);}
 	const dshow=bId("show");
 	const dquad=bId("quad");
 
-var copy=[],poi=[],dir=[],pcam=[],rcam=[];
+var copy=[],poi=[],dir=[],toDetect=[],pcam=[],rcam=[];
 const s=[],sTouch=[],luz=[];
 const arrow=[];
 const radius=6;
@@ -122,7 +119,7 @@ var direction,distance,touchDir,touchPos,dirtoTouch,dirtoS1;
 var inv=1;
 var str="";
 
-var ballD,cylC,toDetect;
+var ballD,cylC;
 
 var s1final;
 var quadrant=1;
@@ -177,9 +174,9 @@ function init(){
 	copy[1].material.opacity=0.4;scene.add(copy[1]);
 	sTouch[1]=copy[1].clone();scene.add(sTouch[1]);
 
-	mat=new THREE.MeshStandardMaterial({color:'#f00',transparent:true,opacity:0.5});
-	toDetect=new THREE.Mesh(geo,mat);
-	scene.add(toDetect);
+	mat=new THREE.MeshStandardMaterial({color:'#f00',transparent:true,opacity:0.4});
+	toDetect[1]=new THREE.Mesh(geo,mat);
+	scene.add(toDetect[1]);toDetect[1].visible=false;
 
 	geo=new THREE.CylinderGeometry(0.4,0.4,20);
 	mat=new THREE.MeshStandardMaterial({color:'#f9c'});
@@ -253,10 +250,10 @@ function finder(){
 	direction=new THREE.Vector3(Math.cos(radang+p/2),Math.sin(radang+p/2),0).normalize();
 //console.log(direction);
 
-	toDetect.position.copy(s[0].position);
-	toDetect.position.addScaledVector(direction,distancex);
+	toDetect[1].position.copy(s[0].position);
+	toDetect[1].position.addScaledVector(direction,distancex);
 
-	const po1 = new THREE.Vector3(toDetect.position.x,toDetect.position.y,0);
+	const po1 = new THREE.Vector3(toDetect[1].position.x,toDetect[1].position.y,0);
 	const po2 = new THREE.Vector3(s[1].position.x,s[1].position.y,0);
 	const dist = po1.distanceTo(po2);//alert(dist);
 
@@ -273,6 +270,7 @@ arrow[17]=new THREE.ArrowHelper(po3,s[0].position,100,'#0f0',10,2);
 direction.normalize();
 
 	if(dist<=radius*2){
+toDetect[1].visible=true;
 //console.log(dist);
 //scene.add(arrow[17]);
 		dBb.style.display="";
@@ -280,6 +278,7 @@ direction.normalize();
 		dnow.innerText="You may click now!";
 		MayClick=1;
 	}else{
+toDetect[1].visible=false;
 //scene.remove(arrow[17]);
 		console.clear();
 		dBb.style.display="none";
@@ -344,12 +343,15 @@ function animate(){
 
 	if(walk==1){
 		MayMoveMouse=0;
-		scene.remove(toDetect);
+		scene.remove(toDetect[1]);
 		dnow.innerText="";
 		dBb.style.display="none";
 		dKS.style.display="";
 		MayClick=0;
-		//const tout=setTimeout(function(){scene.remove(gru);clearTimeout(tout);},2000);
+		//const tout=setTimeout(function(){
+		//	scene.remove(gru);
+			//scene.remove(arrow[12]);scene.remove(arrow[13]);
+		//	clearTimeout(tout);},3000);
 
 		if(ar==0){
 			arrow[1]=new THREE.ArrowHelper(direction,s[0].position,100,'#ccc',10,2);
@@ -403,10 +405,8 @@ function animate(){
 			arrow[3]=new THREE.ArrowHelper(dir[0],ballD.position,30,'#ccc',10,2);
 			scene.add(arrow[3]);
 				//s[0].position.addScaledVector(dir[0],30);
+
 			const pStart=new THREE.Vector3(copy[0].position.x,copy[0].position.y,0);
-
-
-
 			const pEnd=new THREE.Vector3(touchPos.x,touchPos.y,0);
 			const dirStartEndTouch=new THREE.Vector3().subVectors(pEnd,pStart);
 			dirStartEndTouch.normalize();
@@ -453,20 +453,3 @@ animate();
 
 </body>
 </html>
-
-<!--
-
-quadrant 1... white beating in left side of red ... WRONG
-quadrant 1... white beating in right side of red ... OK
-
-quadrant 2... white beating in leftt side of red ... OK
-quadrant 2... white beating in right side of red ... WRONG
-
-quadrant 3... white beating in left side of red ... OK
-quadrant 3... white beating in right side of red ... WRONG
-
-quadrant 4... white beating in left side of red ... OK
-quadrant 4... white beating in right side of red ... WRONG
-
--->
-
