@@ -199,7 +199,6 @@ function make(num,acor,sig){
 	akin[num].material.opacity=0.6;scene.add(akin[num]);
 	sTouch[num]=akin[num].clone();scene.add(sTouch[num]);
 	toDetect[num]=akin[num].clone();scene.add(toDetect[num]);toDetect[num].visible=false;
-	//toDetect[num]=new THREE.Mesh(geo,mat);scene.add(toDetect[num]);toDetect[num].visible=false;
 }
 
 	// ******** Balls START
@@ -207,8 +206,6 @@ function make(num,acor,sig){
 		make(1,'#f00',-1);
 		make(3,'#080',1);
 		make(5,'#09c',1);
-	sTouch[3].position.set(35,-15,0);sTouch[3].visible=false;
-	sTouch[5].position.set(-15,15,0);sTouch[5].visible=false;
 	// ******** Balls END
 
 	geo=new THREE.CylinderGeometry(0.4,0.4,20);
