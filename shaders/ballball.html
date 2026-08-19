@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>ballballv.html</title>
+<title>ballball.html</title>
 <meta charset="utf-8">
 
 <link rel="icon" type="image/png" href="../img/github-mark.png">
@@ -30,17 +30,13 @@ img{position:absolute;left:0px;top:0px;width:40px;}
 </head>
 
 <body>
-<img id="relo" src="img/reload.png" style="left:30px;top:10px;width:80px;cursor:pointer;"></img>
+<img id="KS" src="img/pressP.png" style="left:-50%;top:25px;width:120px;opacity:0.4;"></img>
 <span id="show" style="top:25px;left:150px;font-size:20.5px;color:#0f0;"></span>
-
 <span id="quad" style="top:38px;left:66px;font-size:20.5px;color:#ff0;">1</span>
-
 <span id="ytouch" style="top:80px;font-size:20.5px;color:#ff0;"></span>
 <span id="cam-pos" style="font-size:9pt;left:100px;top:437px;color:#fff;"></span>
 <span id="cam-rot" style="font-size:9pt;left:800px;top:437px;color:#fff;"></span>
-<span id="now" style="top:80%;width:95%;font-size:20.5px;color:#0f0;text-align:center;"></span>
-<img id="KS" src="img/pressP.png" style="left:10px;top:120px;width:120px;display:;"></img>
-<img id="Bb" src="img/redball.png" style="left:29px;top:127px;width:80px;display:none;"></img>
+<img id="relo" src="img/reload.png" style="left:30px;top:10px;width:80px;cursor:pointer;"></img>
 
 <script type="module">
 
@@ -48,8 +44,8 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 function repress(){
-		controls.enabled=false;camera.position.set(pcam[1],pcam[2],pcam[3]);camera.rotation.set(rcam[1],rcam[2],rcam[3]);
-control=1;
+	controls.enabled=false;camera.position.set(pcam[1],pcam[2],pcam[3]);camera.rotation.set(rcam[1],rcam[2],rcam[3]);
+	control=1;
 	quadrant++;
 	if(quadrant==5){quadrant=1;}
 	dquad.innerText=quadrant;
@@ -60,31 +56,55 @@ control=1;
 		case 4:s[0].position.x=-dx;s[0].position.y=dy;	s[1].position.x=dx;s[1].position.y=-dy;break;
 	}
 	str="";
-	dnow.innerText="";
-	dshow.innerText="";
-	ti=0;
-	ar=0;
-	for(let z=0;z<50;z++){if(arrow[z]){scene.remove(arrow[z]);}}
-
-	dBb.style.display="none";
-
-	copy[0].position.copy(s[0].position);
-	copy[1].position.copy(s[1].position);
-
-	sTouch[0].position.copy(s[0].position);
-	sTouch[1].position.copy(s[1].position);
-
+	dshow.innerText="";ti=0;ar=0;
+	akin[0].position.copy(s[0].position)
+		for(let z=0;z<50;z++){if(arrow[z]){scene.remove(arrow[z]);}}
+		for(let k=1;k<8;k++){
+			if(k!=qual){
+				if(akin[k]){akin[k].position.copy(s[k].position);akin[k].visible=false;}
+			}
+		}
+	s[3].position.set(55,15,0);
+	s[5].position.set(-15,15,0);
+		for(let k=0;k<8;k++){
+			if(sTouch[k]){sTouch[k].position.copy(s[k].position);}
+		}
 	cylC.position.set(0,0,0);
-	toDetect[1].position.set(0,0,0);
-
 	MayMoveMouse=1;
-	MayClick=1;
 	walk=0;
 	gru.position.copy(s[0].position);
 	scene.add(gru);
-	scene.add(toDetect[1]);toDetect[1].visible=false;
-		//console.clear();
+	cylC.visible=false;
+	MayClick=[];
+	//console.clear();
+}
 
+let newspan;
+for(let z=0;z<8;z++){
+	newspan=document.createElement("span");
+	newspan.className="tex";
+	newspan.textContent="You may click now! "+String(z);
+	newspan.style.fontSize="20.5px";
+	newspan.style.color="#0f0";
+	newspan.style.position="absolute";
+	newspan.style.left="20%";
+	newspan.style.top="10px";
+	newspan.style.width="60%";
+	newspan.style.textAlign="center";
+	document.body.append(newspan);
+}
+
+let newimg;
+for(let z=0;z<8;z++){
+	newimg=document.createElement("img");
+	newimg.className="ima";
+	newimg.src="img/"+String(z)+"ball.png";
+	if(z==0){newimg.src="";}
+	newimg.style.position="absolute";
+	newimg.style.left="40px";
+	newimg.style.top="128px";
+	newimg.style.width="60px";
+	document.body.append(newimg);
 }
 
 var camera,scene,renderer,controls,tex,bump,geo,mat,mesh,line,cue;
@@ -96,19 +116,16 @@ const mouse=new THREE.Vector2(1,1);
 var bId=function(id){return document.getElementById(id);}
 	const drelo=bId("relo");
 	const dytouch=bId("ytouch");
-	const dBb=bId("Bb");
-	const dKS=bId("KS");
-	const dnow=bId("now");
 	const dshow=bId("show");
 	const dquad=bId("quad");
+	const dKS=bId("KS");
 
-var copy=[],poi=[],dir=[],toDetect=[],pcam=[],rcam=[];
+var akin=[],poi=[],dir=[],toDetect=[],pcam=[],rcam=[];
 const s=[],sTouch=[],luz=[];
 const arrow=[];
-const radius=6;
 
 var ang=0,radang=0,control=1,found=100,walk=0;
-var MayMoveMouse=1,MayClick=1;
+var MayMoveMouse=1;
 var speed=1;
 
 var ti=0;
@@ -121,12 +138,28 @@ var str="";
 
 var ballD,cylC;
 
-var s1final;
 var quadrant=1;
 
-const dx=40;const dy=15;
-
 var zer=0;
+var qual=0;
+
+var distancex=[];
+var dist=[];
+var MayClick=[];
+
+var cor=[];
+cor[1]='#d03';
+cor[3]='#0c0';
+cor[5]='#09c';
+
+const pic=document.querySelectorAll('.ima'); 
+if(pic.length>1){for(var i=0;i<pic.length;i++){pic[i].style.display='none';}}
+
+const spa=document.querySelectorAll('.tex');
+if(spa.length>1){for(var i=0;i<spa.length;i++){spa[i].style.visibility='hidden';}}
+
+const radius=6;
+const dx=30;const dy=15;
 
 function init(){
 
@@ -153,36 +186,36 @@ function init(){
 	luz[1].position.set(0,50,0);
 	scene.add(luz[1]);
 
+function make(num,acor,sig){
+	geo=new THREE.SphereGeometry(radius,32,32);
+	mat=new THREE.MeshStandardMaterial({color:acor,metalness:0,roughness:0.2});
+	s[num]=new THREE.Mesh(geo,mat);
+	s[num].position.set(sig*dx,sig*dy,0);scene.add(s[num]);
+	if(num==3){s[num].position.set(55,15,0);scene.add(s[num]);}
+	if(num==5){s[num].position.set(-15,15,0);scene.add(s[num]);}
+	akin[num]=s[num].clone();
+	akin[num].material=s[num].material.clone();
+	akin[num].material.transparent=true;
+	akin[num].material.opacity=0.6;scene.add(akin[num]);
+	sTouch[num]=akin[num].clone();scene.add(sTouch[num]);
+	toDetect[num]=akin[num].clone();scene.add(toDetect[num]);toDetect[num].visible=false;
+	//toDetect[num]=new THREE.Mesh(geo,mat);scene.add(toDetect[num]);toDetect[num].visible=false;
+}
+
 	// ******** Balls START
-	geo=new THREE.SphereGeometry(radius,32,32);
-	mat=new THREE.MeshStandardMaterial({color:'#ccc',metalness:0,roughness:0.2});
-	s[0]=new THREE.Mesh(geo,mat);
-	s[0].position.set(dx,dy,0);scene.add(s[0]);
-	copy[0]=s[0].clone();
-	copy[0].material=s[0].material.clone();
-	copy[0].material.transparent=true;
-	copy[0].material.opacity=0.4;scene.add(copy[0]);
-	sTouch[0]=copy[0].clone();scene.add(sTouch[0]);
-
-	geo=new THREE.SphereGeometry(radius,32,32);
-	mat=new THREE.MeshStandardMaterial({color:'#f00',metalness:0,roughness:0.2});
-	s[1]=new THREE.Mesh(geo,mat);
-	s[1].position.set(-dx,-dy,0);scene.add(s[1]);
-	copy[1]=s[1].clone();
-	copy[1].material=s[1].material.clone();
-	copy[1].material.transparent=true;
-	copy[1].material.opacity=0.4;scene.add(copy[1]);
-	sTouch[1]=copy[1].clone();scene.add(sTouch[1]);
-
-	mat=new THREE.MeshStandardMaterial({color:'#f00',transparent:true,opacity:0.4});
-	toDetect[1]=new THREE.Mesh(geo,mat);
-	scene.add(toDetect[1]);toDetect[1].visible=false;
+		make(0,'#ccc',1);
+		make(1,'#f00',-1);
+		make(3,'#080',1);
+		make(5,'#09c',1);
+	sTouch[3].position.set(35,-15,0);sTouch[3].visible=false;
+	sTouch[5].position.set(-15,15,0);sTouch[5].visible=false;
+	// ******** Balls END
 
 	geo=new THREE.CylinderGeometry(0.4,0.4,20);
 	mat=new THREE.MeshStandardMaterial({color:'#f9c'});
 	cylC=new THREE.Mesh(geo,mat);
 	cylC.rotation.x=p/2;
-	cylC.position.set(0,0,0);scene.add(cylC);
+	cylC.position.set(0,0,0);scene.add(cylC);cylC.visible=false;
 
 	geo=new THREE.SphereGeometry(0.1,32,32);
 	mat=new THREE.MeshStandardMaterial({color:'#990'});
@@ -217,10 +250,13 @@ function init(){
 	pcam[1]=camera.position.x;pcam[2]=camera.position.y;pcam[3]=camera.position.z;
 	rcam[1]=camera.rotation.x;rcam[2]=camera.rotation.y;rcam[3]=camera.rotation.z;
 
-
 } // init END
 
 function onMouseMove(event){
+	if(MayClick[1]==1){MayClick[1]=0;}
+	if(MayClick[3]==1){MayClick[3]=0;}
+	if(MayClick[5]==1){MayClick[5]=0;}
+
 	if(MayMoveMouse==1){
 		finder();
 		event.preventDefault();
@@ -231,78 +267,145 @@ function onMouseMove(event){
 }
 
 function onMouseDown(event){
-	if(MayClick==1){
-		if(walk<2){
-			walk=1;
-			cue.position.set(0,-6.2,0);
-			const tout=setTimeout(function(){cue.position.set(0,-12,0);clearTimeout(tout);},400);
-
+	for(let k=1;k<8;k++){
+		if(MayClick[k]==1){
+			if(walk<2){
+				walk=1;
+				cue.position.set(0,-6.2,0);
+				const tout=setTimeout(function(){cue.position.set(0,-12,0);clearTimeout(tout);},400);
+			}
+			if(MayClick[k]==1){MayClick[k]=0;}
 		}
 	}
 }
 
 function finder(){
-	const position1=s[0].position;
-	const position2=s[1].position;
-	let distancex=0;
-	distancex=position1.distanceTo(position2);
 	origin=s[0].position.clone();
 	direction=new THREE.Vector3(Math.cos(radang+p/2),Math.sin(radang+p/2),0).normalize();
-//console.log(direction);
-
-	toDetect[1].position.copy(s[0].position);
-	toDetect[1].position.addScaledVector(direction,distancex);
-
-	const po1 = new THREE.Vector3(toDetect[1].position.x,toDetect[1].position.y,0);
-	const po2 = new THREE.Vector3(s[1].position.x,s[1].position.y,0);
-	const dist = po1.distanceTo(po2);//alert(dist);
-
-const po3=new THREE.Vector3();
-po3.subVectors(s[1].position,s[0].position);
-po3.normalize();
-//console.log(po3.x+ "    "+(po3.y));
-arrow[17]=new THREE.ArrowHelper(po3,s[0].position,100,'#0f0',10,2);
-//scene.add(arrow[17]);
-
-
-
-// Normalize to get length of 1
-direction.normalize();
-
-	if(dist<=radius*2){
-toDetect[1].visible=true;
-//console.log(dist);
-//scene.add(arrow[17]);
-		dBb.style.display="";
-		dKS.style.display="none";
-		dnow.innerText="You may click now!";
-		MayClick=1;
-	}else{
-toDetect[1].visible=false;
-//scene.remove(arrow[17]);
-		console.clear();
-		dBb.style.display="none";
-		dKS.style.display="";
-		dnow.innerText="";
-		MayClick=0;
+	// Start fresh: no target found yet
+	qual=0;
+	for(let z=1;z<9;z++){
+		if(toDetect[z]){
+			const position1=s[0].position;
+			const position2=s[z].position;
+			distancex[z]=position1.distanceTo(position2);
+			toDetect[z].position.copy(s[0].position);
+			toDetect[z].position.addScaledVector(direction,distancex[z]);
+			dist[z]=toDetect[z].position.distanceTo(s[z].position);
+			if(dist[z]<=(radius*2)){
+				toDetect[z].visible=true;
+				pic[z].style.display='block';
+				spa[z].style.visibility="visible";
+				qual=z;
+				MayClick[z]=1;
+			}else{
+				toDetect[z].visible=false;
+				pic[z].style.display='none';
+				spa[z].style.visibility="hidden";
+				MayClick[z]=0;
+			}
+		}
 	}
-	inv=-1;
 
-const direc=new THREE.Vector3(direction.x-po3.x,direction.y-po3.y,0).normalize();
+	// Nothing is being aimed at
+	if(qual==0)return;
+	// -------------------------------------------------
+	// Direction from white ball toward target ball
+	// -------------------------------------------------
+	const po3=new THREE.Vector3();
+	po3.subVectors(s[qual].position,s[0].position).normalize();
+	// -------------------------------------------------
+	// Decide which side of po3 the incoming direction is
+	// -------------------------------------------------
+	const cross=direction.x*po3.y-direction.y*po3.x;
+	if(cross>0){
+		inv=-1;
+	}else{
+		inv=1;
+	}
+}
 
-if(direc.y<=0 && quadrant<3){inv=1;}
+function animate(){
+	requestAnimationFrame(animate);
+	gru.rotation.z=radang;
+	if(control==1){controls.enabled=true;}
+	if(walk==1){
+		MayMoveMouse=0;
+		toDetect[qual].visible=false;
+		MayClick=0;
+		if(ar==0){
+			arrow[1]=new THREE.ArrowHelper(direction,s[0].position,100,'#ccc',10,2);
+			scene.add(arrow[1]);
+			ar=1;
+		}
 
-if(direc.y<=0 && quadrant>2){inv=-1;}
-if(direc.y>0 && quadrant>2){inv=1;}
-
-//if(Math.abs(direc.y)<0.1){inv=0;}
-
-//if((direction.y-po3.y)<=0){inv=1;}
-
-//console.log(direction.x+ "    "+direction.y);
-//if(Math.abs(direction.y)<0.01){inv=0;}
-//console.log(direction.x+ "    "+(direction.y-po3.y));
-//console.log(direc.x+ "    "+(direc.y));
+		s[0].position.addScaledVector(direction,speed);
+		const distance=s[0].position.distanceTo(s[qual].position);
+		const minDistance=radius*2;
+//console.log(s[0].position.x);
+		if (distance<=minDistance){
+			walk=2;
+    			// Get the direction vector from s[0] to s[qual]
+    			touchDir=new THREE.Vector3().subVectors(s[qual].position,s[0].position).normalize();
+//console.log("s[0] position:"+s[0].position.x+" " + s[0].position.y);
+    			// Move outward from Ball A's center by its radius
+   	 		touchPos=new THREE.Vector3().copy(s[0].position).addScaledVector(touchDir,radius);
+    			// touchPos now holds the exact Vector3 of the collision point
+//console.log("Surfaces touch position:",touchPos);
+			cylC.position.copy(touchPos);
+			sTouch[0].position.copy(s[0].position);
+			// Direction & movement after touch
+			poi[0]=new THREE.Vector3(touchPos.x,touchPos.y,0); // Start point
+			poi[1]=new THREE.Vector3(s[qual].position.x,s[qual].position.y,0); // Target point
+			// Create an empty vector to store the direction
+			dir[1]=new THREE.Vector3();
+			// Calculate direction (poi[1] - poi[0]) and normalize it
+			dir[1].subVectors(poi[1],poi[0]).normalize();
+//console.log("dir[1]:",dir[1]); // Yields a unit vector pointing from s[1] to outside
+			arrow[2]=new THREE.ArrowHelper(dir[1],s[qual].position,30,cor[qual],10,2);
+			scene.add(arrow[2]);
+				//s[qual].position.addScaledVector(dir[1],30);
+			dir[0]=dir[1].clone();
+			ballD.position.set(s[0].position.x,s[0].position.y,0);
+			dir[0].applyAxisAngle(new THREE.Vector3(0,0,1),inv*p/2);
+//console.log("dir[0]:",dir[0]); // Yields a unit vector pointing from s[0] to outside
+			arrow[3]=new THREE.ArrowHelper(dir[0],ballD.position,30,'#ccc',10,2);
+			scene.add(arrow[3]);
+				//s[0].position.addScaledVector(dir[0],30);
+			const pStart=new THREE.Vector3(akin[0].position.x,akin[0].position.y,0);
+			const pEnd=new THREE.Vector3(touchPos.x,touchPos.y,0);
+			const dirStartEndTouch=new THREE.Vector3().subVectors(pEnd,pStart);
+			dirStartEndTouch.normalize();
+			arrow[12]=new THREE.ArrowHelper(dirStartEndTouch,pStart,100,'#ff0',10,2);
+				scene.add(arrow[12]);
+			const pStart2=new THREE.Vector3(akin[0].position.x,akin[0].position.y,0);
+			const pEnd2=new THREE.Vector3(akin[qual].position.x,akin[qual].position.y,0);
+			const dirStartEndS1=new THREE.Vector3().subVectors(pEnd2,pStart2);
+			dirStartEndS1.normalize();
+			arrow[13]=new THREE.ArrowHelper(dirStartEndS1,pStart2,100,cor[qual],10,2);
+					scene.add(arrow[13]); // inverted for ball 3 ??????????
+			getSignedAngle(dirStartEndTouch,dir[1],"other");
+			getSignedAngle(dirStartEndTouch,dir[0],"white");
+			function getSignedAngle(dir1,dir2,ball){
+				const cross=dir1.x * dir2.y - dir1.y * dir2.x;
+				const dot  =dir1.x * dir2.x + dir1.y * dir2.y;
+				const angle=Math.atan2(cross,dot);
+				if(ball=="other"){zer=Math.abs(angle);}//alert(angle);}
+				str=str+"angle relative "+ball+"= "+(angle*raddeg).toFixed(1)+"\xB0\n";
+				dshow.innerText=str;
+				return angle * raddeg;
+			}
+			cylC.visible=true;
+			const setin=setInterval(anda,10);
+			function anda(){
+				ti++;
+				if(zer>0.07){s[0].position.addScaledVector(dir[0],ti/50);}
+				s[qual].position.addScaledVector(dir[1],ti/50);
+				if(ti==57){clearInterval(setin);}
+			}
+		}
+	}
+	renderer.render(scene,camera);
 }
 
 function triggerAction(event){
@@ -319,7 +422,6 @@ function triggerAction(event){
 			walk=1;
 			cue.position.set(0,-6.2,0);
 			const tout=setTimeout(function(){cue.position.set(0,-12,0);clearTimeout(tout);},400);
-
 		};break;
 	}
 }
@@ -330,125 +432,10 @@ function onWindowResize(){
 	renderer.setSize(window.innerWidth,window.innerHeight);
 }
 
-function animate(){
-	requestAnimationFrame(animate);
-
-	gru.rotation.z=radang;
-
-	if(control==1){
-		controls.enabled=true;
-	}else{
-		controls.enabled=false;camera.position.set(pcam[1],pcam[2],pcam[3]);camera.rotation.set(rcam[1],rcam[2],rcam[3]);
-	}
-
-	if(walk==1){
-		MayMoveMouse=0;
-		scene.remove(toDetect[1]);
-		dnow.innerText="";
-		dBb.style.display="none";
-		dKS.style.display="";
-		MayClick=0;
-		//const tout=setTimeout(function(){
-		//	scene.remove(gru);
-			//scene.remove(arrow[12]);scene.remove(arrow[13]);
-		//	clearTimeout(tout);},3000);
-
-		if(ar==0){
-			arrow[1]=new THREE.ArrowHelper(direction,s[0].position,100,'#ccc',10,2);
-			scene.add(arrow[1]);
-			ar=1;
-		}
-
-		s[0].position.addScaledVector(direction,speed);
-		const distance=s[0].position.distanceTo(s[1].position);
-		const minDistance=radius*2;
-//console.log(s[0].position.x);
-
-
-//		if(s[0].position.x>s[1].position.x+10){walk=2;}
-
-
-		if (distance<=minDistance){
-			walk=2;
-
-    			// Get the direction vector from s[0] to s[1]
-    			touchDir=new THREE.Vector3().subVectors(s[1].position,s[0].position).normalize();
-//console.log("s[0] position:"+s[0].position.x+" " + s[0].position.y);
-
-    			// Move outward from Ball A's center by its radius
-   	 		touchPos=new THREE.Vector3().copy(s[0].position).addScaledVector(touchDir,radius);
-
-    			// touchPos now holds the exact Vector3 of the collision point
-//console.log("Surfaces touch position:",touchPos);
-
-			cylC.position.copy(touchPos);
-			sTouch[0].position.copy(s[0].position);
-
-			// Direction & movement after touch
-			poi[0]=new THREE.Vector3(touchPos.x,touchPos.y,0); // Start point
-			poi[1]=new THREE.Vector3(s[1].position.x,s[1].position.y,0); // Target point
-
-			// Create an empty vector to store the direction
-			dir[1]=new THREE.Vector3();
-
-			// Calculate direction (poi[1] - poi[0]) and normalize it
-			dir[1].subVectors(poi[1],poi[0]).normalize();
-//console.log("dir[1]:",dir[1]); // Yields a unit vector pointing from s[1] to outside
-			arrow[2]=new THREE.ArrowHelper(dir[1],s[1].position,30,'#c00',10,2);
-			scene.add(arrow[2]);
-				//s[1].position.addScaledVector(dir[1],30);
-
-			dir[0]=dir[1].clone();
-			ballD.position.set(s[0].position.x,s[0].position.y,0);
-			dir[0].applyAxisAngle(new THREE.Vector3(0,0,1),inv*p/2);
-//console.log("dir[0]:",dir[0]); // Yields a unit vector pointing from s[0] to outside
-			arrow[3]=new THREE.ArrowHelper(dir[0],ballD.position,30,'#ccc',10,2);
-			scene.add(arrow[3]);
-				//s[0].position.addScaledVector(dir[0],30);
-
-			const pStart=new THREE.Vector3(copy[0].position.x,copy[0].position.y,0);
-			const pEnd=new THREE.Vector3(touchPos.x,touchPos.y,0);
-			const dirStartEndTouch=new THREE.Vector3().subVectors(pEnd,pStart);
-			dirStartEndTouch.normalize();
-			arrow[12]=new THREE.ArrowHelper(dirStartEndTouch,pStart,100,'#ff0',10,2);
-					scene.add(arrow[12]);
-
-	const pStart2=new THREE.Vector3(copy[0].position.x,copy[0].position.y,0);
-	const pEnd2=new THREE.Vector3(copy[1].position.x,copy[1].position.y,0);
-	const dirStartEndS1=new THREE.Vector3().subVectors(pEnd2,pStart2);
-	dirStartEndS1.normalize();
-	arrow[13]=new THREE.ArrowHelper(dirStartEndS1,pStart2,100,'#f00',10,2);
-		scene.add(arrow[13]);
-
-			getSignedAngle(dirStartEndTouch,dir[1],"red");
-			getSignedAngle(dirStartEndTouch,dir[0],"white");
-
-			function getSignedAngle(dir1,dir2,ball){
-				const cross=dir1.x * dir2.y - dir1.y * dir2.x;
-				const dot  =dir1.x * dir2.x + dir1.y * dir2.y;
-				const angle=Math.atan2(cross,dot);
-				if(ball=="red"){zer=Math.abs(angle);}//alert(angle);}
-				str=str+"angle relative "+ball+"= "+(angle*raddeg).toFixed(1)+"\xB0\n";
-				dshow.innerText=str;
-				return angle * raddeg;
-			}
-
-			const setin=setInterval(anda,10);
-			function anda(){
-				ti++;
-				if(zer>0.07){s[0].position.addScaledVector(dir[0],ti/50);}
-				s[1].position.addScaledVector(dir[1],ti/50);
-				if(ti==57){clearInterval(setin);}
-			}
-		}
-	}
-
-	renderer.render(scene,camera);
-}
-console.clear();
+//console.clear();
 init();
 animate();
-
+dKS.style.left=window.innerWidth-140+"px";
 </script>
 
 </body>
