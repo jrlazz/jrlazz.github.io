@@ -21,8 +21,8 @@ img{position:absolute;left:0px;top:0px;width:40px;}
 <script type="importmap">
 {
 	"imports":{
-		"three":"https://unpkg.com/three@0.184.0/build/three.module.min.js",
-		"three/addons/":"https://unpkg.com/three@0.184.0/examples/jsm/"
+		"three":"https://unpkg.com/three@0.166.0/build/three.module.min.js",
+		"three/addons/":"https://unpkg.com/three@0.166.0/examples/jsm/"
 	}
 }
 </script>
@@ -32,11 +32,11 @@ img{position:absolute;left:0px;top:0px;width:40px;}
 <body>
 <img id="KS" src="img/pressP.png" style="left:-50%;top:25px;width:120px;opacity:0.4;"></img>
 <span id="show" style="top:25px;left:150px;font-size:20.5px;color:#0f0;"></span>
-<span id="quad" style="top:38px;left:66px;font-size:20.5px;color:#ff0;">1</span>
+<span id="quad" style="top:38px;left:56px;font-size:20.5px;color:#ff0;">1</span>
 <span id="ytouch" style="top:80px;font-size:20.5px;color:#ff0;"></span>
 <span id="cam-pos" style="font-size:9pt;left:100px;top:437px;color:#fff;"></span>
 <span id="cam-rot" style="font-size:9pt;left:800px;top:437px;color:#fff;"></span>
-<img id="relo" src="img/reload.png" style="left:30px;top:10px;width:80px;cursor:pointer;"></img>
+<img id="relo" src="img/reload.png" style="left:20px;top:10px;width:80px;cursor:pointer;"></img>
 
 <script type="module">
 
@@ -83,13 +83,12 @@ let newspan;
 for(let z=0;z<8;z++){
 	newspan=document.createElement("span");
 	newspan.className="tex";
-	newspan.textContent="You may click now! "+String(z);
-	newspan.style.fontSize="20.5px";
-	newspan.style.color="#0f0";
+	newspan.textContent="Click now in "+String(z);
+	newspan.style.fontSize="10.25pt";
+	newspan.style.color="#fff";
 	newspan.style.position="absolute";
-	newspan.style.left="20%";
-	newspan.style.top="10px";
-	newspan.style.width="60%";
+	newspan.style.left="10px";
+	newspan.style.top="96px";
 	newspan.style.textAlign="center";
 	document.body.append(newspan);
 }
@@ -101,7 +100,7 @@ for(let z=0;z<8;z++){
 	newimg.src="img/"+String(z)+"ball.png";
 	if(z==0){newimg.src="";}
 	newimg.style.position="absolute";
-	newimg.style.left="40px";
+	newimg.style.left="28px";
 	newimg.style.top="128px";
 	newimg.style.width="60px";
 	document.body.append(newimg);
