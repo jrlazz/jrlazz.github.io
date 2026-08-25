@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>moonhalo.html</title>
+<title>moonhalo2.html</title>
 <meta charset="utf-8">
 
 <link rel="icon" type="image/png" href="../img/github-mark.png">
@@ -115,7 +115,7 @@ function init() {
 	new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load('models/steve_to.obj',function(object){object.children[k].castShadow=true;TR=object;},manager.onProgress,manager.onError);});
 	new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(cox,function(object)                        {object.children[k].castShadow=true;BDs=object;},manager.onProgress,manager.onError);});
 
-	text="... beatifull moon halo ... ";
+	text="... beautiful moon's halo ... ";
 	const height=2,size=8,hover=30,curveSegments=1,bevelThickness=0.1,bevelSize=0.1;
 	loader=new FontLoader();
 	loader.load('../fonte/Cascadia_Regular.json',function(response){font=response;createText();
