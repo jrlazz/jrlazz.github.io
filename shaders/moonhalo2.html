@@ -109,7 +109,7 @@ function init() {
 	new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(cox,function(object)                        {object.children[k].castShadow=true;BDs=object;},manager.onProgress,manager.onError);});
 
 	text="... beatifull moon halo ... ";
-	const depth=2,size=8,hover=30,curveSegments=1,bevelThickness=0.1,bevelSize=0.1;
+	const height=2,size=8,hover=30,curveSegments=1,bevelThickness=0.1,bevelSize=0.1;
 	const loader=new FontLoader();
 	loader.load('../fonte/Cascadia_Regular.json',function(response){font=response;createText();
 	});
