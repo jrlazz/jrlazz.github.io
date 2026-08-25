@@ -74,14 +74,14 @@ function init() {
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setClearColor('#001',0);
 	renderer.setSize(window.innerWidth,window.innerHeight);
-	//renderer.outputColorSpace=THREE.SRGBColorSpace;
 	document.body.appendChild(renderer.domElement);
 
-loader = new THREE.TextureLoader();
-loader.load('images/nightsky.jpg',function(texture){
-    texture.colorSpace = THREE.SRGBColorSpace;
-    scene.background = texture;
-});
+	loader = new THREE.TextureLoader();
+	loader.load('images/nightsky.jpg',function(texture){
+		texture.colorSpace = THREE.SRGBColorSpace;
+		scene.background = texture;
+	});
+
 	window.addEventListener('resize',onWindowResize);
 
 	//controls=new OrbitControls(camera,renderer.domElement);
