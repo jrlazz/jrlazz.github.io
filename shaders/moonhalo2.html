@@ -38,7 +38,7 @@ import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
-var camera,scene,renderer,controls,tex,group,innerGeo,innerMat,innerShell,outerShell,outerGeo,outerMat,innerSphere,textMesh;
+var camera,scene,renderer,controls,moontex,group,innerGeo,innerMat,innerShell,outerShell,outerGeo,outerMat,innerSphere,textMesh;
 var loader,text,textGeo,materials,bevelEnabled=true,font=undefined;
 var groupmoon=new THREE.Group();;
 var t=0;
@@ -48,13 +48,13 @@ var altera=0;
 
 var rot=new Array();rot[1]=0;
 
-var BDs,BDi,BEs,BEi,PDs,PDi,PEs,PEi,CA,TR;
+var BDs,BEs,PDs,PEs,CA,TR;
 var group=new THREE.Group();
 var groupCATR=new THREE.Group();
-var groupPD=new THREE.Group();
-var groupPE=new THREE.Group();
-var groupBD=new THREE.Group();
-var groupBE=new THREE.Group();
+
+var BDsS,BEsS,PDsS,PEsS,CAS,TRS;
+var groupS=new THREE.Group();
+var groupCATRS=new THREE.Group();
 
 var p=Math.PI;
 
@@ -62,10 +62,13 @@ var altera=0;
 
 var passo=0.005;
 
+var ste=[],tex=[];
+
+var pare=0;
+
 function init() {
 
 	scene=new THREE.Scene();
-
 
 	camera=new THREE.PerspectiveCamera(70,window.innerWidth/window.innerHeight,1,1000);
 	camera.position.set(0,0,20);
@@ -85,14 +88,13 @@ function init() {
 	window.addEventListener('resize',onWindowResize);
 
 	//controls=new OrbitControls(camera,renderer.domElement);
-	//controls.enableRotate=false;
 
 	scene.add(new THREE.AmbientLight("#fff",3));
 
-	tex=new THREE.TextureLoader().load("images/moon2kr.jpg");
+	moontex=new THREE.TextureLoader().load("images/moon2kr.jpg");
 
 	innerGeo=new THREE.SphereGeometry(2,32,32);
-	innerMat=new THREE.MeshStandardMaterial({color:'#fed',map:tex});
+	innerMat=new THREE.MeshStandardMaterial({color:'#fed',map:moontex});
 	innerSphere=new THREE.Mesh(innerGeo,innerMat);
 	innerSphere.rotation.y=1.57;
 
@@ -109,29 +111,27 @@ function init() {
 	manager.onProgress=function(url,itemsLoaded,itemsTotal){console.log('loading texture'+url+' '+(itemsLoaded/itemsTotal*100)+'%');};
 	manager.onError=function(url){console.log('Error loading texture:'+url);};
 
-	var mo="models/partes.mtl";
-	var cox="models/vivicox.obj";
-	new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load('models/steve_ca.obj',function(object){object.children[k].castShadow=true;CA=object;},manager.onProgress,manager.onError);});
-	new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load('models/steve_to.obj',function(object){object.children[k].castShadow=true;TR=object;},manager.onProgress,manager.onError);});
-	new MTLLoader(manager).load(mo,function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load(cox,function(object)                        {object.children[k].castShadow=true;BDs=object;},manager.onProgress,manager.onError);});
+	tex[99]=new THREE.TextureLoader().load('models/ski99.png');tex[99].colorSpace = THREE.SRGBColorSpace;
+	new MTLLoader(manager).load('models/partesfoscas.mtl',function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load('models/separa9.obj',function(object){
+	for(let k=0;k<6;k++){if(object.children[k]){ste[k]=object.children[k];ste[k].material=new THREE.MeshStandardMaterial({map:tex[49]});}}}),manager.onProgress,manager.onError;});
 
-	text="... beautiful moon's halo ... ";
-	const height=2,size=8,hover=30,curveSegments=1,bevelThickness=0.1,bevelSize=0.1;
+	tex[49]=new THREE.TextureLoader().load('models/ski49.png');tex[49].colorSpace = THREE.SRGBColorSpace;
+	new MTLLoader(manager).load('models/partesfoscas.mtl',function(mat){mat.preload();new OBJLoader(manager).setMaterials(mat).load('models/separa9.obj',function(object){
+	for(let k=0;k<6;k++){if(object.children[k]){ste[k+10]=object.children[k];ste[k+10].material=new THREE.MeshStandardMaterial({map:tex[99]});}}}),manager.onProgress,manager.onError;});
+
+	text="... beautiful moon's halo\n     Let's stay together ...";
+	const depth=1,size=2,curveSegments=1,bevelThickness=0.1,bevelSize=0.1,multiline=true;
 	loader=new FontLoader();
-	loader.load('../fonte/Cascadia_Regular.json',function(response){font=response;createText();
-	});
-
-function createText() {
-	textGeo=new TextGeometry(text,{font:font,size:size,height:height,curveSegments:curveSegments,bevelThickness:bevelThickness,bevelSize:bevelSize,bevelEnabled:bevelEnabled});
-        textGeo.center();
-	materials=[
-		new THREE.MeshPhongMaterial({color:0xffff00,flatShading:true}),
-		new THREE.MeshPhongMaterial({color:0x005599})
-	];
-	textMesh=new THREE.Mesh(textGeo,materials);
-	textMesh.position.set(10,16,96);
-	textMesh.rotation.y=-p/2;
-}
+	loader.load('../fonte/Cascadia_Regular.json',function(response){font=response;createText();});
+	function createText(){
+		textGeo=new TextGeometry(text,{font:font,size:size,depth:depth,curveSegments:curveSegments,bevelThickness:bevelThickness,bevelSize:bevelSize,bevelEnabled:bevelEnabled,multiline:true});
+		textGeo.center();
+			materials=[
+			new THREE.MeshPhongMaterial({color:'#ff0'}),new THREE.MeshPhongMaterial({color:'#60f'})];
+		textMesh=new THREE.Mesh(textGeo,materials);
+		textMesh.position.set(0,10,0);
+		textMesh.rotation.y=-p;
+	}	
 
 } // init END
 
@@ -144,40 +144,112 @@ function onWindowResize(){
 function animate() { 
 	requestAnimationFrame(animate);
 
-	if(w<51){w++;}
+	if(w<51  && ste[5]){w++;}
 	if(altera==0 && w==50){alterando();}
 	if(altera>0){
-		if(groupPD.rotation.x> 1.07){rot[1]=1;PEi.rotation.x=0;}
-		if(groupPD.rotation.x<-1.07){rot[1]=0;PDi.rotation.x=0;}
-		if(rot[1]==0){
-			group.rotation.z +=passo;
-			groupPD.rotation.x +=passo*10;
-			groupPE.rotation.x -=passo*10;
-			groupBD.rotation.x -=passo*10;
-			groupBE.rotation.x +=passo*10;
-				CA.rotation.y -=passo*2;
-				TR.rotation.x +=passo;
-					//BDi.rotation.x -=passo*2;
-					//BEi.rotation.x +=passo*2;
-					//PDi.rotation.x +=passo;
-					//PEi.rotation.x -=passo;
-		}else{
-			group.rotation.z -=passo;
-			groupPD.rotation.x -=passo*10;
-			groupPE.rotation.x +=passo*10;
-			groupBD.rotation.x +=passo*10;
-			groupBE.rotation.x -=passo*10;
-				CA.rotation.y +=passo*2;
-				TR.rotation.x -=passo;
-					//BDi.rotation.x +=passo*2;
-					//BEi.rotation.x -passo*2;
-					//PDi.rotation.x -=passo;
-					//PEi.rotation.x +=passo;
+		if(pare==0){
+			if(PDs.rotation.x> 1.07){rot[1]=1;}
+			if(PDs.rotation.x<-1.07){rot[1]=0;}
+			if(rot[1]==0){
+				CA.rotation.y -=0.01;
+				TR.rotation.x +=0.005;
+				BDs.rotation.x -=0.05;
+				BEs.rotation.x +=0.05;
+				PDs.rotation.x +=0.05;
+				PEs.rotation.x -=0.05;
+
+				CAS.rotation.y -=0.01;
+				TRS.rotation.x +=0.005;
+				BDsS.rotation.x -=0.05;
+				BEsS.rotation.x +=0.05;
+				PDsS.rotation.x +=0.05;
+				PEsS.rotation.x -=0.05;
+			}else{
+				CA.rotation.y +=0.01;
+				TR.rotation.x -=0.005;
+				BDs.rotation.x +=0.05;
+				BEs.rotation.x -=0.05;
+				PDs.rotation.x -=0.05;
+				PEs.rotation.x +=0.05;
+
+				CAS.rotation.y +=0.01;
+				TRS.rotation.x -=0.005;
+				BDsS.rotation.x +=0.05;
+				BEsS.rotation.x -=0.05;
+				PDsS.rotation.x -=0.05;
+				PEsS.rotation.x +=0.05;
+			}
+			group.position.x +=0.1;
+			if(group.position.x>50){group.position.x=-50;}
+			groupS.position.x -=0.1;
+			if(groupS.position.x<-50){groupS.position.x=50;}
+			if(group.position.x>-1){
+				group.rotation.y=p;
+				groupS.rotation.y=0;
+				group.scale.set(0.5,0.6,0.5);
+				groupS.scale.set(0.5,0.6,0.5);
+				BDsS.rotation.x=0;
+				BEsS.rotation.x=0;
+				PDsS.rotation.x=0;
+				PEsS.rotation.x=0;
+				BDs.rotation.x=0;
+				BEs.rotation.x=0;
+				PDs.rotation.x=0;
+				PEs.rotation.x=0;
+					group.position.z -=0.05;
+					group.position.y -=0.03;
+					groupS.position.z -=0.05;
+					groupS.position.y -=0.03;
+				pare=1;
+			}
 		}
-		group.position.x +=0.05;
-		if(group.position.x>40){group.position.x=-40;}
-		if(group.position.x>-10){textMesh.visible=true;}
-		if(group.position.x>10){textMesh.visible=false;}
+		if(pare==1){
+			group.position.z -=0.05;
+			group.position.y -=0.03;
+			groupS.position.z -=0.05;
+			groupS.position.y -=0.03;
+			if(PDs.rotation.x> 1.07){rot[1]=1;}
+			if(PDs.rotation.x<-1.07){rot[1]=0;}
+			if(rot[1]==0){
+				CA.rotation.y -=0.01;
+				TR.rotation.x +=0.005;
+				BDs.rotation.x -=0.05;
+				BEs.rotation.x +=0.05;
+				PDs.rotation.x +=0.05;
+				PEs.rotation.x -=0.05;
+
+				CAS.rotation.y -=0.01;
+				TRS.rotation.x +=0.005;
+				BDsS.rotation.x -=0.05;
+				BEsS.rotation.x +=0.05;
+				PDsS.rotation.x +=0.05;
+				PEsS.rotation.x -=0.05;
+			}else{
+				CA.rotation.y +=0.01;
+				TR.rotation.x -=0.005;
+				BDs.rotation.x +=0.05;
+				BEs.rotation.x -=0.05;
+				PDs.rotation.x -=0.05;
+				PEs.rotation.x +=0.05;
+
+				CAS.rotation.y +=0.01;
+				TRS.rotation.x -=0.005;
+				BDsS.rotation.x +=0.05;
+				BEsS.rotation.x -=0.05;
+				PDsS.rotation.x -=0.05;
+				PEsS.rotation.x +=0.05;
+			}
+			textMesh.visible=true;
+			if(group.position.z<-40){pare=2;}
+		}
+		if(pare==2){
+			group.rotation.y=-p/2;
+			groupS.rotation.y=p/2;
+			group.position.set(-50,-14,-5);
+			groupS.position.set(50,-14,-5);
+			textMesh.visible=false;
+			pare=0;
+		}
 	}
 
 	if(t<31){t++;}
@@ -188,65 +260,55 @@ function animate() {
 	}
 
 	function alterando(){
-		//alert("vai");
-		CA.position.set(0  ,2.1,0); // steve_ca
-		TR.position.set(0  ,2  ,0); // steve_to
-		BDs.position.set(-1.75,   1,0); // vivicox
-		BDi=BDs.clone();
-			BDi.position.set(-1.75,-0.5,0);
-		BEs=BDs.clone();
-			BEs.position.set(1.75,   1,0);
-		BEi=BDs.clone();
-			BEi.position.set(1.75,-0.5,0);
-		PDs=BDs.clone();
-			PDs.position.set(0.025,   0,0);
-		PDi=BDs.clone();
-			PDi.position.set(0.025,-1.5,0);
-		PEs=BDs.clone();
-			PEs.position.set(0.56,    0,0);
-		PEi=BDs.clone();
-			PEi.position.set(0.56, -1.5,0);
-
-		BDs.scale.y=0.5;
-		BEs.scale.y=0.5;
-		BDi.scale.set(0.75,0.75,0.75);
-		BEi.scale.set(0.75,0.75,0.75);
-
-		PDs.scale.y=0.5;
-		PEs.scale.y=0.5;
-		PDi.scale.set(0.85,0.85,0.85);
-		PEi.scale.set(0.85,0.85,0.85);
-
+		CA=ste[0].clone();// Vivi or Steve Head
+		TR=ste[2].clone();// Torso
+		ste[1].rotation.z=-p/2;// Arm
+		//ste[3] Arm
+		//ste[5] Leg
+		BDs=ste[1].clone();BEs=BDs.clone();// Arms
+		PDs=ste[4].clone();PEs=PDs.clone();// Legs
+		CA.position.set(0,5,0);
+		TR.position.set(0,4,0);
+		BDs.position.set(-1.5,4,0);BEs.position.set( 1.5,4,0);
+		PDs.position.set(-0.5,1,0);PEs.position.set( 0.5,1,0);
 		groupCATR.add(CA);groupCATR.add(TR);
-		groupPD.add(PDs);groupPD.add(PDi);
-		groupPE.add(PEs);groupPE.add(PEi);
-		groupBD.add(BDs);groupBD.add(BDi);
-		groupBE.add(BEs);groupBE.add(BEi);
+			group.add(groupCATR);
+			group.add(PDs);
+			group.add(PEs);
+			group.add(BDs);
+			group.add(BEs);
+			group.rotation.y=p/2;
+			group.position.set(-50,-14,-5);
+			//group.position.set(-2,-14,-5);
+			group.scale.set(0.4,0.6,0.4);
+			textMesh.visible=false;
+			group.add(textMesh);
+			scene.add(group);
 
-		groupCATR.scale.set(4,4,4);
-		groupPD.scale.set(4,4,4);
-		groupPE.scale.set(4,4,4);
-		groupBD.scale.set(4,4,4);
-		groupBE.scale.set(4,4,4);
-
-		group.add(groupCATR);
-		group.add(groupPD);
-		group.add(groupPE);
-		group.add(groupBD);
-		group.add(groupBE);
-
-		groupCATR.position.set(  0,4,0);
-		groupPD.position.set(-2.5,0,0);
-		groupPE.position.set(0.0,0,0);
-		groupBD.position.set(0.0,8,0);
-		groupBE.position.set(0.0,8,0);
-
-		group.rotation.y=p/2;
-		group.position.set(-40,-11,0);
-		group.scale.setScalar(0.1);
-		textMesh.visible=false;
-		group.add(textMesh);
-		scene.add(group);
+		CAS=ste[10].clone();
+		TRS=ste[12].clone();
+		ste[11].rotation.z=-p/2;
+		BDsS=ste[11].clone();BEsS=BDsS.clone();// Arms
+		PDsS=ste[14].clone();PEsS=PDsS.clone();// Legs
+		CAS.position.set(0,5,0);
+		CAS.rotation.y=p;
+		TRS.position.set(0,4,0);
+		TRS.rotation.y=p;
+		BDsS.position.set(-1.5,4,0);BEsS.position.set( 1.5,4,0);
+		PDsS.position.set(-0.5,1,0);PEsS.position.set( 0.5,1,0);
+		groupCATRS.add(CAS);groupCATRS.add(TRS);
+			groupS.add(groupCATRS);
+			groupS.add(PDsS);
+			groupS.add(PEsS);
+			groupS.add(BDsS);
+			groupS.add(BEsS);
+			groupS.rotation.y=p/2;
+			groupS.position.set(50,-14,-5);
+			//groupS.position.set(2,-14,-5);
+			groupS.scale.set(0.4,0.6,0.4);
+			//textMesh.visible=false;
+			//groupS.add(textMesh);
+			scene.add(groupS);
 		altera++;
 	}
 
