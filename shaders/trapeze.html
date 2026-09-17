@@ -92,7 +92,7 @@ function init(){
 	manager.onError=function(url){console.error('Error loading:',url);};
 
 	const tl=new THREE.TextureLoader(manager);
-	const texFiles={99:'ski99.png',98:'chi.png',49:'ski49.png',7:'ski07.png',44:'ski44.png',97:'Steve_from_site_2.png'};
+	const texFiles={99:'ski99.png',49:'ski49.png'};
 	for(const [id,file] of Object.entries(texFiles)){
 		tex[id]=tl.load(`models/${file}`);
 		tex[id].colorSpace=THREE.SRGBColorSpace;
