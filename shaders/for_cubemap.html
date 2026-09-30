@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>for_cubemap.html</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,user-scalable=no,minimum-scale=1.0,maximum-scale=1.0">
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+<meta name="description" content="...A ball in a cubemap ...">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+<style>
+body{margin:0px;background:#000;overflow:hidden;font-family:monospace;}
+span{position:absolute;left:10px;top:10px;color:#f0f;font-size:10.25pt;}
+</style>
+<script type="importmap">
+{
+	"imports": {
+		"three": "https://unpkg.com/three@0.186.0/build/three.module.js",
+		"three/addons/": "https://unpkg.com/three@0.186.0/examples/jsm/"
+	}
+}
+</script>
+</head>
+<body>
+<span id="sp1" style="left:11px;top:11px;color:#ff0;">A ball is beeing created</span>
+<script type="module">
+	import * as THREE from 'three';
+	import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+	import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const params={metalness: 1.0,roughness: 0.0,exposure: 1.7,};
+
+var scene,camera,renderer,controls,loader,gui;
+var amb,g,m,s,texture;
+var p=Math.PI;
+var gr=[];for(let z=1;z<10;z++){gr[z]=new THREE.Group();}
+var lig=[],extrudeSettings,loader,path=[],material,shapes=[],shape,geometry;
+var blade,slice;
+let gg,gm;
+var sim=0;
+var t=0;
+var dsp1=document.getElementById("sp1");
+	
+function init(){
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.setClearColor('#000',1);
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.toneMapping=THREE.ACESFilmicToneMapping;
+	renderer.toneMappingExposure=params.exposure;
+	document.body.appendChild(renderer.domElement);
+
+	scene=new THREE.Scene();
+
+	amb=new THREE.AmbientLight('#fff',10);scene.add(amb);
+
+	camera=new THREE.PerspectiveCamera(70,window.innerWidth/window.innerHeight,1,1000,0.1);
+	camera.position.set(0,0,100);
+	controls=new OrbitControls(camera,renderer.domElement);
+
+	loader=new THREE.CubeTextureLoader();
+	loader.setPath('images/pisa/');
+	texture=loader.load(['px.jpg','nx.jpg','py.jpg','ny.jpg','pz.jpg','nz.jpg']);
+	
+	g=new THREE.SphereGeometry(32,64,64);
+	s=new THREE.Mesh(g,new THREE.MeshStandardMaterial({roughness:params.roughness,metalness:params.metalness}));
+	s.position.set(0,20,0);
+	scene.add(s);
+
+	gui=new GUI();
+	gui.add(params,'exposure',0,2,0.01);
+	gui.open();
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+	renderer.toneMappingExposure=params.exposure;
+	controls.update();
+	if (texture && sim==0) {
+		console.log('Cubemap is already loaded');
+		texture.needsUpdate=true;
+		scene.background=texture;
+		scene.environment=texture;
+		renderer.setClearColor('#440',1);
+		dsp1.innerText="Aladdin is ready...";
+		scene.add(gr[9]);
+		sim=1;
+	}
+	renderer.render(scene,camera);
+}
+
+init();
+animate();
+
+/*
+What should I code to avoid this message in the console.log?
+
+THREE.WebGLProgram: Program Info Log: (210,181-309): warning X4122: sum of 0.996094 and -2.98545e-017 cannot be represented accurately in double precision
+(209,78-142): warning X4122: sum of 1 and -1.49272e-017 cannot be represented accurately in double precision
+(210,182-246): warning X4122: sum of 1 and -1.49272e-017 cannot be represented accurately in double precision
+(209,78-142): warning X4122: sum of 1 and -1.66644e-018 cannot be represented accurately in double precision
+(210,182-246): warning X4122: sum of 1 and -1.66644e-018 cannot be represented accurately in double precision
+three.core.js:2023:12
+*/
+
+</script>
+</body>
+</html>
