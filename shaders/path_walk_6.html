@@ -36,11 +36,14 @@ span,button {font-family:Lucida Console;font-size:10pt;font-weight:bold;position
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
-var scene,camera,renderer,controls,light,pointlight,points,curve,geo,mat,tube1,tube2;
+var scene,camera,renderer,controls,light,pointlight,points,curve,tex,geo,mat,tube1,tube2;
 var t=0;
 var sim=0;
 const p=Math.PI;
-var cameraPosition=0;
+var camPos=0;
+var progress=0;
+const vel=0.001;
+const camOffset=0.04; 
 var dbig=document.getElementById("big");
 dbig.style.display="none";
 
@@ -82,7 +85,7 @@ dbig.style.display="none";
 	];
 	curve=new THREE.CatmullRomCurve3(points);
 
-	const tex=new THREE.TextureLoader().load("img/gradient250.jpg");
+	tex=new THREE.TextureLoader().load("img/gradient250.jpg");
 	//tex.rotation=p/2; 
 	tex.wrapS=THREE.RepeatWrapping;tex.wrapT=THREE.RepeatWrapping;
 	tex.repeat.set(16,1);
@@ -104,15 +107,9 @@ dbig.style.display="none";
 	mesh.scale.setScalar(15);
 	scene.add(mesh);
 
-	let progress=0;   // Position da malha (chief)
-	const vel=0.001; // Velocidade do movimento
-	
-	const cameraOffset=0.04; 
-
 function animate() {
 	requestAnimationFrame(animate);
 	if(sim==0){
-		console.clear();
 		mesh.rotation.x +=0.01;
 		mesh.rotation.y -=0.01;
 		mesh.rotation.z +=0.01;
@@ -123,10 +120,12 @@ function animate() {
 			if(t==11){
 				scene.remove(tube1);
 				scene.remove(tube2);
+				console.clear();
+				pointlight.intensity=3;
 			}
 			const meshPosition=curve.getPointAt(progress);
-			let cameraProgress=progress-cameraOffset;
-			if(cameraProgress<0){cameraProgress +=1;}
+			let camProgress=progress-camOffset;
+			if(camProgress<0){camProgress +=1;}
 		}
 		if(t==80){
 			mesh.scale.setScalar(1);
@@ -152,26 +151,25 @@ function animate() {
 					const meshPositionpl=curve.getPointAt(progress+0.05);
 					pointlight.position.copy(meshPositionpl);
 				}else{
+					pointlight.intensity=0.5;
 					const meshPositionpl=curve.getPointAt(progress);
 					pointlight.position.copy(meshPositionpl);
 				}
 				const tangent=curve.getTangentAt(progress).normalize();
 				const lookAtPoint=meshPosition.clone().add(tangent);
-				let cameraProgress=progress-cameraOffset;
-				if(cameraProgress<0){cameraProgress +=1;}
-				cameraPosition=curve.getPointAt(cameraProgress);
-				camera.position.copy(cameraPosition).add(new THREE.Vector3(0, 0.2,0));
+				let camProgress=progress-camOffset;
+				if(camProgress<0){camProgress +=1;}
+				camPos=curve.getPointAt(camProgress);
+				camera.position.copy(camPos).add(new THREE.Vector3(0, 0.2,0));
 				camera.lookAt(mesh.position);
 			}
 		}
 	}
 
-	renderer.render(scene, camera);
+	renderer.render(scene,camera);
 }
 
-
 animate();
-
 
 </script>
 </body>
