@@ -10,7 +10,7 @@
 <meta name="twitter:image:width" content="19" />
 <meta name="twitter:image:height" content="47" />
 <style>
-body {overflow:hidden;margin:0;background-color:#036;}
+body {overflow:hidden;margin:0;background-color:#012;}
 span,button {font-family:Lucida Console;font-size:10pt;font-weight:bold;position:absolute;left:10px;top:30px;color:#009;text-align:center;}	
 </style>
 
@@ -151,6 +151,7 @@ function animate() {
 					const meshPositionpl=curve.getPointAt(progress+0.05);
 					pointlight.position.copy(meshPositionpl);
 				}else{
+				mesh.rotation.y -=0.1;
 					pointlight.intensity=0.5;
 					const meshPositionpl=curve.getPointAt(progress);
 					pointlight.position.copy(meshPositionpl);
