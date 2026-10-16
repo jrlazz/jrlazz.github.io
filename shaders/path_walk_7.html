@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>path_walk_7.html</title>
+<meta charset="utf-8" />
+<link rel="icon" type="image/png" href="../img/github-mark.png">
+<meta name="description" content="Path_Walk_Mirror_Mesh">
+<meta name="twitter:image" content="img/ag_baboy_right.png" />
+<meta name="twitter:image:type" content="png" />
+<meta name="twitter:image:width" content="19" />
+<meta name="twitter:image:height" content="47" />
+<style>
+body {overflow:hidden;margin:0;background-color:#036;}
+span {font-family:Lucida Console;font-size:10pt;font-weight:bold;position:absolute;left:10px;top:10px;color:#0ff;}	
+</style>
+
+<script type="importmap">
+{
+	"imports":{
+		"three":"https://unpkg.com/three@0.186.0/build/three.module.js",
+		"three/addons/":"https://unpkg.com/three@0.186.0/examples/jsm/"
+	}
+}
+</script>
+
+</head>
+
+<body>
+
+<span>
+<big style="color:#ff0;">Path_Walk_Mirror_Mesh</big>
+</span>
+
+<script type="module">
+	
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { Reflector } from 'three/addons/objects/Reflector.js';
+
+var scene,camera,renderer,controls,light,circle2D,cleanPoints2D,curve,tex,geo,mat,front,back,mesh,tube,posCam,posMesh;
+var progress=0;
+const velo=0.002;
+const p=Math.PI;
+const points3D=[];
+var conso=0;
+
+function init(){
+	scene=new THREE.Scene();
+
+	camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,0.1,1000);
+	camera.position.set(0,0,25);
+
+	renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+	renderer.setClearColor('#012',1);
+	renderer.setPixelRatio(devicePixelRatio);
+	renderer.setSize(innerWidth,innerHeight);
+	document.body.appendChild(renderer.domElement);
+
+	window.addEventListener('resize',function(){
+		camera.aspect=window.innerWidth/window.innerHeight;
+		camera.updateProjectionMatrix();
+		renderer.setSize(window.innerWidth,window.innerHeight);
+	}, false);
+
+	controls=new OrbitControls(camera,renderer.domElement);
+
+	light=new THREE.AmbientLight('#fff',5);
+	scene.add(light);
+
+	circle2D=new THREE.ArcCurve(0,0,5,0,2*p,false);
+
+	cleanPoints2D=circle2D.getPoints(64);
+
+	for(let i=0;i<cleanPoints2D.length;i++){
+		const p=cleanPoints2D[i];
+		points3D.push(new THREE.Vector3(p.x,0,p.y));
+	}
+
+	curve=new THREE.CatmullRomCurve3(points3D,true,'centripetal');
+
+	tex=new THREE.TextureLoader().load("img/gradient250.jpg");
+	tex.wrapS=THREE.RepeatWrapping;tex.wrapT=THREE.RepeatWrapping;
+	tex.repeat.set(7,1);
+	tex.colorSpace=THREE.SRGBColorSpace; 
+
+	geo=new THREE.TubeGeometry(curve,64,1,64,true);
+	mat=new THREE.MeshStandardMaterial({color:'#666',map:tex,side:THREE.DoubleSide,wireframe:false});
+	tube=new THREE.Mesh(geo,mat);
+	scene.add(tube);
+
+	mesh=new THREE.Group();
+	geo=new THREE.PlaneGeometry(0.5,0.5);
+	front=new Reflector(geo,{clipBias:0.003,color:'#ccc'});
+	mesh.add(front);
+	back=front.clone();
+	back.rotation.y=Math.PI;
+	back.position.z=-0.01;
+	mesh.add(back);
+	scene.add(mesh);
+}
+
+function animate(){
+	requestAnimationFrame(animate);
+
+	progress +=velo;
+	if(progress>1){progress=0;if(conso==0){console.clear();conso=1;}}
+
+	posCam=curve.getPointAt(progress);
+	camera.position.copy(posCam);
+
+	posMesh=curve.getPointAt((progress+0.05)%1);
+	mesh.position.copy(posMesh);
+
+	controls.target.copy(posMesh);
+	controls.update();
+
+	if(mesh){mesh.rotation.x +=0.05;mesh.rotation.y +=0.05;mesh.rotation.z +=0.05;}
+
+	renderer.render(scene, camera);
+}
+
+init();
+animate();
+
+</script>
+</body>
+</html>
